@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import itertools
-import scipy as sc
+from scipy import stats
 
 default_to_latex_kw = dict(float_format=lambda x:"%.1f"%x, index_names=False)
 colformatlatex = lambda x: "\\%s"%x
@@ -47,7 +47,7 @@ def getWilcoxonQuotientSignificance(x,y, onesided=True, shiftby=10):
       shiftedquotients = (x + shiftby) / (y + shiftby)
       logshifted = np.log(shiftedquotients)
       try:
-          return sc.stats.wilcoxon(logshifted.values)[1] * onesidedfactor
+          return stats.wilcoxon(logshifted.values)[1] * onesidedfactor
       except ValueError:
           return np.nan
 

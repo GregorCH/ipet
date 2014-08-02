@@ -2,7 +2,7 @@
 __all__=[ "Comparator",
           "integrals",
           "Misc",
-          "SCIPcheckgui",
+          "IpetApplication",
           "Observer",
           "quick_Pandas",
           "StatisticReader_CustomReader",

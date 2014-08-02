@@ -23,7 +23,9 @@ from pandas import Panel
 class Comparator:
    '''
    manages the collection of all log (.out) and .solu file data
+
    '''
+
    datakey_gap = 'SoluFileGap'
 
    EXCLUDE_REASON_TIMEOUT = 'timout'

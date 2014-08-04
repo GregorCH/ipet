@@ -59,8 +59,11 @@ class IpetApplication(Tk):
         problemslabel = Label(self.selectionframe, text="Problem: ")
         problemslabel.pack(side=TOP)
 
-        probnamesselectionframe, self.probnamesbox = self.listmakeBoxWithScrollbar(self.selectionframe, self.getProblemList(), self.setSelectedProblem, theheight=screenheight / 2)
-        testrunlistboxframe, self.testrunsbox = self.listmakeBoxWithScrollbar(self.selectionframe, self.getTestrunnames(), self.setSelectedTestrun, theheight=screenheight / 3)
+        probnamesselectionframe, self.probnamesbox = self.listmakeBoxWithScrollbar(self.selectionframe,
+                                                                                   self.getProblemList(), self.setSelectedProblem,
+                                                                                   theheight=screenheight / 2)
+        testrunlistboxframe, self.testrunsbox = self.listmakeBoxWithScrollbar(self.selectionframe, self.getTestrunnames(),
+                                                                              self.setSelectedTestrun, theheight=screenheight / 3)
         probnamesselectionframe.pack(side=TOP, fill=Tkconstants.X)
 
         testrunlabel = Label(self.selectionframe, text="Testrun: ")

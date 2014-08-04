@@ -39,15 +39,11 @@ def quickAggregationOnIndex(df, col, aggfunc=np.min, threshold = None):
         newcolname += 'LE'+repr(threshold)
         return pd.Series(aggforindex <= threshold, name = newcolname)
 
-def getWilcoxonQuotientSignificance(x,y, onesided=True, shiftby=10):
-      if onesided:
-         onesidedfactor = .5
-      else:
-         onesidedfactor = 1.0
+def getWilcoxonQuotientSignificance(x,y, shiftby=10):
       shiftedquotients = (x + shiftby) / (y + shiftby)
       logshifted = np.log(shiftedquotients)
       try:
-          return stats.wilcoxon(logshifted.values)[1] * onesidedfactor
+          return stats.wilcoxon(logshifted.values)[1]
       except ValueError:
           return np.nan
 

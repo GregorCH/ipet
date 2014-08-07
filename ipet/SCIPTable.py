@@ -4,8 +4,7 @@ Created on 08.03.2013
 @author: bzfhende
 '''
 from TableEntry import TableEntry
-from Tkinter import Frame, StringVar, Label
-from Tkconstants import GROOVE, BOTH
+from Tkinter import Frame
 
 class SCIPTable(Frame):
    '''

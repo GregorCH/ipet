@@ -229,8 +229,10 @@ class IpetApplication(Tk):
         self.updateGui()
 
     def handleClickEventListbox(self, event):
-
-        idx = int(event.widget.curselection()[0])
+        try:
+            idx = int(event.widget.curselection()[0])
+        except IndexError:
+            return
         action = event.widget.guiupdatefunction
         action(idx)
         self.updateGui()
@@ -317,6 +319,8 @@ class IpetApplication(Tk):
         self.file_opt['defaultextension'] = '.out'
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)
         print filenames
+        if type(filenames) is not list:
+            filenames = [filenames]
         for filename in filenames:
             if filename:
                 self.comparator.addLogFile(filename)
@@ -330,6 +334,8 @@ class IpetApplication(Tk):
         self.file_opt['defaultextension'] = '.solu'
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)
         print filenames
+        if type(filenames) is not list:
+            filenames = [filenames]
         for filename in filenames:
             if filename:
                 self.comparator.addSoluFile(filename)

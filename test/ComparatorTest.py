@@ -6,6 +6,9 @@ Created on 02.08.2014
 import unittest
 from ipet.Comparator import Comparator
 import os
+from ipet.TestRun import TestRun
+from pandas.util.testing import assert_frame_equal
+import numpy
 
 class ComparatorTest(unittest.TestCase):
     datasamples = [("meanvarx", 'Datetime_Start', "2014-08-01 16:57:10"),
@@ -33,7 +36,15 @@ class ComparatorTest(unittest.TestCase):
         self.comparator.saveToFile(".testcomp.cmp")
         secondcomp = Comparator.loadFromFile(".testcomp.cmp")
 
+        tr = self.comparator.testrunmanager.getManageables()[0]
+        tr.saveToFile(".testrun.trn")
+        tr2 = TestRun.loadFromFile(".testrun.trn")
 
+        self.assertTrue(numpy.all(tr.data.columns.order() == tr2.data.columns.order()), "Columns are not equal")
+        columns = ['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
+        self.assertIsNone(assert_frame_equal(tr.data[columns], tr2.data[columns]), "Testruns do not have exactly same column data:")
+        
+        os.remove(".testrun.trn")
         os.remove(".testcomp.cmp")
 
 if __name__ == "__main__":

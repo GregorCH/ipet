@@ -4,16 +4,18 @@ from StatisticReader import SolvingTimeReader, TimeLimitReader, PrimalBoundReade
 
 from Editable import Editable
 from pandas import DataFrame, notnull
+import os
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 class TestRun(Editable):
     '''
     represents the collected data of a particular (set of) log file(s)
     '''
-    solver = ''
-
     def __init__(self, filenames=[]):
         self.filenames = []
-        self.settings = ''
         for filename in filenames:
             self.appendFilename(filename)
         self.data = DataFrame(dtype=object)
@@ -27,15 +29,18 @@ class TestRun(Editable):
         '''
         appends a file name to the list of filenames of this test run
         '''
+        filename = os.path.abspath(filename)
         if filename not in self.filenames:
             self.filenames.append(filename)
 
     def addData(self, probname, datakeys, data):
         '''
+        add data to problem data under the specified key(s)
+        
         add the current data - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
         
-        after data was added, the method problemGetData() can be used to access this data
+        after data was added, the method problemGetData() can be used for access
         '''
 
         if type(datakeys) is list and type(data) is list:
@@ -123,6 +128,29 @@ class TestRun(Editable):
             return self.filenames[0].split('.')[3]
 
 
+    def saveToFile(self, filename):
+        try:
+            f = open(filename, 'w')
+        except IOError:
+            print "Could not open %s for saving test run" % filename
+
+        pickle.dump(self, f, protocol=0)
+        f.close()
+
+    @staticmethod
+    def loadFromFile(filename):
+        try:
+            f = open(filename, 'r')
+        except IOError:
+            print "Could not open %s for loading test run" % filename
+            return None
+
+        testrun = pickle.load(f)
+        f.close()
+
+        return testrun
+
+
     def getLpSolver(self):
         '''
         returns the LP solver used for this test run
@@ -132,6 +160,14 @@ class TestRun(Editable):
         except KeyError:
             return self.filenames[0].split('.')[4]
 
+    def getSolver(self):
+        '''
+        returns the LP solver used for this test run
+        '''
+        try:
+            return self.data['Solver'][0]
+        except KeyError:
+            return self.filenames[0].split('.')[4]
 
     def getName(self):
         '''
@@ -143,7 +179,7 @@ class TestRun(Editable):
         '''
         return identification string of this test run
         '''
-        return self.solver + '(' + self.getVersion() + ')' + self.getLpSolver() + ':' + self.getSettings()
+        return self.getSolver() + '(' + self.getVersion() + ')' + self.getLpSolver() + ':' + self.getSettings()
 
     def getShortIdentification(self, char='_', maxlength= -1):
         '''
@@ -151,26 +187,6 @@ class TestRun(Editable):
         '''
         return Misc.cutString(self.getSettings(), char, maxlength)
 
-
-    def timeLimitHit(self, probname):
-        '''
-        returns if solver hit time limit
-        '''
-        try:
-            return self.problemGetData(probname, SolvingTimeReader.datakey) - self.problemGetData(probname, TimeLimitReader.datakey) >= 0
-        except KeyError:
-            return False
-
-    def probnameGetTimeToOptimalSolution(self, probname):
-        '''
-        returns INFINITY if best solution found was not (even nearly) optimal.
-        '''
-        optimalsol = self.problemGetOptimalSolution(probname)
-        primalbound = self.problemGetData(probname, PrimalBoundReader.datakey)
-        if Misc.getGap(float(primalbound), float(optimalsol), True) > 1e-4:
-            return Misc.FLOAT_INFINITY
-        else:
-            return self.problemGetData(probname, TimeToBestReader.datakey)
 
     def problemGetOptimalSolution(self, solufileprobname):
         '''

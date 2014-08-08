@@ -18,6 +18,7 @@ from ttk import Frame, Label, Button, Scrollbar
 import Tkconstants
 from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from SCIPguiScatterWidget import SCIPguiScatterWidget
+from IpetMessageWidget import IpetMessageWidget
 
 class IpetApplication(Tk):
     DEFAULT_BORDERWIDTH = 15
@@ -75,7 +76,7 @@ class IpetApplication(Tk):
         recollectDataButton.pack(side=TOP)
 
         # make the remaining window show a tabbed panel with the different widgets
-        widgets = [SCIPguiTableWidget, SCIPguiOutputWidget, SCIPguiScatterWidget]
+        widgets = [SCIPguiTableWidget, SCIPguiOutputWidget, SCIPguiScatterWidget, IpetMessageWidget]
         tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:

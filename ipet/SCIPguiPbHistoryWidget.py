@@ -7,7 +7,7 @@ The PbHistoryWidget features methods to visualize the history of primal and dual
 Testruns can be activated/dectivated. The normalization can be chosen (no normalization (values on the real primal
 and dual scale) or Cplex Gap)
 '''
-from SCIPguiWidget import SCIPguiWidget
+from IpetWidget import IpetWidget
 from Tkinter import IntVar, Frame, Checkbutton, Toplevel, Button
 from Tkconstants import LEFT, BOTH, TOP, VERTICAL, HORIZONTAL
 import matplotlib
@@ -27,7 +27,7 @@ from StatisticReader import PrimalBoundReader, DualBoundReader
 from IPETBrowser import IPETTypeWidget
 from Manager import Manager
 
-class SCIPguiPbHistoryWidget(SCIPguiWidget):
+class SCIPguiPbHistoryWidget(IpetWidget):
 
    '''
    classdocs
@@ -47,7 +47,7 @@ class SCIPguiPbHistoryWidget(SCIPguiWidget):
       - master is the Tk container frame for the widget
       - gui is the central gui instance to retrieve data and events from
       '''
-      SCIPguiWidget.__init__(self, master, gui, **kw)
+      IpetWidget.__init__(self, master, gui, **kw)
 
       self.boolVars = {}
       self.buttons = {}

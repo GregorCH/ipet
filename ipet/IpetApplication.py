@@ -8,7 +8,7 @@ from Comparator import Comparator
 # from SCIPguiScatterWidget import SCIPguiScatterWidget
 from Tkconstants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END
 # from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
-from SCIPguiTableWidget import SCIPguiTableWidget
+from IpetTableWidget import IpetTableWidget
 from TestRun import TestRun
 import ttk
 from SCIPguiOutputWidget import SCIPguiOutputWidget
@@ -76,7 +76,7 @@ class IpetApplication(Tk):
         recollectDataButton.pack(side=TOP)
 
         # make the remaining window show a tabbed panel with the different widgets
-        widgets = [SCIPguiTableWidget, SCIPguiOutputWidget, SCIPguiScatterWidget, IpetMessageWidget]
+        widgets = [IpetTableWidget, SCIPguiOutputWidget, SCIPguiScatterWidget, IpetMessageWidget]
         tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:

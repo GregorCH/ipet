@@ -12,14 +12,19 @@ import pandas as pd
 from ttk import Treeview, Separator, Entry
 import os
 from IPETDataTable import IPETDataTableFrame
+from IpetParam import IPETParam
+from IPETBrowser import IPETTypeWidget
+from Manager import Manager
 
-class SCIPguiTableWidget(IpetWidget):
+class IpetTableWidget(IpetWidget):
     '''
     The table widget enables the user to create custom tables of their data
     '''
 
     EMPTYCOLUMN = ("EMPTY", "EMPTY")
     name = "Table Widget"
+
+    param_maxindexwidth = IPETParam("Maximum index width", 20, [6, 100], 'The maximum index width in characters before truncation')
 
     def __init__(self, master, gui, **kw):
         '''
@@ -39,11 +44,17 @@ class SCIPguiTableWidget(IpetWidget):
         Button(exportframe, text="Create Table", command=self.openTableCreationFrame).pack(side=Tkconstants.LEFT)
         Button(exportframe, text="Export", command=self.export).pack(side=Tkconstants.LEFT)
         Entry(exportframe, textvariable=self.exportfilenamevar).pack(side=Tkconstants.LEFT)
+        self.optionsbutton = Button(exportframe, text="Show Options", command=self.showOptions)
+        self.optionsbutton.pack(side=Tkconstants.RIGHT)
         exportframe.pack(side=Tkconstants.TOP, fill=Tkconstants.X)
         paned.pack(side=Tkconstants.TOP, fill=Tkconstants.BOTH, expand=Tkconstants.TRUE)
         scrollbar.pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=Tkconstants.TRUE)
 
-        self.gui = gui
+        # use a manager to manage the parameters
+        params = [getattr(IpetTableWidget, name) for name in dir(IpetTableWidget) if name.startswith('param_')]
+        self.params = Manager(params)
+        self.params.addObserver(self)
+
         self.selection = [(testrun.getName(), datakey) for testrun in self.gui.getTestrunList(onlyactive=False) \
                           for datakey in ['SolvingTime', 'Nodes']]
         self.update()
@@ -59,6 +70,8 @@ class SCIPguiTableWidget(IpetWidget):
         if self.selection == []:
             return
 
+        for dtb in [self.aggrframe, self.tableframe]:
+            dtb.setMaxIndexWidth(self.param_maxindexwidth.getValue())
 
         useshortnames = self.checkShortNames()
         testruns = self.gui.getTestrunList(onlyactive=False)
@@ -111,6 +124,17 @@ class SCIPguiTableWidget(IpetWidget):
             if settings.count(setting) > 1:
                 return False
         return True
+
+    def showOptions(self):
+        if " ".join(self.optionsbutton.config('text')[-1]) == 'Show Options':
+
+            tl = Toplevel()
+            tl.geometry("300x300+%d+%d" % (self.winfo_screenwidth() / 2, self.winfo_screenheight() / 2))
+            tl.title("Options")
+            for idx, param in enumerate(self.params.getManageables()):
+                IPETTypeWidget(tl, param.getName(), param, self.params, attribute=param.getValue()).grid(row=idx)
+            print "Opening options for Ipet Table Widget"
+            tl.mainloop()
 
     def export(self):
         '''

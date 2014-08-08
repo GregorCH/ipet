@@ -3,7 +3,10 @@ from ReaderManager import ReaderManager
 from TestRun import TestRun
 import Misc
 
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 from Manager import Manager
 from StatisticReader_HeurReader import HeurDataReader
 from StatisticReader import PrimalBoundReader, DualBoundReader, SolvingTimeReader, TimeLimitReader, \
@@ -20,6 +23,8 @@ from Aggregation import Aggregation
 from integrals import calcIntegralValue, getProcessPlotData
 from pandas import Panel
 from StatisticReader import DateTimeReader
+import os
+import sys
 
 class Comparator:
     '''
@@ -41,14 +46,23 @@ class Comparator:
         self.installSomeFilters()
         self.installAllReaders()
         self.installSomeAggregations()
+        self.solufiles = []
 
     def addLogFile(self, filename, testrun=None):
         '''
         adds a log file to a testrun or create a new testrun object with the specified filename
         '''
-        if testrun is None:
+        if os.path.splitext(filename)[-1] == TestRun.FILE_EXTENSION:
+            try:
+                testrun = TestRun.loadFromFile(filename)
+            except IOError, e:
+                sys.stderr.write(" Loading testrun from file %s caused an exception\n%s\n" % (filename, e))
+                return
+        elif testrun is None:
             testrun = TestRun()
-        testrun.appendFilename(filename)
+        if os.path.splitext(filename)[-1] != TestRun.FILE_EXTENSION:
+            testrun.appendFilename(filename)
+
         if testrun not in self.testrunmanager.getManageables():
             self.testrunmanager.addAndActivate(testrun)
 
@@ -56,9 +70,8 @@ class Comparator:
         '''
         associate a solu file with all testruns
         '''
-        for testrun in self.testrunmanager.getManageables():
-            if not solufilename in testrun.filenames:
-                testrun.appendFilename(solufilename)
+        if solufilename not in self.solufiles:
+            self.solufiles.append(solufilename)
 
     def removeTestrun(self, testrun):
         '''
@@ -71,12 +84,6 @@ class Comparator:
         add a reader to the comparators reader manager
         '''
         self.readermanager.registerReader(reader)
-
-    def setTestRun(self, testrun):
-        '''
-        set the testrun for the data collector
-        '''
-        self.readermanager.setTestRun(testrun)
 
     def hasReader(self, reader):
         '''
@@ -132,16 +139,27 @@ class Comparator:
         '''
         iterate over log files and solu file and collect data via installed readers
         '''
-        for testrun in self.testrunmanager.getManageables():
-            self.setTestRun(testrun)
+
+        # add solu file to testrun if it's not yet done
+        testruns = self.testrunmanager.getManageables()
+        for testrun in testruns:
+            for solufilename in self.solufiles:
+                testrun.appendFilename(solufilename)
+
+        for testrun in testruns:
+            self.readermanager.setTestRun(testrun)
+            testrun.setupForDataCollection()
             self.readermanager.collectData()
 
         self.makeProbNameList()
         self.calculateIntegrals()
         self.checkProblemStatus()
 
-        for testrun in self.testrunmanager.getManageables():
+        for testrun in testruns:
             testrun.finalize()
+
+        for tr in testruns:
+            self.testrunmanager.reinsertManageable(tr)
 
 
         print 'Checking problem status'

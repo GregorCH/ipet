@@ -18,7 +18,7 @@ class ComparatorTest(unittest.TestCase):
 
     def setUp(self):
         self.comparator = Comparator()
-        
+
     def test_datacollection(self):
         self.comparator.addLogFile("check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out")
         self.comparator.addSoluFile("short.solu")
@@ -43,10 +43,13 @@ class ComparatorTest(unittest.TestCase):
         self.assertTrue(numpy.all(tr.data.columns.order() == tr2.data.columns.order()), "Columns are not equal")
         columns = ['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
         self.assertIsNone(assert_frame_equal(tr.data[columns], tr2.data[columns]), "Testruns do not have exactly same column data:")
-        
-        os.remove(".testrun.trn")
+
         os.remove(".testcomp.cmp")
 
+    def test_trnfileextension(self):
+        self.comparator.addLogFile(".testrun.trn")
+        self.comparator.collectData()
+
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
+    # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

@@ -12,6 +12,8 @@ from cStringIO import StringIO
 import pandas as pd
 from pandas import MultiIndex
 from functools import partial
+from Editable import Editable
+from IpetParam import IPETParam
 
 class IPETDataTableFrame(Frame):
     '''
@@ -41,6 +43,7 @@ class IPETDataTableFrame(Frame):
 #       scrollbar.pack(side=TOP, fill=Tkconstants.X)
         self.dataframe = None
         self.colwidths = []
+        self.setMaxIndexWidth(20)
 
     def reset(self):
         self.text.delete("1.0", END)
@@ -52,15 +55,28 @@ class IPETDataTableFrame(Frame):
         self.dataframe = dataframe
         self.update()
 
+    def setMaxIndexWidth(self, maxindexwidth):
+        '''
+        set maximum index width
+        '''
+        self.maxindexwidth = maxindexwidth
+
     def analyseDataFrame(self):
         '''
         analyses a data frame object
         '''
+        if self.dataframe.index.size == 0:
+            return False
+
         if type(self.dataframe.columns) is MultiIndex:
             self.ncollevels = len(self.dataframe.columns.levels)
         else:
             self.ncollevels = 1
 
+        # determine the number of characters that should be removed from every line if long indices are present
+        maximumindexwidth = max(map(len, self.dataframe.index))
+        self.ncharsindexremoval = max(0, maximumindexwidth - self.maxindexwidth)
+        return True
 
     def update(self):
         '''
@@ -69,15 +85,19 @@ class IPETDataTableFrame(Frame):
         self.reset()
 
         # analyse data frame
-        self.analyseDataFrame()
+        if not self.analyseDataFrame():
+            return
 
         # mark the leftmost and rightmost element of a column index
         self.colwidths = [(-1, -1)] * len(self.dataframe.columns)
 
         buf = StringIO(self.dataframe.to_string(sparsify=False))
+
         for lineidx, line in enumerate(buf.readlines()):
             if not line:
                 continue
+            if self.ncharsindexremoval > 0:
+                line = line[:self.maxindexwidth] + line[self.maxindexwidth + self.ncharsindexremoval:]
             if lineidx < self.ncollevels:
                 # the line index is the level index
                 startidx = 0

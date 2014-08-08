@@ -14,6 +14,7 @@ class TestRun(Editable):
     '''
     represents the collected data of a particular (set of) log file(s)
     '''
+    FILE_EXTENSION = ".trn"  # : the file extension for saving and loading test runs from
     def __init__(self, filenames=[]):
         self.filenames = []
         for filename in filenames:
@@ -73,6 +74,10 @@ class TestRun(Editable):
     def emptyData(self):
         self.data = DataFrame(dtype=object)
 
+    def setupForDataCollection(self):
+        self.datadict = self.data.to_dict()
+        self.data = DataFrame(dtype=object)
+
     def finalize(self):
         self.data = DataFrame(self.datadict)
         self.datadict = {}
@@ -106,7 +111,11 @@ class TestRun(Editable):
                 except KeyError:
                     pass
         else:
-            self.data.drop(probname, inplace=True)
+            try:
+                self.data.drop(probname, inplace=True)
+            except TypeError:
+                # needs to be caught for pandas version < 0.13
+                self.data = self.data.drop(probname)
 
     def getSettings(self):
         '''

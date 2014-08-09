@@ -4,7 +4,7 @@ Created on 08.03.2013
 @author: bzfhende
 '''
 from IpetWidget import IpetWidget
-from Tkinter import StringVar, Label, Frame, Canvas, Tk, Toplevel
+from Tkinter import StringVar, Label, Frame, Toplevel
 from SCIPguiSelectionLabel import SCIPguiSelectionLabel
 
 import matplotlib
@@ -18,9 +18,8 @@ from matplotlib.backend_bases import key_press_handler
 
 
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 
-class SCIPguiScatterWidget(IpetWidget):
+class IpetScatterWidget(IpetWidget):
     '''
     classdocs
     '''
@@ -116,10 +115,10 @@ class SCIPguiScatterWidget(IpetWidget):
             self.a.lines.remove(self.markerline)
         self.markerline, = self.a.plot(xdata[ind], ydata[ind], 'o', c='r', picker=3)
         self.canvas.draw()
-        self.pointwindow = Toplevel()
+        self.pointwindow = Toplevel(self)
         self.pointwindow.wm_title("Selected Points")
-        self.pointwindow.geometry("200x100+%d+%d" % (event.mouseevent.x, event.mouseevent.y))
+        self.pointwindow.geometry("200x100+%d+%d" % (self.winfo_rootx() + event.mouseevent.x, self.winfo_rooty() + event.mouseevent.y))
         for elem in points:
             Label(self.pointwindow, text=elem, bg='white').pack(side=TOP)
         self.pointwindow.mainloop()
-   
+

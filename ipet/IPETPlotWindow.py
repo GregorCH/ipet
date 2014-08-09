@@ -209,6 +209,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
                 line.set_markerfacecolor(markerfacecolor)
                 line.set_markeredgecolor(markeredgecolor)
 
+        ax.legend()
         self.canvas.figure.tight_layout(pad=0.5)
         self.canvas.draw()
 
@@ -219,5 +220,6 @@ if __name__ == "__main__":
     x = np.linspace(-1, 1, 100)
 
     window = IPETPlotWindow(width=200, height=200)
-    window.a.plot(x, x ** 2)
+    window.a.plot(x, x ** 2, label="Quadrat")
+    window.a.legend()
     window.mainloop()

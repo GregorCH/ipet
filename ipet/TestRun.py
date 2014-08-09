@@ -139,17 +139,17 @@ class TestRun(Editable):
 
     def saveToFile(self, filename):
         try:
-            f = open(filename, 'w')
+            f = open(filename, 'wb')
         except IOError:
             print "Could not open %s for saving test run" % filename
 
-        pickle.dump(self, f, protocol=0)
+        pickle.dump(self, f, protocol=2)
         f.close()
 
     @staticmethod
     def loadFromFile(filename):
         try:
-            f = open(filename, 'r')
+            f = open(filename, 'rb')
         except IOError:
             print "Could not open %s for loading test run" % filename
             return None

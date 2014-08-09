@@ -124,29 +124,52 @@ class IpetTableWidget(IpetWidget):
             if settings.count(setting) > 1:
                 return False
         return True
+    
+    def changeButtonName(self):
+        if " ".join(self.optionsbutton.config('text')[-1]) == 'Show Options':
+            self.optionsbutton.config(text='Hide Options')
+        else:
+            self.optionsbutton.config(text='Show Options')
+            self.tl.destroy()
 
     def showOptions(self):
         if " ".join(self.optionsbutton.config('text')[-1]) == 'Show Options':
 
-            tl = Toplevel()
-            tl.geometry("300x300+%d+%d" % (self.winfo_screenwidth() / 2, self.winfo_screenheight() / 2))
-            tl.title("Options")
+            buttonheight = self.optionsbutton.winfo_height()
+            selfwidth = self.winfo_width()
+
+            self.tl = Toplevel(self)
+            width = self.winfo_screenwidth() / 5
+            height = self.winfo_screenheight() / 2
+            xoff = self.winfo_rootx() + selfwidth - width
+            yoff = self.winfo_rooty() + buttonheight
+            self.tl.geometry("%dx%d+%d+%d" % (width, height, xoff - width / 5, yoff + height / 16))
             for idx, param in enumerate(self.params.getManageables()):
-                IPETTypeWidget(tl, param.getName(), param, self.params, attribute=param.getValue()).grid(row=idx)
+                IPETTypeWidget(self.tl, param.getName(), param, self.params, attribute=param.getValue()).grid(row=idx)
             print "Opening options for Ipet Table Widget"
-            tl.mainloop()
+            self.optionsbutton.config(text='Hide Options')
+            self.tl.protocol('WM_DELETE_WINDOW', self.changeButtonName)
+            self.tl.mainloop()
+        else:
+            try:
+                self.tl.destroy()
+            except AttributeError():
+                pass
+            self.optionsbutton.config(text='Show Options')
+
 
     def export(self):
         '''
         exports the table to the specified file format. The following formats are supported:
+        
         -.tex for a latex compilable tabular
         -.txt for text format
         -.csv for a standard csv-file
         -.html for html-table
         -.xls for a Microsoft Excel parsable output
         '''
-
-        if self.df_selection is None:
+        thedf = self.tableframe.getDataFrame()
+        if thedf is None:
             return
         # use export file name variable
         filename = self.exportfilenamevar.get()
@@ -170,12 +193,15 @@ class IpetTableWidget(IpetWidget):
         replacementdict = dict(tex='latex', xls='excel', xlsx='excel')
         methodname = "to_" + replacementdict.get(extension, extension)
         try:
-            exportmethod = getattr(self.df_selection, methodname)
+            exportmethod = getattr(thedf, methodname)
             exportmethod(filename)
+            print "Saved Table to file %s" % os.path.abspath(filename)
         except AttributeError:
             print "unknown file extension %s: using to string exportmethod" % (methodname)
             with open(filename, 'w') as f:
                 f.write(self.df_selection.to_string())
+                print "Saved Table to file %s" % os.path.abspath(filename)
+
 
     def openTableCreationFrame(self):
         '''

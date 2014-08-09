@@ -335,11 +335,11 @@ class Comparator:
             print "Preferred file extension for comparator instances is '.cmp'"
 
         try:
-            f = open(filename, "w")
+            f = open(filename, "wb")
         except IOError:
             print "Could not open file named", filename
             return
-        pickle.dump(self, f)
+        pickle.dump(self, f, protocol=2)
 
         f.close()
         print "Comparator saved to file", filename
@@ -353,7 +353,7 @@ class Comparator:
         @return: a Comparator instance, or None if errors occured
         '''
         try:
-            f = open(filename, "r")
+            f = open(filename, "rb")
         except IOError:
             print "Could not open file named", filename
             return

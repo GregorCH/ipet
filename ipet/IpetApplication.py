@@ -5,10 +5,11 @@ Created on 06.03.2013
 '''
 from Tkinter import Tk, Listbox, Menu
 from Comparator import Comparator
-# from SCIPguiScatterWidget import SCIPguiScatterWidget
+# from IpetScatterWidget import IpetScatterWidget
 from Tkconstants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END
 # from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from IpetTableWidget import IpetTableWidget
+from IpetScatterWidget import IpetScatterWidget
 from TestRun import TestRun
 import ttk
 from SCIPguiOutputWidget import SCIPguiOutputWidget
@@ -17,7 +18,6 @@ from IPETManagerMenu import IPETManagerMenu
 from ttk import Frame, Label, Button, Scrollbar
 import Tkconstants
 from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
-from SCIPguiScatterWidget import SCIPguiScatterWidget
 from IpetMessageWidget import IpetMessageWidget
 
 class IpetApplication(Tk):
@@ -76,7 +76,7 @@ class IpetApplication(Tk):
         recollectDataButton.pack(side=TOP)
 
         # make the remaining window show a tabbed panel with the different widgets
-        widgets = [IpetTableWidget, SCIPguiOutputWidget, SCIPguiScatterWidget, IpetMessageWidget]
+        widgets = [IpetTableWidget, SCIPguiOutputWidget, IpetScatterWidget, IpetMessageWidget]
         tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:

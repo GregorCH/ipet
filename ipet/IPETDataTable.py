@@ -48,6 +48,12 @@ class IPETDataTableFrame(Frame):
     def reset(self):
         self.text.delete("1.0", END)
 
+    def getDataFrame(self):
+        '''
+        return the current data frame object
+        '''
+        return self.dataframe
+
     def setDataFrame(self, dataframe):
         '''
         set a dataframe object as the data to be displayed
@@ -182,10 +188,10 @@ class IPETDataTableFrame(Frame):
         '''
         menu = Menu(self, tearoff=0)
         plotmenu = Menu(menu)
-        menu.add_command(label='Sort By Column <', command=partial(self.sortBy, ascending=True, what='column'))
-        menu.add_command(label='Sort By Column >', command=partial(self.sortBy, ascending=False, what='column'))
-        menu.add_command(label='Sort By Index < ', command=partial(self.sortBy, ascending=True, what='index'))
-        menu.add_command(label='Sort By Index > ', command=partial(self.sortBy, ascending=False, what='index'))
+        menu.add_command(label='Sort By Column <<', command=partial(self.sortBy, ascending=True, what='column'))
+        menu.add_command(label='Sort By Column >>', command=partial(self.sortBy, ascending=False, what='column'))
+        menu.add_command(label='Sort By Index <<', command=partial(self.sortBy, ascending=True, what='index'))
+        menu.add_command(label='Sort By Index >> ', command=partial(self.sortBy, ascending=False, what='index'))
         plotmenu.add_separator()
         plotmenu.add_command(label='Bar plot')
         plotmenu.add_command(label='Scatter Plot')

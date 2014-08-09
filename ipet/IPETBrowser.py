@@ -3,7 +3,8 @@ Created on 25.12.2013
 
 @author: bzfhende
 '''
-from ttk import Treeview, Frame, Panedwindow, Labelframe, Checkbutton, LabelFrame, Entry, Button, Label, PanedWindow
+from ttk import Treeview, Frame, Panedwindow, Labelframe, Checkbutton, LabelFrame, Entry, Button, Label, PanedWindow, \
+    OptionMenu
 from Tkconstants import VERTICAL, BOTH, TRUE, END, HORIZONTAL, LEFT, TOP
 from ScrolledText import ScrolledText
 from Manager import Manager
@@ -11,6 +12,8 @@ from Tkinter import Tk, IntVar, StringVar
 from Comparator import Comparator
 import Tkconstants
 import tkFont
+from numpy import float16, float32, float64
+from ipet.IpetParam import IPETParam
 class IPETTreeview(Frame):
    '''
    a treeview allows for browsing and custom selection of items from a manager object
@@ -155,11 +158,11 @@ class IPETTypeWidget(Frame):
       if attribute is None:
          attribute = getattr(self.objecttoedit, self.attributename)
 
+      print "Attribute type %s" % type(attribute)
       if type(attribute) is bool:
          self.var = IntVar()
          # bools get checkboxes.
          Checkbutton(self, text=attributename, variable=self.var, command=self.commandTypeSafe).pack()
-
       elif type(attribute) is str:
          # string elements get an entry
          self.var = StringVar()
@@ -167,7 +170,7 @@ class IPETTypeWidget(Frame):
       elif type(attribute) is int:
          self.var = IntVar()
          self.createCompositeEditWidget(attributename)
-      elif type(attribute) is float:
+      elif type(attribute) in [float, float16, float32, float64]:
          self.var = StringVar()
          self.createCompositeEditWidget(attributename)
       elif type(attribute) is list:
@@ -219,6 +222,7 @@ class IPETTypeWidget(Frame):
 
    def createCompositeEditWidget(self, attributename):
       labelframe = LabelFrame(self, text=attributename)
+      print "Label Frame for attribute %s, variable value %s" % (attributename, str(self.var.get()))
       Entry(labelframe, textvariable=self.var, validate="focusout", validatecommand=self.commandTypeSafe).pack(side=LEFT)
       Button(labelframe, text="Go", command=self.commandTypeSafe).pack(side=LEFT)
       labelframe.pack()

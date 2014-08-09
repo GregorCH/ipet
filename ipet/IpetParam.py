@@ -3,7 +3,7 @@ Created on 29.11.2013
 
 @author: bzfhende
 '''
-
+import re
 class IPETParam:
     '''
     a parameter for the IPET gui. A parameter has a name, a description, a default value and
@@ -49,9 +49,10 @@ class IPETParam:
             return value in pv
         else:
             assert type(pv) is list
-            assert len(pv) >= 2 or type(self.getValue()) is str
-            if type(value) in [float, int]:
+            if type(value) in [float, int] and len(pv) == 2:
                 return value <= pv[1] and value >= pv[0]
+            elif type(value) in [float, int]:
+                return True
             else:
                 return (pv == [] and type(self.getValue()) is str) or value in pv
 
@@ -71,3 +72,23 @@ class IPETParam:
 
     def editAttribute(self, attributename, newvalue):
         self.checkAndChange(newvalue)
+
+class IPETColorParam(IPETParam):
+    '''
+    Color parameter in hexadecimal rgb format
+    '''
+
+    def __init__(self, name, value, description=''):
+        IPETParam.__init__(self, name, value, [], description)
+
+    def valIsPossible(self, value):
+        '''
+        checks if a value has the correct format `#xxxxxx` where 0 <= x <= 9 or a <= x <= f
+        '''
+        if type(value) is not str:
+            return False
+        if len(value) != 7:
+            return False
+        if re.search("[^a-fA-F0-9#]", value):
+            return False
+        return True

@@ -3,22 +3,32 @@ Created on 31.01.2014
 
 @author: Customer
 '''
-from ttk import Frame
+from ttk import Frame, OptionMenu, Button, Label
 import Tkconstants
 from Tkconstants import TOP, END
 from ScrolledText import ScrolledText
-from Tkinter import Menu
+from Tkinter import Menu, Toplevel, StringVar
 from cStringIO import StringIO
 import pandas as pd
+import numpy as np
 from pandas import MultiIndex
 from functools import partial
 from Editable import Editable
 from IpetParam import IPETParam
+from ipet.IPETPlotWindow import IPETPlotWindow
+from ipet.IPETBrowser import IPETTypeWidget
+from ipet.Manager import Manager
 
 class IPETDataTableFrame(Frame):
     '''
     Frame object to display and interact with DataFrame objects.
     '''
+
+    param_scatter_secondcolumn = IPETParam("Second column (Y-axis)", None, set([None]), "Second column (y-axis) for scatter plot")
+    param_histogram_leftbin = IPETParam("Left bin edge", -10.0, [], "Left bin border")
+    param_histogram_rightbin = IPETParam("Right bin edge", +10.0, [], "Right bin border")
+    param_histogram_binwidth = IPETParam("Bin width", 1.0, [], "The bin width")
+    param_histogram_nbins = IPETParam("Bin number", -1, [], "The number of bins")
     def __init__(self, master=None, scrollbar=None, **kw):
         '''
         constructs a Data Table Frame with no data
@@ -82,6 +92,11 @@ class IPETDataTableFrame(Frame):
         # determine the number of characters that should be removed from every line if long indices are present
         maximumindexwidth = max(map(len, self.dataframe.index))
         self.ncharsindexremoval = max(0, maximumindexwidth - self.maxindexwidth)
+
+        oldparamval = self.param_scatter_secondcolumn.getValue()
+        self.param_scatter_secondcolumn = IPETParam("Second column (Y-axis)", None, set([None] + list(self.dataframe.columns)), "Second column (y-axis) for scatter plot")
+        self.param_scatter_secondcolumn.checkAndChange(oldparamval)
+
         return True
 
     def update(self):
@@ -182,6 +197,75 @@ class IPETDataTableFrame(Frame):
             raise ValueError("ERROR: what == %s, only accept 'index' or 'column'" % what)
         newdataframe = method(ascending=ascending)
         self.setDataFrame(newdataframe)
+
+    def showPlot(self, kind='scatter'):
+        if self.dataframe is None:
+            return
+        tl = Toplevel(self, width=self.winfo_width() / 5, height=self.winfo_height() / 10)
+
+
+        newplotparam = IPETParam("New plot", False, set((True, False)), "Should a new plot be created?")
+        if kind == 'scatter':
+            param = self.param_scatter_secondcolumn
+            tl.title("Choose Second Column")
+            var = StringVar(value=str(param.getValue()))
+
+            Label(tl, text="Selected X-Axis:%s" % str(self.dataframe.columns[self.getCurrentColumnIndex(None)])).pack(side=Tkconstants.TOP, fill=Tkconstants.X)
+            possiblecolumns = {str(col):col for col in param.getPossibleValues()}
+            om = OptionMenu(tl, var, str(param.getValue()), *list(map(str, param.getPossibleValues())))
+            om.pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=True)
+
+        elif kind == 'histogram':
+            tl.title("Adjust bin properties")
+            paramManager = Manager([getattr(self, paramname) for paramname in dir(self) if paramname.startswith("param_histogram")])
+            for param in paramManager.getManageables():
+                IPETTypeWidget(tl, param.getName(), param, paramManager, param.getValue()).pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=True)
+        def show():
+            newplot = newplotparam.getValue() or not hasattr(self, 'plotwindow')
+            if newplot:
+                self.plotwindow = IPETPlotWindow(master=self, width=self.winfo_width() / 2, heigth=self.winfo_width() / 2)
+
+            if kind == 'scatter':
+                param.checkAndChange(possiblecolumns.get(var.get()))
+                if param.getValue() is not None:
+                    col = self.dataframe.icol(self.getCurrentColumnIndex(None))
+                    ax = self.plotwindow.getAxis()
+                    ax.plot(col, self.dataframe[param.getValue()], 'o', alpha=0.7, label="(X)%s - (Y)%s" % (col.name, param.getValue()))
+
+            elif kind == 'histogram':
+
+                # reset in case we don't want to append
+                if newplot or not hasattr(self, 'histogramcolumns'):
+                    self.histogramcolumns = []
+                self.histogramcolumns.append(self.dataframe.columns[self.getCurrentColumnIndex(None)])
+
+                leftbin, rightbin, binwidth, nbins = map(IPETParam.getValue, [self.param_histogram_leftbin, self.param_histogram_rightbin, self.param_histogram_binwidth, self.param_histogram_nbins])
+                if nbins <= 0:
+                    bins = np.arange(leftbin, rightbin, step=binwidth)
+                else:
+                    bins = np.linspace(leftbin, rightbin, nbins + 1, endpoint=True)
+                print "self.dataframe[self.histogramcolumns] = %s" % self.dataframe[self.histogramcolumns]
+                data = [self.dataframe[col] for col in self.histogramcolumns]
+                self.plotwindow.resetAxis()
+                self.plotwindow.a.hist(data, bins=bins, label=self.histogramcolumns, alpha=0.7)
+
+            tl.destroy()
+            self.plotwindow.getAxis().legend()
+            self.plotwindow.canvas.draw()
+            self.plotwindow.lift()
+            self.plotwindow.mainloop()
+
+        if not hasattr(self, 'plotwindow'):
+            newplotparam.checkAndChange(True)
+        IPETTypeWidget(tl, newplotparam.getName(), newplotparam, Manager([newplotparam]), newplotparam.getValue()).pack(side=Tkconstants.TOP)
+        buttonFrame = Frame(tl)
+        buttonyes = Button(buttonFrame, text='OK', command=show)
+        buttonno = Button(buttonFrame, text='Cancel', command=tl.destroy)
+        buttonyes.pack(side=Tkconstants.LEFT)
+        buttonno.pack(side=Tkconstants.LEFT)
+        buttonFrame.pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=True)
+        tl.mainloop()
+
     def openContextMenu(self, event):
         '''
         open the context menu to interact with the underlying data frame
@@ -192,10 +276,11 @@ class IPETDataTableFrame(Frame):
         menu.add_command(label='Sort By Column >>', command=partial(self.sortBy, ascending=False, what='column'))
         menu.add_command(label='Sort By Index <<', command=partial(self.sortBy, ascending=True, what='index'))
         menu.add_command(label='Sort By Index >> ', command=partial(self.sortBy, ascending=False, what='index'))
-        plotmenu.add_separator()
+        menu.add_separator()
         plotmenu.add_command(label='Bar plot')
-        plotmenu.add_command(label='Scatter Plot')
+        plotmenu.add_command(label='Scatter Plot', command=partial(self.showPlot, kind='scatter'))
         plotmenu.add_command(label='Scatter Matrix')
+        plotmenu.add_command(label='Histogram', command=partial(self.showPlot, kind='histogram'))
         menu.add_cascade(label='Data Plots', menu=plotmenu)
         menu.post(event.x, event.y)
 

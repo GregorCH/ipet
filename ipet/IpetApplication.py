@@ -9,7 +9,6 @@ from Comparator import Comparator
 from Tkconstants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END
 # from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from IpetTableWidget import IpetTableWidget
-from IpetScatterWidget import IpetScatterWidget
 from TestRun import TestRun
 import ttk
 from SCIPguiOutputWidget import SCIPguiOutputWidget
@@ -19,6 +18,7 @@ from ttk import Frame, Label, Button, Scrollbar
 import Tkconstants
 from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from IpetMessageWidget import IpetMessageWidget
+from IpetScatterWidget import IpetScatterWidget
 
 class IpetApplication(Tk):
     DEFAULT_BORDERWIDTH = 15

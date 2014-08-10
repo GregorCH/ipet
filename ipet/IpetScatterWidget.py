@@ -10,6 +10,7 @@ from SCIPguiSelectionLabel import SCIPguiSelectionLabel
 import matplotlib
 from Tkconstants import TOP, BOTH, BOTTOM
 import numpy
+from ipet.IPETPlotWindow import IpetNavigationToolBar
 matplotlib.use('TkAgg')
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -57,7 +58,7 @@ class IpetScatterWidget(IpetWidget):
         self.canvas = FigureCanvasTkAgg(f, master=self)
         self.canvas.get_tk_widget().pack(side=BOTTOM, fill=BOTH, expand=1)
 
-        self.toolbar = NavigationToolbar2TkAgg(self.canvas, self)
+        self.toolbar = IpetNavigationToolBar(self.canvas, self)
         self.toolbar.update()
 
 

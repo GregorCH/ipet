@@ -60,7 +60,7 @@ class IPETParam:
         '''
         set the parameter to a new value inside its domain
         '''
-        if type(newvalue) != type(self.getValue()):
+        if type(newvalue) != type(self.getValue()) and self.getValue() is not None:
             return False
         if self.valIsPossible(newvalue):
             self.value = newvalue

@@ -199,7 +199,7 @@ class IpetTableWidget(IpetWidget):
         except AttributeError:
             print "unknown file extension %s: using to string exportmethod" % (methodname)
             with open(filename, 'w') as f:
-                f.write(self.df_selection.to_string())
+                f.write(thedf.to_string())
                 print "Saved Table to file %s" % os.path.abspath(filename)
 
 
@@ -213,11 +213,11 @@ class IpetTableWidget(IpetWidget):
 class TableCreationFrame(Toplevel):
 
     def __init__(self, gui, tablewidget, master=None, cnf={}, **kw):
-        Toplevel.__init__(self, master=master, cnf=cnf, **kw)
+        Toplevel.__init__(self, master=tablewidget, cnf=cnf, **kw)
         self.wm_title("Configure Table")
         w = self.winfo_screenwidth()
         h = self.winfo_screenheight()
-        self.geometry("600x300+%d+%d" % ((w - 400) / 2, (h - 300) / 2))
+        self.geometry("%dx%d+%d+%d" % (w / 2, h / 4 * 3, tablewidget.winfo_rootx() + w / 10, tablewidget.winfo_rooty() + h / 10))
         self.tablewidget = tablewidget
         panedwindow = PanedWindow(self, orient=Tkconstants.VERTICAL)
         panedwindow.pack(expand=True, fill=Tkconstants.BOTH);

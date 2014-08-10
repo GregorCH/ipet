@@ -36,6 +36,13 @@ class IPETPlotWindow(Toplevel):
 
         self.canvas._tkcanvas.pack(side=Tkconstants.TOP, fill=Tkconstants.BOTH, expand=1)
 
+    def resetAxis(self):
+        while len(self.a.patches) > 0:
+            p = self.a.patches[-1]
+            p.remove()
+
+    def getAxis(self):
+        return self.a
 
 class IpetNavigationToolBar(NavigationToolbar2TkAgg):
 
@@ -45,7 +52,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
               '-.': 'DashDot',
               ':': 'Dotted',
               'steps': 'Steps',
-              'none': 'None',
+              'None': 'none',
               }
 
     MARKERS = {val:key for key, val in markers.MarkerStyle.markers.iteritems()}
@@ -81,7 +88,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
         '''
         change a color parameter
         '''
-        newcolor = askcolor(color=param.getValue())
+        newcolor = askcolor(color=param.getValue(), parent=self.tl)
         self.colorparambuttons[param].config(background=newcolor[1])
         param.checkAndChange(newcolor[1])
 
@@ -134,7 +141,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
         Button(buttonbox, text='Ok', command=self.tl.destroy).pack(side=Tkconstants.LEFT)
         Button(buttonbox, text='Apply', command=self.applyChanges).pack(side=Tkconstants.LEFT)
         buttonbox.pack(side=Tkconstants.TOP, fill=Tkconstants.X)
-
+        self.window.wait_window(self.tl)
         self.tl.mainloop()
 
     def col2hex(self, c):

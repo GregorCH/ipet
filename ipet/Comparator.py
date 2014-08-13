@@ -2,6 +2,8 @@ from ReaderManager import ReaderManager
 # from StatisticReader import StatisticReader
 from TestRun import TestRun
 import Misc
+from ipet.Observer import Observable
+from ipet.IPETMessageStream import Message
 
 try:
     import cPickle as pickle
@@ -26,7 +28,7 @@ from StatisticReader import DateTimeReader
 import os
 import sys
 
-class Comparator:
+class Comparator(Observable):
     '''
     manages the collection of all log (.out) and .solu file data
  

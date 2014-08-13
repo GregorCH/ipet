@@ -6,12 +6,12 @@ Created on 06.03.2013
 from Tkinter import Tk, Listbox, Menu
 from Comparator import Comparator
 # from IpetScatterWidget import IpetScatterWidget
-from Tkconstants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END
+from Tkconstants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END, BOTTOM
 # from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from IpetTableWidget import IpetTableWidget
 from TestRun import TestRun
 import ttk
-from SCIPguiOutputWidget import SCIPguiOutputWidget
+from IpetOutputWidget import IpetOutputWidget
 import tkFileDialog
 from IPETManagerMenu import IPETManagerMenu
 from ttk import Frame, Label, Button, Scrollbar
@@ -19,6 +19,7 @@ import Tkconstants
 from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from IpetMessageWidget import IpetMessageWidget
 from IpetScatterWidget import IpetScatterWidget
+from ipet.IpetProgressWindow import IpetProgressStatus
 
 class IpetApplication(Tk):
     DEFAULT_BORDERWIDTH = 15
@@ -45,45 +46,47 @@ class IpetApplication(Tk):
         screenwidth = self.winfo_screenwidth()
         screenheight = self.winfo_screenheight()
 
-        self.selectionframe = Frame(self, width=screenwidth / 10, height=screenheight)
-        self.selectionframe.pack(side=LEFT, fill=Tkconstants.Y)
-
-        selectionstatusframe = Frame(self.selectionframe, width=screenwidth / 10)
-        Label(selectionstatusframe, text="Current Selection:").pack(side=TOP, fill=Tkconstants.X)
-        self.selectedProbLabel = Label(selectionstatusframe)
-        self.selectedTestrunLabel = Label(selectionstatusframe, justify=RIGHT)
-
-        self.selectedProbLabel.pack(side=TOP, fill=Tkconstants.X)
-        self.selectedTestrunLabel.pack(side=TOP, fill=Tkconstants.X)
-        selectionstatusframe.pack(side=TOP)
-
-        problemslabel = Label(self.selectionframe, text="Problem: ")
-        problemslabel.pack(side=TOP)
-
-        probnamesselectionframe, self.probnamesbox = self.listmakeBoxWithScrollbar(self.selectionframe,
-                                                                                   self.getProblemList(), self.setSelectedProblem,
-                                                                                   theheight=screenheight / 2)
-        testrunlistboxframe, self.testrunsbox = self.listmakeBoxWithScrollbar(self.selectionframe, self.getTestrunnames(),
-                                                                              self.setSelectedTestrun, theheight=screenheight / 3)
-        probnamesselectionframe.pack(side=TOP, fill=Tkconstants.X)
-
-        testrunlabel = Label(self.selectionframe, text="Testrun: ")
-        testrunlabel.pack(side=TOP)
-
-        testrunlistboxframe.pack(side=TOP, fill=Tkconstants.X)
-
-        recollectDataButton = Button(self.selectionframe, text="Collect data", command=self.reCollectData)
-        recollectDataButton.pack(side=TOP)
+#        self.selectionframe = Frame(self, width=screenwidth / 10, height=screenheight)
+#        self.selectionframe.pack(side=LEFT, fill=Tkconstants.Y)
+#
+#        selectionstatusframe = Frame(self.selectionframe, width=screenwidth / 10)
+#        Label(selectionstatusframe, text="Current Selection:").pack(side=TOP, fill=Tkconstants.X)
+#        self.selectedProbLabel = Label(selectionstatusframe)
+#        self.selectedTestrunLabel = Label(selectionstatusframe, justify=RIGHT)
+#
+#        self.selectedProbLabel.pack(side=TOP, fill=Tkconstants.X)
+#        self.selectedTestrunLabel.pack(side=TOP, fill=Tkconstants.X)
+#        selectionstatusframe.pack(side=TOP)
+#
+#        problemslabel = Label(self.selectionframe, text="Problem: ")
+#        problemslabel.pack(side=TOP)
+#
+#        probnamesselectionframe, self.probnamesbox = self.listmakeBoxWithScrollbar(self.selectionframe,
+#                                                                                   self.getProblemList(), self.setSelectedProblem,
+#                                                                                   theheight=screenheight / 2)
+#        testrunlistboxframe, self.testrunsbox = self.listmakeBoxWithScrollbar(self.selectionframe, self.getTestrunnames(),
+#                                                                              self.setSelectedTestrun, theheight=screenheight / 3)
+#        probnamesselectionframe.pack(side=TOP, fill=Tkconstants.X)
+#
+#        testrunlabel = Label(self.selectionframe, text="Testrun: ")
+#        testrunlabel.pack(side=TOP)
+#
+#        testrunlistboxframe.pack(side=TOP, fill=Tkconstants.X)
+#
+#        recollectDataButton = Button(self.selectionframe, text="Collect data", command=self.reCollectData)
+#        recollectDataButton.pack(side=TOP)
 
         # make the remaining window show a tabbed panel with the different widgets
-        widgets = [IpetTableWidget, SCIPguiOutputWidget, IpetScatterWidget, IpetMessageWidget]
+        widgets = [IpetTableWidget, IpetOutputWidget, IpetScatterWidget, IpetMessageWidget]
         tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:
             tabbedFrame.add(widget(tabbedFrame, self), text=widget.name)
 
-        tabbedFrame.pack(side=LEFT, fill=BOTH, expand=1)
 
+        self.progressstatus = IpetProgressStatus(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight() / 12)
+        self.progressstatus.pack(side=BOTTOM, fill=Tkconstants.X)
+        tabbedFrame.pack(side=BOTTOM, fill=BOTH, expand=1)
         self.setComparator(comparator)
 
         self.setupMenu()
@@ -130,16 +133,16 @@ class IpetApplication(Tk):
         for widget in self.updatableWidgets:
             widget.update()
 
-        self.updatelistbox(self.probnamesbox, self.getProblemList())
-        self.updatelistbox(self.testrunsbox, self.getTestrunnames())
-        if not self.selected_problem is None:
-            self.selectedProbLabel.config(text=self.selected_problem)
-        else:
-            self.selectedProbLabel.config(text="No Problem selected")
-        if not self.selected_testrun is None:
-            self.selectedTestrunLabel.config(text=self.selected_testrun.getIdentification())
-        else:
-            self.selectedTestrunLabel.config(text="No Testrun selected")
+#        self.updatelistbox(self.probnamesbox, self.getProblemList())
+#        self.updatelistbox(self.testrunsbox, self.getTestrunnames())
+#        if not self.selected_problem is None:
+#            self.selectedProbLabel.config(text=self.selected_problem)
+#        else:
+#            self.selectedProbLabel.config(text="No Problem selected")
+#        if not self.selected_testrun is None:
+#            self.selectedTestrunLabel.config(text=self.selected_testrun.getIdentification())
+#        else:
+#            self.selectedTestrunLabel.config(text="No Testrun selected")
 
 
     def setSelectedProblem(self, idx):
@@ -226,7 +229,16 @@ class IpetApplication(Tk):
         '''
         invokes data recollection and an update of the GUI
         '''
+#        progress.setUpdateStep(1 / float(len(self.getTestrunList(False))))
+        rm = self.comparator.getManager('reader')
+        rm.addObserver(self.progressstatus)
+        self.progressstatus.start()
+        self.progressstatus.update("Collecting Data")
         self.comparator.collectData()
+        rm.removeObserver(self.progressstatus)
+        self.progressstatus.update("Finished Data Collection")
+        self.progressstatus.stop()
+        self.progressstatus.after(5000, self.progressstatus.update, "I am idle")
         self.updateGui()
 
     def handleClickEventListbox(self, event):
@@ -326,7 +338,7 @@ class IpetApplication(Tk):
             if filename:
                 self.comparator.addLogFile(filename)
 
-        self.updatelistbox(self.testrunsbox, self.getTestrunnames())
+#        self.updatelistbox(self.testrunsbox, self.getTestrunnames())
 
     def addSolufiles(self):
         '''

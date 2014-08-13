@@ -25,10 +25,10 @@ class Observable:
         if theset is not None:
             theset.remove(observer)
 
-    def notify(self):
+    def notify(self, *args):
         '''
         notify all observers about changes in the state
         '''
         theset = Observable.observermap.setdefault(self, set())
         for observer in theset:
-            observer.update()
+            observer.update(*args)

@@ -2,6 +2,7 @@ from StatisticReader import StatisticReader
 import os
 import re
 from Manager import Manager
+from ipet.IPETMessageStream import Message
 
 class ReaderManager(Manager):
     '''
@@ -92,6 +93,8 @@ class ReaderManager(Manager):
                 if self.endOfInstanceReached(line):
                     for reader in readers:
                         reader.execEndOfProb()
+                    else:
+                        self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
                 else:
                     for reader in readers:
                         reader.extractStatistic(line)

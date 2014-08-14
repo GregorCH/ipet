@@ -14,12 +14,16 @@ import ttk
 from IpetOutputWidget import IpetOutputWidget
 import tkFileDialog
 from IPETManagerMenu import IPETManagerMenu
-from ttk import Frame, Label, Button, Scrollbar
+from ttk import Frame, Label, Button, Scrollbar, Separator
 import Tkconstants
 from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from IpetMessageWidget import IpetMessageWidget
 from IpetScatterWidget import IpetScatterWidget
 from ipet.IpetProgressWindow import IpetProgressStatus
+from ImageTk import PhotoImage
+from Tix import Balloon, BALLOON
+from ipet.IpetToolTip import createToolTip
+from ipet.IpetImageButton import IpetImageButton
 
 class IpetApplication(Tk):
     DEFAULT_BORDERWIDTH = 15
@@ -82,8 +86,8 @@ class IpetApplication(Tk):
 
         for widget in widgets:
             tabbedFrame.add(widget(tabbedFrame, self), text=widget.name)
-
-
+        navbar = self.createNavBar()
+        navbar.pack(side=TOP, fill=Tkconstants.X)
         self.progressstatus = IpetProgressStatus(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight() / 12)
         self.progressstatus.pack(side=BOTTOM, fill=Tkconstants.X)
         tabbedFrame.pack(side=BOTTOM, fill=BOTH, expand=1)
@@ -95,6 +99,26 @@ class IpetApplication(Tk):
 
         if show:
             self.mainloop()
+
+    def createNavBar(self):
+        navbar = Frame(self, width=self.winfo_screenwidth(), height=16)
+        buttons = (
+                   ("edit-new-document-icon", "Create new comparator", self.resetComparator),
+                   ("Load-icon", "Load Comparator from .cmp file", self.loadComparator),
+                   ("disk-icon", "Save Comparator to .cmp format", self.saveComparator),
+                   None,
+                   ("document-add-icon", "Add log file(s) to current comparator", self.addLogFiles),
+                   ("coin-add-icon", "Add solution file(s) to current comparator", self.addSolufiles),
+                   None,
+                   ("reload-icon", "Collect data", self.reCollectData)
+                   )
+        for button in buttons:
+            if button:
+                imagefilename, tooltip, command = button
+                IpetImageButton(navbar, imagefilename, tooltip, command).pack(side=LEFT)
+            else:
+                Separator(navbar, orient=Tkconstants.VERTICAL).pack(side=LEFT, fill=Tkconstants.Y, padx=5)
+        return navbar
 
     def listmakeBoxWithScrollbar(self, master, alist, guiupdatefunction, theheight=5):
         frame = Frame(master, height=theheight)

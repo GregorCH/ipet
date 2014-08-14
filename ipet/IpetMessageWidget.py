@@ -17,8 +17,8 @@ class IpetMessageWidget(IpetWidget):
         self.text = ScrolledText(self)
         self.text.pack(side=Tkconstants.LEFT, expand=True, fill=Tkconstants.BOTH)
 
-        sys.stdout = TextRedirector(self.text, 'stdout')
-        sys.stderr = TextRedirector(self.text, 'stderr')
+#        sys.stdout = TextRedirector(self.text, 'stdout')
+#        sys.stderr = TextRedirector(self.text, 'stderr')
 
         self.text.config(state='disabled')
         self.text.tag_config('stderr', background='grey', foreground='red')

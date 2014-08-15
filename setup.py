@@ -4,6 +4,7 @@ setup(
     name='Ipet--Interactive Python Evaluation Tools',
     version='0.1dev',
     packages=['ipet',],
+    package_data=dict(ipet=["../images/*.png"]),
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description="""
         Ipet contains python modules for collecting and evaluating

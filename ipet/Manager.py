@@ -4,6 +4,7 @@ Created on 25.12.2013
 @author: bzfhende
 '''
 from Observer import Observable
+from ipet.IPETMessageStream import Message
 class Manager(Observable):
     '''
     manages all manageables of a certain type of which many objects might exist and need to be listed / browsed frequently
@@ -129,7 +130,7 @@ class Manager(Observable):
                 self.activeset.add(manageable)
 
         if manageables != []:
-            self.notify()
+            self.notify(Message("Activated %s" % ", ".join(map(self.getStringRepresentation, manageables)), messagetype=Message.MESSAGETYPE_INFO))
 
     def addAndActivate(self, manageable):
         '''
@@ -153,7 +154,8 @@ class Manager(Observable):
                 self.activeset.remove(manageable)
             except KeyError:
                 pass
-        self.notify()
+        self.notify(Message("Deactivated %s" % ", ".join(map(self.getStringRepresentation, manageables)), messagetype=Message.MESSAGETYPE_INFO))
+
 
     def countManageables(self, onlyactive):
         '''

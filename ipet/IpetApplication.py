@@ -20,9 +20,6 @@ from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
 from IpetMessageWidget import IpetMessageWidget
 from IpetScatterWidget import IpetScatterWidget
 from ipet.IpetProgressWindow import IpetProgressStatus
-from ImageTk import PhotoImage
-from Tix import Balloon, BALLOON
-from ipet.IpetToolTip import createToolTip
 from ipet.IpetImageButton import IpetImageButton
 
 class IpetApplication(Tk):
@@ -298,13 +295,13 @@ class IpetApplication(Tk):
 
         self.file_opt = options = {}
         options['defaultextension'] = '.*'
-        options['filetypes'] = [('all files', '.*'), ('out-files', '.out'), ('Comparator files', '.cmp'), ('Solu Files', '.solu')]
+        options['filetypes'] = [('all files', '.*'), ('out-files', r'.out'), ('Comparator files', r'.cmp'), ('Solu Files', r'.solu')]
 
     def loadComparator(self):
         '''
         load method to ask for comparator instance to be loaded
         '''
-        self.file_opt['defaultextension'] = '.cmp'
+        self.file_opt['defaultextension'] = r'.cmp'
         filename = tkFileDialog.askopenfilename(**self.file_opt)
         if filename:
             compy = self.comparator.loadFromFile(filename)
@@ -315,7 +312,7 @@ class IpetApplication(Tk):
         '''
         saves the comparator instance to a file
         '''
-        self.file_opt['defaultextension'] = '.cmp'
+        self.file_opt['defaultextension'] = r'.cmp'
         filename = tkFileDialog.asksaveasfilename(**self.file_opt)
         if filename:
             self.comparator.saveToFile(filename)
@@ -353,7 +350,7 @@ class IpetApplication(Tk):
         '''
         opens a file dialog and adds log files by creating new test runs to the current comparator 
         '''
-        self.file_opt['defaultextension'] = '.out'
+        self.file_opt['defaultextension'] = r".out"
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)
         print filenames
         if type(filenames) is not list:
@@ -368,7 +365,7 @@ class IpetApplication(Tk):
         '''
         adds a solu file for reading in (in-)feasibility status and optimal or best known solution values
         '''
-        self.file_opt['defaultextension'] = '.solu'
+        self.file_opt['defaultextension'] = r".solu"
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)
         print filenames
         if type(filenames) is not list:

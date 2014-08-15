@@ -4,7 +4,11 @@ Created on 14.08.2014
 @author: Customer
 '''
 from ttk import Button
-from ImageTk import PhotoImage
+try:
+    from ImageTk import PhotoImage
+except:
+    import PIL
+    from PIL.ImageTk import PhotoImage
 from ipet.IpetToolTip import createToolTip
 import sys
 import os

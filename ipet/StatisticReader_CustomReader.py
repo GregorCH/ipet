@@ -35,7 +35,7 @@ class CustomReader(StatisticReader):
             self.data = self.datatype(self.data)
          except:
             print "Error when parsing data -> using default value", self.name
-            self.data = self.datatype(self.defaultvalue)
+            self.data = self.defaultvalue
 
          self.active = False
       return None
@@ -43,7 +43,7 @@ class CustomReader(StatisticReader):
    def execEndOfProb(self):
       self.active = False
       self.testrun.addData(self.problemname, self.datakey, self.data)
-      self.data = self.datatype(self.defaultvalue)
+      self.data = self.defaultvalue
 
    def setDataType(self, sometype):
       '''

@@ -88,7 +88,7 @@ class Manager(Observable):
         print newname, newattribute
         if oldname != newname:
             self.chgManageableName(manageable, oldname, newname)
-        self.notify()
+        self.notify(Message("Changed attribute %s of %s to %s" % (attributename, newname, newattribute), Message.MESSAGETYPE_INFO))
 
     def chgManageableName(self, manageable, oldname, newname):
         '''

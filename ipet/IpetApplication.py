@@ -78,7 +78,7 @@ class IpetApplication(Tk):
 #        recollectDataButton.pack(side=TOP)
 
         # make the remaining window show a tabbed panel with the different widgets
-        widgets = [IpetTableWidget, IpetOutputWidget, IpetScatterWidget, IpetMessageWidget]
+        widgets = [IpetTableWidget, IpetOutputWidget, IpetMessageWidget, IpetScatterWidget]
         tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:
@@ -210,9 +210,9 @@ class IpetApplication(Tk):
 
         returns the list of problem instances which may have been filtered first through the list of active
         comparator filters
-        
+
         :param onlyfiltered: set to :code:`True` for filtering problems through the set of active filters of the comparator instance
-        
+
         :return: all optionally filtered problem instances as a list
         '''
         try:
@@ -229,7 +229,7 @@ class IpetApplication(Tk):
     def getTestrunList(self, onlyactive=True):
         '''
         returns the list of testruns instances as list
-        
+
         :param onlyactive: set to :code:`False` to get all instead of only the currently active test runs. The testrun manager
         of the comparator object decides if testruns are active
         '''
@@ -241,7 +241,7 @@ class IpetApplication(Tk):
     def addReader(self, reader):
         '''
         adds a reader to the comparator object
-        
+
         :param reader: an instance of :ipet:`StatisticReader`
         '''
         self.comparator.addReader(reader)
@@ -348,12 +348,12 @@ class IpetApplication(Tk):
 
     def addLogFiles(self):
         '''
-        opens a file dialog and adds log files by creating new test runs to the current comparator 
+        opens a file dialog and adds log files by creating new test runs to the current comparator
         '''
         self.file_opt['defaultextension'] = r".out"
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)
         print filenames
-        if type(filenames) is not list:
+        if type(filenames) not in [list, tuple]:
             filenames = [filenames]
         for filename in filenames:
             if filename:
@@ -368,7 +368,7 @@ class IpetApplication(Tk):
         self.file_opt['defaultextension'] = r".solu"
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)
         print filenames
-        if type(filenames) is not list:
+        if type(filenames) not in [list, tuple]:
             filenames = [filenames]
         for filename in filenames:
             if filename:

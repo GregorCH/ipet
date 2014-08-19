@@ -59,7 +59,7 @@ class IpetTableWidget(IpetWidget):
                           for datakey in ['SolvingTime', 'Nodes']]
         self.update()
 
-    def update(self):
+    def update(self, *args):
         '''
         update method called from inside the table creation wizard
         '''
@@ -124,16 +124,16 @@ class IpetTableWidget(IpetWidget):
             if settings.count(setting) > 1:
                 return False
         return True
-    
+
     def changeButtonName(self):
-        if " ".join(self.optionsbutton.config('text')[-1]) == 'Show Options':
+        if self.optionsbutton.cget('text') == 'Show Options':
             self.optionsbutton.config(text='Hide Options')
         else:
             self.optionsbutton.config(text='Show Options')
             self.tl.destroy()
 
     def showOptions(self):
-        if " ".join(self.optionsbutton.config('text')[-1]) == 'Show Options':
+        if self.optionsbutton.cget('text') == 'Show Options':
 
             buttonheight = self.optionsbutton.winfo_height()
             selfwidth = self.winfo_width()
@@ -161,7 +161,7 @@ class IpetTableWidget(IpetWidget):
     def export(self):
         '''
         exports the table to the specified file format. The following formats are supported:
-        
+
         -.tex for a latex compilable tabular
         -.txt for text format
         -.csv for a standard csv-file

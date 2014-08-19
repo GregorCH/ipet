@@ -18,7 +18,7 @@ from functools import partial
 class IPETPlotWindow(Toplevel):
     '''
     toplevel window to contain a matplotlib plot
-    
+
     An IPETPlotWindow is a toplevel window which contains a matplotlib figure,
     containing one or more axes, and a control panel to control its appearance.
     '''
@@ -51,14 +51,17 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
               '--': 'Dashed',
               '-.': 'DashDot',
               ':': 'Dotted',
-              'steps': 'Steps',
+#              don't enable the following option, it's irreversible
+#              'steps': 'Steps',
               'None': 'none',
+              'none': 'none'
               }
 
     MARKERS = {val:key for key, val in markers.MarkerStyle.markers.iteritems()}
 
     COLORS = {'b': '#0000ff', 'g': '#00ff00', 'r': '#ff0000', 'c': '#ff00ff',
           'm': '#ff00ff', 'y': '#ffff00', 'k': '#000000', 'w': '#ffffff'}
+
     def __init__(self, canvas, window):
         # list of toolitems to add to the toolbar, format is:
         # (
@@ -95,9 +98,13 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
 
 
     def addParamWidget(self, masterwindow, param, manager, label='General'):
+        print "%s %s %s %s"%(param.getName(), param.getValue(), label, param.getPossibleValues()) 
         if type(param.getPossibleValues()) is set:
             labelframe = LabelFrame(masterwindow, text=param.getName(), width=85)
-            self.paramtovar[param] = StringVar(value=param.getValue(), name="%s:%s" % (label, param.getName()))
+
+            # do this conversion to please Tkinter on Unix systems were unicode is used
+            name = str("%s:%s" % (label, param.getName()))
+            self.paramtovar[param] = StringVar(name=name, value=param.getValue())
             OptionMenu(labelframe, self.paramtovar[param], param.getValue(), *list(param.getPossibleValues())).pack(side=Tkconstants.LEFT, fill=Tkconstants.X, expand=True)
 
             self.paramtovar[param].trace('w', self.change_var)
@@ -227,6 +234,8 @@ if __name__ == "__main__":
     x = np.linspace(-1, 1, 100)
 
     window = IPETPlotWindow(width=200, height=200)
-    window.a.plot(x, x ** 2, label="Quadrat")
+    lines, = window.a.plot(x, x ** 2, label="Quadrat")
+    lines.set_linestyle('None')
+    print lines.get_linestyle()
     window.a.legend()
     window.mainloop()

@@ -18,7 +18,7 @@ class IPETTreeview(Frame):
     '''
     a treeview allows for browsing and custom selection of items from a manager object
     '''
- 
+
     def __init__(self, master, manager, **kw):
         '''
         constructs a vertical tree view of the manager objects in string representation
@@ -26,17 +26,17 @@ class IPETTreeview(Frame):
         Frame.__init__(self, master, **kw);
         self.manager = manager
         self.manager.addObserver(self)
-        
+
         buttonframe = Frame(self)
         buttons = self.createButtons(buttonframe)
         for button in buttons:
            button.pack(side=LEFT)
         buttonframe.pack(side=TOP, fill=Tkconstants.X)
-        
+
         self.treeview = Treeview(self)
         self.treeview.pack(side=TOP)
         self.fill()
- 
+
     def fill(self, splitonkey='_', split=True):
         '''
         fill the tree view
@@ -49,7 +49,7 @@ class IPETTreeview(Frame):
                 tag = 'active'
             else:
                 tag = 'inactive'
-      
+
             if key.split:
                 splitkey = key.split(splitonkey)
                 nlevels = len(splitkey)
@@ -60,43 +60,43 @@ class IPETTreeview(Frame):
             else:
                 if not self.treeview.exists(key):
                     self.treeview.insert(splitonkey.join(splitkey[:level]), 'end', key, text=key, tags=tag)
-      
+
             self.treeview.tag_configure('active', background='white')
             self.treeview.tag_configure('inactive', background='red')
- 
+
     def quit(self):
         print 'deleting'
         self.manager.removeObserver(self)
         self.destroy()
- 
+
     def getSelection(self):
         '''
         get the tree views current selection
         '''
         return self.treeview.selection()
- 
+
     def update(self, manager):
         map(self.treeview.delete, self.treeview.get_children())
         self.fill()
- 
+
     def createButtons(self, master):
         return [Button(master, text='Activate', command=self.activateSelection),
                 Button(master, text='Deactivate', command=self.deactivateSelection)]
- 
+
     def activateSelection(self):
         '''
         activates the current selection
         '''
         manageables = map(self.manager.getManageable, self.getSelection())
         self.manager.activate(manageables)
- 
+
     def deactivateSelection(self):
         '''
         deactivates the current selection
         '''
         manageables = map(self.manager.getManageable, self.getSelection())
         self.manager.deactivate(manageables)
- 
+
 
 class IPETObjectRepresentation(Labelframe):
     '''
@@ -108,7 +108,7 @@ class IPETObjectRepresentation(Labelframe):
     def __init__(self, master, **kw):
         Labelframe.__init__(self, master, **kw)
         self.reset(text=self.EMPTYREPRESENTATION)
- 
+
     def displayObject(self, manager, managedobject):
         '''
         displays the object representation by showing the objects documentation to browse and
@@ -121,7 +121,7 @@ class IPETObjectRepresentation(Labelframe):
         except AttributeError:
             self.reset(text="No editable attributes defined for object %s" % (manager.getStringRepresentation(managedobject)))
             return
-        
+
         for number, attributename in enumerate(attributes):
             widget = IPETTypeWidget(self.upperpart, attributename, managedobject, manager)
             widget.grid(row=int(number / self.maxrows), column=number % self.maxrows)
@@ -129,10 +129,10 @@ class IPETObjectRepresentation(Labelframe):
             self.lowerpart.insert(END, managedobject.__doc__)
         else:
             self.lowerpart.insert(END, self.EMPTYDOCUMENTATION)
- 
+
     def reset(self, text=""):
         if hasattr(self, 'content'):
-  
+
             self.content.destroy()
         self.content = PanedWindow(self, orient=VERTICAL)
         self.upperpart = Frame(self.content)
@@ -151,19 +151,19 @@ class IPETTypeWidget(Frame):
     conversionmap = {float:str}
     def __init__(self, master, attributename, objecttoedit, manager, attribute=None, **kw):
         Frame.__init__(self, master, **kw)
-        
+
         self.objecttoedit = objecttoedit
         self.attributename = attributename
         self.manager = manager
         if attribute is None:
             attribute = getattr(self.objecttoedit, self.attributename)
-        
+
         print "Attribute type %s" % type(attribute)
         if type(attribute) is bool:
             self.var = IntVar()
             # bools get checkboxes.
             Checkbutton(self, text=attributename, variable=self.var, command=self.commandTypeSafe).pack()
-        elif type(attribute) is str:
+        elif type(attribute) in [str, unicode]:
             # string elements get an entry
             self.var = StringVar()
             self.createCompositeEditWidget(attributename)
@@ -176,9 +176,9 @@ class IPETTypeWidget(Frame):
         elif type(attribute) is list:
             manager = Manager(listofmanageables=attribute)
             IPETTreeview(self, manager).pack()
- 
+
         self.setVariableValue(attribute)
- 
+
     def convertAttribute(self, attribute):
         '''
         convert an attribute for the variable representation
@@ -189,12 +189,12 @@ class IPETTypeWidget(Frame):
             return convert(attribute)
         else:
             return attribute
- 
+
     def setVariableValue(self, attribute):
         if hasattr(self, 'var'):
             self.var.set(value=self.convertAttribute(attribute))
         self.currattribute = attribute
- 
+
     def commandTypeSafe(self):
         '''
         evaluates an expression and ensures type safety, e.g., floats remain floats and are not turned to
@@ -212,14 +212,14 @@ class IPETTypeWidget(Frame):
         # new attribute is safe for type conversion
         self.setVariableValue(newattribute)
         self.manager.editObjectAttribute(self.objecttoedit, self.attributename, newattribute)
- 
- 
+
+
     def getVariable(self):
         '''
         returns this widgets variable
         '''
         return self.var
- 
+
     def createCompositeEditWidget(self, attributename):
         labelframe = LabelFrame(self, text=attributename)
         print "Label Frame for attribute %s, variable value %s" % (attributename, str(self.var.get()))

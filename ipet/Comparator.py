@@ -47,7 +47,7 @@ class Comparator(Observable):
         self.filtermanager = Manager()
         self.installSomeFilters()
         self.installAllReaders()
-        self.installSomeAggregations()
+        self.installAggregations()
         self.solufiles = []
 
     def addLogFile(self, filename, testrun=None):
@@ -264,11 +264,20 @@ class Comparator(Observable):
         for filters in [filter1, filter2, filter3]:
             self.filtermanager.addAndActivate(filters)
 
-    def installSomeAggregations(self):
+    def installAggregations(self):
+        '''
+        populate the aggregation manager of this Comparator instance
+        
+        Aggregations map numeric vectors to single numbers.
+        '''
         self.aggregationmanager = Manager()
-        for aggstring in Aggregation.possibleaggregations:
+        for aggstring in ['min', 'max', 'mean', 'size']:
             self.aggregationmanager.addAndActivate(Aggregation(aggstring))
-
+        for shift in [10.0, 100.0, 1000.0]:
+            agg = Aggregation('listGetShiftedGeometricMean', shiftby=shift)
+            agg.set_name("shifted geom. (%d)"%shift)
+            self.aggregationmanager.addAndActivate(agg)
+        
     def checkProblemStatus(self):
         '''
         checks a problem solving status

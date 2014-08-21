@@ -268,19 +268,24 @@ class IPETDataTableFrame(Frame):
 
     def openContextMenu(self, event):
         '''
-        open the context menu to interact with the underlying data frame
+        open the context contextmenu to interact with the underlying data frame
         '''
-        menu = Menu(self, tearoff=0)
-        plotmenu = Menu(menu)
-        menu.add_command(label='Sort By Column <<', command=partial(self.sortBy, ascending=True, what='column'))
-        menu.add_command(label='Sort By Column >>', command=partial(self.sortBy, ascending=False, what='column'))
-        menu.add_command(label='Sort By Index <<', command=partial(self.sortBy, ascending=True, what='index'))
-        menu.add_command(label='Sort By Index >> ', command=partial(self.sortBy, ascending=False, what='index'))
-        menu.add_separator()
+        try:
+            self.contextmenu.destroy()
+        except:
+            pass
+
+        self.contextmenu = contextmenu = Menu(self, tearoff=0)
+        plotmenu = Menu(contextmenu)
+        contextmenu.add_command(label='Sort By Column <<', command=partial(self.sortBy, ascending=True, what='column'))
+        contextmenu.add_command(label='Sort By Column >>', command=partial(self.sortBy, ascending=False, what='column'))
+        contextmenu.add_command(label='Sort By Index <<', command=partial(self.sortBy, ascending=True, what='index'))
+        contextmenu.add_command(label='Sort By Index >> ', command=partial(self.sortBy, ascending=False, what='index'))
+        contextmenu.add_separator()
         plotmenu.add_command(label='Bar plot')
         plotmenu.add_command(label='Scatter Plot', command=partial(self.showPlot, kind='scatter'))
         plotmenu.add_command(label='Scatter Matrix')
         plotmenu.add_command(label='Histogram', command=partial(self.showPlot, kind='histogram'))
-        menu.add_cascade(label='Data Plots', menu=plotmenu)
-        menu.post(event.x, event.y)
+        contextmenu.add_cascade(label='Data Plots', menu=plotmenu)
+        contextmenu.post(event.x + self.winfo_rootx(), event.y + self.winfo_rooty())
 

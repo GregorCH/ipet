@@ -4,6 +4,7 @@ from TestRun import TestRun
 import Misc
 from ipet.Observer import Observable
 from ipet.IPETMessageStream import Message
+import pandas
 
 try:
     import cPickle as pickle
@@ -170,6 +171,9 @@ class Comparator(Observable):
 
     def getDatakeys(self):
         return self.datakeymanager.getAllRepresentations()
+
+    def concatenateData(self):
+        self.data = pandas.concat([tr.data for tr in self.testrunmanager.getManageables()])
 
     def calculateIntegrals(self):
         '''

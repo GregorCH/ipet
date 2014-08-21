@@ -15,6 +15,9 @@ from IPETDataTable import IPETDataTableFrame
 from IpetParam import IPETParam
 from IPETBrowser import IPETTypeWidget
 from Manager import Manager
+from ipet.IpetImageButton import IpetImageButton
+from functools import partial
+import numpy
 
 class IpetTableWidget(IpetWidget):
     '''
@@ -41,9 +44,19 @@ class IpetTableWidget(IpetWidget):
 
         self.exportfilenamevar = StringVar(value='newtable.txt')
         exportframe = Frame(self)
-        Button(exportframe, text="Create Table", command=self.openTableCreationFrame).pack(side=Tkconstants.LEFT)
-        Button(exportframe, text="Export", command=self.export).pack(side=Tkconstants.LEFT)
-        Entry(exportframe, textvariable=self.exportfilenamevar).pack(side=Tkconstants.LEFT)
+        Button(exportframe, text="Create Table", command=self.openTableCreationFrame).pack(side=Tkconstants.LEFT, padx=2)
+        Button(exportframe, text="Export", command=self.export).pack(side=Tkconstants.LEFT, padx=2)
+        Entry(exportframe, textvariable=self.exportfilenamevar).pack(side=Tkconstants.LEFT, padx=2)
+        Separator(exportframe, orient=Tkconstants.VERTICAL).pack(side=Tkconstants.LEFT, padx=5)
+        IpetImageButton(exportframe, "Refresh-icon", "Refresh the data frame", self.update).pack(side=Tkconstants.LEFT, padx=2)
+        Separator(exportframe, orient=Tkconstants.VERTICAL).pack(side=Tkconstants.LEFT, padx=5)
+        IpetImageButton(exportframe, "arrow-left-icon", "Move selected column left", partial(self.move, where= -1))\
+        .pack(side=Tkconstants.LEFT, padx=2)
+        IpetImageButton(exportframe, "arrow-right-icon", "Move selected column to the right", partial(self.move, where= +1)).pack(side=Tkconstants.LEFT, padx=2)
+
+        IpetImageButton(exportframe, "sort-ascending-icon", "Sort selected column in ascending order", self.update).pack(side=Tkconstants.LEFT, padx=2)
+        IpetImageButton(exportframe, "sort-descending-icon", "Sort selected column in descending order", self.update).pack(side=Tkconstants.LEFT, padx=2)
+
         self.optionsbutton = Button(exportframe, text="Show Options", command=self.showOptions)
         self.optionsbutton.pack(side=Tkconstants.RIGHT)
         exportframe.pack(side=Tkconstants.TOP, fill=Tkconstants.X)
@@ -58,6 +71,36 @@ class IpetTableWidget(IpetWidget):
         self.selection = [(testrun.getName(), datakey) for testrun in self.gui.getTestrunList(onlyactive=False) \
                           for datakey in ['SolvingTime', 'Nodes']]
         self.update()
+
+    def swapcolumns(self, i, j):
+        if self.selection is None or self.df_selection is None:
+            return
+        size = len(self.df_selection.columns)
+        if j < 0 or j >= size or j == i:
+            return
+        tmp = self.selection[i]
+        self.selection[i] = self.selection[j]
+        self.selection[j] = tmp
+        for window, frame in zip([self.tableframe, self.aggrframe], [self.tableframe.getDataFrame(), self.aggrframe.getDataFrame()]):
+            cols = list(frame.columns)
+            tmp = cols[i]
+            cols[i] = cols[j]
+            cols[j] = tmp
+            window.setDataFrame(frame[cols])
+
+
+    def move(self, where= -1):
+        currentcol = max(self.tableframe.getCurrentColumnIndex(None), \
+                         self.aggrframe.getCurrentColumnIndex(None))
+        if currentcol == -1:
+            return
+        if where == -1 and currentcol > 0:
+            self.swapcolumns(currentcol, currentcol - 1)
+        elif where == +1 and currentcol <= len(self.df_selection.columns) - 1:
+            self.swapcolumns(currentcol, currentcol + 1)
+
+
+
 
     def update(self, *args):
         '''
@@ -101,17 +144,17 @@ class IpetTableWidget(IpetWidget):
 
     def updateAggregation(self):
         aggregations = self.gui.comparator.getManager('aggregation').getManageables(onlyactive=True)
-        df_aggr = pd.DataFrame(columns=self.df_selection.columns, index=[aggregation.getName() for aggregation in aggregations])
+        self.df_aggr = pd.DataFrame(columns=self.df_selection.columns, index=[aggregation.getName() for aggregation in aggregations])
         print self.df_selection.columns
         for aggregation in aggregations:
             for col in self.df_selection.columns:
                 try:
                     aggregatedval = aggregation.aggregate(self.df_selection[col])
-                    df_aggr[col][aggregation.getName()] = aggregatedval
+                    self.df_aggr[col][aggregation.getName()] = aggregatedval
                 except TypeError:
                     pass
 
-        self.aggrframe.setDataFrame(df_aggr)
+        self.aggrframe.setDataFrame(self.df_aggr)
 
 
     def checkShortNames(self):

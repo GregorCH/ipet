@@ -182,15 +182,15 @@ class IpetTableWidget(IpetWidget):
             selfwidth = self.winfo_width()
 
             self.tl = Toplevel(self)
-            width = self.winfo_screenwidth() / 5
-            height = self.winfo_screenheight() / 2
-            xoff = self.winfo_rootx() + selfwidth - width
-            yoff = self.winfo_rooty() + buttonheight
-            self.tl.geometry("%dx%d+%d+%d" % (width, height, xoff - width / 5, yoff + height / 16))
             for idx, param in enumerate(self.params.getManageables()):
                 IPETTypeWidget(self.tl, param.getName(), param, self.params, attribute=param.getValue()).grid(row=idx)
             print "Opening options for Ipet Table Widget"
             self.optionsbutton.config(text='Hide Options')
+            width = self.tl.winfo_width()
+            height = self.tl.winfo_height()
+            xoff = self.winfo_rootx() + selfwidth - width
+            yoff = self.winfo_rooty() + buttonheight
+            self.tl.geometry("%dx%d+%d+%d" % (width, height, xoff - width / 5, yoff + height / 16))
             self.tl.protocol('WM_DELETE_WINDOW', self.changeButtonName)
             self.tl.mainloop()
         else:
@@ -268,9 +268,9 @@ class TableCreationFrame(Toplevel):
         self.createDataSelectionPanel(gui, dataselectionframe)
         panedwindow.add(dataselectionframe)
 
-        selectionviewpanel = LabelFrame(panedwindow, text='Current Selection')
-        self.createSelectionViewPanel(gui, selectionviewpanel)
-        panedwindow.add(selectionviewpanel)
+#        selectionviewpanel = LabelFrame(panedwindow, text='Current Selection')
+#        self.createSelectionViewPanel(gui, selectionviewpanel)
+#        panedwindow.add(selectionviewpanel)
 
     def createDataSelectionPanel(self, gui, master):
         panedwindowdsf = PanedWindow(master, orient=Tkconstants.HORIZONTAL)

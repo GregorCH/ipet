@@ -37,10 +37,10 @@ class TestRun(Editable):
     def addData(self, probname, datakeys, data):
         '''
         add data to problem data under the specified key(s)
-        
+
         add the current data - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
-        
+
         after data was added, the method problemGetData() can be used for access
         '''
 
@@ -102,7 +102,7 @@ class TestRun(Editable):
 
     def deleteProblemData(self, probname):
         '''
-        deletes all data aquired so far for probname
+        deletes all data acquired so far for probname
         '''
         if self.datadict != {}:
             for col in self.datadict.keys():
@@ -133,7 +133,6 @@ class TestRun(Editable):
         try:
             return self.data['Version'][0]
         except KeyError:
-            print self.filenames
             return self.filenames[0].split('.')[3]
 
 
@@ -167,17 +166,23 @@ class TestRun(Editable):
         try:
             return self.data['LPSolver'][0]
         except KeyError:
-            return self.filenames[0].split('.')[4]
+            return self.filenames[0].split('.')[-4]
 
     def getSolver(self):
         '''
         returns the LP solver used for this test run
         '''
         try:
-            return self.data['Solver'][0]
+            return self.data['Solver'][0] + self.data['GitHash'][0]
         except KeyError:
-            return self.filenames[0].split('.')[4]
+            return self.filenames[0].split('.')[2]
 
+    def getMode(self):
+        "get mode (optimized or debug)"
+        try:
+            return self.filenames[0].split('.')[-5]
+        except:
+            return "opt"
     def getName(self):
         '''
         convenience method to make test run a manageable object
@@ -188,7 +193,7 @@ class TestRun(Editable):
         '''
         return identification string of this test run
         '''
-        return self.getSolver() + '(' + self.getVersion() + ')' + self.getLpSolver() + ':' + self.getSettings()
+        return self.getSolver() + '(' + self.getVersion() + ')' + "-%s-"%self.getMode() + self.getLpSolver() + ':' + self.getSettings()
 
     def getShortIdentification(self, char='_', maxlength= -1):
         '''

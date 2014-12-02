@@ -14,13 +14,16 @@ DEFAULT_XLIMITKEY = 'TimeLimit'
 DEFAULT_CUTOFFGAP = 100
 DEFAULT_BOUNDKEY = 'PrimalBound'
 
-def calcIntegralValue(thedatalist):
+def calcIntegralValue(thedatalist, pwlinear=False):
    '''
-      calculates the integral value of a piece-wise constant function represented as data list.
+      calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
 
       Keyword arguments:
       thedatalist -- a list of tuples (x_i,f(x_i)) (sorted by x_i-1 <= x_i)
                      interpreted as step-wise constant function f between the x_i, and 0 outside the range of the x_i
+      pwlinear -- optional : should the method treat the function as piece-wise linear (True) or piece-wise constant
+                             step-function.
+
    '''
    assert len(thedatalist) >= 2
 
@@ -28,7 +31,14 @@ def calcIntegralValue(thedatalist):
    times, gaps = zip(*thedatalist)
    times = np.array(times)
    gaps = np.array(gaps)
-   return np.sum((times[1:] - times[:-1]) * gaps[:-1])
+
+   # for piece-wise linear functions, use trapez triangulation
+   # note that only n - 1 gaps are used
+   if pwlinear:
+      gaps = (gaps[1:] + gaps[:-1]) / 2
+   else:
+      gaps = gaps[:-1]
+   return np.sum((times[1:] - times[:-1]) * gaps)
 
 def getProcessPlotData(testrun, probname, optimum, **kw):
    '''
@@ -51,10 +61,12 @@ def getProcessPlotData(testrun, probname, optimum, **kw):
    lastboundkey = kw.get('boundkey', DEFAULT_BOUNDKEY)
    lastbound = testrun.problemGetData(probname, lastboundkey)
 
+   if xlim is None:
+       return None
    if history is None:
-     history = []
+       history = []
    if xaftersolve is None:
-     xaftersolve = 1e+20
+       xaftersolve = 1e+20
 
 
    plotpoints = [(X, min(cutoffgap, Misc.getGap(bound, optimum, useCplexGap=True))) for X, bound in history]

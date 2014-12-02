@@ -255,91 +255,97 @@ class IpetTableWidget(IpetWidget):
 
 class TableCreationFrame(Toplevel):
 
-    def __init__(self, gui, tablewidget, master=None, cnf={}, **kw):
-        Toplevel.__init__(self, master=tablewidget, cnf=cnf, **kw)
-        self.wm_title("Configure Table")
-        w = self.winfo_screenwidth()
-        h = self.winfo_screenheight()
-        self.geometry("%dx%d+%d+%d" % (w / 2, h / 4 * 3, tablewidget.winfo_rootx() + w / 10, tablewidget.winfo_rooty() + h / 10))
-        self.tablewidget = tablewidget
-        panedwindow = PanedWindow(self, orient=Tkconstants.VERTICAL)
-        panedwindow.pack(expand=True, fill=Tkconstants.BOTH);
-        dataselectionframe = LabelFrame(panedwindow, text='Select Data')
-        self.createDataSelectionPanel(gui, dataselectionframe)
-        panedwindow.add(dataselectionframe)
+   def __init__(self, gui, tablewidget, master=None, cnf={}, **kw):
+      Toplevel.__init__(self, master=tablewidget, cnf=cnf, **kw)
+      self.wm_title("Configure Table")
+      w = self.winfo_screenwidth()
+      h = self.winfo_screenheight()
+      self.geometry("%dx%d+%d+%d" % (w / 2, h / 4 * 3, tablewidget.winfo_rootx() + w / 10, tablewidget.winfo_rooty() + h / 10))
+      self.tablewidget = tablewidget
+      panedwindow = PanedWindow(self, orient=Tkconstants.VERTICAL)
+      panedwindow.pack(expand=True, fill=Tkconstants.BOTH);
+      dataselectionframe = LabelFrame(panedwindow, text='Select Data')
+      self.createDataSelectionPanel(gui, dataselectionframe)
+      panedwindow.add(dataselectionframe)
 
-#        selectionviewpanel = LabelFrame(panedwindow, text='Current Selection')
-#        self.createSelectionViewPanel(gui, selectionviewpanel)
-#        panedwindow.add(selectionviewpanel)
+        #selectionviewpanel = LabelFrame(panedwindow, text='Current Selection')
+        #self.createSelectionViewPanel(gui, selectionviewpanel)
+        #panedwindow.add(selectionviewpanel)
 
-    def createDataSelectionPanel(self, gui, master):
-        panedwindowdsf = PanedWindow(master, orient=Tkconstants.HORIZONTAL)
-        panedwindowdsf.pack(expand=True, fill=Tkconstants.BOTH)
-        buttonframedfs = Frame(master)
-        buttonframedfs.pack(side=Tkconstants.TOP)
-        Button(buttonframedfs, text='Add current selection', command=self.selectionAdd).pack(side=Tkconstants.LEFT)
-        Button(buttonframedfs, text='Remove current selection', command=self.selectionRemove).pack(side=Tkconstants.LEFT)
-        Button(buttonframedfs, text='Reset', command=self.selectionReset).pack(side=Tkconstants.LEFT)
-        Separator(master).pack(side=Tkconstants.TOP)
+   def createDataSelectionPanel(self, gui, master):
+      panedwindowdsf = PanedWindow(master, orient=Tkconstants.HORIZONTAL)
+      panedwindowdsf.pack(expand=True, fill=Tkconstants.BOTH)
+      buttonframedfs = Frame(master)
+      buttonframedfs.pack(side=Tkconstants.TOP)
+      Button(buttonframedfs, text='Add current selection', command=self.selectionAdd).pack(side=Tkconstants.LEFT)
+      Button(buttonframedfs, text='Remove current selection', command=self.selectionRemove).pack(side=Tkconstants.LEFT)
+      Button(buttonframedfs, text='Reset', command=self.selectionReset).pack(side=Tkconstants.LEFT)
+      Separator(master).pack(side=Tkconstants.TOP)
 
-        self.treeviewkeys = Treeview(panedwindowdsf)
-        panedwindowdsf.add(self.treeviewkeys)
-        datakeys = gui.getAllDatakeys()
-        self.fillTreeView(self.treeviewkeys, datakeys)
-        self.treeviewtestruns = Treeview(panedwindowdsf)
-        panedwindowdsf.add(self.treeviewtestruns)
-        for testrunname in gui.getTestrunnames():
-            self.treeviewtestruns.insert('', 'end', testrunname, text=testrunname)
+      self.treeviewkeys = Treeview(panedwindowdsf)
+      panedwindowdsf.add(self.treeviewkeys)
+      datakeys = gui.getAllDatakeys()
+      self.fillTreeView(self.treeviewkeys, datakeys)
+      self.treeviewtestruns = Treeview(panedwindowdsf)
+      panedwindowdsf.add(self.treeviewtestruns)
+      for testrunname in gui.getTestrunnames():
+         self.treeviewtestruns.insert('', 'end', testrunname, text=testrunname)
 
-    def createSelectionViewPanel(self, gui, master):
-        panedwindowsv = PanedWindow(master, orient=Tkconstants.HORIZONTAL)
-        panedwindowsv.pack(expand=True, fill=Tkconstants.BOTH)
-        buttonframedfs = Frame(master)
-        buttonframedfs.pack(side=Tkconstants.TOP)
-        Separator(master).pack(side=Tkconstants.TOP)
+   def createSelectionViewPanel(self, gui, master):
+      panedwindowsv = PanedWindow(master, orient=Tkconstants.HORIZONTAL)
+      panedwindowsv.pack(expand=True, fill=Tkconstants.BOTH)
+      buttonframedfs = Frame(master)
+      buttonframedfs.pack(side=Tkconstants.TOP)
+      Separator(master).pack(side=Tkconstants.TOP)
 
-        self.treeviewcurrselection = Treeview(panedwindowsv)
-        panedwindowsv.add(self.treeviewcurrselection)
-        optionframe = LabelFrame(panedwindowsv, text='Options for selection')
-        panedwindowsv.add(optionframe)
+      self.treeviewcurrselection = Treeview(panedwindowsv)
+      panedwindowsv.add(self.treeviewcurrselection)
+      optionframe = LabelFrame(panedwindowsv, text='Options for selection')
+      panedwindowsv.add(optionframe)
 
-    def fillTreeCurrSelection(self):
-        map(self.treeviewcurrselection.delete, self.treeviewcurrselection.get_children())
-        lastrun = ''
-        for run, key in self.tablewidget.selection:
-            if run != lastrun:
-                self.treeviewcurrselection.insert('', 'end', run, text=run)
-                lastrun = run
-            self.treeviewcurrselection.insert(lastrun, 'end', text=key)
+   def fillTreeCurrSelection(self):
+      map(self.treeviewcurrselection.delete, self.treeviewcurrselection.get_children())
+      lastrun = ''
+      for run, key in self.tablewidget.selection:
+         if run != lastrun:
+            self.treeviewcurrselection.insert('', 'end', run, text=run)
+            lastrun = run
+         self.treeviewcurrselection.insert(lastrun, 'end', text=key)
 
-    def fillTreeView(self, treeview, datalist):
-        for key in datalist:
-            splitkey = key.split('_')
-            nlevels = len(splitkey)
-            for level in range(0, nlevels):
-                menukey = '_'.join(splitkey[:level + 1])
-                if not treeview.exists(menukey):
-                    treeview.insert('_'.join(splitkey[:level]), 'end', menukey, text=menukey)
+   def fillTreeView(self, treeview, datalist):
+      '''
+      populates a tree view with the content of data list
 
-    def getCurrentSelectionList(self):
-        return [(testrunname, key) for testrunname in self.treeviewtestruns.selection() \
-                for key in self.treeviewkeys.selection()]
-    def selectionAdd(self):
-        newselection = self.getCurrentSelectionList()
-        self.tablewidget.selection += [element for element in newselection if newselection not in self.tablewidget.selection]
-        self.update()
+      hierarchy is defined by underscores -- each underscore defines a new level
+      '''
+      for key in sorted(datalist):
+         splitkey = key.split('_')
+         nlevels = len(splitkey)
+         for level in range(0, nlevels):
+            menukey = '_'.join(splitkey[:level + 1])
+            if not treeview.exists(menukey):
+               treeview.insert('_'.join(splitkey[:level]), 'end', menukey, text=menukey)
 
-    def selectionRemove(self):
-        newselection = self.getCurrentSelectionList()
-        for sel in newselection:
-            while self.tablewidget.selection.count(sel) > 0:
-                self.tablewidget.selection.remove(sel)
-        self.update()
+   def getCurrentSelectionList(self):
+      return [(testrunname, key) for testrunname in self.treeviewtestruns.selection() \
+             for key in self.treeviewkeys.selection()]
 
-    def selectionReset(self):
-        self.tablewidget.selection = []
-        self.update()
+   def selectionAdd(self):
+      newselection = self.getCurrentSelectionList()
+      self.tablewidget.selection += [element for element in newselection if newselection not in self.tablewidget.selection]
+      self.update()
 
-    def update(self):
-        self.tablewidget.update()
-        self.fillTreeCurrSelection()
+   def selectionRemove(self):
+      newselection = self.getCurrentSelectionList()
+      for sel in newselection:
+         while self.tablewidget.selection.count(sel) > 0:
+            self.tablewidget.selection.remove(sel)
+      self.update()
+
+   def selectionReset(self):
+      self.tablewidget.selection = []
+      self.update()
+
+   def update(self):
+      self.tablewidget.update()
+       #self.fillTreeCurrSelection()

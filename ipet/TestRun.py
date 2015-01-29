@@ -65,7 +65,10 @@ class TestRun(Editable):
         if self.datadict != {}:
             return self.datadict.get(datakey, {}).get(probname, None)
         else:
-            data = self.data.loc[probname, datakey]
+            try:
+                data = self.data.loc[probname, datakey]
+            except KeyError:
+                data = None
             if type(data) is list or notnull(data):
                 return data
             else:

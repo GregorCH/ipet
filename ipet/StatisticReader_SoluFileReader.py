@@ -82,3 +82,11 @@ class SoluFileReader(StatisticReader):
       objval = np.nan
 
       self.storeToStatistics(instance, objval, status='feas')
+
+   def newbestdualInstance(self, line):
+      splittedline = line.split()
+      assert splittedline[0] == '=bestdual='
+      instance = splittedline[1]
+      dualval = splittedline[2]
+
+      #self.storeToStatistics(instance, objval, status='bestdual')

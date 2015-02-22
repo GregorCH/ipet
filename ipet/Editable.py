@@ -29,3 +29,7 @@ class Editable:
             setter_method(newvalue)
         except AttributeError:
             setattr(self, attributename, newvalue)
+
+
+    def attributesToDict(self):
+        return {elem:getattr(self, elem) for elem in self.getEditableAttributes()}

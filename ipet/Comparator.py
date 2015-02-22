@@ -269,9 +269,9 @@ class Comparator(Observable):
         return faildict
 
     def installSomeFilters(self):
-        filter1 = IPETFilter('Nodes', '1', '>=')
-        filter2 = IPETFilter('Status', 'ok', '==')
-        filter3 = IPETFilter('SolvingTime', '0.0', '>=')
+        filter1 = IPETFilter('Nodes', '1', 'ge')
+        filter2 = IPETFilter('Status', 'ok', 'eq')
+        filter3 = IPETFilter('SolvingTime', '0.0', 'ge')
         for filters in [filter1, filter2, filter3]:
             self.filtermanager.addAndActivate(filters)
 

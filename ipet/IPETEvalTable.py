@@ -58,6 +58,7 @@ class IPETEvaluation:
     def __init__(self):
         self.filtergroups = []
         self.groupkey = 'Settings'
+        self.defaultgroup = 'default'
         self.columns = []
         
     def addFilterGroup(self, fg):
@@ -68,6 +69,10 @@ class IPETEvaluation:
     def setGroupKey(self, gk):
         self.groupkey = gk
         
+    
+    def setDefaultGroup(self, dg):
+        self.defaultgroup = dg
+        
     def addColumn(self, col):
         self.columns.append(col)
     
@@ -75,10 +80,21 @@ class IPETEvaluation:
         self.columns.remove(col)
         
     def reduceToColumns(self, df):
-        return df[[col.origcolname for col in self.columns] + [self.groupkey]]
+        usercolumns = [col.origcolname for col in self.columns]
+        neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns] 
+        return df.loc[:,usercolumns + neededcolumns]
     
+    def calculateNeededData(self, df):
+        df['_solved_'] = (df.SolvingTime < df.TimeLimit) & (df.Status != 'fail') & (df.Status != 'abort')
+        df['_timelimit_'] = (df.Status == 'TimeLimit')
+        df['_fail_'] = (df.Status == 'fail')
+        df['_abort_'] = (df.Status == 'abort') 
+        df['ProblemNames'] = df.index
+        
+        return df
+        
     def toXMLElem(self):
-        me = ElementTree.Element('Evaluation', {'groupkey':self.groupkey})
+        me = ElementTree.Element('Evaluation', {'groupkey':self.groupkey, 'defaultgroup':self.defaultgroup})
         for col in self.columns:
             me.append(col.toXMLElem())
         for fg in self.filtergroups:
@@ -101,6 +117,7 @@ class IPETEvaluation:
         if elem.tag == 'Evaluation':
             ev = IPETEvaluation()
             ev.setGroupKey(elem.attrib.get('groupkey'))
+            ev.setDefaultGroup(elem.attrib.get('defaultgroup', 'default'))
         for child in elem:
             if child.tag == 'FilterGroup':
                 ev.addFilterGroup(IPETFilterGroup.processXMLElem(child))
@@ -113,23 +130,36 @@ class IPETEvaluation:
         data = pd.concat([tr.data for tr in comp.testrunmanager.getManageables()])
         
         columndata = self.reduceToColumns(data)
-        columndata['ProblemNames'] = columndata.index
+        columndata = self.calculateNeededData(columndata)
+        
         filtered = {}
         
-            
-        ret = columndata.pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
+        # compile a results table containing all instances    
+        ret = columndata[[col.origcolname for col in self.columns] + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
         
         # filter column data and group by group key #
         
         for fg in self.filtergroups:
             reduceddata = columndata[self.applyFilterGroup(columndata, fg, comp)]
-            filtered[fg.name] = reduceddata.pivot_table(index=self.groupkey, aggfunc=len)
+            firstpart = reduceddata[['_solved_', '_fail_', '_abort_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
+            secondpart = pd.concat([reduceddata[[col.origcolname, self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)
+            secondpart.columns = ['_'.join((col.name, agg.name)) for col in self.columns for agg in col.aggregations]
+            if self.defaultgroup in secondpart.index:
+                defaultidx = secondpart.index.find(self.defaultgroup)
+            else:
+                defaultidx = 0
+                
+            defaultrow = secondpart.iloc[defaultidx, :]
+            thirdpart = secondpart / defaultrow
+            thirdpart.columns = [col + 'Q' for col in secondpart.columns] 
+             
+                                   
+            filtered[fg.name] = pd.concat([firstpart, secondpart, thirdpart], axis = 1)
+            
+        rettab = pd.concat((ret, self.aggregateTable(ret)))
+        retagg = pd.concat([filtered[fg.name] for fg in self.filtergroups], keys=[fg.name for fg in self.filtergroups], names=['Group'])
         
-        ret = pd.concat((ret, self.aggregateTable(ret)))
-        print ret.to_string(na_rep = '')
-        print pd.concat([filtered[fg.name] for fg in self.filtergroups], keys=[fg.name for fg in self.filtergroups], names=['Group']).to_latex()
-        
-        return ret
+        return rettab, retagg
     '''
         for fg in self.filtergroups:
             self.applyFilterGroup(columndata, fg, comp)
@@ -150,7 +180,6 @@ class IPETEvaluation:
                 for agg in col.aggregations:
                     results[partialcol][agg.getName()] = agg.aggregate(df[partialcol])
                 
-        print columnorder
         return pd.DataFrame(results)[columnorder]
 if __name__ == '__main__':
     ev = IPETEvaluation.fromXMLFile('myfile.xml')
@@ -163,13 +192,14 @@ if __name__ == '__main__':
 #     group.addFilter(filter2)
     agg = Aggregation('listGetShiftedGeometricMean', shiftby=10)
     #ev.columns[0].addAggregation(agg)
-    print ElementTree.tostring(agg.toXMLElem())
+    #print ElementTree.tostring(agg.toXMLElem())
         
     from ipet.Comparator import Comparator
     comp = Comparator.loadFromFile('../test/.testcomp.cmp')
     
-    ev.evaluate(comp)
-#     
+    rettab, retagg = ev.evaluate(comp)
+    print rettab.to_string()
+    print retagg.to_string()
     xml = ev.toXMLElem()
     from xml.dom.minidom import parseString
     dom = parseString(ElementTree.tostring(xml))

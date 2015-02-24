@@ -44,7 +44,7 @@ class ComparatorTest(unittest.TestCase):
         columns = ['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
         self.assertIsNone(assert_frame_equal(tr.data[columns], tr2.data[columns]), "Testruns do not have exactly same column data:")
 
-        os.remove(".testcomp.cmp")
+        #os.remove(".testcomp.cmp")
 
     def test_trnfileextension(self):
         self.comparator.addLogFile(".testrun.trn")

@@ -5,6 +5,7 @@ Created on 30.12.2013
 '''
 import numpy
 import Misc, Editable
+from xml.etree import ElementTree
 class Aggregation(Editable.Editable):
     '''
     aggregates a list of values into a single value, as, e.g., a mean. Allows functions from numpy and
@@ -43,6 +44,23 @@ class Aggregation(Editable.Editable):
             return self.aggrfunc(valuelist, **{key:self.__dict__[key] for key in self.editableattributes[1:]})
         else:
             return self.aggrfunc(valuelist)
+        
+    @staticmethod
+    def processXMLElem(elem):
+        if elem.tag == 'Aggregation':
+            additional = {}
+            for child in elem:
+                additional.update({child.tag:float(child.attrib.get('val'))})
+            return Aggregation(elem.attrib.get('name'), **additional)
+    
+    def toXMLElem(self):
+        me = ElementTree.Element('Aggregation', {'name':self.name})
+        for att in self.editableattributes:
+            if att == 'name':
+                continue
+            val = self.__dict__[att]
+            me.append(ElementTree.Element(att, {'type':'float', 'val':str(val)}))
+        return me
 
 if __name__ == '__main__':
     arr = range(10)

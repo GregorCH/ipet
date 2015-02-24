@@ -4,7 +4,6 @@ Created on 16.12.2013
 @author: bzfhende
 '''
 from Editable import Editable
-from dicttoxml import dicttoxml
 import xml.etree.ElementTree as ElementTree
 class IPETComparison:
     '''
@@ -121,7 +120,13 @@ class IPETFilterGroup(Editable):
 
     def addFilter(self, filter_):
         self.filters.append(filter_)
-
+        
+    def filterProblem(self, probname, testruns=[]):
+        for filter_ in self.filters:
+            if not filter_.filterProblem(probname, testruns):
+                return False
+            
+        return True
     def toXMLElem(self):
 
         me = ElementTree.Element('FilterGroup', {'name':self.name})

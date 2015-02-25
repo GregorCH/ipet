@@ -300,8 +300,11 @@ class Comparator(Observable):
                 db = testrun.problemGetData(probname, DualBoundReader.datakey)
                 time = testrun.problemGetData(probname, SolvingTimeReader.datakey)
                 status = 'ok'
+                if solustatus is None:
+                    status = 'unknown'
+
                 probgap = Misc.getGap(pb, db)
-                if probgap > 1e+4 and solustatus in ['opt', 'best', 'feas'] and testrun.problemGetData(probname, LimitReachedReader.datakey) is None:
+                if probgap > 1e-4 and solustatus in ['opt', 'best', 'feas'] and testrun.problemGetData(probname, LimitReachedReader.datakey) is None:
                     status = 'fail'
                 elif testrun.problemCheckFail(probname) > 0:
                     status = 'fail'
@@ -310,10 +313,6 @@ class Comparator(Observable):
 
                 if time is None:
                     status = 'abort'
-
-                if solustatus is None:
-                    status = 'unknown'
-
 
                 testrun.addData(probname, 'Status', status)
 

@@ -10,9 +10,9 @@ class IPETComparison:
     comparison operators for filters. All standard binary comparisons + float comparisons (with tolerance)
     + percentage based inequality
     '''
-    comparisondict = {"le":"le", "ge":"ge", "eq":"eq", "neq":"neq"}
+    comparisondict = {"le":"le", "ge":"ge", "eq":"eq", "neq":"neq", "contains":"cont"}
 
-    def __init__(self, operator):
+    def __init__(self, operator, containset=None):
         '''
         constructs a comparison object by passing an appropriate operator as string
         '''
@@ -20,7 +20,9 @@ class IPETComparison:
             self.operator = operator
         else:
             raise KeyError("Unknown key value %s" % (operator))
-
+        self.containset = containset
+        
+        
     def compare(self, x, y):
         method = getattr(self, "method_" + IPETComparison.comparisondict[self.operator])
         return method(x, y)
@@ -34,11 +36,14 @@ class IPETComparison:
     def method_neq(self, x, y):
         return x != y
 
+    def method_cont(self, x, y):
+        return x in self.containset or y in self.containset
+     
 class IPETFilter(Editable):
     '''
     Filters are used for selecting subsets of problems to analyze.
     '''
-    def __init__(self, expression1, expression2, operator, anytestrun=True):
+    def __init__(self, expression1, expression2, operator, anytestrun='all', containset=None):
         '''
         filter constructor
         '''
@@ -46,6 +51,7 @@ class IPETFilter(Editable):
         self.expression2 = expression2
 
         self.anytestrun = anytestrun
+        self.containset = containset
         self.set_operator(operator)
         
     @staticmethod
@@ -55,7 +61,9 @@ class IPETFilter(Editable):
 
         anytestrun = attrdict.get('anytestrun')
         operator = attrdict.get('operator')
-        return IPETFilter(expression1, expression2, operator, anytestrun)
+        containset = attrdict.get('containset')
+        
+        return IPETFilter(expression1, expression2, operator, anytestrun, containset)
 
 
     def getName(self):
@@ -68,7 +76,7 @@ class IPETFilter(Editable):
 
     def set_operator(self, operator):
         self.operator = operator
-        self.comparison = IPETComparison(self.operator)
+        self.comparison = IPETComparison(self.operator, self.containset)
 
     def getEditableAttributes(self):
         return ['anytestrun', 'expression1', 'operator', 'expression2']
@@ -77,6 +85,10 @@ class IPETFilter(Editable):
         '''
         return True or False depending on the evaluation of the filter operator comparison
         '''
+        if self.operator == 'contains':
+            if probname in self.containset:
+                return True
+            return False
         for testrun in testruns:
             x = self.evaluate(self.expression1, probname, testrun)
             y = self.evaluate(self.expression2, probname, testrun)
@@ -110,7 +122,11 @@ class IPETFilter(Editable):
     def toXMLElem(self):
         myattributes = self.attributesToDict()
         mystrattributes = {key:str(myattributes[key]) for key in self.getEditableAttributes()}
-        return ElementTree.Element('Filter', mystrattributes)
+        me = ElementTree.Element('Filter', mystrattributes)
+        if self.containset is not None:
+            for containelem in sorted(list(self.containset)):
+                me.append(ElementTree.Element(containelem))
+        return me
 
 class IPETFilterGroup(Editable):
 
@@ -147,7 +163,10 @@ class IPETFilterGroup(Editable):
                 filtergroup.addFilter(IPETFilterGroup.processXMLElem(child))
             return filtergroup
         elif elem.tag == 'Filter':
-            filter_ = IPETFilter.fromDict(elem.attrib)
+            elemdict = dict(elem.attrib)
+            for child in elem:
+                elemdict.setdefault('containset', set()).add(child.tag)
+            filter_ = IPETFilter.fromDict(elemdict)
             return filter_
 
     @staticmethod

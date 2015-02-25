@@ -53,7 +53,7 @@ class IPETFilter(Editable):
         expression1 = attrdict.get('expression1')
         expression2 = attrdict.get('expression2')
 
-        anytestrun = bool(attrdict.get('anytestrun'))
+        anytestrun = attrdict.get('anytestrun')
         operator = attrdict.get('operator')
         return IPETFilter(expression1, expression2, operator, anytestrun)
 
@@ -80,14 +80,14 @@ class IPETFilter(Editable):
         for testrun in testruns:
             x = self.evaluate(self.expression1, probname, testrun)
             y = self.evaluate(self.expression2, probname, testrun)
-            if self.anytestrun and self.comparison.compare(x, y):
+            if self.anytestrun == 'one' and self.comparison.compare(x, y):
                 return True
-            elif not self.anytestrun and not self.comparison.compare(x, y):
+            elif self.anytestrun == 'all' and not self.comparison.compare(x, y):
                 return False
-        else:
-            if self.anytestrun:
-                return False
-            return True
+        
+        if self.anytestrun == 'one':
+            return False
+        return True
 
     def evaluate(self, value, probname, testrun):
         if value in testrun.getKeySet():

@@ -140,6 +140,7 @@ class IPETEvaluation:
         # filter column data and group by group key #
         
         for fg in self.filtergroups:
+            print self.applyFilterGroup(columndata, fg, comp)
             reduceddata = columndata[self.applyFilterGroup(columndata, fg, comp)]
             firstpart = reduceddata[['_solved_', '_fail_', '_abort_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
             secondpart = pd.concat([reduceddata[[col.origcolname, self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)

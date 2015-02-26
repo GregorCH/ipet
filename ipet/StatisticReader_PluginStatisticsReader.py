@@ -30,7 +30,7 @@ class PluginStatisticsReader(StatisticReader):
    singlecolumnnames = ['Root Node', 'Total Time']
    active = False
    spacesepcolumnnames = ['LP Iters']
-   replacecolumnnames = [''.join(name.split()) for name in spacesepcolumnnames]
+   replacecolumnnames = [''.join(sscname.split()) for sscname in spacesepcolumnnames]
    wrongplugintype = 'Wrong'
    plugintype = wrongplugintype
 

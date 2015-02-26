@@ -139,18 +139,17 @@ class IPETEvaluation:
 
         # filter column data and group by group key #
 
+        print ret.head(5).to_string()
         for fg in self.filtergroups:
-            reduceddata = columndata[self.applyFilterGroup(columndata, fg, comp)]
+            reduceddata = self.applyFilterGroup(columndata, fg)
             firstpart = reduceddata[['_solved_', '_fail_', '_abort_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
             secondpart = pd.concat([reduceddata[[col.origcolname, self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)
             secondpart.columns = ['_'.join((col.name, agg.name)) for col in self.columns for agg in col.aggregations]
             if self.defaultgroup in secondpart.index:
-                defaultrow = secondpart.loc[[self.defaultgroup], :]
+                defaultrow = secondpart.loc[self.defaultgroup, :]
             else:
-                defaultrow = secondpart.iloc[[0], :]
+                defaultrow = secondpart.iloc[0, :]
 
-            print secondpart
-            print defaultrow
             thirdpart = secondpart / defaultrow
             thirdpart.columns = [col + 'Q' for col in secondpart.columns]
 
@@ -165,8 +164,8 @@ class IPETEvaluation:
         for fg in self.filtergroups:
             self.applyFilterGroup(columndata, fg, comp)
     '''
-    def applyFilterGroup(self, df, fg, comp):
-        return df.ProblemNames.apply(fg.filterProblem, testruns=comp.testrunmanager.getManageables())
+    def applyFilterGroup(self, df, fg):
+        return fg.filterDataFrame(df)
 
     def aggregateTable(self, df):
         results = {}

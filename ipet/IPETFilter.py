@@ -5,6 +5,9 @@ Created on 16.12.2013
 '''
 from Editable import Editable
 import xml.etree.ElementTree as ElementTree
+import numpy as np
+import pandas as pd
+
 class IPETComparison:
     '''
     comparison operators for filters. All standard binary comparisons + float comparisons (with tolerance)
@@ -67,11 +70,7 @@ class IPETFilter(Editable):
 
 
     def getName(self):
-        prefix = ""
-        if self.anytestrun:
-            prefix = "any"
-        else:
-            prefix = "all"
+        prefix = self.anytestrun
         return " ".join((prefix, self.expression1, self.operator, self.expression2))
 
     def set_operator(self, operator):
@@ -101,11 +100,36 @@ class IPETFilter(Editable):
             return False
         return True
 
+
+    def filterDataFrame(self, df):
+        if self.operator == 'contains':
+            return np.all(df.index.isin(self.containset))
+        x = self.evaluateValueDataFrame(df, self.expression1)
+        y = self.evaluateValueDataFrame(df, self.expression2)
+        booleanseries = self.comparison.compare(x, y)
+        mymethod = np.any
+        if self.anytestrun == 'all':
+            mymethod = np.all
+            
+        return mymethod(booleanseries)
+        
+    
+    def evaluateValueDataFrame(self, df, value):
+        if value in df.columns:
+            return df[[value]]
+        else:
+            for conversion in [int, float, str]:
+                try:
+                    return conversion(value)
+                except ValueError:
+                    pass
+        return value
+    
     def evaluate(self, value, probname, testrun):
         if value in testrun.getKeySet():
             return testrun.problemGetData(probname, value)
         else:
-            for conversion in [int, float]:
+            for conversion in [int, float, str]:
                 try:
                     return conversion(value)
                 except ValueError:
@@ -136,6 +160,9 @@ class IPETFilterGroup(Editable):
 
     def addFilter(self, filter_):
         self.filters.append(filter_)
+    
+    def filterDataFrame(self, df):
+        return df.groupby(level=0).filter(lambda x:np.all([filter_.filterDataFrame(x) for filter_ in self.filters]))
         
     def filterProblem(self, probname, testruns=[]):
         for filter_ in self.filters:

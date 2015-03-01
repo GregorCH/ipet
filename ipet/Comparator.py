@@ -309,7 +309,7 @@ class Comparator(Observable):
                 elif testrun.problemCheckFail(probname) > 0:
                     status = 'fail'
                 elif testrun.problemGetData(probname, LimitReachedReader.datakey) is not None:
-                    status = testrun.problemGetData(probname, LimitReachedReader.datakey)
+                    status = testrun.problemGetData(probname, LimitReachedReader.datakey).lower()
 
                 if time is None:
                     status = 'abort'

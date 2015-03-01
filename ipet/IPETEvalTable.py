@@ -139,7 +139,6 @@ class IPETEvaluation:
 
         # filter column data and group by group key #
 
-        print ret.head(5).to_string()
         for fg in self.filtergroups:
             reduceddata = self.applyFilterGroup(columndata, fg)
             firstpart = reduceddata[['_solved_', '_fail_', '_abort_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
@@ -149,6 +148,7 @@ class IPETEvaluation:
                 defaultrow = secondpart.loc[self.defaultgroup, :]
             else:
                 defaultrow = secondpart.iloc[0, :]
+
 
             thirdpart = secondpart / defaultrow
             thirdpart.columns = [col + 'Q' for col in secondpart.columns]

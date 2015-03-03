@@ -6,12 +6,16 @@ Created on 30.12.2013
 import numpy
 import Misc, Editable
 from xml.etree import ElementTree
+from _functools import partial
+from ipet.quick_Pandas import getWilcoxonQuotientSignificance as qWilcox
+
 class Aggregation(Editable.Editable):
     '''
     aggregates a list of values into a single value, as, e.g., a mean. Allows functions from numpy and
     from Misc-module
     '''
-    possibleaggregations = ['listGetShiftedGeometricMean', 'listGetGeomMean', 'min', 'max', 'mean', 'size']
+    possibleaggregations = ['shmean', 'gemean', 'min', 'max', 'mean', 'size', 'std', 'sum']
+    agg2Stat = {'shmean':qWilcox}
  
     def __init__(self, aggregation, **kw):
         self.set_aggregation(aggregation)
@@ -25,8 +29,11 @@ class Aggregation(Editable.Editable):
         self.name = newname
         
     def getName(self):
-        return self.name
-
+        name = self.name
+        if( len(self.getEditableAttributes()) > 1 ):
+            name += '(%s)'% ','.join((str(self.__dict__[key]) for key in self.editableattributes[1:]))
+        return name
+    
     def getEditableAttributes(self):
         return self.editableattributes
  
@@ -61,6 +68,13 @@ class Aggregation(Editable.Editable):
             val = self.__dict__[att]
             me.append(ElementTree.Element(att, {'type':'float', 'val':str(val)}))
         return me
+    
+    def getStatsTest(self):
+        method = self.agg2Stat.get(self.name)
+        if len(self.getEditableAttributes()) > 1 and method is not None:
+            method = partial(method, **{key:self.__dict__[key] for key in self.editableattributes[1:]})
+            method.__name__ = self.getName()
+        return method    
 
 if __name__ == '__main__':
     arr = range(10)

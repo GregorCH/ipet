@@ -24,8 +24,8 @@ class IPETComparison:
         else:
             raise KeyError("Unknown key value %s" % (operator))
         self.containset = containset
-        
-        
+
+
     def compare(self, x, y):
         method = getattr(self, "method_" + IPETComparison.comparisondict[self.operator])
         return method(x, y)
@@ -41,7 +41,7 @@ class IPETComparison:
 
     def method_cont(self, x, y):
         return x in self.containset or y in self.containset
-     
+
 class IPETFilter(Editable):
     '''
     Filters are used for selecting subsets of problems to analyze.
@@ -56,7 +56,7 @@ class IPETFilter(Editable):
         self.anytestrun = anytestrun
         self.containset = containset
         self.set_operator(operator)
-        
+
     @staticmethod
     def fromDict(attrdict):
         expression1 = attrdict.get('expression1')
@@ -65,7 +65,7 @@ class IPETFilter(Editable):
         anytestrun = attrdict.get('anytestrun')
         operator = attrdict.get('operator')
         containset = attrdict.get('containset')
-        
+
         return IPETFilter(expression1, expression2, operator, anytestrun, containset)
 
 
@@ -95,7 +95,7 @@ class IPETFilter(Editable):
                 return True
             elif self.anytestrun == 'all' and not self.comparison.compare(x, y):
                 return False
-        
+
         if self.anytestrun == 'one':
             return False
         return True
@@ -110,10 +110,10 @@ class IPETFilter(Editable):
         mymethod = np.any
         if self.anytestrun == 'all':
             mymethod = np.all
-            
+
         return mymethod(booleanseries)
-        
-    
+
+
     def evaluateValueDataFrame(self, df, value):
         if value in df.columns:
             return df[[value]]
@@ -124,7 +124,7 @@ class IPETFilter(Editable):
                 except ValueError:
                     pass
         return value
-    
+
     def evaluate(self, value, probname, testrun):
         if value in testrun.getKeySet():
             return testrun.problemGetData(probname, value)
@@ -160,15 +160,18 @@ class IPETFilterGroup(Editable):
 
     def addFilter(self, filter_):
         self.filters.append(filter_)
-    
+
+    def getName(self):
+        return self.name
+
     def filterDataFrame(self, df):
         return df.groupby(level=0).filter(lambda x:np.all([filter_.filterDataFrame(x) for filter_ in self.filters]))
-        
+
     def filterProblem(self, probname, testruns=[]):
         for filter_ in self.filters:
             if not filter_.filterProblem(probname, testruns):
                 return False
-            
+
         return True
     def toXMLElem(self):
 
@@ -178,11 +181,11 @@ class IPETFilterGroup(Editable):
             me.append(filter_.toXMLElem())
 
         return me
-    
+
     @staticmethod
     def processXMLElem(elem):
         '''
-        inspect and process an xml element 
+        inspect and process an xml element
         '''
         if elem.tag == 'FilterGroup':
             filtergroup = IPETFilterGroup(elem.attrib.get('name'))

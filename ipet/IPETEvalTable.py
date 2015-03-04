@@ -6,23 +6,38 @@ Created on 24.02.2015
 import pandas as pd
 from Aggregation import Aggregation
 import xml.etree.ElementTree as ElementTree
-from ipet.IPETFilter import IPETFilterGroup, IPETFilter
-from ipet.Misc import listGetShiftedGeometricMean
+from ipet.IPETFilter import IPETFilterGroup
+import numpy
 
 class IPETEvaluationColumn:
-
     
-    
-    def __init__(self, origcolname, colname=None, formatstr="%.1f"):
+    def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None):
+        '''
+        constructor of a column for the IPET evaluation
+        
+        Parameters
+        ----------
+        origcolname : column name in the original data frame
+        name : column name that will be displayed for this column
+        formatstr : a format string to define how the column gets printed, if no format
+        
+        transformfunc : a transformation function, that should be applied to all children
+                        columns of this column recursively
+                        
+        constant : should this column represent a constant value? 
+        '''
+        
+        if origcolname is None and transformfunc is None and constant is None:
+            raise AttributeError("Error constructing this column: No origcolname or transformfunction specified")
+        
         self.children = []
 
         self.origcolname = origcolname
-        if colname is not None:
-            self.name = colname
-        else:
-            self.name = origcolname
+        self.name = name
             
         self.formatstr = formatstr
+        self.transformfunc = transformfunc
+        self.constant = constant
 
         self.aggregations = []
 
@@ -30,13 +45,40 @@ class IPETEvaluationColumn:
         self.children.append(child)
 
     def getName(self):
-        return self.name
+        '''
+        infer the name for this column
+        
+        if this column was constructed with a column name, the name is used
+        else if this column represents an original column of the data frame, 
+        the original column name is used, otherwise, we construct an
+        artificial name that represents how this column is constructed
+        '''
+        if self.name is not None:
+            return self.name
+        elif self.origcolname is not None:
+            return self.origcolname
+        elif self.constant is not None:
+            return "Const_%s"%self.constant
+        else: 
+            return self.transformfunc + ','.join((child.getName() for child in self.children))
+        
+        
+    def parseConstant(self):
+        for conversion in [int, float]:
+            try:
+                return conversion(self.constant)
+            except:
+                pass
+        return None
     
     def addAggregation(self, agg):
         self.aggregations.append(agg)
 
     def toXMLElem(self):
-        me = ElementTree.Element("Column", {'name':self.name, 'origcolname':self.origcolname})
+        myelements = {k:self.__dict__[k] for k in ['name', 'origcolname', 'transformfunc', 'formatstr', 'constant'] if self.__dict__.get(k) is not None}
+        
+        
+        me = ElementTree.Element("Column", myelements)
         for child in self.children:
             me.append(child.toXMLElem())
 
@@ -47,14 +89,51 @@ class IPETEvaluationColumn:
     @staticmethod
     def processXMLElem(elem):
         if elem.tag == 'Column':
-            column = IPETEvaluationColumn(elem.attrib.get('origcolname'), elem.attrib.get('name'))
+            column = IPETEvaluationColumn(**elem.attrib)
             for child in elem:
                 if child.tag == 'Aggregation':
                     column.addAggregation(Aggregation.processXMLElem(child))
-
+                elif child.tag == 'Column':
+                    column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column
 
-
+    def getColumnData(self, df):
+        '''
+        Retrieve the data associated with this column
+        '''
+        
+        # if no children are associated with this column, it is either 
+        # a column represented in the data frame by an 'origcolname',
+        # or a constant
+        if len(self.children) == 0:
+            if self.origcolname is not None:
+                return df[self.origcolname]
+            elif self.constant is not None:
+                df[self.getName()] = self.parseConstant()
+                return df[self.getName()]
+        else:
+            # try to apply an element-wise transformation function to the children of this column
+            transformfunc = getattr(numpy, self.transformfunc)
+            
+            # concatenate the children data into a new data frame object
+            argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)
+            try:
+                # try to directly apply the transformation function, this might fail for
+                # some transformations, e.g., the 'divide'-function of numpy because it
+                # requires two arguments instead of the series associated with each row
+                result = argdf.apply(transformfunc, axis=1)
+            except ValueError:
+                
+                # try to wrap things up in a temporary wrapper function that unpacks
+                # the series argument into its single values
+                def tmpwrapper(*args):
+                    return transformfunc(*(args[0].values))
+                
+                # apply the wrapper function instead
+                result = argdf.apply(tmpwrapper, axis=1)
+                
+            return result
+                
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
         
@@ -89,7 +168,11 @@ class IPETEvaluation:
         self.columns.remove(col)
 
     def reduceToColumns(self, df):
-        usercolumns = [col.origcolname for col in self.columns]
+        usercolumns = []
+        for col in self.columns:
+            df[col.getName()] = col.getColumnData(df)
+            usercolumns.append(col.getName())
+            
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
         return df.loc[:,usercolumns + neededcolumns]
 
@@ -161,7 +244,7 @@ class IPETEvaluation:
         filtered = {}
 
         # compile a results table containing all instances
-        ret = columndata[[col.origcolname for col in self.columns] + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
+        ret = columndata[[col.getName() for col in self.columns] + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
 
         # filter column data and group by group key #
 
@@ -173,7 +256,7 @@ class IPETEvaluation:
             generalpart = reduceddata[['_count_', '_solved_', '_time_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
             
             # column aggregations aggregate every column and every column aggregation
-            colaggpart = pd.concat([reduceddata[[col.origcolname, self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)
+            colaggpart = pd.concat([reduceddata[[col.getName(), self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)
             
             # rename the column aggregations
             colaggpart.columns = ['_'.join((col.getName(), agg.getName())) for col in self.columns for agg in col.aggregations]
@@ -223,20 +306,18 @@ class IPETEvaluation:
             # iterate through the columns
             defaultvalues = None
             try:
-                defaultvalues = groupeddata[self.defaultgroup][col.origcolname]
+                defaultvalues = groupeddata[self.defaultgroup][col.getName()]
             except KeyError:
-                print "Sorry, cannot retrieve default values for column %s, key %s"%(col.origcolname, self.defaultgroup)
+                print "Sorry, cannot retrieve default values for column %s, key %s"%(col.getName(), self.defaultgroup)
                 continue
             
             # iterate through the stats tests associated with each column
             for statstest in col.getStatsTests():
-                stats.append(df[[self.groupkey, col.origcolname]].pivot_table(index=self.groupkey, aggfunc=lambda x:statstest(x, defaultvalues)))
+                stats.append(df[[self.groupkey, col.getName()]].pivot_table(index=self.groupkey, aggfunc=lambda x:statstest(x, defaultvalues)))
                 names.append('_'.join((col.getName(), statstest.__name__)))
                 
         if len(stats) > 0:
             stats = pd.concat(stats, axis=1)
-            print stats
-            print names
             stats.columns = names
             
             return stats
@@ -246,7 +327,7 @@ class IPETEvaluation:
         results = {}
         columnorder = []
         for col in self.columns:
-            origcolname = col.origcolname
+            origcolname = col.getName()
             partialdf = df.xs(origcolname, level=1, axis=1, drop_level=False)
 
             for partialcol in partialdf.columns:
@@ -256,6 +337,7 @@ class IPETEvaluation:
                     results[partialcol][agg.getName()] = agg.aggregate(df[partialcol])
 
         return pd.DataFrame(results)[columnorder]
+    
 if __name__ == '__main__':
     ev = IPETEvaluation.fromXMLFile('../test/testevaluate.xml')
 #     ev.addColumn(IPETEvaluationColumn('SolvingTime'))
@@ -274,7 +356,6 @@ if __name__ == '__main__':
 
     rettab, retagg = ev.evaluate(comp)
     print rettab.to_string()
-    print rettab.dtypes
     print retagg.to_string()
     xml = ev.toXMLElem()
     from xml.dom.minidom import parseString

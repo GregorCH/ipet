@@ -155,7 +155,7 @@ class IPETEvaluation:
     '''
 
     #todo put tex, csv etc. here as other possible streams for filter group output
-    possiblestreams=['stdout']
+    possiblestreams=['stdout', 'tex', 'txt']
     DEFAULT_GROUPKEY="SETTINGS"
     DEFAULT_DEFAULTGROUP="default"
     def __init__(self):
@@ -262,9 +262,25 @@ class IPETEvaluation:
         streammethod(df, filebasename)
 
     def streamDataFrame_stdout(self, df, filebasename):
+        '''
+        print to console
+        '''
         print "Data for %s:"%filebasename
         print df.to_string()
 
+    def streamDataFrame_tex(self, df, filebasename):
+        '''
+        write tex output
+        '''
+        with open("%s.tex"%filebasename, "w") as texfile:
+            texfile.write(df.to_latex())
+
+    def streamDataFrame_txt(self, df, filebasename):
+        '''
+        write txt output
+        '''
+        with open("%s.txt"%filebasename, "w") as txtfile:
+            df.to_string(txtfile)
 
     def evaluate(self, comp):
         '''

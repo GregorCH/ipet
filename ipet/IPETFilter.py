@@ -149,7 +149,7 @@ class IPETFilter(Editable):
         me = ElementTree.Element('Filter', mystrattributes)
         if self.containset is not None:
             for containelem in sorted(list(self.containset)):
-                me.append(ElementTree.Element(containelem))
+                me.append(ElementTree.Element("Instance", {"name":containelem}))
         return me
 
 class IPETFilterGroup(Editable):
@@ -195,7 +195,9 @@ class IPETFilterGroup(Editable):
         elif elem.tag == 'Filter':
             elemdict = dict(elem.attrib)
             for child in elem:
-                elemdict.setdefault('containset', set()).add(child.tag)
+                instancename = child.attrib.get("name")
+                if instancename:
+                    elemdict.setdefault('containset', set()).add(instancename)
             filter_ = IPETFilter.fromDict(elemdict)
             return filter_
 

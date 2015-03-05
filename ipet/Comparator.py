@@ -285,7 +285,7 @@ class Comparator(Observable):
         for aggstring in ['min', 'max', 'mean', 'size']:
             self.aggregationmanager.addAndActivate(Aggregation(aggstring))
         for shift in [10.0, 100.0, 1000.0]:
-            agg = Aggregation('listGetShiftedGeometricMean', shiftby=shift)
+            agg = Aggregation('shmean', shiftby=shift)
             agg.set_name("shifted geom. (%d)"%shift)
             self.aggregationmanager.addAndActivate(agg)
 

@@ -9,7 +9,7 @@ class StatisticReader(Editable):
     '''
     base class for all statistic readers - readers should always inherit from this base class for minimal implementation
     effort
- 
+
     readers only need to overwrite the methods extractStatistic() and perhaps execEndOfProb()
     '''
 
@@ -113,7 +113,7 @@ class StatisticReader(Editable):
                     data = None
                 except TypeError:
 #                  print self.name, " failed data conversion"
-                    raise TypeError
+                    raise TypeError("Type error during data conversion in line <%s>"%line)
                 self.testrun.addData(self.problemname, self.datakey, data)
         except AttributeError:
 #          print self.name, " has no such attribute"
@@ -135,7 +135,7 @@ class StatisticReader(Editable):
     def turnIntoFloat(self, astring):
         '''
         parses strings to floats, keeps track of trailing caracters signifying magnitudes
-  
+
         Special attention is put to strings of the form, e.g., '900k' where
         the tailing 'k'-character signifies multiplication by 1000.
         '''
@@ -151,7 +151,7 @@ class StatisticReader(Editable):
 class BestSolFeasReader(StatisticReader):
     '''
     catches the expression 'best solution is not feasible in original problem'
-    
+
     @return: False if above expression is found in the log and the best solution is thus not feasible, otherwise True
     '''
     name = 'BestSolFeasReader'
@@ -169,6 +169,40 @@ class BestSolFeasReader(StatisticReader):
         self.testrun.addData(self.problemname, self.datakey, self.bestsolfailedcheck)
         self.bestsolfailedcheck = False
 
+
+
+class DateTimeReader(StatisticReader):
+    '''
+    reads in the start and finish time from a timestamp in given in Milliseconds
+
+    If found, the corresponding data keys are Datetime_Start and Datetime_End
+    '''
+    name = 'DateTimeReader'  # : the name for this reader
+    datetimestartexp = re.compile(r"^@03 ([0-9]+)")  # : the expression for the date time start
+    datetimeendexp = re.compile(r"^@04 ([0-9]+)")  # : the expression for the date time after termination
+    datetimestartdatakey = 'Datetime_Start'  # : data key for start of run
+    datetimeendkey = 'Datetime_End'  # : data key for end of run
+
+    datetimekw = {datetimestartdatakey:datetimestartexp, datetimeendkey:datetimeendexp}
+
+    def extractStatistic(self, line):
+        for key, exp in self.datetimekw.items():
+            matched = exp.match(line)
+            if matched:
+                timestamp = long(matched.groups()[0])
+                time = datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                self.testrun.addData(self.problemname, key, time)
+                break
+
+class DualLPTimeReader(StatisticReader):
+    '''
+    reads the dual LP time
+    '''
+    name = 'DualLPTimeReader'
+    regular_exp = re.compile('^  dual LP')
+    datakey = 'duallptime'
+    datatype = float
+    lineindex = 3
 
 class DualBoundReader(StatisticReader):
     '''
@@ -201,36 +235,25 @@ class DualBoundReader(StatisticReader):
                 pass
 #               print line
 
-class DualLPTimeReader(StatisticReader):
+class GapReader(StatisticReader):
     '''
-    reads the dual LP time
+    reads the primal dual gap at the end of the solving
     '''
-    name = 'DualLPTimeReader'
-    regular_exp = re.compile('^  dual LP')
-    datakey = 'duallptime'
+    name = 'GapReader'
+    regular_exp = re.compile('^Gap')
+    datakey = 'Gap'
     datatype = float
-    lineindex = 3
+    lineindex = 2
 
+    def extractStatistic(self, line):
+        if self.regular_exp.match(line):
+            gapasword = self.getWordAtIndex(line, self.lineindex)
 
-class NodesReader(StatisticReader):
-    '''
-    reads the total number of solving nodes of the branch and bound search
-    '''
-    name = 'NodesReader'
-    regular_exp = re.compile("^  nodes \(total\)    :")
-    datakey = 'Nodes'
-    datatype = int
-    lineindex = 3
+            # if the gap is infinite, no data is passed to the test run
+            if gapasword != "infinite":
+                gap = self.turnIntoFloat(gapasword)
+                self.testrun.addData(self.problemname, self.datakey, gap)
 
-class MaxDepthReader(StatisticReader):
-    '''
-    reads the maximum depth
-    '''
-    name = 'MaxDepthReader'
-    regular_exp = re.compile('  max depth        :')
-    datakey = 'MaxDepth'
-    datatype = int
-    lineindex = 3
 
 class LimitReachedReader(StatisticReader):
     '''
@@ -249,6 +272,28 @@ class LimitReachedReader(StatisticReader):
                 stringexpression = match.groups()[0]
                 limit = "".join((part.capitalize() for part in stringexpression.split()))
                 self.testrun.addData(self.problemname, self.datakey, limit)
+
+class MaxDepthReader(StatisticReader):
+    '''
+    reads the maximum depth
+    '''
+    name = 'MaxDepthReader'
+    regular_exp = re.compile('  max depth        :')
+    datakey = 'MaxDepth'
+    datatype = int
+    lineindex = 3
+
+class NodesReader(StatisticReader):
+    '''
+    reads the total number of solving nodes of the branch and bound search
+    '''
+    name = 'NodesReader'
+    regular_exp = re.compile("^  nodes \(total\)    :")
+    datakey = 'Nodes'
+    datatype = int
+    lineindex = 3
+
+
 
 class PrimalBoundReader(StatisticReader):
     '''
@@ -365,26 +410,3 @@ class TimeToFirstReader(StatisticReader):
 
             except TypeError:
                 pass
-
-class DateTimeReader(StatisticReader):
-    '''
-    reads in the start and finish time from a timestamp in given in Milliseconds
-
-    If found, the corresponding data keys are Datetime_Start and Datetime_End
-    '''
-    name = 'DateTimeReader'  # : the name for this reader
-    datetimestartexp = re.compile(r"^@03 ([0-9]+)")  # : the expression for the date time start
-    datetimeendexp = re.compile(r"^@04 ([0-9]+)")  # : the expression for the date time after termination
-    datetimestartdatakey = 'Datetime_Start'  # : data key for start of run
-    datetimeendkey = 'Datetime_End'  # : data key for end of run
-
-    datetimekw = {datetimestartdatakey:datetimestartexp, datetimeendkey:datetimeendexp}
-
-    def extractStatistic(self, line):
-        for key, exp in self.datetimekw.items():
-            matched = exp.match(line)
-            if matched:
-                timestamp = long(matched.groups()[0])
-                time = datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
-                self.testrun.addData(self.problemname, key, time)
-                break

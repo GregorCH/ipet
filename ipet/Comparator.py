@@ -12,7 +12,7 @@ except:
     import pickle
 from Manager import Manager
 from StatisticReader_HeurReader import HeurDataReader
-from StatisticReader import PrimalBoundReader, DualBoundReader, SolvingTimeReader, TimeLimitReader, \
+from StatisticReader import PrimalBoundReader, DualBoundReader, GapReader, SolvingTimeReader, TimeLimitReader, \
    BestSolFeasReader, MaxDepthReader, LimitReachedReader, NodesReader, RootNodeFixingsReader, \
    TimeToFirstReader, TimeToBestReader
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
@@ -326,6 +326,7 @@ class Comparator(Observable):
                   DateTimeReader(),
                   DualBoundReader(),
                   DualBoundHistoryReader(),
+                  GapReader(),
                   GeneralInformationReader(),
                   HeurDataReader(),
                   MaxDepthReader(),

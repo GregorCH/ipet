@@ -11,7 +11,8 @@ import numpy
 
 class IPETEvaluationColumn:
 
-    def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None):
+    def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
+                 nanrep=None, minval=None, maxval=None, comp=None, translevel=None):
         '''
         constructor of a column for the IPET evaluation
 
@@ -22,15 +23,28 @@ class IPETEvaluationColumn:
         formatstr : a format string to define how the column gets printed, if no format
 
         transformfunc : a transformation function, that should be applied to all children
-                        columns of this column recursively
+                        columns of this column recursively. See also the 'translevel' attribute
 
         constant : should this column represent a constant value?
+
+        nanrep : replacement of nan-values for this column
+
+        minval : a minimum value for all elements in this column
+
+        maxval : a maximum value for all elements in this column
+
+        comp : should a comparison for this column with the 'comp'-group be made? This will append one column per group with this column
+               name and a 'Q'-Suffix. Use comp="default" if it should be compared with the setting 'default', if existent. Any nonexistent
+               comp will be silently skipped
+
+        translevel : Specifies the level on which to apply the defined transformation for this column. Use translevel=0 to handle every instance
+                     and group separately, and translevel=1 for an instance-wise transformation over all groups, e.g., the mean solving time
+                     if five permutations were tested. Columns with translevel=1 are appended at the end of the instance-wise table
         '''
 
         if origcolname is None and transformfunc is None and constant is None:
             raise AttributeError("Error constructing this column: No origcolname or transformfunction specified")
 
-        self.children = []
 
         self.origcolname = origcolname
         self.name = name
@@ -39,7 +53,15 @@ class IPETEvaluationColumn:
         self.transformfunc = transformfunc
         self.constant = constant
 
+        self.nanrep = nanrep
+        self.minval = minval
+        self.maxval = maxval
+        self.translevel = translevel
+        self.comp = comp
+
+
         self.aggregations = []
+        self.children = []
 
     def addChild(self, child):
         self.children.append(child)
@@ -62,20 +84,32 @@ class IPETEvaluationColumn:
         else:
             return self.transformfunc + ','.join((child.getName() for child in self.children))
 
+    def parseValue(self, val):
+        '''
+        parse a value into an integer (prioritized) or float
+        '''
+        for conversion in [int, float]:
+            try:
+                return conversion(val)
+            except:
+                pass
+        return None
+
 
     def parseConstant(self):
         '''
         parse the constant attribute, which is a string, into an integer (prioritized) or float
         '''
-        for conversion in [int, float]:
-            try:
-                return conversion(self.constant)
-            except:
-                pass
-        return None
+        return self.parseValue(self.constant)
 
     def addAggregation(self, agg):
         self.aggregations.append(agg)
+
+    def getTransLevel(self):
+        if self.translevel is None or int(self.translevel) == 0:
+            return 0
+        else:
+            return 1
 
     def toXMLElem(self):
         '''
@@ -83,7 +117,7 @@ class IPETEvaluationColumn:
         '''
 
         # keep only non NAN elements
-        myelements = {k:self.__dict__[k] for k in ['name', 'origcolname', 'transformfunc', 'formatstr', 'constant'] if self.__dict__.get(k) is not None}
+        myelements = {k:self.__dict__[k] for k in ['name', 'origcolname', 'transformfunc', 'formatstr', 'constant', 'nanrep', 'minval', 'maxval'] if self.__dict__.get(k) is not None}
 
 
         me = ElementTree.Element("Column", myelements)
@@ -119,21 +153,32 @@ class IPETEvaluationColumn:
         # or a constant
         if len(self.children) == 0:
             if self.origcolname is not None:
-                return df[self.origcolname]
+                result = df[self.origcolname]
             elif self.constant is not None:
                 df[self.getName()] = self.parseConstant()
-                return df[self.getName()]
+                result = df[self.getName()]
         else:
             # try to apply an element-wise transformation function to the children of this column
             transformfunc = getattr(numpy, self.transformfunc)
 
             # concatenate the children data into a new data frame object
             argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)
+
+            if self.translevel is not None and int(self.translevel) == 1:
+
+                # group the whole table per instance #
+                argdf = argdf.groupby(level=0)
+
+                #determine the axis along which to apply the transformation later on
+                applyaxis = 0
+            else:
+                applyaxis = 1
+
             try:
                 # try to directly apply the transformation function, this might fail for
                 # some transformations, e.g., the 'divide'-function of numpy because it
                 # requires two arguments instead of the series associated with each row
-                result = argdf.apply(transformfunc, axis=1)
+                result = argdf.apply(transformfunc, axis=applyaxis)
             except ValueError:
 
                 # try to wrap things up in a temporary wrapper function that unpacks
@@ -142,9 +187,23 @@ class IPETEvaluationColumn:
                     return transformfunc(*(args[0].values))
 
                 # apply the wrapper function instead
-                result = argdf.apply(tmpwrapper, axis=1)
+                result = argdf.apply(tmpwrapper, axis=applyaxis)
 
-            return result
+        if self.nanrep is not None:
+            nanrep = self.parseValue(self.nanrep)
+            if nanrep is not None:
+                result = result.fillna(nanrep)
+        if self.minval is not None:
+            minval = self.parseValue(self.minval)
+            if minval is not None:
+                result = numpy.maximum(result, minval)
+        if self.maxval is not None:
+            maxval = self.parseValue(self.maxval)
+            if maxval is not None:
+                result = numpy.minimum(result, maxval)
+
+        return result
+
 
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
@@ -158,6 +217,8 @@ class IPETEvaluation:
     possiblestreams=['stdout', 'tex', 'txt']
     DEFAULT_GROUPKEY="SETTINGS"
     DEFAULT_DEFAULTGROUP="default"
+    ALLTOGETHER="_alltogether_"
+
     def __init__(self):
         self.filtergroups = []
         self.groupkey = self.DEFAULT_GROUPKEY
@@ -185,12 +246,41 @@ class IPETEvaluation:
 
     def reduceToColumns(self, df):
         usercolumns = []
+
+        levelonecols = []
+        #treat columns differently for level=0 and level=1
         for col in self.columns:
-            df[col.getName()] = col.getColumnData(df)
-            usercolumns.append(col.getName())
+            if col.getTransLevel() == 0:
+                df[col.getName()] = col.getColumnData(df)
+                usercolumns.append(col.getName())
+
+                if col.comp is not None and col.comp in df[self.groupkey].unique():
+                    compcol = dict(list(df.groupby(self.groupkey)[col.getName()]))[col.comp]
+                    df["_tmpcol_"] = compcol
+                    df[col.getName() + "Q"] = df[col.getName()] / df["_tmpcol_"]
+                    usercolumns.append(col.getName() + "Q")
+
+
+            else:
+                levelonecols.append(col.getColumnData(df))
+                if col.getName() not in usercolumns:
+                    usercolumns.append(col.getName())
+
+        # concatenate level one columns into a new data frame and treat them as the altogether setting
+        if len(levelonecols) > 0:
+            alltogetherdf = pd.concat(levelonecols, axis=1)
+            alltogetherdf[self.groupkey] = IPETEvaluation.ALLTOGETHER
+            # concatenate both data frames #
+            newdf = pd.concat([df, alltogetherdf], axis=0)
+        else:
+            newdf = df
+
+
 
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
-        return df.loc[:,usercolumns + neededcolumns]
+        result = newdf.loc[:,usercolumns + neededcolumns]
+        self.usercolumns = usercolumns
+        return result
 
     def calculateNeededData(self, df):
         df['_solved_'] = (df.SolvingTime < df.TimeLimit) & (df.Status != 'fail') & (df.Status != 'abort')
@@ -246,7 +336,7 @@ class IPETEvaluation:
         return ev
 
     def convertToHorizontalFormat(self, df):
-        return df[[col.getName() for col in self.columns] + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
+        return df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
 
     def checkStreamType(self, streamtype):
         if streamtype not in self.possiblestreams:
@@ -330,7 +420,10 @@ class IPETEvaluation:
                 defaultrow = colaggpart.loc[self.defaultgroup, :]
             else:
                 # if there is no default setting, take the first group as default group
-                defaultrow = colaggpart.iloc[0, :]
+                try:
+                    defaultrow = colaggpart.iloc[0, :]
+                except:
+                    defaultrow = numpy.nan
 
             # determine quotients
             comppart = colaggpart / defaultrow

@@ -153,19 +153,43 @@ class IPETFilter(Editable):
         return me
 
 class IPETFilterGroup(Editable):
+    '''
+    represents a list of filters or filter groups, has a name attribute for quick tabular representation
+
+    a filter group collects
+    '''
 
     def __init__(self, name):
+        '''
+        constructor for a filter group
+        '''
         self.name = name
         self.filters = []
 
     def addFilter(self, filter_):
+        '''
+        add a filter to the list of filters.
+
+        Parameters
+        ----------
+        filter_ : an instance of IPETFilter or IPETFilterGroup
+        '''
         self.filters.append(filter_)
 
     def getName(self):
         return self.name
 
     def filterDataFrame(self, df):
-        return df.groupby(level=0).filter(lambda x:np.all([filter_.filterDataFrame(x) for filter_ in self.filters]))
+        '''
+        filters a data frame object as the intersection of all instances that match the criteria defined by the filters
+        '''
+
+        groups = df.groupby(level=0)
+        # first, get the highest number of instance occurrences. This number must be matched to keep the instance
+        instancecount = groups.apply(len).max()
+
+        # return a filtered data frame as intersection of all instances that match all filter criteria and appear in every test run
+        return groups.filter(lambda x:len(x) == instancecount and np.all([filter_.filterDataFrame(x) for filter_ in self.filters]))
 
     def filterProblem(self, probname, testruns=[]):
         for filter_ in self.filters:
@@ -203,11 +227,17 @@ class IPETFilterGroup(Editable):
 
     @staticmethod
     def fromXML(xmlstring):
+        '''
+        parse an xml string matching the filter group XML syntax
+        '''
         tree = ElementTree.fromstring(xmlstring)
         return IPETFilterGroup.processXMLElem(tree)
 
     @staticmethod
     def fromXMLFile(xmlfilename):
+        '''
+        parse a file containing an xml string matching the filter group XML representation syntax
+        '''
         tree = ElementTree.parse(xmlfilename)
         return IPETFilterGroup.processXMLElem(tree.getroot())
 

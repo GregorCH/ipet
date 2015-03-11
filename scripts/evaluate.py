@@ -13,7 +13,8 @@ from ipet.IPETEvalTable import IPETEvaluation
 # possible arguments in the form name,default,short,description #
 clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read"),
                ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
-               ('--recollect', False,'-r', "Should the loaded comparator recollect data before proceeding?")]
+               ('--recollect', False,'-r', "Should the loaded comparator recollect data before proceeding?"),
+               ('--save', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="starts the IPET graphical user interface")
@@ -45,8 +46,12 @@ if __name__ == '__main__':
         print "Recollecting data"
         comp.collectData()
 
+    if save is not False:
+        comp.saveToFile(comparatorfile)
+
+
     rettab, retagg = eval.evaluate(comp)
 
-    print rettab.to_string()
+    print rettab.to_string(float_format=lambda x:"%.1f"%x)
     print
-    print retagg.to_string()
+    print retagg.to_string(float_format=lambda x:"%.3f"%x)

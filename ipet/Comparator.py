@@ -156,6 +156,7 @@ class Comparator(Observable):
 
         self.makeProbNameList()
         self.calculateIntegrals()
+        self.calculateGaps()
         self.checkProblemStatus()
 
         for testrun in testruns:
@@ -174,6 +175,27 @@ class Comparator(Observable):
 
     def concatenateData(self):
         self.data = pandas.concat([tr.data for tr in self.testrunmanager.getManageables()])
+
+    def calculateGaps(self):
+        '''
+        calculate and store primal and dual gap
+        '''
+        for testrun in self.testrunmanager.getManageables():
+            for probname in self.probnamelist:
+
+                optval = testrun.problemGetData(probname, "OptVal")
+                if optval is not None:
+                    for key in ["PrimalBound", "DualBound"]:
+                        val = testrun.problemGetData(probname, key)
+                        if val is not None:
+                            gap = Misc.getGap(val, optval, True)
+                            # subtract 'Bound' and add 'Gap' from Key
+                            thename = key[:-5] + "Gap"
+                            testrun.addData(probname, thename, gap)
+
+
+
+
 
     def calculateIntegrals(self):
         '''

@@ -386,7 +386,7 @@ class IPETEvaluation:
         optdf = pd.concat([optstatus, opttime, opttimelim], axis=1)
         optdf[self.groupkey] = "OPT. AUTO"
 
-        useroptdf = pd.concat([grouped[col].apply(numpy.min) for col in self.usercolumns], axis=1)
+        useroptdf = pd.concat([grouped[col].apply(numpy.min) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis=1)
         optdf = pd.concat([optdf, useroptdf], axis=1)
 
 
@@ -413,6 +413,7 @@ class IPETEvaluation:
 
         columndata = self.reduceToColumns(data)
         opt = self.calculateOptimalAutoSettings(columndata)
+
         columndata = pd.concat([columndata, opt])
         columndata = self.calculateNeededData(columndata)
 

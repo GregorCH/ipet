@@ -9,12 +9,13 @@ from ipet.Comparator import Comparator
 import argparse
 import sys
 from ipet.IPETEvalTable import IPETEvaluation
+import pandas as pd
 
 # possible arguments in the form name,default,short,description #
 clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read"),
                ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
                ('--recollect', False,'-r', "Should the loaded comparator recollect data before proceeding?"),
-               ('--save', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'")]
+               ('--savecomparator', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="starts the IPET graphical user interface")
@@ -39,19 +40,21 @@ if __name__ == '__main__':
         sys.exit(0)
 
 
-    eval = IPETEvaluation.fromXMLFile(evalfile)
+    theeval = IPETEvaluation.fromXMLFile(evalfile)
     comp = Comparator.loadFromFile(comparatorfile)
 
     if recollect is not False:
         print "Recollecting data"
         comp.collectData()
 
-    if save is not False:
+    if savecomparator is not False:
         comp.saveToFile(comparatorfile)
 
 
-    rettab, retagg = eval.evaluate(comp)
+    rettab, retagg = theeval.evaluate(comp)
 
-    print rettab.to_string(float_format=lambda x:"%.1f"%x)
+    #print pd.concat([rettab, theeval.levelonedf], axis=1)
+
+    print rettab.to_string(float_format=lambda x:"%.2f"%x)
     print
     print retagg.to_string(float_format=lambda x:"%.3f"%x)

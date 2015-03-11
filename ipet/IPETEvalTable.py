@@ -164,21 +164,22 @@ class IPETEvaluationColumn:
             # concatenate the children data into a new data frame object
             argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)
 
-            if self.translevel is not None and int(self.translevel) == 1:
+            if self.getTransLevel() == 1:
 
                 # group the whole table per instance #
+
                 argdf = argdf.groupby(level=0)
 
                 #determine the axis along which to apply the transformation later on
-                applyaxis = 0
+                applydict={}
             else:
-                applyaxis = 1
+                applydict=dict(axis=1)
 
             try:
                 # try to directly apply the transformation function, this might fail for
                 # some transformations, e.g., the 'divide'-function of numpy because it
                 # requires two arguments instead of the series associated with each row
-                result = argdf.apply(transformfunc, axis=applyaxis)
+                result = argdf.apply(transformfunc, **applydict)
             except ValueError:
 
                 # try to wrap things up in a temporary wrapper function that unpacks
@@ -187,7 +188,7 @@ class IPETEvaluationColumn:
                     return transformfunc(*(args[0].values))
 
                 # apply the wrapper function instead
-                result = argdf.apply(tmpwrapper, axis=applyaxis)
+                result = argdf.apply(tmpwrapper, **applydict)
 
         if self.nanrep is not None:
             nanrep = self.parseValue(self.nanrep)
@@ -247,7 +248,6 @@ class IPETEvaluation:
     def reduceToColumns(self, df):
         usercolumns = []
 
-        levelonecols = []
         #treat columns differently for level=0 and level=1
         for col in self.columns:
             if col.getTransLevel() == 0:
@@ -261,24 +261,15 @@ class IPETEvaluation:
                     usercolumns.append(col.getName() + "Q")
 
 
-            else:
-                levelonecols.append(col.getColumnData(df))
-                if col.getName() not in usercolumns:
-                    usercolumns.append(col.getName())
-
         # concatenate level one columns into a new data frame and treat them as the altogether setting
-        if len(levelonecols) > 0:
-            alltogetherdf = pd.concat(levelonecols, axis=1)
-            alltogetherdf[self.groupkey] = IPETEvaluation.ALLTOGETHER
-            # concatenate both data frames #
-            newdf = pd.concat([df, alltogetherdf], axis=0)
+        lvlonecols = [col for col in self.columns if col.getTransLevel() == 1]
+        if len(lvlonecols) > 0:
+            self.levelonedf = pd.concat([col.getColumnData(df) for col in lvlonecols], axis=1)
         else:
-            newdf = df
-
-
+            self.levelonedf = None
 
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
-        result = newdf.loc[:,usercolumns + neededcolumns]
+        result = df.loc[:,usercolumns + neededcolumns]
         self.usercolumns = usercolumns
         return result
 
@@ -372,6 +363,37 @@ class IPETEvaluation:
         with open("%s.txt"%filebasename, "w") as txtfile:
             df.to_string(txtfile)
 
+    def findStatus(self, statuscol):
+        uniques = set(statuscol.unique())
+        for status in ["ok", "timelimit", "nodelimit", "memlimit", "unknown", "fail", "abort"]:
+            if status in uniques:
+                return status
+        else:
+            return statuscol.unique()[0]
+
+    def calculateOptimalAutoSettings(self, df):
+        '''
+        calculate optimal auto settings instancewise
+        '''
+        aggfuncs = {'solved':numpy.max}
+
+        grouped = df.groupby(level=0)
+
+        optstatus = grouped["Status"].apply(self.findStatus)
+        opttime = grouped["SolvingTime"].apply(numpy.min)
+        opttimelim = grouped["TimeLimit"].apply(numpy.mean)
+
+        optdf = pd.concat([optstatus, opttime, opttimelim], axis=1)
+        optdf[self.groupkey] = "OPT. AUTO"
+
+        useroptdf = pd.concat([grouped[col].apply(numpy.min) for col in self.usercolumns], axis=1)
+        optdf = pd.concat([optdf, useroptdf], axis=1)
+
+
+        return optdf
+
+
+
     def evaluate(self, comp):
         '''
         evaluate the data of a Comparator instance comp
@@ -390,6 +412,8 @@ class IPETEvaluation:
         data = pd.concat([tr.data for tr in comp.testrunmanager.getManageables()])
 
         columndata = self.reduceToColumns(data)
+        opt = self.calculateOptimalAutoSettings(columndata)
+        columndata = pd.concat([columndata, opt])
         columndata = self.calculateNeededData(columndata)
 
         filtered = {}
@@ -438,8 +462,11 @@ class IPETEvaluation:
                 parts.append(statspart)
 
             filtered[fg.name] = pd.concat(parts, axis = 1)
-
-        rettab = ret#pd.concat((ret, self.aggregateTable(ret)))
+        if self.levelonedf is not None:
+            self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
+            rettab = pd.concat([ret, self.levelonedf], axis=1)
+        else:
+            rettab = ret
         retagg = pd.concat([filtered[fg.name] for fg in self.filtergroups], keys=[fg.name for fg in self.filtergroups], names=['Group'])
 
         return rettab, retagg

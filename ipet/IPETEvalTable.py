@@ -215,7 +215,7 @@ class IPETEvaluation:
     '''
 
     #todo put tex, csv etc. here as other possible streams for filter group output
-    possiblestreams=['stdout', 'tex', 'txt']
+    possiblestreams=['stdout', 'tex', 'txt', 'csv']
     DEFAULT_GROUPKEY="SETTINGS"
     DEFAULT_DEFAULTGROUP="default"
     ALLTOGETHER="_alltogether_"
@@ -355,6 +355,10 @@ class IPETEvaluation:
         '''
         with open("%s.tex"%filebasename, "w") as texfile:
             texfile.write(df.to_latex())
+
+    def streamDataFrame_csv(self, df, filebasename):
+        with open("%s.csv"%filebasename, "w") as csvfile:
+            df.to_csv(csvfile)
 
     def streamDataFrame_txt(self, df, filebasename):
         '''

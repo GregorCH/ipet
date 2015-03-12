@@ -3,7 +3,7 @@ Created on 31.01.2014
 
 @author: Customer
 '''
-from Tkinter import Toplevel, StringVar, Button
+from Tkinter import Toplevel, StringVar, Button, Frame
 from matplotlib.figure import Figure
 from matplotlib import markers
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -14,16 +14,12 @@ from IPETBrowser import IPETTypeWidget
 from tkColorChooser import askcolor
 from ttk import Frame, Notebook, LabelFrame, OptionMenu, Entry
 from functools import partial
-# implement the default mpl key bindings
-class IPETPlotWindow(Toplevel):
-    '''
-    toplevel window to contain a matplotlib plot
+import numpy as np
 
-    An IPETPlotWindow is a toplevel window which contains a matplotlib figure,
-    containing one or more axes, and a control panel to control its appearance.
-    '''
+# implement the default mpl key bindings
+class IPETPlotFrame(Frame):
     def __init__(self, master=None, cnf={}, **kw):
-        Toplevel.__init__(self, master, cnf)
+        Frame.__init__(self, master)
         f = Figure(figsize=(8, 6), dpi=100)
         self.a = f.add_subplot(111)
 
@@ -43,6 +39,60 @@ class IPETPlotWindow(Toplevel):
 
     def getAxis(self):
         return self.a
+
+    def plothistogram(self, data, boundsfromdata=True , binwidth=1, leftbin=-10, rightbin=10, nbins=10, datalabels=None):
+        '''
+        plot a histogram of given, 2-dimensional data.
+
+        Parameters:
+        ----------
+        boundsfromdata : True if left and right bin border should be inferred from the data, False if leftbin and rightbin should be used
+        binwidth : the width of every bin. Only used when 'nbins' is smaller than 0
+        datalabels : labels for the data
+        leftbin : border for the leftmost bin, only used when boundsfromdata is set to False
+        rightbin : border for the rightmost bin, only used when boundsfromdata is set to False
+        nbins : the total number of bins. Use a negative value for calculating the bins from bin width instead
+
+        '''
+        if boundsfromdata:
+            leftbin = np.min([np.min(col) for col in data])
+            rightbin = np.max([np.max(col) for col in data])
+
+        #print map(repr, [leftbin, rightbin, nbins, binwidth])
+        if nbins <= 0:
+            bins = np.arange(leftbin, rightbin, step=binwidth)
+        else:
+            bins = np.linspace(leftbin, rightbin, nbins + 1, endpoint=True)
+
+        if datalabels is None:
+            datalabels = map(str, np.arange(len(data)))
+        elif len(datalabels) != len(data):
+            raise ValueError("Error: Length of data labels (%d) and of data (%d) mismatch!"%(len(datalabels),len(data)))
+
+        self.resetAxis()
+        self.a.hist(data, bins=bins, label=datalabels, alpha=0.7)
+        self.a.legend()
+
+class IPETPlotWindow(Toplevel):
+    '''
+    toplevel window to contain a matplotlib plot
+
+    An IPETPlotWindow is a toplevel window which contains a matplotlib figure,
+    containing one or more axes, and a control panel to control its appearance.
+    '''
+    def __init__(self, master=None, cnf={}, **kw):
+        Toplevel.__init__(self, master, cnf)
+        self.plotframe = IPETPlotFrame(self, cnf)
+        self.plotframe.pack()
+
+    def resetAxis(self):
+        self.plotframe.resetAxis()
+
+    def getAxis(self):
+        return self.plotframe.getAxis()
+
+    def plothistogram(self, *args, **kw):
+        self.plotframe.plothistogram(args, kw)
 
 class IpetNavigationToolBar(NavigationToolbar2TkAgg):
 
@@ -74,17 +124,17 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
         self.toolitems = list(NavigationToolbar2TkAgg.toolitems)
         self.toolitems.append(additionaloptions)
         self.toolitems = tuple(self.toolitems)
-        print self.toolitems
+        #print self.toolitems
         NavigationToolbar2TkAgg.__init__(self, canvas, window)
 
     def change_var(self, *args):
-        print args
+        #print args
         label, paramname = tuple(args[0].split(':'))
         manager = self.linemanagers.get(label, self.generalmanager)
         param = manager.getManageable(paramname)
         newval = self.paramtovar.get(param).get()
 
-        print "Changing value of parameter %s to %s" % (paramname, newval)
+        #print "Changing value of parameter %s to %s" % (paramname, newval)
         param.checkAndChange(newval)
 
     def changeColorVar(self, param):
@@ -98,7 +148,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
 
 
     def addParamWidget(self, masterwindow, param, manager, label='General'):
-        print "%s %s %s %s"%(param.getName(), param.getValue(), label, param.getPossibleValues()) 
+        #print "%s %s %s %s"%(param.getName(), param.getValue(), label, param.getPossibleValues())
         if type(param.getPossibleValues()) is set:
             labelframe = LabelFrame(masterwindow, text=param.getName(), width=85)
 
@@ -118,7 +168,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
         else:
             return IPETTypeWidget(masterwindow, param.getName(), param, self.generalmanager, attribute=param.getValue())
     def edit_options(self):
-        print "Calling Edit Options"
+        #print "Calling Edit Options"
         self.tl = Toplevel(self.window, width=self.winfo_screenwidth() / 4, height=self.winfo_screenheight() / 2)
 
         self.createParams()

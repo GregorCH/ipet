@@ -14,7 +14,7 @@ from Manager import Manager
 from StatisticReader_HeurReader import HeurDataReader
 from StatisticReader import PrimalBoundReader, DualBoundReader, GapReader, SolvingTimeReader, TimeLimitReader, \
    BestSolFeasReader, MaxDepthReader, LimitReachedReader, NodesReader, RootNodeFixingsReader, \
-   TimeToFirstReader, TimeToBestReader
+   TimeToFirstReader, TimeToBestReader, ListReader
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
 from StatisticReader_GeneralInformationReader import GeneralInformationReader
@@ -363,7 +363,7 @@ class Comparator(Observable):
                   SoluFileReader(),
                   TimeLimitReader(),
                   TimeToFirstReader(),
-                  TimeToBestReader()
+                  TimeToBestReader(),
                   ])
 
     def saveToFile(self, filename):

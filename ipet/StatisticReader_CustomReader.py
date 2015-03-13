@@ -14,43 +14,61 @@ class CustomReader(StatisticReader):
 
 
 
-   def __init__(self, **kw):
-      self.name = kw.get("name", self.name)
-      self.activateexpression = kw.get("activateexpression", self.activateexpression)
-      self.regexp = kw.get("regexp", self.regexp)
-      self.datakey = kw.get("datakey", self.datakey)
-      self.index = kw.get("index", 0)
+   def __init__(self, name=None, regpattern=None, activateexpression=None, datakey=None, index=0, datatype="float"):
+
+      if regpattern is None:
+          raise ValueError("Error: No 'regpattern' specified for reader with name %s"%str(name))
+
+      if activateexpression is None:
+          raise ValueError("Error: No 'activateexpression' specified for reader with name %s"%str(name))
+
+      if name is None:
+          name = CustomReader.name + regpattern
+      self.name = name
+
+      if datakey is None:
+          datakey = CustomReader.datakey + regpattern
+      self.datakey = datakey
+
+      self.activateexpression = activateexpression
+      self.regpattern = regpattern
+      self.regexp = re.compile(regpattern)
+      self.index = int(index)
+
+      self.datatype = datatype
+      self.setDataType(datatype)
+
       self.active = False
-      self.defaultvalue = kw.get("defaultvalue", 0.0)
-      self.data = self.defaultvalue
-      self.setDataType(kw.get("datatype", 'float'))
+
+   def getEditableAttributes(self):
+       return ['name', 'regpattern', 'activateexpression', 'datakey', 'index', 'datatype']
 
    def extractStatistic(self, line):
       if not self.active and (self.activateexpression == "" or re.search(self.activateexpression, line)):
          self.active = True
-      if self.active and re.search(self.regexp, line):
+      if self.active and self.regexp.search(line):
 
          try:
             self.data = self.getNumberAtIndex(line, self.index)
-            self.data = self.datatype(self.data)
+            self.data = self.datatypemethod(self.data)
+
+            self.testrun.addData(self.problemname, self.datakey, self.data)
          except:
             print "Error when parsing data -> using default value", self.name
-            self.data = self.defaultvalue
+            pass
 
          self.active = False
       return None
 
    def execEndOfProb(self):
       self.active = False
-      self.testrun.addData(self.problemname, self.datakey, self.data)
-      self.data = self.defaultvalue
 
    def setDataType(self, sometype):
       '''
       recognizes data types (e.g., 'float' or 'int') and sets reader data type to this value
       '''
       try:
-         self.datatype = getattr(__builtin__, sometype)
+         self.datatypemethod = getattr(__builtin__, sometype)
       except:
          print "Error: Could not recognize data type, using float", sometype
-         self.datatype = float
+         self.datatypemethod = float

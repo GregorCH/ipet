@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <Evaluation groupkey="Settings">
 	<Column name="SolvingTime" origcolname="SolvingTime">
-		<Aggregation name="listGetShiftedGeometricMean">
+		<Aggregation name="shmean">
 			<shiftby type="float" val="10.0"/>
 		</Aggregation>
 		<Aggregation name="mean"/>
 	</Column>
 	<Column name="Nodes" origcolname="Nodes">
-		<Aggregation name="listGetShiftedGeometricMean">
+		<Aggregation name="shmean">
 			<shiftby type="float" val="100.0"/>
 		</Aggregation>
 	</Column>
-	<Column name="Shift" origcolname="HeurTime_shiftandpropagate"/>
-	<Column name="Shift" origcolname="HeurTime_rens"/>
+	<Column name="TShift" origcolname="HeurTime_shiftandpropagate"/>
+	<Column name="TRens" origcolname="HeurTime_rens"/>
 	<FilterGroup name="new">
 		<Filter anytestrun="True" expression1="SolvingTime" expression2="0.01" operator="ge"/>
 		<Filter anytestrun="True" expression1="Nodes" expression2="99" operator="le"/>

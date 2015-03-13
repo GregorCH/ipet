@@ -46,9 +46,9 @@ class StatisticReader(Editable):
         StatisticReader.problemname = problemname
     setProblemName = staticmethod(setProblemName)
 
+    @staticmethod
     def changeSolverType(newtype):
         StatisticReader.solvertype = newtype
-    changeSolverType = staticmethod(changeSolverType)
 
     def setTestRun(self, testrun):
         self.testrun = testrun
@@ -240,7 +240,7 @@ class GapReader(StatisticReader):
     reads the primal dual gap at the end of the solving
     '''
     name = 'GapReader'
-    regular_exp = re.compile('^Gap')
+    regular_exp = re.compile('^Gap                :')
     datakey = 'Gap'
     datatype = float
     lineindex = 2
@@ -410,3 +410,38 @@ class TimeToFirstReader(StatisticReader):
 
             except TypeError:
                 pass
+
+class ListReader(StatisticReader):
+    '''
+    reads a list matching a regular expression
+    '''
+    name = "ListReader"
+
+    def __init__(self, regpattern=None, name=None):
+        if regpattern is None:
+            raise ValueError("Error: No 'regpattern' specified for reader %s"%str(name))
+        self.regular_exp = re.compile(regpattern)
+        self.regpattern = regpattern
+        if name is None:
+            name = ListReader.name
+        self.name = name
+
+    def extractStatistic(self, line):
+        match = self.regular_exp.match(line)
+        if match is not None:
+            datakey = match.group(0)
+            strval = self.getNumberAtIndex(line, 0)
+            try:
+                val = int(strval)
+            except ValueError:
+                val = float(strval)
+            self.testrun.addData(self.problemname, datakey, val)
+
+
+    def getEditableAttributes(self):
+        return ['name', 'regpattern']
+
+
+
+
+

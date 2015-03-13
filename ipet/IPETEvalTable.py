@@ -380,7 +380,7 @@ class IPETEvaluation:
         calculate optimal auto settings instancewise
         '''
         aggfuncs = {'solved':numpy.max}
-
+        print df.head(5)
         grouped = df.groupby(level=0)
 
         optstatus = grouped["Status"].apply(self.findStatus)

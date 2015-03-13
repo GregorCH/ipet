@@ -22,7 +22,7 @@ argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
 for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 
-
+argparser.add_argument('-t', '--testrunfiles', nargs='*', default=[], help="list of .trn files that should used for the evaluation")
 
 
 if __name__ == '__main__':
@@ -35,13 +35,24 @@ if __name__ == '__main__':
 
     #initialize a comparator
     comparator = None
-    if evalfile is None or comparatorfile is None:
-        print "please provide an eval and a comparator file!"
+    print n
+    if evalfile is None:
+        print "please provide an eval file!"
         sys.exit(0)
 
 
+    if comparatorfile is None and testrunfiles == []:
+        print "please provide either a comparatorfile or (multiple, if needed) .trn testrun files"
+        sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
-    comp = Comparator.loadFromFile(comparatorfile)
+
+    if comparatorfile is not None:
+        comp = Comparator.loadFromFile(comparatorfile)
+    else:
+        comp = Comparator()
+
+    for trfile in testrunfiles:
+        comp.addLogFile(trfile)
 
     if recollect is not False:
         print "Recollecting data"
@@ -53,8 +64,8 @@ if __name__ == '__main__':
 
     rettab, retagg = theeval.evaluate(comp)
 
-    #print pd.concat([rettab, theeval.levelonedf], axis=1)
+    print pd.concat([rettab, theeval.levelonedf], axis=1)
 
-    print rettab.to_string(float_format=lambda x:"%.2f"%x)
+    print rettab.to_string()
     print
-    print retagg.to_string(float_format=lambda x:"%.3f"%x)
+    print retagg.to_string()

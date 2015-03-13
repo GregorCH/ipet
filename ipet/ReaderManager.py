@@ -1,8 +1,10 @@
-from StatisticReader import StatisticReader
+from StatisticReader import StatisticReader, ListReader
+from StatisticReader_CustomReader import CustomReader
 import os
 import re
 from Manager import Manager
 from ipet.IPETMessageStream import Message
+import xml.etree.ElementTree as ElementTree
 
 class ReaderManager(Manager):
     '''
@@ -17,10 +19,14 @@ class ReaderManager(Manager):
                               StatisticReader.SOLVERTYPE_CPLEX:"Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer",
                               StatisticReader.SOLVERTYPE_XPRESS:"FICO Xpress Optimizer",
                               StatisticReader.SOLVERTYPE_CBC:"Welcome to the CBC MILP Solver",
-                              StatisticReader.SOLVERTYPE_COUENNE:" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization"
+                              StatisticReader.SOLVERTYPE_COUENNE:" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization",
                               }
 
+
     othersolvers = [solver for solver in solvertype_recognition.keys() if solver != StatisticReader.solvertype]
+
+
+    xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
 
     def setTestRun(self, testrun):
         self.testrun = testrun
@@ -103,4 +109,53 @@ class ReaderManager(Manager):
             f.close()
         # print("Collection of data finished")
         return 1
+
+    ### XML IO methods
+    def toXMLElem(self):
+        me = ElementTree.Element('Readers')
+        readers = self.getManageables(False)
+        for reader in readers:
+            if reader.__class__ in ReaderManager.xmlfactorydict.values():
+                readerattrs = reader.attributesToDict()
+                readerstrattrs = {key:str(val) for key, val in readerattrs.iteritems()}
+                for key in ReaderManager.xmlfactorydict.keys():
+                    if reader.__class__ is ReaderManager.xmlfactorydict[key]:
+                        break
+                me.append(ElementTree.Element(key, readerstrattrs))
+
+        return me
+
+    @staticmethod
+    def fromXML(xmlstring):
+        tree = ElementTree.fromstring(xmlstring)
+        return ReaderManager.processXMLElem(tree)
+
+    @staticmethod
+    def fromXMLFile(xmlfilename):
+        tree = ElementTree.parse(xmlfilename)
+        return ReaderManager.processXMLElem(tree.getroot())
+
+    @staticmethod
+    def processXMLElem(elem):
+        if elem.tag == 'Readers':
+            rm = ReaderManager()
+        for child in elem:
+            reader = ReaderManager.xmlfactorydict[child.tag](**child.attrib)
+            rm.registerReader(reader)
+        return rm
+
+
+if __name__ == "__main__":
+    rm = ReaderManager()
+    rm.registerReader(ListReader("[nf]Genios_\w*"))
+    rm.registerReader(CustomReader(name="Me", activateexpression="@01", regpattern="SolvingTime", datakey="MyStime"))
+    el = rm.toXMLElem()
+    from xml.dom.minidom import parseString
+    dom = parseString(ElementTree.tostring(el))
+    with open("myfile.xml", 'w') as myfile:
+        myfile.write(dom.toprettyxml())
+
+    rm2 = ReaderManager.fromXMLFile("myfile.xml")
+    for r in rm2.getManageables():
+        print r.attributesToDict()
 

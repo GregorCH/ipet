@@ -226,6 +226,7 @@ class IPETEvaluation:
         self.defaultgroup = self.DEFAULT_DEFAULTGROUP
         self.columns = []
         self.fgroup2stream = {}
+        self.evaluateoptauto = True
 
     def addFilterGroup(self, fg):
         self.filtergroups.append(fg)
@@ -244,6 +245,12 @@ class IPETEvaluation:
 
     def removeColumn(self, col):
         self.columns.remove(col)
+
+    def setEvaluateOptAuto(self, evaloptauto):
+        '''
+        should the evaluation calculate optimal auto settings?
+        '''
+        self.evaluateoptauto = bool(evaloptauto)
 
     def reduceToColumns(self, df):
         usercolumns = []
@@ -412,13 +419,15 @@ class IPETEvaluation:
         retagg : aggregated results for every filter group and every entry of the specified
         '''
 
-        #data is concatenated along the rows
-        data = pd.concat([tr.data for tr in comp.testrunmanager.getManageables()])
+        #data is concatenated along the rows and eventually extended by external data
+        data = comp.getJoinedData()
 
         columndata = self.reduceToColumns(data)
-        opt = self.calculateOptimalAutoSettings(columndata)
 
-        columndata = pd.concat([columndata, opt])
+        if self.evaluateoptauto:
+            opt = self.calculateOptimalAutoSettings(columndata)
+            columndata = pd.concat([columndata, opt])
+            
         columndata = self.calculateNeededData(columndata)
 
         filtered = {}

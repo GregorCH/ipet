@@ -146,16 +146,16 @@ class ReaderManager(Manager):
 
 
 if __name__ == "__main__":
-    rm = ReaderManager()
-    rm.registerReader(ListReader("[nf]Genios_\w*"))
-    rm.registerReader(CustomReader(name="Me", activateexpression="@01", regpattern="SolvingTime", datakey="MyStime"))
-    el = rm.toXMLElem()
-    from xml.dom.minidom import parseString
-    dom = parseString(ElementTree.tostring(el))
-    with open("myfile.xml", 'w') as myfile:
-        myfile.write(dom.toprettyxml())
+    #rm = ReaderManager()
+    #rm.registerReader(ListReader("[nf]Genios_\w*"))
+    #rm.registerReader(CustomReader(name="Me", activateexpression="@01", regpattern="SolvingTime", datakey="MyStime"))
+    #el = rm.toXMLElem()
+    #from xml.dom.minidom import parseString
+    #dom = parseString(ElementTree.tostring(el))
+    #with open("myfile.xml", 'w') as myfile:
+        #myfile.write(dom.toprettyxml())
 
-    rm2 = ReaderManager.fromXMLFile("myfile.xml")
+    rm2 = ReaderManager.fromXMLFile("/nfs/optimi/kombadon/bzfhende/projects/sap-data/phase_2/DLScip/check/sap-readers.xml")
     for r in rm2.getManageables():
         print r.attributesToDict()
 

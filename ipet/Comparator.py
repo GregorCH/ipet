@@ -25,6 +25,7 @@ from IPETFilter import IPETFilter
 from Aggregation import Aggregation
 from integrals import calcIntegralValue, getProcessPlotData
 from pandas import Panel
+import pandas as pd
 from StatisticReader import DateTimeReader
 import os
 import sys
@@ -50,6 +51,7 @@ class Comparator(Observable):
         self.installAllReaders()
         self.installAggregations()
         self.solufiles = []
+        self.externaldata = None
 
     def addLogFile(self, filename, testrun=None):
         '''
@@ -138,6 +140,16 @@ class Comparator(Observable):
         managernames = [name for name in dir(self) if name.endswith('manager')]
         return {name:getattr(self, name) for name in managernames}
 
+    def addExternalDataFile(self, filename):
+        '''
+        add a filename pointing to an external file, eg a solu file with additional information
+        '''
+        try:
+            self.externaldata = pd.read_table(filename, sep=",", skipinitialspace=True, index_col="Name")
+        except:
+            raise ValueError("Error reading file name %s"%filename)
+
+
     def collectData(self):
         '''
         iterate over log files and solu file and collect data via installed readers
@@ -194,6 +206,20 @@ class Comparator(Observable):
                             testrun.addData(probname, thename, gap)
 
 
+
+    def getJoinedData(self):
+        '''
+        concatenate the testrun data (possibly joined with external data)
+
+        '''
+        datalist = []
+        for tr in self.testrunmanager.getManageables():
+            trdata = tr.data
+            if self.externaldata is not None:
+                trdata = trdata.merge(self.externaldata, left_index=True, right_index=True, how="left", suffixes=("_data", "_ext"))
+            datalist.append(trdata)
+
+        return pd.concat(datalist)
 
 
 

@@ -15,7 +15,8 @@ import pandas as pd
 clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read"),
                ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
                ('--recollect', False,'-r', "Should the loaded comparator recollect data before proceeding?"),
-               ('--savecomparator', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'")]
+               ('--savecomparator', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'"),
+               ('--externaldata', None,'-E', "Should external data such as additional instance information be used?")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="starts the IPET graphical user interface")
@@ -23,7 +24,7 @@ for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 
 argparser.add_argument('-t', '--testrunfiles', nargs='*', default=[], help="list of .trn files that should used for the evaluation")
-
+argparser.add_argument("-n", "--nooptauto", action="store_true", default=False, help="Disable calculation of optimal auto settings")
 
 if __name__ == '__main__':
     try:
@@ -46,6 +47,10 @@ if __name__ == '__main__':
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
 
+    if nooptauto:
+        theeval.setEvaluateOptAuto(False)
+    else:
+        theeval.setEvaluateOptAuto(True)
     if comparatorfile is not None:
         comp = Comparator.loadFromFile(comparatorfile)
     else:
@@ -62,9 +67,13 @@ if __name__ == '__main__':
         comp.saveToFile(comparatorfile)
 
 
+
+    if externaldata is not None:
+        comp.addExternalDataFile(externaldata)
+
     rettab, retagg = theeval.evaluate(comp)
 
-    print pd.concat([rettab, theeval.levelonedf], axis=1)
+    #print pd.concat([rettab, theeval.levelonedf], axis=1)
 
     print rettab.to_string()
     print

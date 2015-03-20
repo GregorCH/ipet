@@ -46,8 +46,8 @@ class Comparator(Observable):
             self.addLogFile(filename)
 
         self.readermanager = ReaderManager()
-        self.filtermanager = Manager()
-        self.installSomeFilters()
+        #self.filtermanager = Manager()
+        #self.installSomeFilters()
         self.installAllReaders()
         self.installAggregations()
         self.solufiles = []

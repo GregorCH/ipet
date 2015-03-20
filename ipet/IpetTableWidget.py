@@ -119,7 +119,7 @@ class IpetTableWidget(IpetWidget):
         useshortnames = self.checkShortNames()
         testruns = self.gui.getTestrunList(onlyactive=False)
         dataframes = [testrun.data for testrun in testruns]
-        probnames = self.gui.getProblemList(onlyfiltered=True)
+        probnames = self.gui.getProblemList(onlyfiltered=False)
 
         # construct a pandas data frame object to represent the data
         # distinguish between single testruns and multiple testruns

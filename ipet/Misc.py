@@ -142,7 +142,7 @@ def saveAsXML(object, filename):
 
     dom = parseString(ElementTree.tostring(xml))
 
-    with open("filename", 'w') as thefile:
+    with open(filename, 'w') as thefile:
         thefile.write(dom.toprettyxml())
 
 

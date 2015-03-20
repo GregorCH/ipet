@@ -7,6 +7,7 @@ from Tkinter import Menu, Toplevel
 from IPETBrowser import IPETBrowser
 from Tkconstants import BOTH
 from ipet import Misc
+import tkFileDialog
 
 class IPETManagerMenu(Menu):
     '''
@@ -18,7 +19,7 @@ class IPETManagerMenu(Menu):
         if "fromXMLFile" in dir(self.manager.__class__):
             self.add_command(label="Save", command=self.saveManageables)
             self.add_command(label="Load", command=self.loadManageables)
-        
+
         self.add_command(label='Browse...', command=self.openBrowser)
 
 
@@ -41,8 +42,7 @@ class IPETManagerMenu(Menu):
         '''
         load manageables
         '''
-        self.file_opt['defaultextension'] = r'.xml'
-        filename = tkFileDialog.askopenfilename(**self.file_opt)
+        filename = tkFileDialog.askopenfilename()
         if filename:
             rm = self.manager.__class__.fromXMLFile(filename)
             for reader in rm.getManageables(False):
@@ -55,7 +55,6 @@ class IPETManagerMenu(Menu):
         '''
         save custom readers and list readers to a specified destination
         '''
-        self.file_opt['defaultextension'] = r'.xml'
-        filename = tkFileDialog.asksaveasfilename(**self.file_opt)
+        filename = tkFileDialog.asksaveasfilename()
         if filename:
             Misc.saveAsXML(self.manager, filename)

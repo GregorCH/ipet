@@ -16,9 +16,8 @@ class IpetReaderWizard(Toplevel):
     '''
     def __init__(self, line, linestartidx, gui, activateString=""):
 
-        self.customreader = CustomReader()
-        self.allnumbersinline = self.customreader.numericExpression.findall(line)
-        self.numbersbeforelinestartidx = self.customreader.numericExpression.findall(line[:linestartidx])
+        self.allnumbersinline = StatisticReader.numericExpression.findall(line)
+        self.numbersbeforelinestartidx = StatisticReader.numericExpression.findall(line[:linestartidx])
         print self.numbersbeforelinestartidx
 
         startindexsuggestion = len(self.numbersbeforelinestartidx)
@@ -30,7 +29,7 @@ class IpetReaderWizard(Toplevel):
         else:
             regexp = line.split()[0]
         self.namevar = StringVar()
-        self.namevar.set(activateString.replace(" ", "") + '_' + regexp.replace(" ", "") + "Reader")
+        self.namevar.set(regexp.replace(" ", "") + "Reader")
         self.createField("Name:", "Edit the name for this reader; reader names have to be unique", self.namevar, row=0)
 
         self.datakeyvar = StringVar()
@@ -49,10 +48,6 @@ class IpetReaderWizard(Toplevel):
         self.startindexvar = StringVar()
         self.startindexvar.set(str(startindexsuggestion))
         self.createField("Index: ", "the index of the number to parse, starting from 0", self.startindexvar, row=4)
-
-        self.defaultvar = StringVar()
-        self.defaultvar.set(str(0))
-        self.createField("Default value:", "A default value for instances without a match", self.defaultvar, row=5)
 
         self.datatypevar = StringVar()
         self.datatypevar.set('float')
@@ -80,15 +75,15 @@ class IpetReaderWizard(Toplevel):
         nameentry.grid(row=row, column=1, pady=3)
 
     def finish(self):
-        self.customreader.activateexpression = self.activateStringvar.get()
-        self.customreader.name = self.namevar.get()
-        self.customreader.defaultvalue = float(self.defaultvar.get())
-        self.customreader.regexp = self.regexpvar.get()
-        self.customreader.index = int(self.startindexvar.get())
-        self.customreader.datakey = self.datakeyvar.get()
-        self.customreader.setDataType(self.datatypevar.get())
+        customreader = CustomReader(name = self.namevar.get(),
+                                    activateexpression=self.activateStringvar.get(),
+                                    regpattern=self.regexpvar.get(),
+                                    datakey = self.datakeyvar.get(),
+                                    index = int(self.startindexvar.get()),
+                                    datatype = self.datatypevar.get()
+                                    )
 
-        self.gui.addReader(self.customreader)
+        self.gui.addReader(customreader)
 
         self.destroy()
 

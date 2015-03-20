@@ -227,6 +227,7 @@ class IPETEvaluation:
         self.columns = []
         self.fgroup2stream = {}
         self.evaluateoptauto = True
+        self.sortlevel = 0
 
     def addFilterGroup(self, fg):
         self.filtergroups.append(fg)
@@ -276,7 +277,15 @@ class IPETEvaluation:
             self.levelonedf = None
 
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
-        result = df.loc[:,usercolumns + neededcolumns]
+
+        additionalfiltercolumns = []
+        for fg in self.filtergroups:
+            additionalfiltercolumns += fg.getNeededColumns(df)
+
+        additionalfiltercolumns = list(set(additionalfiltercolumns))
+        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(usercolumns + neededcolumns)]
+
+        result = df.loc[:,usercolumns + neededcolumns + additionalfiltercolumns]
         self.usercolumns = usercolumns
         return result
 
@@ -334,7 +343,9 @@ class IPETEvaluation:
         return ev
 
     def convertToHorizontalFormat(self, df):
-        return df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
+        horidf = df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
+        horidf.sortlevel(axis=1, level=self.sortlevel)
+        return horidf
 
     def checkStreamType(self, streamtype):
         if streamtype not in self.possiblestreams:
@@ -427,7 +438,7 @@ class IPETEvaluation:
         if self.evaluateoptauto:
             opt = self.calculateOptimalAutoSettings(columndata)
             columndata = pd.concat([columndata, opt])
-            
+
         columndata = self.calculateNeededData(columndata)
 
         filtered = {}

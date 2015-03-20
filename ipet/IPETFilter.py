@@ -113,6 +113,9 @@ class IPETFilter(Editable):
 
         return mymethod(booleanseries)
 
+    def getNeededColumns(self, df):
+        return [exp for exp in [self.expression1, self.expression2] if exp in df.columns]
+
 
     def evaluateValueDataFrame(self, df, value):
         if value in df.columns:
@@ -159,12 +162,21 @@ class IPETFilterGroup(Editable):
     a filter group collects
     '''
 
-    def __init__(self, name):
+    def __init__(self, name=None, filtertype="intersection", stream=None):
         '''
         constructor for a filter group
+
+        Parameters:
+        ----------
+        name : a suitable name for the filter group
+        filtertype : either 'union' or 'intersection'
         '''
         self.name = name
         self.filters = []
+        if filtertype not in ["intersection", "union"]:
+            raise ValueError("Error: filtertype <%s> must be either 'intersection' or 'union'"%filtertype)
+
+        self.filtertype = filtertype
 
     def addFilter(self, filter_):
         '''
@@ -186,10 +198,14 @@ class IPETFilterGroup(Editable):
 
         groups = df.groupby(level=0)
         # first, get the highest number of instance occurrences. This number must be matched to keep the instance
-        instancecount = groups.apply(len).max()
+        if self.filtertype == "intersection":
+            instancecount = groups.apply(len).max()
+            intersectionfunction = lambda x:len(x) == instancecount
+        elif self.filtertype == "union":
+            intersectionfunction = lambda x:len(x) >= 1
 
         # return a filtered data frame as intersection of all instances that match all filter criteria and appear in every test run
-        return groups.filter(lambda x:len(x) == instancecount and np.all([filter_.filterDataFrame(x) for filter_ in self.filters]))
+        return groups.filter(lambda x:intersectionfunction(x) and np.all([filter_.filterDataFrame(x) for filter_ in self.filters]))
 
     def filterProblem(self, probname, testruns=[]):
         for filter_ in self.filters:
@@ -197,9 +213,21 @@ class IPETFilterGroup(Editable):
                 return False
 
         return True
-    def toXMLElem(self):
 
-        me = ElementTree.Element('FilterGroup', {'name':self.name})
+    def getNeededColumns(self, df):
+        needed = []
+        for filter_ in self.filters:
+            needed += filter_.getNeededColumns(df)
+
+        return needed
+
+
+    def toXMLElem(self):
+        myattributes = {'name':self.name}
+        if self.filtertype != "intersection":
+            myattributes.update({'filtertype':self.filtertype})
+
+        me = ElementTree.Element('FilterGroup', myattributes)
 
         for filter_ in self.filters:
             me.append(filter_.toXMLElem())
@@ -212,7 +240,7 @@ class IPETFilterGroup(Editable):
         inspect and process an xml element
         '''
         if elem.tag == 'FilterGroup':
-            filtergroup = IPETFilterGroup(elem.attrib.get('name'))
+            filtergroup = IPETFilterGroup(**elem.attrib)
             for child in elem:
                 filtergroup.addFilter(IPETFilterGroup.processXMLElem(child))
             return filtergroup

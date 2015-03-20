@@ -16,7 +16,8 @@ clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must hav
                ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
                ('--recollect', False,'-r', "Should the loaded comparator recollect data before proceeding?"),
                ('--savecomparator', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'"),
-               ('--externaldata', None,'-E', "Should external data such as additional instance information be used?")]
+               ('--externaldata', None,'-E', "Should external data such as additional instance information be used?"),
+               ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="starts the IPET graphical user interface")
@@ -66,7 +67,8 @@ if __name__ == '__main__':
     if savecomparator is not False:
         comp.saveToFile(comparatorfile)
 
-
+    if defaultgroup is not None:
+        theeval.setDefaultGroup(defaultgroup)
 
     if externaldata is not None:
         comp.addExternalDataFile(externaldata)

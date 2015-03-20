@@ -12,6 +12,7 @@ import argparse
 import sys
 from ipet.IPETEvalTable import IPETEvaluation
 import pandas as pd
+import os
 
 # possible arguments in the form name,default,short,description #
 clarguments = []
@@ -56,5 +57,11 @@ if __name__ == '__main__':
     comparator.collectData()
 
     for tr in comparator.testrunmanager.getManageables():
-        tr.saveToFile("%s%s"%(tr.getIdentification(),TestRun.FILE_EXTENSION))
+        try:
+            filename = tr.filenames[0]
+            newfilename = "%s%s"%(os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
+            tr.saveToFile(newfilename)
+            print "converted %s --> %s"%(filename, newfilename)
+        except:
+            print "skipped testrun %s"%tr.getIdentification()
 

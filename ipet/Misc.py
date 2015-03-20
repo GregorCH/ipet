@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from math import *
+from xml.dom.minidom import parseString
+import xml.etree.ElementTree as ElementTree
 
 '''
    Various methods for evaluation such as gap calculation, geometric means etc. and some printing methods
@@ -32,7 +34,7 @@ def getGap(value, referencevalue, useCplexGap=False):
     '''
     if value in [None, FLOAT_INFINITY] or referencevalue in [None, FLOAT_INFINITY]:
         return FLOAT_INFINITY
-    
+
     if not useCplexGap:
         if referencevalue == 0.0:
             if value == 0.0:
@@ -68,7 +70,7 @@ def gemean(listofnumbers, mingeommean=DEFAULT_MIN_GEOM_MEAN):
     convenience function to have shorter access to geometric mean
     '''
     return listGetGeomMean(listofnumbers, mingeommean)
-   
+
 def listGetGeomMean(listofnumbers, mingeommean=DEFAULT_MIN_GEOM_MEAN):
     '''
     returns the geometric mean of a list of numbers, where each element under consideration
@@ -79,12 +81,12 @@ def listGetGeomMean(listofnumbers, mingeommean=DEFAULT_MIN_GEOM_MEAN):
     for number in listofnumbers:
         nitems = nitems + 1
         nextnumber = max(number, mingeommean)
-        geommean = pow(geommean, (nitems - 1)/float(nitems)) * pow(nextnumber, 1 / float(nitems)) 
+        geommean = pow(geommean, (nitems - 1)/float(nitems)) * pow(nextnumber, 1 / float(nitems))
     return geommean
-   
+
 def listGetShiftedGeometricMean(listofnumbers, shiftby=10.0):
     '''
-    returns the shifted geometric mean of a list of numbers, where the additional shift defaults to 
+    returns the shifted geometric mean of a list of numbers, where the additional shift defaults to
     10.0 and can be set via shiftby
     '''
     geommean = 1.0
@@ -92,10 +94,10 @@ def listGetShiftedGeometricMean(listofnumbers, shiftby=10.0):
     for number in listofnumbers:
         nitems = nitems + 1
         nextnumber = number + shiftby
-        geommean = pow(geommean, (nitems - 1)/float(nitems)) * pow(nextnumber, 1 / float(nitems)) 
+        geommean = pow(geommean, (nitems - 1)/float(nitems)) * pow(nextnumber, 1 / float(nitems))
     return geommean - shiftby
-                
-   
+
+
 def cutString(string, char = '_', maxlength = -1):
     iscuttable = True
     stringcopy = string[0:len(string)]
@@ -119,7 +121,7 @@ def cutString(string, char = '_', maxlength = -1):
                     stringcopy = stringcopy + stringitem + char
                 else:
                     stringcopy.rstrip(char)
-               
+
     return stringcopy.rstrip(char)
 
 def listGetMinColWidth(listofitems):
@@ -128,5 +130,19 @@ def listGetMinColWidth(listofitems):
         if len(item) > maxlen:
             maxlen = len(item)
     return maxlen
-   
-   
+
+def saveAsXML(object, filename):
+    '''
+    save object as XML file under the specified filename
+
+    object must have a 'toXMLElem'-method
+    '''
+
+    xml = object.toXMLElem()
+
+    dom = parseString(ElementTree.tostring(xml))
+
+    with open("filename", 'w') as thefile:
+        thefile.write(dom.toprettyxml())
+
+

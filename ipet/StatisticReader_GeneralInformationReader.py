@@ -47,7 +47,7 @@ class GeneralInformationReader(StatisticReader):
                 self.testrun.addData(self.problemname, 'AbsolutePathSettings', absolutesettingspath)
                 settings = os.path.basename(absolutesettingspath)
                 settings = os.path.splitext(settings)[0]
-                self.testrun.addData(self.problemname, 'Settings', settings)
+                self.testrun.addData(self.problemname, 'Settings', self.testrun.getSettings())
 
         elif StatisticReader.solvertype == StatisticReader.SOLVERTYPE_CPLEX:
             if "CPLEX> Non-default parameters written to file" in line:
@@ -56,7 +56,7 @@ class GeneralInformationReader(StatisticReader):
     def __handleVersion(self, line):
         '''
         handles more than just the version
-        
+
         SCIP version 3.1.0.1 [precision: 8 byte] [memory: block] [mode: debug] [LP solver: SoPlex 2.0.0.1] [GitHash: 825e268-dirty]
         '''
         version = line[13:20]

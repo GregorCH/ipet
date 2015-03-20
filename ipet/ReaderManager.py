@@ -19,7 +19,7 @@ class ReaderManager(Manager):
                               StatisticReader.SOLVERTYPE_CPLEX:"Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer",
                               StatisticReader.SOLVERTYPE_XPRESS:"FICO Xpress Optimizer",
                               StatisticReader.SOLVERTYPE_CBC:"Welcome to the CBC MILP Solver",
-                              StatisticReader.SOLVERTYPE_COUENNE:" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization",
+                              StatisticReader.SOLVERTYPE_COUENNE:" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization"
                               }
 
 

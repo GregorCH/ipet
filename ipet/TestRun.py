@@ -196,7 +196,7 @@ class TestRun(Editable):
         '''
         return identification string of this test run
         '''
-        return self.getSolver() + '(' + self.getVersion() + ')' + "-%s-"%self.getMode() + self.getLpSolver() + ':' + self.getSettings()
+        return os.path.splitext(os.path.basename(self.filenames[0]))[0]
 
     def getShortIdentification(self, char='_', maxlength= -1):
         '''

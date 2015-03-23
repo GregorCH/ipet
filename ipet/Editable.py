@@ -33,3 +33,6 @@ class Editable:
 
     def attributesToDict(self):
         return {elem:getattr(self, elem) for elem in self.getEditableAttributes()}
+    
+    def getRequiredOptionsByAttribute(self, attr):
+        return None

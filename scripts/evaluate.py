@@ -17,7 +17,8 @@ clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must hav
                ('--recollect', False,'-r', "Should the loaded comparator recollect data before proceeding?"),
                ('--savecomparator', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'"),
                ('--externaldata', None,'-E', "Should external data such as additional instance information be used?"),
-               ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation")]
+               ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation"),
+               ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="starts the IPET graphical user interface")
@@ -72,11 +73,22 @@ if __name__ == '__main__':
 
     if externaldata is not None:
         comp.addExternalDataFile(externaldata)
-
+    else:
+        comp.externaldata = None
     rettab, retagg = theeval.evaluate(comp)
-
-    #print pd.concat([rettab, theeval.levelonedf], axis=1)
-
+    
     print rettab.to_string()
     print
     print retagg.to_string()
+    if fileextension is not None:
+        path = "."
+        extension = fileextension
+        for fg in theeval.filtergroups:
+            instancewisename = "%s/%s"%(path,fg.name)
+            theeval.streamDataFrame(theeval.filtered_instancewise[fg.name], instancewisename, extension)
+            print "Instance-wise data written to %s.%s"%(instancewisename,extension)
+            aggname = instancewisename + "_agg"
+            theeval.streamDataFrame(theeval.filtered_agg[fg.name], aggname, extension)
+            print "aggregated data written to %s.%s"%(aggname,extension)
+    #print pd.concat([rettab, theeval.levelonedf], axis=1)
+

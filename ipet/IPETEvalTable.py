@@ -8,8 +8,16 @@ from Aggregation import Aggregation
 import xml.etree.ElementTree as ElementTree
 from ipet.IPETFilter import IPETFilterGroup
 import numpy
+from ipet.Editable import Editable
 
-class IPETEvaluationColumn:
+class IPETEvaluationColumn(Editable):
+    
+    editableAttributes = ["name", "origcolname", "formatstr","transformfunc", "constant",
+                 "nanrep", "minval", "maxval", "comp", "translevel"]
+    
+    possibletransformations = ["sum", "subtract", "divide", "log10", "log", "mean", "median", "std"]
+    
+    requiredOptions = {"origcolname":"datakey", "translevel":[0,1], "transformfunc":possibletransformations}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
                  nanrep=None, minval=None, maxval=None, comp=None, translevel=None):
@@ -65,6 +73,12 @@ class IPETEvaluationColumn:
 
     def addChild(self, child):
         self.children.append(child)
+        
+    def getEditableAttributes(self):
+        return self.editableAttributes
+    
+    def getRequiredOptionsByAttribute(self, attr):
+        return self.requiredOptions.get(attr, None)
 
     def getName(self):
         '''
@@ -209,25 +223,32 @@ class IPETEvaluationColumn:
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
 
-class IPETEvaluation:
+class IPETEvaluation(Editable):
     '''
     evaluates for a comparator with given group keys, columns, and filter groups
     '''
 
     #todo put tex, csv etc. here as other possible streams for filter group output
     possiblestreams=['stdout', 'tex', 'txt', 'csv']
-    DEFAULT_GROUPKEY="SETTINGS"
+    DEFAULT_GROUPKEY="Settings"
     DEFAULT_DEFAULTGROUP="default"
     ALLTOGETHER="_alltogether_"
-
+    
+    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel"]
+    attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0,1]}
     def __init__(self):
         self.filtergroups = []
         self.groupkey = self.DEFAULT_GROUPKEY
         self.defaultgroup = self.DEFAULT_DEFAULTGROUP
         self.columns = []
-        self.fgroup2stream = {}
         self.evaluateoptauto = True
         self.sortlevel = 0
+        
+    def getEditableAttributes(self):
+        return self.editableAttributes
+    
+    def getRequiredOptionsByAttribute(self, attr):
+        return self.attributes2Options.get(attr)
 
     def addFilterGroup(self, fg):
         self.filtergroups.append(fg)
@@ -307,8 +328,6 @@ class IPETEvaluation:
         for fg in self.filtergroups:
             fgelem = fg.toXMLElem()
             me.append(fgelem)
-            if self.fgroup2stream.get(fg.getName()) is not None:
-                fgelem.attrib["stream"] = self.fgroup2stream.get(fg.getName())
 
         return me
 
@@ -333,10 +352,6 @@ class IPETEvaluation:
                 # add the filter group to the list of filter groups
                 fg = IPETFilterGroup.processXMLElem(child)
                 ev.addFilterGroup(fg)
-
-                #if there is a stream attribute associated with this group
-                if child.attrib.get("stream") is not None:
-                    ev.fgroup2stream[fg.getName()] = child.attrib.get("stream")
 
             elif child.tag == 'Column':
                 ev.addColumn(IPETEvaluationColumn.processXMLElem(child))
@@ -441,58 +456,28 @@ class IPETEvaluation:
 
         columndata = self.calculateNeededData(columndata)
 
-        filtered = {}
-
         # compile a results table containing all instances
         ret = self.convertToHorizontalFormat(columndata)
-
-        # filter column data and group by group key #
-
-        for fg in self.filtergroups:
-            # iterate through filter groups, thereby aggregating results for every group
-            reduceddata = self.applyFilterGroup(columndata, fg)
-
-            if self.fgroup2stream.get(fg.getName()) is not None:
-                self.streamDataFrame(self.convertToHorizontalFormat(reduceddata), fg.getName(), self.fgroup2stream.get(fg.getName()))
-
-            # the general part sums up the number of instances falling into different categories
-            generalpart = reduceddata[['_count_', '_solved_', '_time_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
-
-            # column aggregations aggregate every column and every column aggregation
-            colaggpart = pd.concat([reduceddata[[col.getName(), self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)
-
-            # rename the column aggregations
-            colaggpart.columns = ['_'.join((col.getName(), agg.getName())) for col in self.columns for agg in col.aggregations]
-
-            # determine the row in the aggregated table corresponding to the default group
-            if self.defaultgroup in colaggpart.index:
-                defaultrow = colaggpart.loc[self.defaultgroup, :]
-            else:
-                # if there is no default setting, take the first group as default group
-                try:
-                    defaultrow = colaggpart.iloc[0, :]
-                except:
-                    defaultrow = numpy.nan
-
-            # determine quotients
-            comppart = colaggpart / defaultrow
-            comppart.columns = [col + 'Q' for col in colaggpart.columns]
-
-            #apply statistical tests, whereever possible
-            statspart = self.applyStatsTests(reduceddata)
-
-            #glue the parts together
-            parts = [generalpart, colaggpart, comppart]
-            if statspart is not None:
-                parts.append(statspart)
-
-            filtered[fg.name] = pd.concat(parts, axis = 1)
         if self.levelonedf is not None:
             self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
             rettab = pd.concat([ret, self.levelonedf], axis=1)
         else:
             rettab = ret
-        retagg = pd.concat([filtered[fg.name] for fg in self.filtergroups], keys=[fg.name for fg in self.filtergroups], names=['Group'])
+
+        
+        self.instance_wise = ret
+        self.agg = self.aggregateToPivotTable(columndata)
+        
+        self.filtered_agg = {}
+        self.filtered_instancewise = {}
+        # filter column data and group by group key #
+        for fg in self.filtergroups:
+            # iterate through filter groups, thereby aggregating results for every group
+            reduceddata = self.applyFilterGroup(columndata, fg)
+            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
+            self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
+
+        retagg = pd.concat([self.filtered_agg[fg.name] for fg in self.filtergroups], keys=[fg.name for fg in self.filtergroups], names=['Group'])
 
         return rettab, retagg
     '''
@@ -501,6 +486,40 @@ class IPETEvaluation:
     '''
     def applyFilterGroup(self, df, fg):
         return fg.filterDataFrame(df)
+    
+    def aggregateToPivotTable(self, df):
+        # the general part sums up the number of instances falling into different categories
+        generalpart = df[['_count_', '_solved_', '_time_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
+
+        # column aggregations aggregate every column and every column aggregation
+        colaggpart = pd.concat([df[[col.getName(), self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)
+
+        # rename the column aggregations
+        colaggpart.columns = ['_'.join((col.getName(), agg.getName())) for col in self.columns for agg in col.aggregations]
+
+        # determine the row in the aggregated table corresponding to the default group
+        if self.defaultgroup in colaggpart.index:
+            defaultrow = colaggpart.loc[self.defaultgroup, :]
+        else:
+            # if there is no default setting, take the first group as default group
+            try:
+                defaultrow = colaggpart.iloc[0, :]
+            except:
+                defaultrow = numpy.nan
+
+        # determine quotients
+        comppart = colaggpart / defaultrow
+        comppart.columns = [col + 'Q' for col in colaggpart.columns]
+
+        #apply statistical tests, whereever possible
+        statspart = self.applyStatsTests(df)
+
+        #glue the parts together
+        parts = [generalpart, colaggpart, comppart]
+        if statspart is not None:
+            parts.append(statspart)
+            
+        return pd.concat(parts, axis = 1)
 
     def applyStatsTests(self, df):
         '''
@@ -562,7 +581,7 @@ if __name__ == '__main__':
 
     from ipet.Comparator import Comparator
     comp = Comparator.loadFromFile('../test/.testcomp.cmp')
-
+    comp.externaldata = None
     rettab, retagg = ev.evaluate(comp)
     print rettab.to_string()
     print retagg.to_string()

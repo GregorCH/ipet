@@ -34,6 +34,10 @@ class Aggregation(Editable.Editable):
             name += '(%s)'% ','.join((str(self.__dict__[key]) for key in self.editableattributes[1:]))
         return name
 
+    @staticmethod
+    def getPossibleAggregations():
+        return Aggregation.possibleaggregations
+    
     def getEditableAttributes(self):
         return self.editableattributes
 

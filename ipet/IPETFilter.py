@@ -46,6 +46,8 @@ class IPETFilter(Editable):
     '''
     Filters are used for selecting subsets of problems to analyze.
     '''
+    attribute2Options = {"anytestrun":["one", "all"], "operator":IPETComparison.comparisondict.keys()}
+    
     def __init__(self, expression1, expression2, operator, anytestrun='all', containset=None):
         '''
         filter constructor
@@ -54,8 +56,13 @@ class IPETFilter(Editable):
         self.expression2 = expression2
 
         self.anytestrun = anytestrun
+        
+        if operator == "contains" and containset is None:
+            raise ValueError("Error: Trying to initialize a filter with operator 'contains' but no 'containset'")
+        
         self.containset = containset
         self.set_operator(operator)
+        
 
     @staticmethod
     def fromDict(attrdict):
@@ -79,6 +86,9 @@ class IPETFilter(Editable):
 
     def getEditableAttributes(self):
         return ['anytestrun', 'expression1', 'operator', 'expression2']
+    
+    def getRequiredOptionsByAttribute(self, attr):
+        return self.attribute2Options.get(attr)
 
     def filterProblem(self, probname, testruns=[]):
         '''
@@ -161,8 +171,11 @@ class IPETFilterGroup(Editable):
 
     a filter group collects
     '''
+    attribute2options = {"filtertype":["union", "intersection"]}
+    
+    editableAttributes = ["name", "filtertype"]
 
-    def __init__(self, name=None, filtertype="intersection", stream=None):
+    def __init__(self, name=None, filtertype="intersection"):
         '''
         constructor for a filter group
 
@@ -177,6 +190,12 @@ class IPETFilterGroup(Editable):
             raise ValueError("Error: filtertype <%s> must be either 'intersection' or 'union'"%filtertype)
 
         self.filtertype = filtertype
+        
+    def getEditableAttributes(self):
+        return self.editableAttributes
+    
+    def getRequiredOptionsByAttribute(self, attr):
+        return self.attribute2options.get(attr)
 
     def addFilter(self, filter_):
         '''

@@ -7,6 +7,32 @@ from Editable import Editable
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 import pandas as pd
+from ipet.IpetNode import IpetNode
+
+class IPETInstance(IpetNode, Editable):
+    nodetag = "Instance"
+    
+    def __init__(self, name=None):
+        '''
+        constructs an Ipet Instance
+        
+        Parameters
+        ----------
+        
+        name : The name of this instance
+        '''
+        if name is None:
+            raise ValueError("Error: An instance needs a name")
+        self.name = name
+    def getEditableAttributes(self):
+        return ["name"]
+    
+    @staticmethod
+    def getNodeTag():
+        return IPETInstance.nodetag
+    
+    def getName(self):
+        return self.name
 
 class IPETComparison:
     '''
@@ -19,8 +45,8 @@ class IPETComparison:
         '''
         constructs a comparison object by passing an appropriate operator as string
         '''
-        if IPETComparison.comparisondict.has_key(operator):
-            self.operator = operator
+        if IPETComparison.comparisondict.has_key(str(operator)):
+            self.operator = str(operator)
         else:
             raise KeyError("Unknown key value %s" % (operator))
         self.containset = containset
@@ -42,28 +68,38 @@ class IPETComparison:
     def method_cont(self, x, y):
         return x in self.containset or y in self.containset
 
-class IPETFilter(Editable):
+class IPETFilter(Editable, IpetNode):
     '''
     Filters are used for selecting subsets of problems to analyze.
     '''
     attribute2Options = {"anytestrun":["one", "all"], "operator":IPETComparison.comparisondict.keys()}
+    nodetag = "Filter"
     
     def __init__(self, expression1, expression2, operator, anytestrun='all', containset=None):
         '''
         filter constructor
+        
+        Parameters
+        ----------
+        
+        expression1 : integer, float, string, or column name
+        expression2 : integer, float, string, or column name
+        operator : operator such that evaluation expression1 op expression2 yields True or False
+        anytestrun : either 'one' or 'all' 
         '''
         self.expression1 = expression1
         self.expression2 = expression2
 
         self.anytestrun = anytestrun
         
-        if operator == "contains" and containset is None:
-            raise ValueError("Error: Trying to initialize a filter with operator 'contains' but no 'containset'")
-        
         self.containset = containset
         self.set_operator(operator)
         
-
+    def checkAttributes(self):
+        if self.operator == "contains" and self.containset is None:
+            raise ValueError("Error: Trying to initialize a filter with operator 'contains' but no 'containset'")
+        
+        
     @staticmethod
     def fromDict(attrdict):
         expression1 = attrdict.get('expression1')
@@ -74,7 +110,6 @@ class IPETFilter(Editable):
         containset = attrdict.get('containset')
 
         return IPETFilter(expression1, expression2, operator, anytestrun, containset)
-
 
     def getName(self):
         prefix = self.anytestrun
@@ -87,6 +122,29 @@ class IPETFilter(Editable):
     def getEditableAttributes(self):
         return ['anytestrun', 'expression1', 'operator', 'expression2']
     
+    @staticmethod
+    def getNodeTag():
+        return IPETFilter.nodetag
+    
+    def getChildren(self):
+        if self.containset is not None:
+            return map(IPETInstance, sorted(list(self.containset)))
+        else:
+            return None
+        
+    def acceptsAsChild(self, child):
+        return child.__class__ is IPETInstance
+    
+    def addChild(self, child):
+        if self.containset is None:
+            self.containset = set()
+            
+        self.containset.add(child.getName())
+        
+    def removeChild(self, child):
+        if self.containset is not None:
+            self.containset.remove(child.getName())
+            
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2Options.get(attr)
 
@@ -165,12 +223,13 @@ class IPETFilter(Editable):
                 me.append(ElementTree.Element("Instance", {"name":containelem}))
         return me
 
-class IPETFilterGroup(Editable):
+class IPETFilterGroup(Editable, IpetNode):
     '''
     represents a list of filters or filter groups, has a name attribute for quick tabular representation
 
     a filter group collects
     '''
+    nodetag = "FilterGroup"
     attribute2options = {"filtertype":["union", "intersection"]}
     
     editableAttributes = ["name", "filtertype"]
@@ -193,6 +252,19 @@ class IPETFilterGroup(Editable):
         
     def getEditableAttributes(self):
         return self.editableAttributes
+    
+    def getChildren(self):
+        return self.filters
+    
+    def acceptsAsChild(self, child):
+        return child.__class__ is IPETFilter
+    
+    def removeChild(self, child):
+        self.filters.remove(child)
+    
+    @staticmethod
+    def getNodeTag():
+        return IPETFilterGroup.nodetag
     
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2options.get(attr)
@@ -258,18 +330,19 @@ class IPETFilterGroup(Editable):
         '''
         inspect and process an xml element
         '''
-        if elem.tag == 'FilterGroup':
+        if elem.tag == IPETFilterGroup.getNodeTag():
             filtergroup = IPETFilterGroup(**elem.attrib)
             for child in elem:
                 filtergroup.addFilter(IPETFilterGroup.processXMLElem(child))
             return filtergroup
-        elif elem.tag == 'Filter':
+        elif elem.tag == IPETFilter.getNodeTag():
             elemdict = dict(elem.attrib)
+            filter_ = IPETFilter.fromDict(elemdict)
             for child in elem:
                 instancename = child.attrib.get("name")
                 if instancename:
-                    elemdict.setdefault('containset', set()).add(instancename)
-            filter_ = IPETFilter.fromDict(elemdict)
+                    filter_.addChild(IPETInstance(instancename))
+                filter_.checkAttributes()
             return filter_
 
     @staticmethod

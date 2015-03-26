@@ -8,18 +8,29 @@ import Misc, Editable
 from xml.etree import ElementTree
 from _functools import partial
 from ipet.quick_Pandas import getWilcoxonQuotientSignificance as qWilcox
+from ipet.IpetNode import IpetNode
 
-class Aggregation(Editable.Editable):
+class Aggregation(Editable.Editable, IpetNode):
     '''
     aggregates a list of values into a single value, as, e.g., a mean. Allows functions from numpy and
     from Misc-module
     '''
+    nodetag = "Aggregation"
     possibleaggregations = ['shmean', 'gemean', 'min', 'max', 'mean', 'size', 'std', 'sum', 'median']
     agg2Stat = {'shmean':qWilcox}
 
-    def __init__(self, aggregation, **kw):
-        self.set_aggregation(aggregation)
-        self.name = aggregation
+    def __init__(self, name, **kw):
+        '''
+        constructs an Aggregation
+        
+        Parameters
+        ----------
+        name : The name for this aggregation, must be the name of the aggregation function in use
+        
+        kw : eventually, other options that will be passed to the call of the aggregation function
+        '''
+        self.set_aggregation(name)
+        self.name = name
         self.editableattributes = ['name']
         for key, val in kw.iteritems():
             self.__dict__[key] = val
@@ -57,15 +68,19 @@ class Aggregation(Editable.Editable):
             return self.aggrfunc(valuelist)
 
     @staticmethod
+    def getNodeTag():
+        return Aggregation.nodetag
+    
+    @staticmethod
     def processXMLElem(elem):
-        if elem.tag == 'Aggregation':
+        if elem.tag == Aggregation.getNodeTag():
             additional = {}
             for child in elem:
                 additional.update({child.tag:float(child.attrib.get('val'))})
             return Aggregation(elem.attrib.get('name'), **additional)
 
     def toXMLElem(self):
-        me = ElementTree.Element('Aggregation', {'name':self.name})
+        me = ElementTree.Element(Aggregation.getNodeTag(), {'name':self.name})
         for att in self.editableattributes:
             if att == 'name':
                 continue

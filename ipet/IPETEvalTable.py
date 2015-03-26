@@ -9,13 +9,16 @@ import xml.etree.ElementTree as ElementTree
 from ipet.IPETFilter import IPETFilterGroup
 import numpy
 from ipet.Editable import Editable
+from ipet.IpetNode import IpetNode
 
-class IPETEvaluationColumn(Editable):
+class IPETEvaluationColumn(Editable, IpetNode):
+    
+    nodetag = "Column"
     
     editableAttributes = ["name", "origcolname", "formatstr","transformfunc", "constant",
                  "nanrep", "minval", "maxval", "comp", "translevel"]
     
-    possibletransformations = ["sum", "subtract", "divide", "log10", "log", "mean", "median", "std"]
+    possibletransformations = [None, "sum", "subtract", "divide", "log10", "log", "mean", "median", "std", "min", "max"]
     
     requiredOptions = {"origcolname":"datakey", "translevel":[0,1], "transformfunc":possibletransformations}
 
@@ -72,7 +75,28 @@ class IPETEvaluationColumn(Editable):
         self.children = []
 
     def addChild(self, child):
-        self.children.append(child)
+        if not self.acceptsAsChild(child):
+            raise ValueError("Cannot accept child %s as child of a column node"%child)
+        if child.__class__ is IPETEvaluationColumn:
+            self.children.append(child)
+        elif child.__class__ is Aggregation:
+            self.aggregations.append(child)
+        
+    def getChildren(self):
+        return self.children + self.aggregations
+    
+    def acceptsAsChild(self, child):
+        return child.__class__ in (IPETEvaluationColumn, Aggregation)
+        
+    def removeChild(self, child):
+        if child.__class__ is IPETEvaluationColumn:
+            self.children.remove(child)
+        elif child.__class__ is Aggregation:
+            self.aggregations.remove(child)
+            
+    @staticmethod
+    def getNodeTag():
+        return IPETEvaluationColumn.nodetag
         
     def getEditableAttributes(self):
         return self.editableAttributes
@@ -131,10 +155,10 @@ class IPETEvaluationColumn(Editable):
         '''
 
         # keep only non NAN elements
-        myelements = {k:self.__dict__[k] for k in ['name', 'origcolname', 'transformfunc', 'formatstr', 'constant', 'nanrep', 'minval', 'maxval'] if self.__dict__.get(k) is not None}
+        myelements = {k:self.__dict__[k] for k in ['name', 'origcolname', 'transformfunc', 'formatstr', 'constant', 'nanrep', 'minval', 'maxval', 'translevel'] if self.__dict__.get(k) is not None}
 
 
-        me = ElementTree.Element("Column", myelements)
+        me = ElementTree.Element(IPETEvaluationColumn.getNodeTag(), myelements)
 
         # iterate through children and aggregations and convert them to xml nodes
         for child in self.children:
@@ -144,16 +168,16 @@ class IPETEvaluationColumn(Editable):
             me.append(agg.toXMLElem())
 
         return me
+    
     @staticmethod
-
     def processXMLElem(elem):
 
-        if elem.tag == 'Column':
+        if elem.tag == IPETEvaluationColumn.getNodeTag():
             column = IPETEvaluationColumn(**elem.attrib)
             for child in elem:
                 if child.tag == 'Aggregation':
                     column.addAggregation(Aggregation.processXMLElem(child))
-                elif child.tag == 'Column':
+                elif child.tag == IPETEvaluationColumn.getNodeTag():
                     column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column
 
@@ -223,11 +247,11 @@ class IPETEvaluationColumn(Editable):
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
 
-class IPETEvaluation(Editable):
+class IPETEvaluation(Editable, IpetNode):
     '''
     evaluates for a comparator with given group keys, columns, and filter groups
     '''
-
+    nodetag = "Evaluation"
     #todo put tex, csv etc. here as other possible streams for filter group output
     possiblestreams=['stdout', 'tex', 'txt', 'csv']
     DEFAULT_GROUPKEY="Settings"
@@ -243,9 +267,37 @@ class IPETEvaluation(Editable):
         self.columns = []
         self.evaluateoptauto = True
         self.sortlevel = 0
+       
+        
+    def getName(self):
+        return self.nodetag
+    
+    @staticmethod
+    def getNodeTag():
+        return IPETEvaluation.nodetag
         
     def getEditableAttributes(self):
         return self.editableAttributes
+    
+    def getChildren(self):
+        return self.columns + self.filtergroups
+    
+    def acceptsAsChild(self, child):
+        return child.__class__ in (IPETEvaluationColumn, IPETFilterGroup)
+    
+    def addChild(self, child):
+        if not self.acceptsAsChild(child):
+            raise ValueError("Cannot accept child %s as child of an evaluation node"%child)
+        if child.__class__ is IPETEvaluationColumn:
+            self.columns.append(child)
+        elif child.__class__ is IPETFilterGroup:
+            self.filtergroups.append(child)
+            
+    def removeChild(self, child):
+        if child.__class__ is IPETEvaluationColumn:
+            self.columns.remove(child)
+        elif child.__class__ is IPETFilterGroup:
+            self.filtergroups.remove(child)
     
     def getRequiredOptionsByAttribute(self, attr):
         return self.attributes2Options.get(attr)
@@ -322,7 +374,7 @@ class IPETEvaluation(Editable):
         return df
 
     def toXMLElem(self):
-        me = ElementTree.Element('Evaluation', {'groupkey':self.groupkey, 'defaultgroup':self.defaultgroup})
+        me = ElementTree.Element(IPETEvaluation.getNodeTag(), {'groupkey':self.groupkey, 'defaultgroup':self.defaultgroup})
         for col in self.columns:
             me.append(col.toXMLElem())
         for fg in self.filtergroups:
@@ -343,17 +395,18 @@ class IPETEvaluation(Editable):
 
     @staticmethod
     def processXMLElem(elem):
-        if elem.tag == 'Evaluation':
+        if elem.tag == IPETEvaluation.getNodeTag():
             ev = IPETEvaluation()
             ev.setGroupKey(elem.attrib.get('groupkey', IPETEvaluation.DEFAULT_GROUPKEY))
             ev.setDefaultGroup(elem.attrib.get('defaultgroup', IPETEvaluation.DEFAULT_DEFAULTGROUP))
+            
         for child in elem:
-            if child.tag == 'FilterGroup':
+            if child.tag == IPETFilterGroup.getNodeTag():
                 # add the filter group to the list of filter groups
                 fg = IPETFilterGroup.processXMLElem(child)
                 ev.addFilterGroup(fg)
 
-            elif child.tag == 'Column':
+            elif child.tag == IPETEvaluationColumn.getNodeTag():
                 ev.addColumn(IPETEvaluationColumn.processXMLElem(child))
         return ev
 

@@ -36,3 +36,12 @@ class Editable:
     
     def getRequiredOptionsByAttribute(self, attr):
         return None
+    
+    def getAttrDocumentation(self, attr):
+        for line in self.__init__.__doc__.splitlines():
+            if line.strip().startswith(attr):
+                return line[line.index(":") + 1:]
+        return None
+        
+        
+        

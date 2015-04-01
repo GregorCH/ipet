@@ -8,7 +8,7 @@ Testruns can be activated/dectivated. The normalization can be chosen (no normal
 and dual scale) or Cplex Gap)
 '''
 from IpetWidget import IpetWidget
-from Tkinter import IntVar, Frame, Checkbutton, Toplevel, Button
+from Tkinter import IntVar, Checkbutton, Toplevel, Button, StringVar
 from Tkconstants import LEFT, BOTH, TOP, VERTICAL, HORIZONTAL
 import matplotlib
 matplotlib.use('TkAgg')
@@ -19,7 +19,7 @@ from matplotlib.pyplot import cm
 import matplotlib.pylab as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 import Misc
-from ttk import Panedwindow, LabelFrame, Treeview
+from ttk import Panedwindow, LabelFrame, Treeview, Frame, OptionMenu, Label
 import Tkconstants
 from IpetParam import IPETParam
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
@@ -55,6 +55,11 @@ class SCIPguiPbHistoryWidget(IpetWidget):
       self.gui.requestUpdate(self)
       self.f = Figure(figsize=(5, 4), dpi=120)
       self.a = self.f.add_subplot(111)
+      self.navpanel = Frame(self, width=self.winfo_screenwidth())
+      Label(self.navpanel, text="select test run and instance:").grid(row=0, column=1)
+
+      self.probvar = StringVar(value=str(None))
+      self.navpanel.pack(side=TOP, fill=Tkconstants.X)
 
       # init a canvas
       self.canvas = FigureCanvasTkAgg(self.f, master=self)
@@ -77,7 +82,21 @@ class SCIPguiPbHistoryWidget(IpetWidget):
       self.params = Manager(params)
       self.params.addObserver(self)
 
+
+
+      self.probvar.trace_variable("w", self.update)
+
       self.update()
+
+   def updateBoxes(self):
+      try:
+          self.ompr.destroy()
+      except AttributeError:
+          pass
+
+      self.ompr = OptionMenu(self.navpanel, self.probvar, self.probvar.get(), *([str(None)] + self.gui.getProblemList()))
+      self.ompr.config(width=40)
+      self.ompr.grid(row=0, column=3)
 
    def openPbConfiguration(self):
       pbconfigurationframe = PbConfigurationFrame(self.gui, self)
@@ -136,10 +155,11 @@ class SCIPguiPbHistoryWidget(IpetWidget):
       y = numpy.array(map(normfunction, thelist[1]))
 
       return (x, y)
-   def update(self, manager=None):
+   def update(self, *args):
       '''
       update method called every time a new instance was selected
       '''
+      self.updateBoxes()
       self.resetAxis()
       # make up data for plotting method
       x = {}
@@ -158,8 +178,8 @@ class SCIPguiPbHistoryWidget(IpetWidget):
       for testrun in [testrun for testrun in self.gui.getTestrunList() if self.boolVars.setdefault(testrun.getIdentification(), IntVar(value=1)).get() == 1]:
          testrunname = testrun.getIdentification()
 
-         probname = self.gui.selected_problem
-         if probname is None:
+         probname = self.probvar.get()
+         if probname not in self.gui.getProblemList():
             return
 
          x[testrunname], y[testrunname] = self.getTestrunPlotData(testrun, probname, usenormalization)
@@ -201,7 +221,7 @@ class SCIPguiPbHistoryWidget(IpetWidget):
 
          self.canvas.draw()
 
-   def axisPlotForTestrunData(self, dataX, dataY, bars=True, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, ax=None, legend=True,
+   def axisPlotForTestrunData(self, dataX, dataY, bars=False, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, ax=None, legend=True,
        colormapname="spectral", plotkw=None, barkw=None):
       '''
       create a plot for your X and Y data. The data can either be specified as matrix, or as a dictionary

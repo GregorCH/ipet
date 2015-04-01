@@ -26,7 +26,7 @@ class IpetOutputWidget(IpetWidget):
         Label(self.navpanel, text="select test run and instance:").grid(row=0, column=1)
         self.trvar = StringVar(value=str(None))
         self.probvar = StringVar(value=str(None))
-        
+
         self.navpanel.pack(side=TOP, fill=Tkconstants.X)
         self.textoutputframe = ScrolledOutputWidget(self, self.gui, bd=5, bg="white", width=self.winfo_screenwidth(), height=self.winfo_screenheight())
         self.textoutputframe.pack(side=TOP, expand=1, fill=Tkconstants.BOTH)
@@ -47,11 +47,11 @@ class IpetOutputWidget(IpetWidget):
         self.omtr = OptionMenu(self.navpanel, self.trvar, self.trvar.get(), *([str(None)] + self.gui.getTestrunnames()))
         self.omtr.config(width=40)
         self.omtr.grid(row=0, column=2)
-        
+
         self.ompr = OptionMenu(self.navpanel, self.probvar, self.probvar.get(), *([str(None)] + self.gui.getProblemList()))
         self.ompr.config(width=40)
         self.ompr.grid(row=0, column=3)
-        
+
     def reactOnSelection(self, *args):
         print "reacting on selection %s %s" % (self.probvar.get(), self.trvar.get())
         self.textoutputframe.setProblem(self.probvar.get())
@@ -60,4 +60,4 @@ class IpetOutputWidget(IpetWidget):
 
     def update(self):
         self.updateBoxes()
-        
+

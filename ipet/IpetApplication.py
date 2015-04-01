@@ -78,7 +78,7 @@ class IpetApplication(Tk):
 #        recollectDataButton.pack(side=TOP)
 
         # make the remaining window show a tabbed panel with the different widgets
-        widgets = [IpetTableWidget, IpetOutputWidget, IpetMessageWidget, IpetScatterWidget]
+        widgets = [IpetTableWidget, IpetOutputWidget, IpetMessageWidget, IpetScatterWidget, SCIPguiPbHistoryWidget]
         tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:

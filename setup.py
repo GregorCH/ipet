@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='Ipet--Interactive Python Evaluation Tools',
     version='0.1dev',
-    packages=['ipet',],
+    packages=['ipet','qipet'],
     package_data=dict(ipet=["../images/*.png"]),
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description="""

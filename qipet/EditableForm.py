@@ -17,6 +17,7 @@ class EditableForm(QWidget):
     availableOptions = {}
     
     USERINPUT_SIGNAL = "userinput"
+    NOSELECTIONTEXT = "-- no selection --"
     
     @staticmethod
     def extendAvailableOptions(key, moreoptions):
@@ -64,14 +65,14 @@ class EditableForm(QWidget):
             return str(value)
         
     def convertTextToValue(self, text):
-        if text == "":
+        if text == "" or text == self.NOSELECTIONTEXT:
             return None
         else:
             return str(text)
         
     def convertListOptions(self, optioninlist):
         if optioninlist is None:
-            return unicode("-- no selection --")
+            return unicode(self.NOSELECTIONTEXT)
         else:
             return unicode(optioninlist)
         

@@ -9,9 +9,11 @@ from PyQt4.QtGui import QMainWindow, QGridLayout, QFrame, QWidget, QLabel,\
 from qipet.IPetTreeView import IpetTreeView
 from qipet.EditableForm import EditableForm
 from PyQt4.QtCore import QString, Qt, SIGNAL
-from ipet.IPETEvalTable import IPETEvaluation
+from ipet.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
 from ipet import Misc
+from ipet.Aggregation import Aggregation
+from ipet.IPETFilter import IPETFilterGroup, IPETFilter, IPETInstance
 
 class IpetEvaluationEditorApp(QMainWindow):
     '''
@@ -67,14 +69,16 @@ class IpetEvaluationEditorApp(QMainWindow):
                                        tip="Save evaluation to XML format")
         saveasaction = self.createAction("&Save as", self.saveEvaluationAs, QKeySequence.SaveAs, icon="disk-icon", 
                                        tip="Save evaluation to XML format")
-        addcolaction = self.createAction("Add &Column", self.addColumn, "Alt+C", icon="Letter-C-violet-icon", 
+        self.addcolaction = self.createAction("Add &Column", self.addColumn, "Alt+C", icon="Letter-C-violet-icon", 
                                          tip="Add new column as a child of the currently selected element")
-        addfiltergroupaction = self.createAction("Add Filter &Group", self.addFilterGroup, "Alt+G", icon="Letter-F-blue-icon", 
+        self.addfiltergroupaction = self.createAction("Add Filter &Group", self.addFilterGroup, "Alt+G", icon="Letter-G-gold-icon", 
                                          tip="Add new filter group as a child of the current evaluation")
-        addfilteraction = self.createAction("Add &Filter", self.addFilter, "Alt+H", icon="Letter-F-lg-icon", 
+        self.addfilteraction = self.createAction("Add &Filter", self.addFilter, "Alt+H", icon="Letter-F-lg-icon", 
                                             tip="Add filter as a child of the current filter group")
-        addaggregationaction = self.createAction("Add &Aggregation", self.addAggregation, "Alt+A", icon="Letter-A-dg-icon", 
+        self.addaggregationaction = self.createAction("Add &Aggregation", self.addAggregation, "Alt+A", icon="Letter-A-dg-icon", 
                                             tip="Add aggregation as a child for the current top level column")
+        self.addinstancenaction = self.createAction("Add &Instance", self.addInstance, "Alt+I", icon="Letter-I-blue-icon", 
+                                            tip="Add instance as child of the current filter")
         
         deletelementaction = self.createAction("&Delete Element", self.deleteElement, QKeySequence.Delete, "delete-icon", 
                                                tip="Delete currently selected element")
@@ -84,10 +88,11 @@ class IpetEvaluationEditorApp(QMainWindow):
         filetoolbar.addAction(saveaction)
         filetoolbar.addAction(loadaction)
         filetoolbar.addSeparator()
-        filetoolbar.addAction(addcolaction)
-        filetoolbar.addAction(addfiltergroupaction)
-        filetoolbar.addAction(addfilteraction)
-        filetoolbar.addAction(addaggregationaction)
+        filetoolbar.addAction(self.addcolaction)
+        filetoolbar.addAction(self.addfiltergroupaction)
+        filetoolbar.addAction(self.addfilteraction)
+        filetoolbar.addAction(self.addaggregationaction)
+        filetoolbar.addAction(self.addinstancenaction)
         filetoolbar.addAction(deletelementaction)
         
         
@@ -104,6 +109,10 @@ class IpetEvaluationEditorApp(QMainWindow):
     
     def addAggregation(self):
         print "Add aggregation"
+        pass
+    
+    def addInstance(self):
+        print "Add instance"
         pass
     
     def deleteElement(self):
@@ -168,7 +177,17 @@ class IpetEvaluationEditorApp(QMainWindow):
             self.connect(action, SIGNAL(signal), slot)
         if checkable:
             action.setCheckable(True)
+            
         return action
+    
+    def enableOrDisableActions(self):
+        for action, addclass in zip([self.addcolaction, self.addfiltergroupaction, self.addfilteraction, self.addaggregationaction, self.addinstancenaction],
+                                    [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETInstance()]):
+            if self.treewidget.currentItemAcceptsClassAsChild(addclass):
+                action.setEnabled(True)
+            else:
+                action.setEnabled(False)
+            
         
     def changeSelection(self):
         if len(self.treewidget.selectedItems()) > 0:
@@ -190,7 +209,8 @@ class IpetEvaluationEditorApp(QMainWindow):
         textlabel.setBuddy(editframecontent)
         self.editframelayout.addWidget(textlabel)
         self.editframelayout.addWidget(editframecontent)
-        self.connect(editframecontent, SIGNAL(EditableForm.USERINPUT_SIGNAL), self.updateItem) 
+        self.connect(editframecontent, SIGNAL(EditableForm.USERINPUT_SIGNAL), self.updateItem)
+        self.enableOrDisableActions()
         
     def updateItem(self):
         self.treewidget.updateSelectedItem()

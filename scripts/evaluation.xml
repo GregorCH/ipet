@@ -14,10 +14,10 @@
 	<Column name="TShift" origcolname="HeurTime_shiftandpropagate"/>
 	<Column name="TRens" origcolname="HeurTime_rens"/>
 	<FilterGroup name="new">
-		<Filter anytestrun="True" expression1="SolvingTime" expression2="0.01" operator="ge"/>
-		<Filter anytestrun="True" expression1="Nodes" expression2="99" operator="le"/>
+		<Filter anytestrun="all" expression1="SolvingTime" expression2="0.01" operator="ge"/>
+		<Filter anytestrun="one" expression1="Nodes" expression2="99" operator="le"/>
 	</FilterGroup>
 	<FilterGroup name="Tree">
-		<Filter anytestrun="True" expression1="Nodes" expression2="100" operator="ge"/>
+		<Filter anytestrun="one" expression1="Nodes" expression2="100" operator="ge"/>
 	</FilterGroup>
 </Evaluation>

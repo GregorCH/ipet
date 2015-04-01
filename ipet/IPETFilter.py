@@ -21,9 +21,12 @@ class IPETInstance(IpetNode, Editable):
         
         name : The name of this instance
         '''
-        if name is None:
-            raise ValueError("Error: An instance needs a name")
         self.name = name
+        
+    def checkAttributes(self):
+        if self.name is None:
+            raise ValueError("Error: An instance needs a name")
+        
     def getEditableAttributes(self):
         return ["name"]
     
@@ -75,7 +78,7 @@ class IPETFilter(Editable, IpetNode):
     attribute2Options = {"anytestrun":["one", "all"], "operator":IPETComparison.comparisondict.keys()}
     nodetag = "Filter"
     
-    def __init__(self, expression1, expression2, operator, anytestrun='all', containset=None):
+    def __init__(self, expression1=None, expression2=None, operator="ge", anytestrun='all', containset=None):
         '''
         filter constructor
         

@@ -53,10 +53,6 @@ class IPETEvaluationColumn(Editable, IpetNode):
                      if five permutations were tested. Columns with translevel=1 are appended at the end of the instance-wise table
         '''
 
-        if origcolname is None and transformfunc is None and constant is None:
-            raise AttributeError("Error constructing this column: No origcolname or transformfunction specified")
-
-
         self.origcolname = origcolname
         self.name = name
 
@@ -74,6 +70,10 @@ class IPETEvaluationColumn(Editable, IpetNode):
         self.aggregations = []
         self.children = []
 
+    def checkAttributes(self):
+        if self.origcolname is None and self.transformfunc is None and self.constant is None:
+            raise AttributeError("Error constructing this column: No origcolname, constant, or transformfunction specified")
+        
     def addChild(self, child):
         if not self.acceptsAsChild(child):
             raise ValueError("Cannot accept child %s as child of a column node"%child)
@@ -260,18 +260,35 @@ class IPETEvaluation(Editable, IpetNode):
     
     editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0,1]}
-    def __init__(self):
+    def __init__(self, groupkey=DEFAULT_GROUPKEY, defaultgroup=DEFAULT_DEFAULTGROUP, evaluateoptauto=True,
+                 sortlevel=0):
+        '''
+        constructs an Ipet-Evaluation
+        
+        Parameters
+        ----------
+        groupkey : the key by which groups should be built, eg, 'Settings'
+        defaultgroup : the name of the default group
+        evaluateoptauto : should optimal auto settings be calculated?
+        sortlevel : level on which to base column sorting, '0' for group level, '1' for column level 
+        '''
         self.filtergroups = []
-        self.groupkey = self.DEFAULT_GROUPKEY
-        self.defaultgroup = self.DEFAULT_DEFAULTGROUP
+        self.groupkey = groupkey
+        self.defaultgroup = defaultgroup
         self.columns = []
-        self.evaluateoptauto = True
-        self.sortlevel = 0
+        self.evaluateoptauto = bool(evaluateoptauto)
+        self.sortlevel = int(sortlevel)
        
         
     def getName(self):
         return self.nodetag
     
+    def set_evaluateoptauto(self, evaluateoptauto):
+        self.evaluateoptauto = bool(evaluateoptauto)
+    
+    def set_sortlevel(self, sortlevel):
+        self.sortlevel = int(sortlevel)
+        
     @staticmethod
     def getNodeTag():
         return IPETEvaluation.nodetag
@@ -324,7 +341,7 @@ class IPETEvaluation(Editable, IpetNode):
         '''
         should the evaluation calculate optimal auto settings?
         '''
-        self.evaluateoptauto = bool(evaloptauto)
+        self.set_evaluateoptauto(evaloptauto)
 
     def reduceToColumns(self, df):
         usercolumns = []

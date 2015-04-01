@@ -10,7 +10,7 @@ import sys
 from PyQt4.QtCore import SIGNAL, QString, Qt
 from qipet.EditableForm import EditableForm
 from ipet.Aggregation import Aggregation
-from ipet.IPETFilter import IPETFilterGroup, IPETFilter
+from ipet.IPETFilter import IPETFilterGroup, IPETFilter, IPETInstance
 from PyQt4 import QtCore
 
 class IpetTreeView(QTreeWidget):
@@ -19,8 +19,9 @@ class IpetTreeView(QTreeWidget):
     '''
     icons = {IPETEvaluationColumn:QString("images/Letter-C-violet-icon.png"),
              Aggregation:QString("images/Letter-A-dg-icon.png"),
-             IPETFilterGroup:QString("images/Letter-F-blue-icon.png"),
-             IPETFilter:QString("images/Letter-F-lg-icon.png")}
+             IPETFilterGroup:QString("images/Letter-G-gold-icon.png"),
+             IPETFilter:QString("images/Letter-F-lg-icon.png"),
+             IPETInstance:QString("images/Letter-I-blue-icon.png")}
 
     def __init__(self, parent = None):
         '''
@@ -51,6 +52,20 @@ class IpetTreeView(QTreeWidget):
         filename = self.icons.get(editable.__class__)
         if filename is not None:
             item.setIcon(0, QIcon(filename))
+    
+    def currentItemAcceptsClassAsChild(self, nodeclass):
+        item = self.currentItem()
+        if not item:
+            return False
+        return self.itemAcceptsClassAsChild(item, nodeclass)
+        
+    def itemAcceptsClassAsChild(self, item, nodeclass):
+        node = self.item2editable[item]
+        if node.acceptsAsChild(nodeclass):
+            return True
+        else:
+            return False
+        
         
     def createAndAddItem(self, editable, parent=None):
         if parent is None:

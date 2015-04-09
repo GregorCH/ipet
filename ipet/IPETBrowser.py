@@ -201,6 +201,8 @@ class IPETTypeWidget(Frame):
         strings
         '''
         newattribute = self.var.get()
+        print self.currattribute, "-->", newattribute
+        print type(self.currattribute), "-->", type(newattribute)
         if type(self.currattribute) is not type(newattribute):
             try:
                 # try a conversion
@@ -212,6 +214,7 @@ class IPETTypeWidget(Frame):
         # new attribute is safe for type conversion
         self.setVariableValue(newattribute)
         self.manager.editObjectAttribute(self.objecttoedit, self.attributename, newattribute)
+        print self.var.get()
 
 
     def getVariable(self):

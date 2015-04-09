@@ -135,6 +135,8 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
         newval = self.paramtovar.get(param).get()
 
         #print "Changing value of parameter %s to %s" % (paramname, newval)
+        oldval = param.getValue()
+
         param.checkAndChange(newval)
 
     def changeColorVar(self, param):
@@ -262,7 +264,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
         for curvedata, label, line in self.curves:
             label, linestyle, linewidth, color, \
                     marker, markersize, markerfacecolor, markeredgecolor = tuple(map(IPETParam.getValue, curvedata))
-            line.set_label(label)
+            line.set_label(str(label))
             line.set_linestyle(linestyle.lower())
             line.set_linewidth(linewidth)
             line.set_color(color)

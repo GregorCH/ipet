@@ -14,7 +14,7 @@ class IPETParam:
         '''
         construct a new Ipet parameter. the paramlist contains the name, description, value and a range or
         collection of possible values for this parameter
-        
+
         To pass a float parameter called 'weight', set to 0.5 and ranging from 0 to 1,
         call
            IPETParam('weight', .5, [0,1])
@@ -60,7 +60,12 @@ class IPETParam:
         '''
         set the parameter to a new value inside its domain
         '''
-        if type(newvalue) != type(self.getValue()) and self.getValue() is not None:
+
+        # convert between strings and unicodes, but keep internal type consistent
+        if type(newvalue) in [str, unicode] and type(self.value) in [str, unicode]:
+            self.value = type(self.value)(newvalue)
+            return True
+        elif type(newvalue) != type(self.getValue()) and self.getValue() is not None:
             return False
         if self.valIsPossible(newvalue):
             self.value = newvalue

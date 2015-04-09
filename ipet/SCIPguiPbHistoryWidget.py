@@ -26,6 +26,7 @@ from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from StatisticReader import PrimalBoundReader, DualBoundReader
 from IPETBrowser import IPETTypeWidget
 from Manager import Manager
+from IPETPlotWindow import IPETPlotFrame
 
 class SCIPguiPbHistoryWidget(IpetWidget):
 
@@ -53,8 +54,10 @@ class SCIPguiPbHistoryWidget(IpetWidget):
       self.buttons = {}
 
       self.gui.requestUpdate(self)
-      self.f = Figure(figsize=(5, 4), dpi=120)
-      self.a = self.f.add_subplot(111)
+
+      self.pw = IPETPlotFrame(self)
+
+      self.a = self.pw.getAxis()
       self.navpanel = Frame(self, width=self.winfo_screenwidth())
       Label(self.navpanel, text="select test run and instance:").grid(row=0, column=1)
 
@@ -62,13 +65,10 @@ class SCIPguiPbHistoryWidget(IpetWidget):
       self.navpanel.pack(side=TOP, fill=Tkconstants.X)
 
       # init a canvas
-      self.canvas = FigureCanvasTkAgg(self.f, master=self)
-      self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
-      self.canvas.show()
+      self.pw.pack(side=TOP, fill=BOTH, expand=1)
+      self.canvas = self.pw.canvas
 
       # init a toolbar
-      self.toolbar = NavigationToolbar2TkAgg(self.canvas, self)
-      self.toolbar.update()
       self.primallines = {}
       self.duallines = {}
 
@@ -203,14 +203,13 @@ class SCIPguiPbHistoryWidget(IpetWidget):
          kws[testrunname] = dict(alpha=0.1)
       else:
          # for now, only one color cycle exists
-         colormap = cm.get_cmap(name='spectral', lut=128)
-         self.a.set_color_cycle([colormap(i) for i in numpy.linspace(0.1, 0.9, len(self.gui.getTestrunList()))])
-
+         #colormap = cm.get_cmap(name='spectral', lut=128)
+         #self.a.set_color_cycle([colormap(i) for i in numpy.linspace(0.1, 0.9, len(self.gui.getTestrunList()))])
 
          # call the plot on the collected data
-         self.primalpatches, self.primallines, self.a = self.axisPlotForTestrunData(x, y, baseline=baseline, ax=self.a, legend=False, plotkw=kws, barkw=kws)
+         self.primalpatches, self.primallines, self.a = self.axisPlotForTestrunData(x, y, baseline=baseline, ax=self.a, legend=False, labelsuffix="_primal", plotkw=kws, barkw=kws)
          if showdualbound:
-            __ , self.duallines, self.a = self.axisPlotForTestrunData(zx, z, barwidthfactor=.7, step=False, baseline=0, ax=self.a, legend=False, plotkw=duallinekws, barkw=dualbarkws)
+            __ , self.duallines, self.a = self.axisPlotForTestrunData(zx, z, step=False, baseline=0, ax=self.a, legend=False, labelsuffix="_dual", plotkw=duallinekws, barkw=dualbarkws)
 
          # set a legend and limits
          self.a.legend(fontsize=8)
@@ -221,7 +220,7 @@ class SCIPguiPbHistoryWidget(IpetWidget):
 
          self.canvas.draw()
 
-   def axisPlotForTestrunData(self, dataX, dataY, bars=False, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, ax=None, legend=True,
+   def axisPlotForTestrunData(self, dataX, dataY, bars=False, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, ax=None, legend=True, labelsuffix="",
        colormapname="spectral", plotkw=None, barkw=None):
       '''
       create a plot for your X and Y data. The data can either be specified as matrix, or as a dictionary
@@ -299,10 +298,13 @@ class SCIPguiPbHistoryWidget(IpetWidget):
          else:
             patches[idd] = []
          # # use step functions for primal and plot for dual plots
+         plotlabel = idd + labelsuffix
          if step:
-            lines[idd], = ax.step(x, y + baseline, color=colors[label], label=idd, where='post')
+            #lines[idd], = ax.step(x, y + baseline, color=colors[label], label=idd, where='post')
+            lines[idd], = ax.step(x, y + baseline, label=plotlabel, where='post')
          else:
-            lines[idd], = ax.plot(x, y + baseline, color=colors[label], label=idd, **linekw)
+            #lines[idd], = ax.plot(x, y + baseline, color=colors[label], label=idd, **linekw)
+            lines[idd], = ax.plot(x, y + baseline, label=plotlabel, **linekw)
 
       if len(labels) > 0 and legend:
          ax.legend(fontsize=8)

@@ -26,7 +26,7 @@ class PluginStatisticsReader(StatisticReader):
    '''
    name = 'PluginStatisticsReader'
    plugintypes = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
-              'Separators', 'Branching Rules', 'LP']
+              'Separators', 'Branching Rules', 'Diving Statistics', 'LP']
    singlecolumnnames = ['Root Node', 'Total Time']
    active = False
    spacesepcolumnnames = ['LP Iters']
@@ -42,7 +42,7 @@ class PluginStatisticsReader(StatisticReader):
          return 0.0
 
    def extractStatistic(self, line):
-      if re.match('SCIP> display statistics', line):
+      if re.match('^SCIP Status', line):
          self.active = True
 
       elif self.active and re.match('[a-zA-Z]', line):

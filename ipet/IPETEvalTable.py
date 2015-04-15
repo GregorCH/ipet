@@ -12,14 +12,14 @@ from ipet.Editable import Editable
 from ipet.IpetNode import IpetNode
 
 class IPETEvaluationColumn(Editable, IpetNode):
-    
+
     nodetag = "Column"
-    
+
     editableAttributes = ["name", "origcolname", "formatstr","transformfunc", "constant",
                  "nanrep", "minval", "maxval", "comp", "translevel"]
-    
+
     possibletransformations = [None, "sum", "subtract", "divide", "log10", "log", "mean", "median", "std", "min", "max"]
-    
+
     requiredOptions = {"origcolname":"datakey", "translevel":[0,1], "transformfunc":possibletransformations}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
@@ -73,7 +73,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
     def checkAttributes(self):
         if self.origcolname is None and self.transformfunc is None and self.constant is None:
             raise AttributeError("Error constructing this column: No origcolname, constant, or transformfunction specified")
-        
+
     def addChild(self, child):
         if not self.acceptsAsChild(child):
             raise ValueError("Cannot accept child %s as child of a column node"%child)
@@ -81,26 +81,26 @@ class IPETEvaluationColumn(Editable, IpetNode):
             self.children.append(child)
         elif child.__class__ is Aggregation:
             self.aggregations.append(child)
-        
+
     def getChildren(self):
         return self.children + self.aggregations
-    
+
     def acceptsAsChild(self, child):
         return child.__class__ in (IPETEvaluationColumn, Aggregation)
-        
+
     def removeChild(self, child):
         if child.__class__ is IPETEvaluationColumn:
             self.children.remove(child)
         elif child.__class__ is Aggregation:
             self.aggregations.remove(child)
-            
+
     @staticmethod
     def getNodeTag():
         return IPETEvaluationColumn.nodetag
-        
+
     def getEditableAttributes(self):
         return self.editableAttributes
-    
+
     def getRequiredOptionsByAttribute(self, attr):
         return self.requiredOptions.get(attr, None)
 
@@ -168,7 +168,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
             me.append(agg.toXMLElem())
 
         return me
-    
+
     @staticmethod
     def processXMLElem(elem):
 
@@ -257,20 +257,20 @@ class IPETEvaluation(Editable, IpetNode):
     DEFAULT_GROUPKEY="Settings"
     DEFAULT_DEFAULTGROUP="default"
     ALLTOGETHER="_alltogether_"
-    
+
     editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0,1]}
     def __init__(self, groupkey=DEFAULT_GROUPKEY, defaultgroup=DEFAULT_DEFAULTGROUP, evaluateoptauto=True,
                  sortlevel=0):
         '''
         constructs an Ipet-Evaluation
-        
+
         Parameters
         ----------
         groupkey : the key by which groups should be built, eg, 'Settings'
         defaultgroup : the name of the default group
         evaluateoptauto : should optimal auto settings be calculated?
-        sortlevel : level on which to base column sorting, '0' for group level, '1' for column level 
+        sortlevel : level on which to base column sorting, '0' for group level, '1' for column level
         '''
         self.filtergroups = []
         self.groupkey = groupkey
@@ -278,30 +278,30 @@ class IPETEvaluation(Editable, IpetNode):
         self.columns = []
         self.evaluateoptauto = bool(evaluateoptauto)
         self.sortlevel = int(sortlevel)
-       
-        
+
+
     def getName(self):
         return self.nodetag
-    
+
     def set_evaluateoptauto(self, evaluateoptauto):
         self.evaluateoptauto = bool(evaluateoptauto)
-    
+
     def set_sortlevel(self, sortlevel):
         self.sortlevel = int(sortlevel)
-        
+
     @staticmethod
     def getNodeTag():
         return IPETEvaluation.nodetag
-        
+
     def getEditableAttributes(self):
         return self.editableAttributes
-    
+
     def getChildren(self):
         return self.columns + self.filtergroups
-    
+
     def acceptsAsChild(self, child):
         return child.__class__ in (IPETEvaluationColumn, IPETFilterGroup)
-    
+
     def addChild(self, child):
         if not self.acceptsAsChild(child):
             raise ValueError("Cannot accept child %s as child of an evaluation node"%child)
@@ -309,13 +309,13 @@ class IPETEvaluation(Editable, IpetNode):
             self.columns.append(child)
         elif child.__class__ is IPETFilterGroup:
             self.filtergroups.append(child)
-            
+
     def removeChild(self, child):
         if child.__class__ is IPETEvaluationColumn:
             self.columns.remove(child)
         elif child.__class__ is IPETFilterGroup:
             self.filtergroups.remove(child)
-    
+
     def getRequiredOptionsByAttribute(self, attr):
         return self.attributes2Options.get(attr)
 
@@ -416,7 +416,7 @@ class IPETEvaluation(Editable, IpetNode):
             ev = IPETEvaluation()
             ev.setGroupKey(elem.attrib.get('groupkey', IPETEvaluation.DEFAULT_GROUPKEY))
             ev.setDefaultGroup(elem.attrib.get('defaultgroup', IPETEvaluation.DEFAULT_DEFAULTGROUP))
-            
+
         for child in elem:
             if child.tag == IPETFilterGroup.getNodeTag():
                 # add the filter group to the list of filter groups
@@ -534,10 +534,10 @@ class IPETEvaluation(Editable, IpetNode):
         else:
             rettab = ret
 
-        
+
         self.instance_wise = ret
         self.agg = self.aggregateToPivotTable(columndata)
-        
+
         self.filtered_agg = {}
         self.filtered_instancewise = {}
         # filter column data and group by group key #
@@ -547,7 +547,9 @@ class IPETEvaluation(Editable, IpetNode):
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 
-        retagg = pd.concat([self.filtered_agg[fg.name] for fg in self.filtergroups], keys=[fg.name for fg in self.filtergroups], names=['Group'])
+        dfs = [self.filtered_agg[fg.name] for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
+        names = [fg.name for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
+        retagg = pd.concat(dfs, keys=names, names=['Group'])
 
         return rettab, retagg
     '''
@@ -556,7 +558,7 @@ class IPETEvaluation(Editable, IpetNode):
     '''
     def applyFilterGroup(self, df, fg):
         return fg.filterDataFrame(df)
-    
+
     def aggregateToPivotTable(self, df):
         # the general part sums up the number of instances falling into different categories
         generalpart = df[['_count_', '_solved_', '_time_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
@@ -588,7 +590,7 @@ class IPETEvaluation(Editable, IpetNode):
         parts = [generalpart, colaggpart, comppart]
         if statspart is not None:
             parts.append(statspart)
-            
+
         return pd.concat(parts, axis = 1)
 
     def applyStatsTests(self, df):

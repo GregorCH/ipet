@@ -47,7 +47,7 @@ class GeneralInformationReader(StatisticReader):
                 self.testrun.addData(self.problemname, 'AbsolutePathSettings', absolutesettingspath)
                 settings = os.path.basename(absolutesettingspath)
                 settings = os.path.splitext(settings)[0]
-                self.testrun.addData(self.problemname, 'Settings', self.testrun.getSettings())
+
 
         elif StatisticReader.solvertype == StatisticReader.SOLVERTYPE_CPLEX:
             if "CPLEX> Non-default parameters written to file" in line:
@@ -61,7 +61,7 @@ class GeneralInformationReader(StatisticReader):
         '''
         version = line[13:20]
         self.testrun.addData(self.problemname, 'Version', version)
-        self.testrun.addData(self.problemname, 'Settings', 'default')
+        self.testrun.addData(self.problemname, 'Settings', self.testrun.getSettings())
         for keyword in ["mode", "LP solver", 'GitHash']:
             data = re.search(r"\[%s: ([\w .-]+)\]" % keyword, line)
             self.testrun.addData(self.problemname, keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])

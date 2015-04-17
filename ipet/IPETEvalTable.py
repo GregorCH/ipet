@@ -16,14 +16,14 @@ class IPETEvaluationColumn(Editable, IpetNode):
     nodetag = "Column"
 
     editableAttributes = ["name", "origcolname", "formatstr","transformfunc", "constant",
-                 "nanrep", "minval", "maxval", "comp", "translevel"]
+                 "nanrep", "minval", "maxval", "comp", "translevel", "regex"]
 
     possibletransformations = [None, "sum", "subtract", "divide", "log10", "log", "mean", "median", "std", "min", "max"]
 
     requiredOptions = {"origcolname":"datakey", "translevel":[0,1], "transformfunc":possibletransformations}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
-                 nanrep=None, minval=None, maxval=None, comp=None, translevel=None):
+                 nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None):
         '''
         constructor of a column for the IPET evaluation
 
@@ -48,6 +48,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
                name and a 'Q'-Suffix. Use comp="default" if it should be compared with the setting 'default', if existent. Any nonexistent
                comp will be silently skipped
 
+        regex : use for selecting a set of columns at once by including regular expression wildcards such as '*+?' etc.
+
         translevel : Specifies the level on which to apply the defined transformation for this column. Use translevel=0 to handle every instance
                      and group separately, and translevel=1 for an instance-wise transformation over all groups, e.g., the mean solving time
                      if five permutations were tested. Columns with translevel=1 are appended at the end of the instance-wise table
@@ -65,14 +67,15 @@ class IPETEvaluationColumn(Editable, IpetNode):
         self.maxval = maxval
         self.translevel = translevel
         self.comp = comp
+        self.regex = regex
 
 
         self.aggregations = []
         self.children = []
 
     def checkAttributes(self):
-        if self.origcolname is None and self.transformfunc is None and self.constant is None:
-            raise AttributeError("Error constructing this column: No origcolname, constant, or transformfunction specified")
+        if self.origcolname is None and self.regex is None and self.transformfunc is None and self.constant is None:
+            raise AttributeError("Error constructing this column: No origcolname, regex, constant, or transformfunction specified")
 
     def addChild(self, child):
         if not self.acceptsAsChild(child):
@@ -155,7 +158,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
         '''
 
         # keep only non NAN elements
-        myelements = {k:self.__dict__[k] for k in ['name', 'origcolname', 'transformfunc', 'formatstr', 'constant', 'nanrep', 'minval', 'maxval', 'translevel'] if self.__dict__.get(k) is not None}
+        myelements = {k:self.__dict__[k] for k in self.getEditableAttributes() if self.__dict__.get(k) is not None}
 
 
         me = ElementTree.Element(IPETEvaluationColumn.getNodeTag(), myelements)
@@ -192,6 +195,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
         if len(self.children) == 0:
             if self.origcolname is not None:
                 result = df[self.origcolname]
+            elif self.regex is not None:
+                result = df.filter(regex = self.regex)
             elif self.constant is not None:
                 df[self.getName()] = self.parseConstant()
                 result = df[self.getName()]

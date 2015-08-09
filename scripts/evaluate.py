@@ -4,7 +4,6 @@ Created on 24.02.2015
 @author: bzfhende
 '''
 
-from ipet.IpetApplication import IpetApplication
 from ipet.Comparator import Comparator
 import argparse
 import sys
@@ -18,7 +17,8 @@ clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must hav
                ('--savecomparator', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'"),
                ('--externaldata', None,'-E', "Should external data such as additional instance information be used?"),
                ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation"),
-               ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt")]
+               ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
+               ('--compformatstring', None,'-C', "a format string like %%.5f for compare columns (those ending with ...'Q')")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="starts the IPET graphical user interface")
@@ -75,11 +75,17 @@ if __name__ == '__main__':
         comp.addExternalDataFile(externaldata)
     else:
         comp.externaldata = None
+
+    if compformatstring is not None:
+        theeval.setCompareColFormat(compformatstring)
+        
     rettab, retagg = theeval.evaluate(comp)
+
     
-    print rettab.to_string()
+    theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
     print
-    print retagg.to_string()
+    theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
+
     if fileextension is not None:
         path = "."
         extension = fileextension

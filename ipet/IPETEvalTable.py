@@ -136,7 +136,6 @@ class IPETEvaluationColumn(Editable, IpetNode):
                 pass
         return None
 
-
     def parseConstant(self):
         '''
         parse the constant attribute, which is a string, into an integer (prioritized) or float
@@ -145,6 +144,9 @@ class IPETEvaluationColumn(Editable, IpetNode):
 
     def addAggregation(self, agg):
         self.aggregations.append(agg)
+
+    def getFormatString(self):
+        return self.formatstr
 
     def getTransLevel(self):
         if self.translevel is None or int(self.translevel) == 0:
@@ -252,6 +254,17 @@ class IPETEvaluationColumn(Editable, IpetNode):
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
 
+
+class FormatFunc:
+
+    def __init__(self, formatstr):
+        self.formatstr = formatstr[:]
+
+    def beautify(self, x):
+        return (self.formatstr%x)
+
+
+
 class IPETEvaluation(Editable, IpetNode):
     '''
     evaluates for a comparator with given group keys, columns, and filter groups
@@ -261,12 +274,13 @@ class IPETEvaluation(Editable, IpetNode):
     possiblestreams=['stdout', 'tex', 'txt', 'csv']
     DEFAULT_GROUPKEY="Settings"
     DEFAULT_DEFAULTGROUP="default"
+    DEFAULT_COMPARECOLFORMAT="%.3f"
     ALLTOGETHER="_alltogether_"
 
-    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel"]
+    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0,1]}
     def __init__(self, groupkey=DEFAULT_GROUPKEY, defaultgroup=DEFAULT_DEFAULTGROUP, evaluateoptauto=True,
-                 sortlevel=0):
+                 sortlevel=0, comparecolformat=DEFAULT_COMPARECOLFORMAT):
         '''
         constructs an Ipet-Evaluation
 
@@ -280,6 +294,7 @@ class IPETEvaluation(Editable, IpetNode):
         self.filtergroups = []
         self.groupkey = groupkey
         self.defaultgroup = defaultgroup
+        self.comparecolformat = comparecolformat[:]
         self.columns = []
         self.evaluateoptauto = bool(evaluateoptauto)
         self.sortlevel = int(sortlevel)
@@ -293,6 +308,9 @@ class IPETEvaluation(Editable, IpetNode):
 
     def set_sortlevel(self, sortlevel):
         self.sortlevel = int(sortlevel)
+
+    def setCompareColFormat(self, comparecolformat):
+        self.comparecolformat = comparecolformat[:]
 
     @staticmethod
     def getNodeTag():
@@ -443,37 +461,90 @@ class IPETEvaluation(Editable, IpetNode):
         else:
             return True
 
+    def getColumnFormatters(self, df):
+        '''
+        returns a formatter dictionary for all columns of this data frame
+
+        expects a Multiindex column data frame df
+        '''
+        formatters = {}
+
+        thelevel = 0
+
+        # temporary hack to test which level is the maximum level
+        try:
+            df.columns.get_level_values(1)
+            thelevel = 1
+        except IndexError, AttributeError:
+            pass
+
+        # loop over columns
+        for idx, col in enumerate(self.columns):
+
+            # if the column has no formatstr attribute, continue
+            if not col.getFormatString():
+                continue
+
+            # retrieve all columns as tuples that contain the column name, ie. for column 'Time' and
+            # settings 'default' and 'heuroff', the result should be [('default', 'Time'),('heuroff', 'Time')]
+            try:
+                if thelevel == 1:
+                    tuples = df.xs(col.getName(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
+
+                else:
+                    tuples = [col.getName(), col.getName() + "Q"]
+            except KeyError:
+                # the column name is not contained in the final df
+                continue
+
+            try:
+                comptuples = tuples = df.xs(col.getName() + 'Q', axis=1, level=thelevel, drop_level=False).columns.values.tolist()
+            except:
+                comptuples = []
+
+
+            # add new formatting function to the map of formatting functions
+            for thetuple in tuples:
+                formatters.update({thetuple:FormatFunc(col.getFormatString()).beautify})
+
+            for comptuple in comptuples:
+                formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
+
+        return formatters
+
     def streamDataFrame(self, df, filebasename, streamtype):
         if not self.checkStreamType(streamtype):
             raise ValueError("Stream error: Unknown stream type %s"%streamtype)
         streammethod = getattr(self, "streamDataFrame_%s"%streamtype)
 
-        streammethod(df, filebasename)
+        formatters = self.getColumnFormatters(df)
 
-    def streamDataFrame_stdout(self, df, filebasename):
+        streammethod(df, filebasename, formatters)
+
+    def streamDataFrame_stdout(self, df, filebasename, formatters = {}):
         '''
         print to console
         '''
         print "Data for %s:"%filebasename
-        print df.to_string()
+        print df.to_string(formatters=formatters)
 
-    def streamDataFrame_tex(self, df, filebasename):
+    def streamDataFrame_tex(self, df, filebasename, formatters = {}):
         '''
         write tex output
         '''
         with open("%s.tex"%filebasename, "w") as texfile:
-            texfile.write(df.to_latex())
+            texfile.write(df.to_latex(formatters = formatters))
 
-    def streamDataFrame_csv(self, df, filebasename):
+    def streamDataFrame_csv(self, df, filebasename, formatters = {}):
         with open("%s.csv"%filebasename, "w") as csvfile:
-            df.to_csv(csvfile)
+            df.to_csv(csvfile, formatters = formatters)
 
-    def streamDataFrame_txt(self, df, filebasename):
+    def streamDataFrame_txt(self, df, filebasename, formatters = {}):
         '''
         write txt output
         '''
         with open("%s.txt"%filebasename, "w") as txtfile:
-            df.to_string(txtfile)
+            df.to_string(txtfile, formatters = formatters)
 
     def findStatus(self, statuscol):
         uniques = set(statuscol.unique())

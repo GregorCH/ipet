@@ -78,13 +78,18 @@ if __name__ == '__main__':
 
     if compformatstring is not None:
         theeval.setCompareColFormat(compformatstring)
-        
+
     rettab, retagg = theeval.evaluate(comp)
 
-    
+
     theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
     print
     theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
+
+    #for tr in comp.testrunmanager.getManageables():
+        #for col in tr.data.columns:
+            #print col
+
 
     if fileextension is not None:
         path = "."

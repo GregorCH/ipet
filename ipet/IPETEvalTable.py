@@ -478,8 +478,18 @@ class IPETEvaluation(Editable, IpetNode):
         except IndexError, AttributeError:
             pass
 
+        comptuples = []
         # loop over columns
-        for idx, col in enumerate(self.columns):
+        for col in self.columns:
+
+            #determine all possible comparison columns and append them to the list
+            try:
+                if thelevel == 1:
+                    comptuples += df.xs(col.getName() + 'Q', axis=1, level=thelevel, drop_level=False).columns.values.tolist()
+                else:
+                    comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and dfcol.endswith("Q")]
+            except:
+                pass
 
             # if the column has no formatstr attribute, continue
             if not col.getFormatString():
@@ -492,23 +502,20 @@ class IPETEvaluation(Editable, IpetNode):
                     tuples = df.xs(col.getName(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
 
                 else:
-                    tuples = [col.getName(), col.getName() + "Q"]
+                    tuples = [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and not dfcol.endswith("Q")]
             except KeyError:
                 # the column name is not contained in the final df
                 continue
 
-            try:
-                comptuples = tuples = df.xs(col.getName() + 'Q', axis=1, level=thelevel, drop_level=False).columns.values.tolist()
-            except:
-                comptuples = []
 
 
             # add new formatting function to the map of formatting functions
             for thetuple in tuples:
                 formatters.update({thetuple:FormatFunc(col.getFormatString()).beautify})
 
-            for comptuple in comptuples:
-                formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
+
+        for comptuple in comptuples:
+            formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
 
         return formatters
 

@@ -142,16 +142,21 @@ class TestRun(Editable):
     def saveToFile(self, filename):
         try:
             f = open(filename, 'wb')
+            pickle.dump(self, f, protocol=2)
+            f.close()
         except IOError:
             print "Could not open %s for saving test run" % filename
 
-        pickle.dump(self, f, protocol=2)
-        f.close()
+
 
     @staticmethod
     def loadFromFile(filename):
         try:
-            f = open(filename, 'rb')
+            if filename.endswith(".gz"):
+                import gzip
+                f = gzip.open(filename, 'rb')
+            else:
+                f = open(filename, 'rb')
         except IOError:
             print "Could not open %s for loading test run" % filename
             return None

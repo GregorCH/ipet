@@ -39,7 +39,7 @@ class PluginStatisticsReader(StatisticReader):
       try:
          return float(x)
       except:
-         return 0.0
+         return None
 
    def extractStatistic(self, line):
       if re.match('^SCIP Status', line):
@@ -78,13 +78,19 @@ class PluginStatisticsReader(StatisticReader):
             return None
 
          pluginname = ''.join(line[:colonidx].split())
+
+         #distinguish between vectors and
          if self.columns != []:
+
+            # treat tables (tables with at least two data columns)
             datakeys = ['_'.join((self.plugintype, column, pluginname)) for column in self.columns]
             data = map(self.convertToFloat, StatisticReader.numericExpression.findall(line[colonidx+1:]))
          else:
+            # treat vectors (tables with only one data column)
             datakeys = ['_'.join((self.plugintype, pluginname))]
             data = [self.convertToFloat(StatisticReader.numericExpression.search(line, colonidx + 1).group(0))]
 
+         # determine minimum length (necessary if more headers were recognized than actual available data)
          minlen = min(len(datakeys), len(data))
 
          self.testrun.addData(StatisticReader.problemname, datakeys[:minlen], data[:minlen])

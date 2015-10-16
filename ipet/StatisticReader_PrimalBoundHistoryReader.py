@@ -36,7 +36,11 @@ class PrimalBoundHistoryReader(StatisticReader):
             PrimalBound = allmatches[-1]
             if PrimalBound != self.lastPrimalBound:
                self.lastPrimalBound = PrimalBound
-               self.listOfPoints.append((float(pointInTime), float(PrimalBound)))
+               try:
+                   self.listOfPoints.append((float(pointInTime), float(PrimalBound)))
+               except ValueError:
+                   # we just don't append in case that something can't be parsed correctly
+                   pass
 
          elif line.startswith("SCIP Status") and self.inTable:
             self.inTable = False

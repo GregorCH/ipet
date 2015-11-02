@@ -18,10 +18,13 @@ clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must hav
                ('--externaldata', None,'-E', "Should external data such as additional instance information be used?"),
                ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation"),
                ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
-               ('--compformatstring', None,'-C', "a format string like %%.5f for compare columns (those ending with ...'Q')")]
+               ('--compformatstring', None,'-C', "a format string like %%.5f for compare columns (those ending with ...'Q')"),
+               ('--groupkey', None,'-g', "overwrites the group key as, e.g., 'Settings' specified in the evaluation by something else"),
+               ('--prefix', None,'-p', "a prefix string for every file written, only useful combined with --filextension"),
+               ]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
-                                 description="starts the IPET graphical user interface")
+                                 description="evaluates experimental data according to an evaluation XML-file")
 for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 
@@ -71,6 +74,9 @@ if __name__ == '__main__':
     if defaultgroup is not None:
         theeval.setDefaultGroup(defaultgroup)
 
+    if groupkey is not None:
+        theeval.setGroupKey(groupkey)
+
     if externaldata is not None:
         comp.addExternalDataFile(externaldata)
     else:
@@ -95,7 +101,8 @@ if __name__ == '__main__':
         path = "."
         extension = fileextension
         for fg in theeval.filtergroups:
-            instancewisename = "%s/%s"%(path,fg.name)
+            prefixstr = prefix and prefix or ""
+            instancewisename = "%s/%s%s"%(path, prefixstr, fg.name)
             theeval.streamDataFrame(theeval.filtered_instancewise[fg.name], instancewisename, extension)
             print "Instance-wise data written to %s.%s"%(instancewisename,extension)
             aggname = instancewisename + "_agg"

@@ -239,6 +239,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
             nanrep = self.parseValue(self.nanrep)
             if nanrep is not None:
                 result = result.fillna(nanrep)
+            elif self.nanrep in df.columns:
+                result = result.fillna(df[self.nanrep])
         if self.minval is not None:
             minval = self.parseValue(self.minval)
             if minval is not None:

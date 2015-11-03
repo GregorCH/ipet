@@ -100,13 +100,19 @@ if __name__ == '__main__':
     if fileextension is not None:
         path = "."
         extension = fileextension
+        prefixstr = prefix and prefix or ""
         for fg in theeval.filtergroups:
-            prefixstr = prefix and prefix or ""
             instancewisename = "%s/%s%s"%(path, prefixstr, fg.name)
             theeval.streamDataFrame(theeval.filtered_instancewise[fg.name], instancewisename, extension)
             print "Instance-wise data written to %s.%s"%(instancewisename,extension)
             aggname = instancewisename + "_agg"
             theeval.streamDataFrame(theeval.filtered_agg[fg.name], aggname, extension)
             print "aggregated data written to %s.%s"%(aggname,extension)
+
+        # print the combined aggregated data if there are multiple filter groups present
+        filename = "%s/%s"%(path, "_".join(prefixstr, "agg_combined") if prefixstr != "" else "agg_combined")
+        theeval.streamDataFrame(retagg, filename, extension)
+        print "combined aggregated data written to %s.%s"%(filename,extension)
+
     #print pd.concat([rettab, theeval.levelonedf], axis=1)
 

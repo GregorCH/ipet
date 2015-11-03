@@ -59,7 +59,7 @@ class GeneralInformationReader(StatisticReader):
 
         SCIP version 3.1.0.1 [precision: 8 byte] [memory: block] [mode: debug] [LP solver: SoPlex 2.0.0.1] [GitHash: 825e268-dirty]
         '''
-        version = line[13:20]
+        version = line.split()[2]
         self.testrun.addData(self.problemname, 'Version', version)
         self.testrun.addData(self.problemname, 'Settings', self.testrun.getSettings())
         for keyword in ["mode", "LP solver", 'GitHash']:

@@ -196,7 +196,11 @@ class IPETEvaluationColumn(Editable, IpetNode):
         # or a constant
         if len(self.children) == 0:
             if self.origcolname is not None:
-                result = df[self.origcolname]
+                try:
+                    result = df[self.origcolname]
+                except:
+                    #try to get data from the second data frame
+                    result = df2[self.origcolname]
             elif self.regex is not None:
                 result = df.filter(regex = self.regex)
             elif self.constant is not None:
@@ -371,6 +375,12 @@ class IPETEvaluation(Editable, IpetNode):
     def reduceToColumns(self, df):
         usercolumns = []
 
+        lvlonecols = [col for col in self.columns if col.getTransLevel() == 1]
+        if len(lvlonecols) > 0:
+            self.levelonedf = pd.concat([col.getColumnData(df) for col in lvlonecols], axis=1)
+            self.levelonedf.columns = [col.getName() for col in lvlonecols]
+        else:
+            self.levelonedf = None
         #treat columns differently for level=0 and level=1
         for col in self.columns:
             if col.getTransLevel() == 0:
@@ -384,12 +394,8 @@ class IPETEvaluation(Editable, IpetNode):
                     usercolumns.append(col.getName() + "Q")
 
 
+
         # concatenate level one columns into a new data frame and treat them as the altogether setting
-        lvlonecols = [col for col in self.columns if col.getTransLevel() == 1]
-        if len(lvlonecols) > 0:
-            self.levelonedf = pd.concat([col.getColumnData(df) for col in lvlonecols], axis=1)
-        else:
-            self.levelonedf = None
 
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
 
@@ -632,9 +638,12 @@ class IPETEvaluation(Editable, IpetNode):
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 
-        dfs = [self.filtered_agg[fg.name] for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
-        names = [fg.name for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
-        retagg = pd.concat(dfs, keys=names, names=['Group'])
+        if len(self.filtergroups) > 0:
+            dfs = [self.filtered_agg[fg.name] for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
+            names = [fg.name for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
+            retagg = pd.concat(dfs, keys=names, names=['Group'])
+        else:
+            retagg = pd.DataFrame()
 
         return rettab, retagg
     '''
@@ -647,6 +656,20 @@ class IPETEvaluation(Editable, IpetNode):
     def aggregateToPivotTable(self, df):
         # the general part sums up the number of instances falling into different categories
         generalpart = df[['_count_', '_solved_', '_time_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
+
+        # test if there is any aggregation to be calculated
+        hasaggregation = False
+        stop = False
+        for col in self.columns:
+            for agg in col.aggregations:
+                hasaggregation = True
+                stop = True
+                break
+            if stop:
+                break
+        # if no aggregation was specified, print only the general part
+        if not hasaggregation:
+            return generalpart
 
         # column aggregations aggregate every column and every column aggregation
         colaggpart = pd.concat([df[[col.getName(), self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)

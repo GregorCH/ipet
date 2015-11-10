@@ -109,6 +109,9 @@ if __name__ == '__main__':
             theeval.streamDataFrame(theeval.filtered_agg[fg.name], aggname, extension)
             print "aggregated data written to %s.%s"%(aggname,extension)
 
+        filename = "%s/%s"%(path, "_".join(prefixstr, "inst_combined") if prefixstr != "" else "inst_combined")
+        theeval.streamDataFrame(rettab, filename, extension)
+        print "combined instance data written to %s.%s"%(filename,extension)
         # print the combined aggregated data if there are multiple filter groups present
         filename = "%s/%s"%(path, "_".join(prefixstr, "agg_combined") if prefixstr != "" else "agg_combined")
         theeval.streamDataFrame(retagg, filename, extension)

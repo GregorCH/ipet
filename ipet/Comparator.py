@@ -70,6 +70,8 @@ class Comparator(Observable):
 
         if testrun not in self.testrunmanager.getManageables():
             self.testrunmanager.addAndActivate(testrun)
+            
+        self.updateDatakeys()
 
     def addSoluFile(self, solufilename):
         '''
@@ -232,13 +234,13 @@ class Comparator(Observable):
 
             # go through problems and calculate both primal and dual integrals
             for probname in self.probnamelist:
-                processplotdata = getProcessPlotData(testrun, probname, testrun.problemGetData(probname, 'OptVal'))
+                processplotdata = getProcessPlotData(testrun, probname)
 
                 #check for well defined data (may not exist sometimes)
                 if processplotdata:
                     testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
 
-                processplotdata = getProcessPlotData(testrun, probname, testrun.problemGetData(probname, 'OptVal'), **dualargs)
+                processplotdata = getProcessPlotData(testrun, probname, **dualargs)
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     testrun.addData(probname, 'DualIntegral', calcIntegralValue(processplotdata, pwlinear=True))

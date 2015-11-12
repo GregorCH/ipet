@@ -327,6 +327,7 @@ class IPETEvaluation(Editable, IpetNode):
 
     def getChildren(self):
         return self.columns + self.filtergroups
+    
 
     def acceptsAsChild(self, child):
         return child.__class__ in (IPETEvaluationColumn, IPETFilterGroup)

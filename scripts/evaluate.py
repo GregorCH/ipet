@@ -9,6 +9,7 @@ import argparse
 import sys
 from ipet.IPETEvalTable import IPETEvaluation
 import pandas as pd
+import re
 
 # possible arguments in the form name,default,short,description #
 clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read"),
@@ -21,7 +22,7 @@ clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must hav
                ('--compformatstring', None,'-C', "a format string like %%.5f for compare columns (those ending with ...'Q')"),
                ('--groupkey', None,'-g', "overwrites the group key as, e.g., 'Settings' specified in the evaluation by something else"),
                ('--prefix', None,'-p', "a prefix string for every file written, only useful combined with --filextension"),
-               ]
+               ('--keysearch', None,'-k', "a string containing a regular expression to search all columns that match this expression")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="evaluates experimental data according to an evaluation XML-file")
@@ -84,7 +85,15 @@ if __name__ == '__main__':
 
     if compformatstring is not None:
         theeval.setCompareColFormat(compformatstring)
-
+        
+    if keysearch is not None:
+        print "Starting key enumeration"
+        for key in comp.getDatakeys():
+            if re.search(keysearch, key):
+                print "    " + key
+        print "End key enumeration"
+        exit(0)
+        
     rettab, retagg = theeval.evaluate(comp)
 
 

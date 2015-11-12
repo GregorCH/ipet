@@ -14,8 +14,9 @@ import sys
 from ipet import Misc
 from ipet.Aggregation import Aggregation
 from ipet.IPETFilter import IPETFilterGroup, IPETFilter, IPETInstance
+from qipet.IpetMainWindow import IpetMainWindow
 
-class IpetEvaluationEditorApp(QMainWindow):
+class IpetEvaluationEditorApp(IpetMainWindow):
     '''
     classdocs
     '''
@@ -163,23 +164,6 @@ class IpetEvaluationEditorApp(QMainWindow):
         self.filename = filename
         self.updateStatus("Saved evaluation to file %s"%filename)
         
-    def createAction(self, text, slot=None, shortcut=None, icon=None,
-        tip=None, checkable=False, signal="triggered()"):
-        action = QAction(text, self)
-        if icon is not None:
-            action.setIcon(QIcon("images/%s.png" % icon))
-        if shortcut is not None:
-            action.setShortcut(shortcut)
-        if tip is not None:
-            action.setToolTip(tip)
-            action.setStatusTip(tip)
-        if slot is not None:
-            self.connect(action, SIGNAL(signal), slot)
-        if checkable:
-            action.setCheckable(True)
-            
-        return action
-    
     def enableOrDisableActions(self):
         for action, addclass in zip([self.addcolaction, self.addfiltergroupaction, self.addfilteraction, self.addaggregationaction, self.addinstancenaction],
                                     [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETInstance()]):

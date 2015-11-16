@@ -10,7 +10,7 @@ import Misc
 import numpy
 
 DEFAULT_HISTORYTOUSE = 'PrimalBoundHistory'
-DEFAULT_XAFTERSOLVEKEY = 'SolvingTime'
+DEFAULT_XAFTERSOLVEKEY = 'TotalTime_solving'
 DEFAULT_XLIMITKEY = 'TimeLimit'
 DEFAULT_CUTOFFGAP = 100
 DEFAULT_BOUNDKEY = 'PrimalBound'
@@ -72,23 +72,32 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
         try:
             lastbound = history[-1][1]
         except:
-            pass 
+            lastbound = Misc.FLOAT_INFINITY
         
-    if len(history) > 0 and xlim is not None:
-        history.append((xlim, lastbound))
-         
+    if len(history) > 0:
+        x, y = zip(*history)
+        x = list(x)
+        y = list(y)
+    else:
+        x = []
+        y = []
+        
     if normalize:
-        history.insert(0, (0.0, Misc.FLOAT_INFINITY))
-         
-    thelist = map(list, zip(*history))
-    x = numpy.array(thelist[0])
+        x.insert(0, 0.0)
+        y.insert(0, Misc.FLOAT_INFINITY)
+        
+    if xaftersolve is not None and lastbound is not None:
+        x.append(xaftersolve)
+        y.append(lastbound)
          
     # depending on the normalization parameter, the normfunction used is either the CPlex gap, or the identity  
     if normalize:
-        normfunction = lambda x : min(cutoffgap, Misc.getGap(x, optimum, True))
+        normfunction = lambda z : min(cutoffgap, Misc.getGap(z, optimum, True))
     else:
-        normfunction = lambda x : x
-    y = numpy.array(map(normfunction, thelist[1]))
+        normfunction = lambda z : z
+        
+    x = numpy.array(x)
+    y = numpy.array(map(normfunction, y))
         
     
     return zip(x,y)
@@ -108,7 +117,11 @@ def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
     # go through problem list and add up integrals for every problem
     for probname in problemlist:
         plotpoints = getProcessPlotData(testrun, probname, **kw)
-        it = plotpoints[1:].__iter__()
+        try:
+            it = plotpoints[1:].__iter__()
+        except Exception, e:
+            print probname, e
+            continue
         lastX = -1.0
         lastgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
         for xi, itgap in it:

@@ -5,6 +5,7 @@ from StatisticReader import SolvingTimeReader, TimeLimitReader, PrimalBoundReade
 from Editable import Editable
 from pandas import DataFrame, notnull
 import os
+from Tix import ROW
 try:
     import cPickle as pickle
 except:
@@ -196,6 +197,12 @@ class TestRun(Editable):
         convenience method to make test run a manageable object
         '''
         return self.getIdentification()
+    
+    def getProbData(self, probname):
+        try:
+            return ",".join("%s: %s"%(key,self.problemGetData(probname, key)) for key in self.getKeySet())
+        except KeyError:
+            return "<%s> not contained in keys, have only\n%s"%(probname, ",".join((ind for ind in self.getProblems())))
 
     def getIdentification(self):
         '''

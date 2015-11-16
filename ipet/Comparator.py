@@ -5,6 +5,7 @@ import Misc
 from ipet.Observer import Observable
 from ipet.IPETMessageStream import Message
 import pandas
+from ipet.StatisticReader_DualBoundHistoryReader import ParascipDualBoundHistoryReader
 
 try:
     import cPickle as pickle
@@ -169,8 +170,8 @@ class Comparator(Observable):
             self.readermanager.collectData()
 
         self.makeProbNameList()
-        self.calculateIntegrals()
         self.calculateGaps()
+        self.calculateIntegrals()
         self.checkProblemStatus()
 
         for testrun in testruns:
@@ -235,15 +236,25 @@ class Comparator(Observable):
             # go through problems and calculate both primal and dual integrals
             for probname in self.probnamelist:
                 processplotdata = getProcessPlotData(testrun, probname)
-
+                
                 #check for well defined data (may not exist sometimes)
+                
                 if processplotdata:
-                    testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
-
+                    try:
+                        testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
+                    except AssertionError, e:
+                        print e
+                        print "Error for primal bound on problem %s, list: "%(probname)
+                        print testrun.getProbData(probname)
                 processplotdata = getProcessPlotData(testrun, probname, **dualargs)
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
-                    testrun.addData(probname, 'DualIntegral', calcIntegralValue(processplotdata, pwlinear=True))
+                    try:
+                        testrun.addData(probname, 'DualIntegral', calcIntegralValue(processplotdata, pwlinear=True))
+                    except AssertionError, e:
+                        print e
+                        print "Error for dual bound on problem %s, list: "%(probname), processplotdata
+                        print testrun.getProbData(probname)
 
     def writeSolufile(self):
         '''
@@ -376,6 +387,7 @@ class Comparator(Observable):
                   DateTimeReader(),
                   DualBoundReader(),
                   DualBoundHistoryReader(),
+                  ParascipDualBoundHistoryReader(),
                   GapReader(),
                   GeneralInformationReader(),
                   HeurDataReader(),

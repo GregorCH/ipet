@@ -46,7 +46,7 @@ class MyMplCanvas(FigureCanvas):
         self.axes = fig.add_subplot(111)
         # We want the axes cleared every time plot() is called
         #self.axes.hold(False)
-        
+
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 
@@ -69,9 +69,9 @@ class MyStaticMplCanvas(MyMplCanvas):
 
 
 class IpetPbHistoryWindow(IpetMainWindow):
-    
+
     default_cmap = 'spectral'
-    
+
     DEBUG = True
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
@@ -82,7 +82,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         self.file_menu.addAction('&Quit', self.fileQuit,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
-        loadaction = self.createAction("&Load", self.loadTestruns, QKeySequence.Open, icon="Load-icon", 
+        loadaction = self.createAction("&Load", self.loadTestruns, QKeySequence.Open, icon="Load-icon",
                                        tip="Load testrun from trn file (current test run gets discarded)")
         self.file_menu.addAction(loadaction)
         self.help_menu = QtGui.QMenu('&Help', self)
@@ -101,21 +101,21 @@ class IpetPbHistoryWindow(IpetMainWindow):
         l.addWidget(self.sc)
         h = QtGui.QHBoxLayout(lwframe)
         l.addWidget(lwframe)
-        
+
         self.probListWidget = QListWidget()
         for item in list("12345"):
             self.probListWidget.addItem(QString(item))
         self.probListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         h.addWidget(self.probListWidget)
         self.connect(self.probListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
-        
+
         self.trListWidget = QListWidget()
         for item in list("ABC"):
             self.trListWidget.addItem(QString(item))
         self.trListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         h.addWidget(self.trListWidget)
         self.connect(self.trListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
-        
+
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
         self.testruns = []
@@ -127,58 +127,58 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
     def getSelectedProblist(self):
         return [str(item.text()) for item in self.probListWidget.selectedItems()]
-    
+
     def getSelectedTestrunList(self):
         return [tr for idx, tr in enumerate(self.testruns) if self.trListWidget.isItemSelected(self.trListWidget.item(idx))]
-    
+
     def selectionChanged(self):
         if len(self.testruns) == 0:
             return
-        
+
         problist = self.getSelectedProblist()
         if len(problist) == 0:
             return
-        
+
         testruns = self.getSelectedTestrunList()
         if len(testruns) == 0:
             return
-        
-        
+
+
         self.update_Axis(problist, testruns)
-        
-        
-            
+
+
+
     def updateStatus(self, message):
         self.statusBar().showMessage(message, 5000)
 
-    
+
     def fileQuit(self):
         self.close()
-        
+
     def addTestrun(self, tr):
         self.testruns.append(tr)
         self.probListWidget.clear()
         self.trListWidget.clear()
-        
+
         problems = []
         for testrun in self.testruns:
             self.trListWidget.addItem(QString(testrun.getName()))
             problems += testrun.getProblems()
-        
+
         for prob in sorted(list(set(problems))):
             self.probListWidget.addItem(QString(prob))
-        
+
         self.trListWidget.selectAll()
-        
+
     def closeEvent(self, ce):
         self.fileQuit()
-        
+
     def debugMessage(self, message):
         if self.DEBUG:
             print message
         else:
             pass
-        
+
     def loadTestruns(self):
         thedir = unicode(".")
         filenames = QFileDialog.getOpenFileNames(self, caption=QString("%s - Load testruns"%QApplication.applicationName()),
@@ -194,17 +194,17 @@ class IpetPbHistoryWindow(IpetMainWindow):
                         self.addTestrun(tr)
                     except Exception, e:
                         print e
-                    
+
                     loadedtrs += 1
                 except Exception:
                     notloadedtrs += 1
-                    
+
             message = "Loaded %d/%d test runs"%(loadedtrs, loadedtrs + notloadedtrs)
             self.updateStatus(message)
-            
-        
+
+
         pass
-    
+
     def update_Axis(self, probnames, testruns):
         '''
         update method called every time a new instance was selected
@@ -219,18 +219,18 @@ class IpetPbHistoryWindow(IpetMainWindow):
         duallinekws = {}
         dualbarkws = {}
         baseline = 0
-        
+
         if len(probnames) == 1:
             self.updateStatus("Showing problem %s on %d test runs"%(probnames[0], len(testruns)))
         else:
             self.updateStatus("Showing mean over %d problems on %d test runs"%(len(probnames), len(testruns)))
         self.resetAxis()
         usenormalization = True
-        showdualbound = False
+        showdualbound = True
         xmax = xmin = ymax = ymin = 0
         for testrun in testruns:
             testrunname = testrun.getName()
-         
+
             if len(probnames) == 1:
                 x[testrunname], y[testrunname] = zip(*getProcessPlotData(testrun, probnames[0], usenormalization))
             else:
@@ -239,74 +239,74 @@ class IpetPbHistoryWindow(IpetMainWindow):
             if not usenormalization and len(probnames) == 1:
                 baseline = testrun.problemGetOptimalSolution(probnames[0])
                 y[testrunname] -= baseline
-         
+
             xmax = max(xmax, max(x[testrunname]))
             ymax = max(ymax, max(y[testrunname]))
             ymin = min(ymin, min(y[testrunname]))
             if showdualbound:
-                arguments = {"historytouse":DualBoundHistoryReader.datakey, "xaftersolvekey":DualBoundReader.datakey}
+                arguments = {"historytouse":DualBoundHistoryReader.datakey, "boundkey":DualBoundReader.datakey}
                 if len(probnames) == 1:
                     zx[testrunname], z[testrunname] = zip(*getProcessPlotData(testrun, probnames[0], usenormalization, **arguments))
                 else:
-                    z[testrunname], scale = getMeanIntegral(testrun, probnames, 200, usenormalization, **arguments)
+                    z[testrunname], scale = getMeanIntegral(testrun, probnames, 200, **arguments)
                     zx[testrunname] = numpy.arange(200) * scale
-                    
+
                 # normalization requires negative dual gap
                 if usenormalization:
-                    z[testrunname] = -z[testrunname]
-                    
+                    z[testrunname] = -numpy.array(z[testrunname])
+
                 ymin = min(ymin, min(z[testrunname]))
-          
+
                 duallinekws[testrunname] = dict(linestyle=':')
                 dualbarkws = dict(alpha=0.1)
-          
+
             # set special key words for the testrun
             kws[testrunname] = dict(alpha=0.1)
                 # for now, only one color cycle exists
                 #colormap = cm.get_cmap(name='spectral', lut=128)
             #self.axes.set_color_cycle([colormap(i) for i in numpy.linspace(0.1, 0.9, len(self.gui.getTestrunList()))])
-            
+
             # call the plot on the collected data
         self.primalpatches, self.primallines, _ = self.axisPlotForTestrunData(x, y, baseline=baseline, legend=False, labelsuffix="_primal", plotkw=kws, barkw=kws)
         if showdualbound:
             __ , self.duallines, _ = self.axisPlotForTestrunData(zx, z, step=False, baseline=0, legend=False, labelsuffix="_dual", plotkw=duallinekws, barkw=dualbarkws)
-        
+
         # set a legend and limits
         self.sc.axes.legend(fontsize=8)
         self.sc.axes.set_xlim((xmin - 0.05 * (xmax - xmin), xmax + 0.05 * (xmax - xmin)))
         self.sc.axes.set_ylim((ymin - 0.1 * (ymax - ymin), ymax + 0.1 * (ymax - ymin)), emit=True)
-        
+
         self.sc.draw()
-    
+
     def axisPlotForTestrunData(self, dataX, dataY, bars=False, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, legend=True, labelsuffix="",
          colormapname="spectral", plotkw=None, barkw=None):
         '''
         create a plot for your X and Y data. The data can either be specified as matrix, or as a dictionary
         specifying containing the labels as keys.
-        
+
         - returns the axes object and a dictionary {label:line} of the line plots that were added
-        
+
         arguments:
         -dataX : The X data for the plot, exspected either as
                     1: A dictionary with the plot labels as keys and some iterable as value-list
                     OR
                     2: A list of some iterables which denote the X values.
-        
+
         -dataY : The y plot data of the plot. Must be specified in the same way as the X data
-        
+
         -testrunnames: labels for axis legend. they will overwrite the labels specified by dictionary-organized data.
                        if testrunnames == None, the primallines will either be labelled from '0' to 'len(dataX)-1',
                        or inferred from the dataX-keys().
         -ax: matplotlib axes object, will be created as new axis if not specified
-        
+
         -legend: specify if legend should be created, default True
         -colormapname: name of the colormap to use in case no colors are specified by the 'colors' argument
-        
+
         -kw, other keywords for the plotting function, such as transparency, etc. can be specified for every plot
             separately, either as a dictionary with the dataX-keys, or as a kw-list with the same length as the
             dataX list
         '''
-        
+
         # index everything by labels, either given as dictionary keys, or integer indices ranging from 0 to len(dataX) - 1
         assert type(dataX) is type(dataY)
         if type(dataX) is dict:
@@ -316,22 +316,22 @@ class IpetPbHistoryWindow(IpetMainWindow):
         else:
             assert type(dataX) is list
             labels = range(len(dataX))
-           
+
             if testrunnames is None:
                 testrunnames = {label:repr(label) for label in labels}
-        
+
         # init colors if not given
-        
+
         try:
             colormap = cm.get_cmap(name=colormapname, lut=128)
         except ValueError:
             print "Colormap of name ", colormapname, " does not exist"
             colormap = cm.get_cmap(name=IpetPbHistoryWindow.default_cmap, lut=128)
         colortransform = numpy.linspace(0.1, 0.9, len(labels))
-        
+
         colors = {label:colormap(colortransform[index]) for index, label in enumerate(labels)}
-        
-        
+
+
         patches = {}
         lines = {}
         for label in labels:
@@ -344,7 +344,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
                 bkw = barkw.get(testrunnames[label], barkw)
             else:
                 bkw = {}
-         
+
             x = dataX[label]
             y = dataY[label]
             idd = testrunnames[label]
@@ -360,12 +360,12 @@ class IpetPbHistoryWindow(IpetMainWindow):
             else:
                 #lines[idd], = ax.plot(x, y + baseline, color=colors[label], label=idd, **linekw)
                 lines[idd], = self.sc.axes.plot(x, y + baseline, label=plotlabel, **linekw)
-        
+
         if len(labels) > 0 and legend:
             self.sc.axes.legend(fontsize=8)
         return (patches, lines, self.sc.axes)
-    
-    
+
+
     def resetAxis(self):
         '''
         reset axis by removing all primallines and primalpatches previously drawn.

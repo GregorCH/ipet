@@ -93,7 +93,7 @@ class TestRun(Editable):
         if self.datadict != {}:
             return list(set([problem for col in self.datadict.keys() for problem in self.datadict[col].keys()]))
         else:
-            return self.data.index
+            return list(self.data.index.get_values())
 
     def problemlistGetData(self, problemlist, datakey):
         '''

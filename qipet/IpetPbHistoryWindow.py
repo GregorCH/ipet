@@ -22,11 +22,12 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 
 from matplotlib.figure import Figure
 from ipet import integrals
-from PyQt4.Qt import QListWidget, QString, QAbstractItemView, QFileDialog, QApplication, QKeySequence, QAction, QIcon
+from PyQt4.Qt import QListWidget, QString, QAbstractItemView, QFileDialog, QApplication, QKeySequence, QAction, QIcon,\
+    QVariant, QFrame, QStringList
 from PyQt4.QtCore import SIGNAL
 from ipet.TestRun import TestRun
 from argparse import Action
-from ipet.integrals import getProcessPlotData
+from ipet.integrals import getProcessPlotData, getMeanIntegral
 from qipet.IpetMainWindow import IpetMainWindow
 from ipet.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from ipet.StatisticReader import DualBoundReader
@@ -44,11 +45,7 @@ class MyMplCanvas(FigureCanvas):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         # We want the axes cleared every time plot() is called
-        self.axes.hold(False)
-
-        self.compute_initial_figure()
-
-        #
+        #self.axes.hold(False)
         
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
@@ -75,6 +72,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
     
     default_cmap = 'spectral'
     
+    DEBUG = True
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -84,7 +82,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         self.file_menu.addAction('&Quit', self.fileQuit,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
-        loadaction = self.createAction("&Load", self.loadTestrun, QKeySequence.Open, icon="Load-icon", 
+        loadaction = self.createAction("&Load", self.loadTestruns, QKeySequence.Open, icon="Load-icon", 
                                        tip="Load testrun from trn file (current test run gets discarded)")
         self.file_menu.addAction(loadaction)
         self.help_menu = QtGui.QMenu('&Help', self)
@@ -95,35 +93,60 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         self.main_widget = QtGui.QWidget(self)
 
+        lwframe = QFrame(self.main_widget)
         l = QtGui.QVBoxLayout(self.main_widget)
         self.sc = MyStaticMplCanvas(self.main_widget, width=5, height=4, dpi=100)
         toolbar = NavigationToolbar(self.sc, self.main_widget)
         l.addWidget(toolbar)
         l.addWidget(self.sc)
-        self.listWidget = QListWidget()
-        for item in list("ABCDE"):
-            self.listWidget.addItem(QString(item))
-        self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        l.addWidget(self.listWidget)
-        self.connect(self.listWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
+        h = QtGui.QHBoxLayout(lwframe)
+        l.addWidget(lwframe)
+        
+        self.probListWidget = QListWidget()
+        for item in list("12345"):
+            self.probListWidget.addItem(QString(item))
+        self.probListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        h.addWidget(self.probListWidget)
+        self.connect(self.probListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
+        
+        self.trListWidget = QListWidget()
+        for item in list("ABC"):
+            self.trListWidget.addItem(QString(item))
+        self.trListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        h.addWidget(self.trListWidget)
+        self.connect(self.trListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
         
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
-        self.testrun = None
+        self.testruns = []
+        self.primallines = {}
+        self.duallines = {}
+        self.primalpatches = {}
 
         self.statusBar().showMessage("Ready to load some test run data!", 5000)
 
+    def getSelectedProblist(self):
+        return [str(item.text()) for item in self.probListWidget.selectedItems()]
+    
+    def getSelectedTestrunList(self):
+        return [tr for idx, tr in enumerate(self.testruns) if self.trListWidget.isItemSelected(self.trListWidget.item(idx))]
+    
     def selectionChanged(self):
-        if self.testrun is None:
+        if len(self.testruns) == 0:
             return
         
-        problist = [str(item.text()) for item in self.listWidget.selectedItems()]
+        problist = self.getSelectedProblist()
         if len(problist) == 0:
             return
-        if len(problist) == 1:
-            plotpoints = getProcessPlotData(self.testrun, problist[0])
-            print plotpoints
-            self.update_Axis(problist[0])
+        
+        testruns = self.getSelectedTestrunList()
+        if len(testruns) == 0:
+            return
+        
+        
+        self.update_Axis(problist, testruns)
+        
+        
             
     def updateStatus(self, message):
         self.statusBar().showMessage(message, 5000)
@@ -132,34 +155,57 @@ class IpetPbHistoryWindow(IpetMainWindow):
     def fileQuit(self):
         self.close()
         
-    def setTestrun(self, tr):
-        self.testrun = tr
-        self.listWidget.clear()
-        for prob in tr.getProblems():
-            self.listWidget.addItem(QString(prob))
+    def addTestrun(self, tr):
+        self.testruns.append(tr)
+        self.probListWidget.clear()
+        self.trListWidget.clear()
+        
+        problems = []
+        for testrun in self.testruns:
+            self.trListWidget.addItem(QString(testrun.getName()))
+            problems += testrun.getProblems()
+        
+        for prob in sorted(list(set(problems))):
+            self.probListWidget.addItem(QString(prob))
+        
+        self.trListWidget.selectAll()
         
     def closeEvent(self, ce):
         self.fileQuit()
         
-    def loadTestrun(self):
+    def debugMessage(self, message):
+        if self.DEBUG:
+            print message
+        else:
+            pass
+        
+    def loadTestruns(self):
         thedir = unicode(".")
-        filename = unicode(QFileDialog.getOpenFileName(self, caption=QString("%s - Load a testrun"%QApplication.applicationName()),
-                                               directory=thedir, filter=unicode("Testrun files (*.trn)")))
-        if filename:
-            try:
-                tr = TestRun.loadFromFile(str(filename))
-                message = "Loaded testrun from %s"%filename
-                
-                self.setTestrun(tr)
-            except Exception, e:
-                message = "Error: Could not load testrun from file %s"%filename
-                
+        filenames = QFileDialog.getOpenFileNames(self, caption=QString("%s - Load testruns"%QApplication.applicationName()),
+                                               directory=thedir, filter=unicode("Testrun files (*.trn)"))
+        if filenames:
+            loadedtrs = 0
+            notloadedtrs = 0
+            for filename in filenames:
+                try:
+                    print filename
+                    tr = TestRun.loadFromFile(str(filename))
+                    try:
+                        self.addTestrun(tr)
+                    except Exception, e:
+                        print e
+                    
+                    loadedtrs += 1
+                except Exception:
+                    notloadedtrs += 1
+                    
+            message = "Loaded %d/%d test runs"%(loadedtrs, loadedtrs + notloadedtrs)
             self.updateStatus(message)
             
         
         pass
     
-    def update_Axis(self, probname):
+    def update_Axis(self, probnames, testruns):
         '''
         update method called every time a new instance was selected
         '''
@@ -174,36 +220,53 @@ class IpetPbHistoryWindow(IpetMainWindow):
         dualbarkws = {}
         baseline = 0
         
+        if len(probnames) == 1:
+            self.updateStatus("Showing problem %s on %d test runs"%(probnames[0], len(testruns)))
+        else:
+            self.updateStatus("Showing mean over %d problems on %d test runs"%(len(probnames), len(testruns)))
+        self.resetAxis()
         usenormalization = True
         showdualbound = False
         xmax = xmin = ymax = ymin = 0
-        # loop over testruns still in the GUI (test runs can be removed by resetting comparator object )
-        testrunname = self.testrun.getIdentification()
-     
-        x[testrunname], y[testrunname] = zip(*getProcessPlotData(self.testrun, probname, usenormalization))
-        if not usenormalization:
-            baseline = self.testrun.problemGetOptimalSolution(probname)
-            y[testrunname] -= baseline
-     
-        xmax = max(xmax, max(x[testrunname]))
-        ymax = max(ymax, max(y[testrunname]))
-        ymin = min(ymin, min(y[testrunname]))
-        if showdualbound:
-            zx[testrunname], z[testrunname] = zip(*getProcessPlotData(self.testrun, probname, usenormalization, historytouse=DualBoundHistoryReader.datakey, xaftersolvekey=DualBoundReader.datakey))
-            if usenormalization:
-                z[testrunname] = -z[testrunname]
-            ymin = min(ymin, min(z[testrunname]))
-      
-            duallinekws[testrunname] = dict(linestyle=':')
-            dualbarkws = dict(alpha=0.1)
-      
-        # set special key words for the testrun
-        kws[testrunname] = dict(alpha=0.1)
-            # for now, only one color cycle exists
-            #colormap = cm.get_cmap(name='spectral', lut=128)
-        #self.axes.set_color_cycle([colormap(i) for i in numpy.linspace(0.1, 0.9, len(self.gui.getTestrunList()))])
-        
-        # call the plot on the collected data
+        for testrun in testruns:
+            testrunname = testrun.getName()
+         
+            if len(probnames) == 1:
+                x[testrunname], y[testrunname] = zip(*getProcessPlotData(testrun, probnames[0], usenormalization))
+            else:
+                y[testrunname], scale = getMeanIntegral(testrun, probnames, 200)
+                x[testrunname] = numpy.arange(200) * scale
+            if not usenormalization and len(probnames) == 1:
+                baseline = testrun.problemGetOptimalSolution(probnames[0])
+                y[testrunname] -= baseline
+         
+            xmax = max(xmax, max(x[testrunname]))
+            ymax = max(ymax, max(y[testrunname]))
+            ymin = min(ymin, min(y[testrunname]))
+            if showdualbound:
+                arguments = {"historytouse":DualBoundHistoryReader.datakey, "xaftersolvekey":DualBoundReader.datakey}
+                if len(probnames) == 1:
+                    zx[testrunname], z[testrunname] = zip(*getProcessPlotData(testrun, probnames[0], usenormalization, **arguments))
+                else:
+                    z[testrunname], scale = getMeanIntegral(testrun, probnames, 200, usenormalization, **arguments)
+                    zx[testrunname] = numpy.arange(200) * scale
+                    
+                # normalization requires negative dual gap
+                if usenormalization:
+                    z[testrunname] = -z[testrunname]
+                    
+                ymin = min(ymin, min(z[testrunname]))
+          
+                duallinekws[testrunname] = dict(linestyle=':')
+                dualbarkws = dict(alpha=0.1)
+          
+            # set special key words for the testrun
+            kws[testrunname] = dict(alpha=0.1)
+                # for now, only one color cycle exists
+                #colormap = cm.get_cmap(name='spectral', lut=128)
+            #self.axes.set_color_cycle([colormap(i) for i in numpy.linspace(0.1, 0.9, len(self.gui.getTestrunList()))])
+            
+            # call the plot on the collected data
         self.primalpatches, self.primallines, _ = self.axisPlotForTestrunData(x, y, baseline=baseline, legend=False, labelsuffix="_primal", plotkw=kws, barkw=kws)
         if showdualbound:
             __ , self.duallines, _ = self.axisPlotForTestrunData(zx, z, step=False, baseline=0, legend=False, labelsuffix="_dual", plotkw=duallinekws, barkw=dualbarkws)
@@ -301,6 +364,13 @@ class IpetPbHistoryWindow(IpetMainWindow):
         if len(labels) > 0 and legend:
             self.sc.axes.legend(fontsize=8)
         return (patches, lines, self.sc.axes)
+    
+    
+    def resetAxis(self):
+        '''
+        reset axis by removing all primallines and primalpatches previously drawn.
+        '''
+        self.sc.axes.cla()
 
     def about(self):
         QtGui.QMessageBox.about(self, "About",

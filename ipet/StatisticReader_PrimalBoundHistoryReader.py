@@ -3,7 +3,7 @@ import re
 
 class PrimalBoundHistoryReader(StatisticReader):
     name = 'PrimalBoundHistoryReader'
-    regular_exp = re.compile('^ time \| .* \| primalbound  \|  gap   ')
+    regular_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
     ugtableexp = re.compile('^\s+Time\s+Nodes')
     columnwidth = 20
     datakey = 'PrimalBoundHistory'
@@ -25,15 +25,18 @@ class PrimalBoundHistoryReader(StatisticReader):
     def extractStatistic(self, line):
         if StatisticReader.solvertype == StatisticReader.SOLVERTYPE_SCIP:
             # is the line a column header ?
+            
             if not self.inTable:
                 if self.regular_exp.search(line):
+                    
                     self.inTable = True
                 elif self.ugtableexp.match(line):
                     self.inTable = True
                     self.ugmode = True
+                
             # history reader should be in a table. check if a display char indicates a new primal bound
             elif self.inTable and self.heurdispcharexp.match(line):
-    #            print line
+                
                 if not (self.shorttablecheckexp.search(line) or self.ugmode):
                     return
                 
@@ -192,4 +195,5 @@ class PrimalBoundHistoryReader(StatisticReader):
         self.lastPrimalBound = '--'
         PrimalBoundHistoryReader.totalnumberofsols += len(theList)
         # print " solutions added:", PrimalBoundHistoryReader.totalnumberofsols
+        print self.problemname, theList
         self.testrun.addData(self.problemname, self.datakey, theList)

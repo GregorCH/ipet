@@ -3,17 +3,27 @@ from StatisticReader import StatisticReader
 import re
 
 class VariableReader(StatisticReader):
-   name = 'VariableReader'
-   regular_exp = re.compile(r'^  Variables        :')
-   datakeys = ['Vars', 'BinVars', 'IntVars', 'ImplVars', 'ContVars']
-   ready = False
+    name = 'VariableReader'
+    varexp = re.compile(r'^  Variables        :')
+    consexp= re.compile(r'^  Constraints      :')
+    datakeys = ['Vars', 'BinVars', 'IntVars', 'ImplVars', 'ContVars']
+    problemtype = None
+    
+    def extractStatistic(self, line):
+        if line.startswith('Presolved Problem  :'):
+            self.problemtype = "PresolvedProblem"
+        elif line.startswith('Original Problem   :'):
+            self.problemtype = "OriginalProblem"
+     
+        elif self.problemtype and self.varexp.match(line):
+            nvariables = map(int, self.numericExpression.findall(line))
+            datakeys = ["%s_%s"%(self.problemtype,key) for key in self.datakeys]
+            self.testrun.addData(StatisticReader.problemname, datakeys, nvariables)
+        elif self.problemtype and self.consexp.match(line):
+            nconns = map(int, self.numericExpression.findall(line))
 
-   def extractStatistic(self, line):
-      if line.startswith('Presolved Problem  :'):
-         self.ready = True
-
-      if self.ready and self.regular_exp.match(line):
-         self.ready = False
-         nvariables = map(int, self.numericExpression.findall(line))
-         self.testrun.addData(StatisticReader.problemname, self.datakeys, nvariables)
-      return None
+            datakeys = ["%s_%s"%(self.problemtype,key) for key in ["InitialNCons", "MaxNCons"]]
+            self.testrun.addData(StatisticReader.problemname, datakeys, nconns)
+            self.problemtype = None
+            
+        return None

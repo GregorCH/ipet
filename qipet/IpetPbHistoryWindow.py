@@ -18,12 +18,15 @@ from PyQt4 import QtGui, QtCore
 
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+try:
+    from matplotlib.backends.backend_qt4 import NavigationToolbar2QT as NavigationToolbar
+except ImportError:
+    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
 from matplotlib.figure import Figure
 from ipet import integrals
 from PyQt4.Qt import QListWidget, QString, QAbstractItemView, QFileDialog, QApplication, QKeySequence, QAction, QIcon,\
-    QVariant, QFrame, QStringList
+    QVariant, QFrame, QStringList, QListWidgetItem
 from PyQt4.QtCore import SIGNAL
 from ipet.TestRun import TestRun
 from argparse import Action
@@ -84,10 +87,15 @@ class IpetPbHistoryWindow(IpetMainWindow):
         self.menuBar().addMenu(self.file_menu)
         loadaction = self.createAction("&Load", self.loadTestruns, QKeySequence.Open, icon="Load-icon",
                                        tip="Load testrun from trn file (current test run gets discarded)")
+        resetaction = self.createAction("&Reset selected names", self.resetSelectedTestrunNames, QKeySequence.Undo, icon="",
+                                       tip="Reset names of selected test runs")
         self.file_menu.addAction(loadaction)
         self.help_menu = QtGui.QMenu('&Help', self)
+        self.edit_menu = QtGui.QMenu('&Edit', self)
+        self.edit_menu.addAction(resetaction)
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.help_menu)
+        self.menuBar().addMenu(self.edit_menu)
 
         self.help_menu.addAction('&About', self.about)
 
@@ -102,26 +110,30 @@ class IpetPbHistoryWindow(IpetMainWindow):
         h = QtGui.QHBoxLayout(lwframe)
         l.addWidget(lwframe)
 
-        self.probListWidget = QListWidget()
-        for item in list("12345"):
-            self.probListWidget.addItem(QString(item))
-        self.probListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        h.addWidget(self.probListWidget)
-        self.connect(self.probListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
-
         self.trListWidget = QListWidget()
-        for item in list("ABC"):
-            self.trListWidget.addItem(QString(item))
+#         for item in list("ABC"):
+#             self.trListWidget.addItem(QString(item))
         self.trListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         h.addWidget(self.trListWidget)
         self.connect(self.trListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
 
+        self.trListWidget.itemChanged.connect(self.testrunItemChanged)
+        
+        self.probListWidget = QListWidget()
+#         for item in list("12345"):
+#             self.probListWidget.addItem(QString(item))
+        self.probListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        h.addWidget(self.probListWidget)
+        self.connect(self.probListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
+
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
         self.testruns = []
-        self.primallines = {}
-        self.duallines = {}
-        self.primalpatches = {}
+        self.testrunnames = {}
+        
+#         self.primallines = {}
+#         self.duallines = {}
+#         self.primalpatches = {}
 
         self.statusBar().showMessage("Ready to load some test run data!", 5000)
 
@@ -145,6 +157,45 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
 
         self.update_Axis(problist, testruns)
+        
+    def testrunItemChanged(self):
+        curritem = self.trListWidget.currentItem()
+        
+        if not curritem:
+            return
+        
+        rowindex =  self.trListWidget.currentRow()
+        if rowindex < 0 or rowindex > len(self.testruns):
+            return
+        
+        newtext = str(curritem.text())
+        testrun = self.testruns[rowindex]
+        
+        self.setTestrunName(testrun, newtext) 
+    def resetSelectedTestrunNames(self):
+        for tr in self.getSelectedTestrunList():
+            self.resetTestrunName(tr)
+    
+    def getTestrunName(self, testrun):
+        '''
+        returns the test run name as specified by the user
+        '''
+        return self.testrunnames.get(testrun.getName(), testrun.getName())
+    
+    def setTestrunName(self, testrun, newname):
+        self.debugMessage("Changing testrun name from %s to %s"%(self.getTestrunName(testrun), newname))
+        
+        self.testrunnames[testrun.getName()] = newname
+        
+    def resetTestrunName(self, testrun):
+        try:
+            del self.testrunnames[testrun.getName()]
+            item = self.trListWidget.item(self.testruns.index(testrun))
+            item.setText(QString(self.getTestrunName(testrun)))
+        except KeyError:
+            pass
+    
+    
 
 
 
@@ -162,7 +213,10 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         problems = []
         for testrun in self.testruns:
-            self.trListWidget.addItem(QString(testrun.getName()))
+            item = QListWidgetItem(QString(self.getTestrunName(testrun)))
+            self.trListWidget.addItem(item)
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            
             problems += testrun.getProblems()
 
         for prob in sorted(list(set(problems))):
@@ -229,7 +283,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         showdualbound = True
         xmax = xmin = ymax = ymin = 0
         for testrun in testruns:
-            testrunname = testrun.getName()
+            testrunname = self.getTestrunName(testrun)
 
             if len(probnames) == 1:
                 x[testrunname], y[testrunname] = zip(*getProcessPlotData(testrun, probnames[0], usenormalization))

@@ -198,9 +198,11 @@ class IPETEvaluationColumn(Editable, IpetNode):
             if self.origcolname is not None:
                 try:
                     result = df[self.origcolname]
-                except:
+                except KeyError, e:
+                    print e
+                    print "Could not retrieve data %s"%self.origcolname
                     #try to get data from the second data frame
-                    result = df2[self.origcolname]
+                    
             elif self.regex is not None:
                 result = df.filter(regex = self.regex)
             elif self.constant is not None:

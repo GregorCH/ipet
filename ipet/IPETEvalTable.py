@@ -255,6 +255,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
             maxval = self.parseValue(self.maxval)
             if maxval is not None:
                 result = numpy.minimum(result, maxval)
+            elif self.maxval in df.columns:
+                result = numpy.minimum(result, df[self.maxval])
 
         return result
 

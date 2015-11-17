@@ -202,12 +202,14 @@ class IpetEvaluationEditorApp(IpetMainWindow):
     
 if __name__ == "__main__":
     
-    ev = IPETEvaluation.fromXMLFile("test/testevaluate.xml")
-    
     app = QApplication(sys.argv)
     app.setApplicationName("Evaluation editor")
     mainwindow = IpetEvaluationEditorApp()
-    mainwindow.setEvaluation(ev)
+    try:
+        ev = IPETEvaluation.fromXMLFile("test/testevaluate.xml")
+        mainwindow.setEvaluation(ev)
+    except:
+        pass
     mainwindow.show()
     
     sys.exit(app.exec_())  

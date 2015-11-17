@@ -1,21 +1,24 @@
 <?xml version="1.0" ?>
-<Evaluation groupkey="Settings" defaultgroup="default">
-	<Column name="SolvingTime" origcolname="TotalTime_solving">
-		<Aggregation name="shmean">
-			<shiftby type="float" val="10.0"/>
-		</Aggregation>
+<Evaluation defaultgroup="default" groupkey="Settings">
+	<Column maxval="TimeLimit" minval="0.5" name="SolvingTime" nanrep="TimeLimit" origcolname="TotalTime_solving" translevel="0">
+		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>
 	<Column name="Nodes" origcolname="Nodes">
-		<Aggregation name="shmean">
-			<shiftby type="float" val="100.0"/>
-		</Aggregation>
+		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
 	</Column>
-	<Column origcolname="Status" />
-	
-	<FilterGroup name="all">
-		<Filter anytestrun="all" expression1="SolvingTime" expression2="0.00001" operator="ge"/>
-	</FilterGroup>
-	<FilterGroup name="Tree">
-		<Filter anytestrun="one" expression1="Nodes" expression2="100" operator="ge"/>
+	<Column formatstr="%.1f" name="PrimInt" transformfunc="divide" translevel="0">
+		<Column nanrep="720000.0" origcolname="PrimalIntegral"/>
+		<Column constant="100.0"/>
+		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
+	</Column>
+	<Column formatstr="%.1f" name="DualInt" transformfunc="divide" translevel="0">
+		<Column name="DualInt" nanrep="720000.0" origcolname="DualIntegral"/>
+		<Column constant="100.0"/>
+		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
+	</Column>
+	<Column origcolname="Status"/>
+	<FilterGroup name="all"/>
+	<FilterGroup name="alloptimal">
+		<Filter anytestrun="all" expression1="SolvingTime" expression2="7199.9" operator="le"/>
 	</FilterGroup>
 </Evaluation>

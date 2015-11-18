@@ -128,7 +128,7 @@ class TestRun(Editable):
         try:
             return self.data['Settings'][0]
         except KeyError:
-            return self.filenames[0].split('.')[-2]
+            return os.path.basename(self.filenames[0]).split('.')[-2]
 
     def getVersion(self):
         '''
@@ -137,7 +137,7 @@ class TestRun(Editable):
         try:
             return self.data['Version'][0]
         except KeyError:
-            return self.filenames[0].split('.')[3]
+            return os.path.basename(self.filenames[0]).split('.')[3]
 
 
     def saveToFile(self, filename):
@@ -175,7 +175,7 @@ class TestRun(Editable):
         try:
             return self.data['LPSolver'][0]
         except KeyError:
-            return self.filenames[0].split('.')[-4]
+            return os.path.basename(self.filenames[0]).split('.')[-4]
 
     def getSolver(self):
         '''
@@ -184,14 +184,15 @@ class TestRun(Editable):
         try:
             return self.data['Solver'][0] + self.data['GitHash'][0]
         except KeyError:
-            return self.filenames[0].split('.')[2]
+            return os.path.basename(self.filenames[0]).split('.')[2]
 
     def getMode(self):
         "get mode (optimized or debug)"
         try:
-            return self.filenames[0].split('.')[-5]
+            return self.data['mode'][0]
         except:
-            return "opt"
+            return os.path.basename(self.filenames[0]).split('.')[-5]
+
     def getName(self):
         '''
         convenience method to make test run a manageable object

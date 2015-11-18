@@ -199,10 +199,12 @@ class IPETEvaluationColumn(Editable, IpetNode):
                 try:
                     result = df[self.origcolname]
                 except KeyError, e:
+                    # print an error message and make a series with NaN's
                     print e
                     print "Could not retrieve data %s"%self.origcolname
-                    #try to get data from the second data frame
-                    
+                    result = pd.Series(numpy.nan, index=df.index)
+
+
             elif self.regex is not None:
                 result = df.filter(regex = self.regex)
             elif self.constant is not None:

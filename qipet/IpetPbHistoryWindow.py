@@ -311,7 +311,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
                 ymin = min(ymin, min(z[testrunname]))
 
-                duallinekws[testrunname] = dict(linestyle=':')
+                duallinekws[testrunname] = dict(linestyle='dashed')
                 dualbarkws = dict(alpha=0.1)
 
             # set special key words for the testrun

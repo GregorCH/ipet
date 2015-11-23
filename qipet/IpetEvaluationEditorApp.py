@@ -199,6 +199,9 @@ class IpetEvaluationEditorApp(IpetMainWindow):
     def updateItem(self):
         self.treewidget.updateSelectedItem()
         
+    def setComparator(self, comp):
+        EditableForm.extendAvailableOptions("datakey", comp.getDatakeys())
+
     
 if __name__ == "__main__":
     
@@ -212,6 +215,6 @@ if __name__ == "__main__":
         pass
     mainwindow.show()
     
-    sys.exit(app.exec_())  
+    sys.exit(app.exec_())
         
     

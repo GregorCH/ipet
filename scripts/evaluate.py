@@ -10,6 +10,8 @@ import sys
 from ipet.IPETEvalTable import IPETEvaluation
 import pandas as pd
 import re
+from PyQt4.Qt import QApplication
+from qipet.IpetEvaluationEditorApp import IpetEvaluationEditorApp
 
 # possible arguments in the form name,default,short,description #
 clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read"),
@@ -32,6 +34,7 @@ for name, default, short, description in clarguments:
 argparser.add_argument('-t', '--testrunfiles', nargs='*', default=[], help="list of .trn files that should used for the evaluation")
 argparser.add_argument("-n", "--nooptauto", action="store_true", default=False, help="Disable calculation of optimal auto settings")
 
+argparser.add_argument("-A", "--showapp", action = "store_true", default = False, help = "Display the Evaluation Editor app to modify the evaluation")
 if __name__ == '__main__':
     try:
         n = vars(argparser.parse_args())
@@ -94,6 +97,19 @@ if __name__ == '__main__':
         print "End key enumeration"
         exit(0)
         
+    if showapp:
+        application = QApplication(sys.argv)
+        application.setApplicationName("Evaluation editor")
+        mainwindow = IpetEvaluationEditorApp()
+        try:
+            mainwindow.setEvaluation(theeval)
+        except:
+            pass
+        mainwindow.setComparator(comp)
+        mainwindow.show()
+
+        sys.exit(application.exec_())
+
     rettab, retagg = theeval.evaluate(comp)
 
 

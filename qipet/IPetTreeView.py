@@ -12,16 +12,17 @@ from qipet.EditableForm import EditableForm
 from ipet.Aggregation import Aggregation
 from ipet.IPETFilter import IPETFilterGroup, IPETFilter, IPETInstance
 from PyQt4 import QtCore
-
+import os.path as osp
 class IpetTreeView(QTreeWidget):
     '''
     classdocs
     '''
-    icons = {IPETEvaluationColumn:QString("images/Letter-C-violet-icon.png"),
-             Aggregation:QString("images/Letter-A-dg-icon.png"),
-             IPETFilterGroup:QString("images/Letter-G-gold-icon.png"),
-             IPETFilter:QString("images/Letter-F-lg-icon.png"),
-             IPETInstance:QString("images/Letter-I-blue-icon.png")}
+    imagepath = osp.sep.join((osp.dirname(__file__), osp.pardir, "images"))
+    icons = {IPETEvaluationColumn:QString(osp.sep.join((imagepath, "Letter-C-violet-icon.png"))),
+             Aggregation:QString(osp.sep.join((imagepath, "Letter-A-dg-icon.png"))),
+             IPETFilterGroup:QString(osp.sep.join((imagepath, "Letter-G-gold-icon.png"))),
+             IPETFilter:QString(osp.sep.join((imagepath, "Letter-F-lg-icon.png"))),
+             IPETInstance:QString(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
 
     def __init__(self, parent = None):
         '''

@@ -356,7 +356,12 @@ class IPETEvaluation(Editable, IpetNode):
         return self.attributes2Options.get(attr)
 
     def addFilterGroup(self, fg):
+        # check if a filter group of the same name already exists
+        if fg.getName() in (fgroup.getName() for fgroup in self.filtergroups):
+            raise ValueError("Error: Filter group of name <%s> already existing in current evaluation!" % fg.getName())
+
         self.filtergroups.append(fg)
+
     def removeFilterGroup(self, fg):
         self.filtergroups.remove(fg)
 

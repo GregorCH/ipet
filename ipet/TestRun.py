@@ -5,6 +5,7 @@ from StatisticReader import SolvingTimeReader, TimeLimitReader, PrimalBoundReade
 from Editable import Editable
 from pandas import DataFrame, notnull
 import os
+from Tix import ROW
 try:
     import cPickle as pickle
 except:
@@ -92,7 +93,7 @@ class TestRun(Editable):
         if self.datadict != {}:
             return list(set([problem for col in self.datadict.keys() for problem in self.datadict[col].keys()]))
         else:
-            return self.data.index
+            return list(self.data.index.get_values())
 
     def problemlistGetData(self, problemlist, datakey):
         '''
@@ -127,7 +128,7 @@ class TestRun(Editable):
         try:
             return self.data['Settings'][0]
         except KeyError:
-            return self.filenames[0].split('.')[-2]
+            return os.path.basename(self.filenames[0]).split('.')[-2]
 
     def getVersion(self):
         '''
@@ -136,22 +137,27 @@ class TestRun(Editable):
         try:
             return self.data['Version'][0]
         except KeyError:
-            return self.filenames[0].split('.')[3]
+            return os.path.basename(self.filenames[0]).split('.')[3]
 
 
     def saveToFile(self, filename):
         try:
             f = open(filename, 'wb')
+            pickle.dump(self, f, protocol=2)
+            f.close()
         except IOError:
             print "Could not open %s for saving test run" % filename
 
-        pickle.dump(self, f, protocol=2)
-        f.close()
+
 
     @staticmethod
     def loadFromFile(filename):
         try:
-            f = open(filename, 'rb')
+            if filename.endswith(".gz"):
+                import gzip
+                f = gzip.open(filename, 'rb')
+            else:
+                f = open(filename, 'rb')
         except IOError:
             print "Could not open %s for loading test run" % filename
             return None
@@ -169,7 +175,7 @@ class TestRun(Editable):
         try:
             return self.data['LPSolver'][0]
         except KeyError:
-            return self.filenames[0].split('.')[-4]
+            return os.path.basename(self.filenames[0]).split('.')[-4]
 
     def getSolver(self):
         '''
@@ -178,19 +184,26 @@ class TestRun(Editable):
         try:
             return self.data['Solver'][0] + self.data['GitHash'][0]
         except KeyError:
-            return self.filenames[0].split('.')[2]
+            return os.path.basename(self.filenames[0]).split('.')[2]
 
     def getMode(self):
         "get mode (optimized or debug)"
         try:
-            return self.filenames[0].split('.')[-5]
+            return self.data['mode'][0]
         except:
-            return "opt"
+            return os.path.basename(self.filenames[0]).split('.')[-5]
+
     def getName(self):
         '''
         convenience method to make test run a manageable object
         '''
         return self.getIdentification()
+    
+    def getProbData(self, probname):
+        try:
+            return ",".join("%s: %s"%(key,self.problemGetData(probname, key)) for key in self.getKeySet())
+        except KeyError:
+            return "<%s> not contained in keys, have only\n%s"%(probname, ",".join((ind for ind in self.getProblems())))
 
     def getIdentification(self):
         '''

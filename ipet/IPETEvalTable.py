@@ -196,7 +196,15 @@ class IPETEvaluationColumn(Editable, IpetNode):
         # or a constant
         if len(self.children) == 0:
             if self.origcolname is not None:
-                result = df[self.origcolname]
+                try:
+                    result = df[self.origcolname]
+                except KeyError, e:
+                    # print an error message and make a series with NaN's
+                    print e
+                    print "Could not retrieve data %s"%self.origcolname
+                    result = pd.Series(numpy.nan, index=df.index)
+
+
             elif self.regex is not None:
                 result = df.filter(regex = self.regex)
             elif self.constant is not None:
@@ -239,6 +247,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
             nanrep = self.parseValue(self.nanrep)
             if nanrep is not None:
                 result = result.fillna(nanrep)
+            elif self.nanrep in df.columns:
+                result = result.fillna(df[self.nanrep])
         if self.minval is not None:
             minval = self.parseValue(self.minval)
             if minval is not None:
@@ -247,6 +257,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
             maxval = self.parseValue(self.maxval)
             if maxval is not None:
                 result = numpy.minimum(result, maxval)
+            elif self.maxval in df.columns:
+                result = numpy.minimum(result, df[self.maxval])
 
         return result
 
@@ -321,6 +333,7 @@ class IPETEvaluation(Editable, IpetNode):
 
     def getChildren(self):
         return self.columns + self.filtergroups
+    
 
     def acceptsAsChild(self, child):
         return child.__class__ in (IPETEvaluationColumn, IPETFilterGroup)
@@ -369,6 +382,12 @@ class IPETEvaluation(Editable, IpetNode):
     def reduceToColumns(self, df):
         usercolumns = []
 
+        lvlonecols = [col for col in self.columns if col.getTransLevel() == 1]
+        if len(lvlonecols) > 0:
+            self.levelonedf = pd.concat([col.getColumnData(df) for col in lvlonecols], axis=1)
+            self.levelonedf.columns = [col.getName() for col in lvlonecols]
+        else:
+            self.levelonedf = None
         #treat columns differently for level=0 and level=1
         for col in self.columns:
             if col.getTransLevel() == 0:
@@ -382,12 +401,8 @@ class IPETEvaluation(Editable, IpetNode):
                     usercolumns.append(col.getName() + "Q")
 
 
+
         # concatenate level one columns into a new data frame and treat them as the altogether setting
-        lvlonecols = [col for col in self.columns if col.getTransLevel() == 1]
-        if len(lvlonecols) > 0:
-            self.levelonedf = pd.concat([col.getColumnData(df) for col in lvlonecols], axis=1)
-        else:
-            self.levelonedf = None
 
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
 
@@ -478,8 +493,18 @@ class IPETEvaluation(Editable, IpetNode):
         except IndexError, AttributeError:
             pass
 
+        comptuples = []
         # loop over columns
-        for idx, col in enumerate(self.columns):
+        for col in self.columns:
+
+            #determine all possible comparison columns and append them to the list
+            try:
+                if thelevel == 1:
+                    comptuples += df.xs(col.getName() + 'Q', axis=1, level=thelevel, drop_level=False).columns.values.tolist()
+                else:
+                    comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and dfcol.endswith("Q")]
+            except:
+                pass
 
             # if the column has no formatstr attribute, continue
             if not col.getFormatString():
@@ -492,23 +517,20 @@ class IPETEvaluation(Editable, IpetNode):
                     tuples = df.xs(col.getName(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
 
                 else:
-                    tuples = [col.getName(), col.getName() + "Q"]
+                    tuples = [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and not dfcol.endswith("Q")]
             except KeyError:
                 # the column name is not contained in the final df
                 continue
 
-            try:
-                comptuples = tuples = df.xs(col.getName() + 'Q', axis=1, level=thelevel, drop_level=False).columns.values.tolist()
-            except:
-                comptuples = []
 
 
             # add new formatting function to the map of formatting functions
             for thetuple in tuples:
                 formatters.update({thetuple:FormatFunc(col.getFormatString()).beautify})
 
-            for comptuple in comptuples:
-                formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
+
+        for comptuple in comptuples:
+            formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
 
         return formatters
 
@@ -623,9 +645,12 @@ class IPETEvaluation(Editable, IpetNode):
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 
-        dfs = [self.filtered_agg[fg.name] for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
-        names = [fg.name for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
-        retagg = pd.concat(dfs, keys=names, names=['Group'])
+        if len(self.filtergroups) > 0:
+            dfs = [self.filtered_agg[fg.name] for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
+            names = [fg.name for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
+            retagg = pd.concat(dfs, keys=names, names=['Group'])
+        else:
+            retagg = pd.DataFrame()
 
         return rettab, retagg
     '''
@@ -638,6 +663,20 @@ class IPETEvaluation(Editable, IpetNode):
     def aggregateToPivotTable(self, df):
         # the general part sums up the number of instances falling into different categories
         generalpart = df[['_count_', '_solved_', '_time_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
+
+        # test if there is any aggregation to be calculated
+        hasaggregation = False
+        stop = False
+        for col in self.columns:
+            for agg in col.aggregations:
+                hasaggregation = True
+                stop = True
+                break
+            if stop:
+                break
+        # if no aggregation was specified, print only the general part
+        if not hasaggregation:
+            return generalpart
 
         # column aggregations aggregate every column and every column aggregation
         colaggpart = pd.concat([df[[col.getName(), self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)

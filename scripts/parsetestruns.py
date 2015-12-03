@@ -4,14 +4,12 @@ Created on 24.02.2015
 @author: bzfhende
 '''
 
-from ipet.IpetApplication import IpetApplication
 from ipet.Comparator import Comparator
 from ipet.ReaderManager import ReaderManager
 from ipet.TestRun import TestRun
 import argparse
 import sys
 from ipet.IPETEvalTable import IPETEvaluation
-import pandas as pd
 import os
 
 # possible arguments in the form name,default,short,description #

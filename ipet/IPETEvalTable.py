@@ -19,8 +19,12 @@ class IPETEvaluationColumn(Editable, IpetNode):
                  "nanrep", "minval", "maxval", "comp", "translevel", "regex"]
 
     possibletransformations = [None, "sum", "subtract", "divide", "log10", "log", "mean", "median", "std", "min", "max"]
-
-    requiredOptions = {"origcolname":"datakey", "translevel":[0,1], "transformfunc":possibletransformations}
+    possiblecomparisons = ["quot", "difference"] + ["quot shift. by %d"%shift for shift in (1,5,10,100,1000)]
+    
+    requiredOptions = {"comp":possiblecomparisons,
+                       "origcolname":"datakey",
+                       "translevel":[0,1],
+                       "transformfunc":possibletransformations}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
                  nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None):
@@ -44,9 +48,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
 
         maxval : a maximum value for all elements in this column
 
-        comp : should a comparison for this column with the 'comp'-group be made? This will append one column per group with this column
-               name and a 'Q'-Suffix. Use comp="default" if it should be compared with the setting 'default', if existent. Any nonexistent
-               comp will be silently skipped
+        comp : should a comparison for this column with the default group be made? This will append one column per group with this column
+               name and an appropriate suffix. Any nonexistent comp will raise a ValueError
 
         regex : use for selecting a set of columns at once by including regular expression wildcards such as '*+?' etc.
 
@@ -66,7 +69,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
         self.minval = minval
         self.maxval = maxval
         self.translevel = translevel
-        self.comp = comp
+        self.set_comp(comp)
         self.regex = regex
 
 
@@ -147,12 +150,44 @@ class IPETEvaluationColumn(Editable, IpetNode):
 
     def getFormatString(self):
         return self.formatstr
+    
+    def set_comp(self, newvalue):
+        if not newvalue:
+            self.comp = newvalue
+        elif newvalue == "quot" or newvalue == "difference":
+            self.comp = newvalue
+        elif newvalue.startswith("quot shift"):
+            try:
+                _ = float(newvalue[newvalue.rindex(" "):])
+                self.comp = newvalue
+            except ValueError:
+                raise ValueError("Trying to set an unknown comparison method '%s' for column '%s', should be in\n %s"%(newvalue, self.getName(), ", ".join((repr(c) for c in self.possiblecomparisons))))
 
-    def getCompare(self):
-        if self.comp is None or self.comp == "" or self.comp == "False":
-            return False
+    def getCompareMethod(self):
+        if self.comp is None or self.comp == "":
+            return None
         else:
-            return True
+            if self.comp == "quot":
+                return numpy.true_divide
+            elif self.comp == "difference":
+                return numpy.subtract
+            else:
+                try:
+                    shift = float(self.comp[self.comp.rindex(" "):])
+                    return lambda x,y:numpy.true_divide(x + shift, y + shift)
+                except ValueError:
+                    return None
+                    
+            
+        
+    def getCompareSuffix(self):
+        if self.getCompareMethod() is not None:
+            if self.comp == "quot":
+                return "Q"
+            elif self.comp == 'difference':
+                return "D"
+            else:
+                return "Q+" + (self.comp[self.comp.rindex(" ") + 1:])
 
     def getTransLevel(self):
         if self.translevel is None or int(self.translevel) == 0:
@@ -390,26 +425,36 @@ class IPETEvaluation(Editable, IpetNode):
         '''
         self.set_evaluateoptauto(evaloptauto)
 
-    def reduceToColumns(self, df):
+    def reduceToColumns(self, df_long):
         usercolumns = []
 
         lvlonecols = [col for col in self.columns if col.getTransLevel() == 1]
         if len(lvlonecols) > 0:
-            self.levelonedf = pd.concat([col.getColumnData(df) for col in lvlonecols], axis=1)
+            self.levelonedf = pd.concat([col.getColumnData(df_long) for col in lvlonecols], axis=1)
             self.levelonedf.columns = [col.getName() for col in lvlonecols]
         else:
             self.levelonedf = None
         #treat columns differently for level=0 and level=1
         for col in self.columns:
             if col.getTransLevel() == 0:
-                df[col.getName()] = col.getColumnData(df)
+                df_long[col.getName()] = col.getColumnData(df_long)
                 usercolumns.append(col.getName())
 
-                if col.getCompare():
-                    compcol = dict(list(df.groupby(self.groupkey)[col.getName()]))[self.defaultgroup]
-                    df["_tmpcol_"] = compcol
-                    df[col.getName() + "Q"] = df[col.getName()] / df["_tmpcol_"]
-                    usercolumns.append(col.getName() + "Q")
+                # look if a comparison with the default group should be made
+                if col.getCompareMethod() is not None:
+                    compcol = dict(list(df_long.groupby(self.groupkey)[col.getName()]))[self.defaultgroup]
+                    
+                    # save as temporary column. This will expand the smaller compcol index to the larger data frame
+                    df_long["_tmpcol_"] = compcol
+                    
+                    # append the right suffix to the column name
+                    comparecolname = col.getName() + col.getCompareSuffix()
+                    
+                    # apply the correct comparison method to the original and the temporary column
+                    compmethod = col.getCompareMethod()
+                    method = lambda x:compmethod(*x) 
+                    df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis=1)
+                    usercolumns.append(comparecolname)
 
 
 
@@ -419,12 +464,12 @@ class IPETEvaluation(Editable, IpetNode):
 
         additionalfiltercolumns = []
         for fg in self.filtergroups:
-            additionalfiltercolumns += fg.getNeededColumns(df)
+            additionalfiltercolumns += fg.getNeededColumns(df_long)
 
         additionalfiltercolumns = list(set(additionalfiltercolumns))
         additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(usercolumns + neededcolumns)]
 
-        result = df.loc[:,usercolumns + neededcolumns + additionalfiltercolumns]
+        result = df_long.loc[:,usercolumns + neededcolumns + additionalfiltercolumns]
         self.usercolumns = usercolumns
         return result
 

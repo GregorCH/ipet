@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <Evaluation defaultgroup="default" groupkey="Settings">
-	<Column maxval="TimeLimit" minval="0.5" name="SolvingTime" nanrep="TimeLimit" origcolname="TotalTime_solving" translevel="0">
+	<Column maxval="TimeLimit" minval="0.5" name="SolvingTime" nanrep="TimeLimit" origcolname="TotalTime_solving" translevel="0" comp="quot">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>
-	<Column name="Nodes" origcolname="Nodes">
-		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
+	<Column name="Nodes" origcolname="Nodes" comp="quot">
+		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0" />
 	</Column>
 	<Column formatstr="%.1f" name="PrimInt" transformfunc="divide" translevel="0">
 		<Column nanrep="720000.0" origcolname="PrimalIntegral"/>

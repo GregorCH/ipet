@@ -188,6 +188,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
                 return "D"
             else:
                 return "Q+" + (self.comp[self.comp.rindex(" ") + 1:])
+        return ""
 
     def getTransLevel(self):
         if self.translevel is None or int(self.translevel) == 0:
@@ -554,13 +555,14 @@ class IPETEvaluation(Editable, IpetNode):
         for col in self.columns:
 
             #determine all possible comparison columns and append them to the list
-            try:
-                if thelevel == 1:
-                    comptuples += df.xs(col.getName() + 'Q', axis=1, level=thelevel, drop_level=False).columns.values.tolist()
-                else:
-                    comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and dfcol.endswith("Q")]
-            except:
-                pass
+            if col.getCompareMethod() is not None:
+                try:
+                    if thelevel == 1:
+                        comptuples += df.xs(col.getName() + col.getCompareSuffix(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
+                    else:
+                        comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and dfcol.endswith("Q")]
+                except:
+                    pass
 
             # if the column has no formatstr attribute, continue
             if not col.getFormatString():

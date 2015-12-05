@@ -148,6 +148,12 @@ class IPETEvaluationColumn(Editable, IpetNode):
     def getFormatString(self):
         return self.formatstr
 
+    def getCompare(self):
+        if self.comp is None or self.comp == "" or self.comp == "False":
+            return False
+        else:
+            return True
+
     def getTransLevel(self):
         if self.translevel is None or int(self.translevel) == 0:
             return 0
@@ -399,8 +405,8 @@ class IPETEvaluation(Editable, IpetNode):
                 df[col.getName()] = col.getColumnData(df)
                 usercolumns.append(col.getName())
 
-                if col.comp is not None and col.comp in df[self.groupkey].unique():
-                    compcol = dict(list(df.groupby(self.groupkey)[col.getName()]))[col.comp]
+                if col.getCompare():
+                    compcol = dict(list(df.groupby(self.groupkey)[col.getName()]))[self.defaultgroup]
                     df["_tmpcol_"] = compcol
                     df[col.getName() + "Q"] = df[col.getName()] / df["_tmpcol_"]
                     usercolumns.append(col.getName() + "Q")
@@ -495,7 +501,7 @@ class IPETEvaluation(Editable, IpetNode):
         try:
             df.columns.get_level_values(1)
             thelevel = 1
-        except IndexError, AttributeError:
+        except IndexError:
             pass
 
         comptuples = []

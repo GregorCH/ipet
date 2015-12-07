@@ -152,6 +152,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
         return self.formatstr
     
     def set_comp(self, newvalue):
+        self.comp = None
         if not newvalue:
             self.comp = newvalue
         elif newvalue == "quot" or newvalue == "difference":

@@ -12,24 +12,18 @@
 from __future__ import unicode_literals
 import sys
 import os
-import random
 
 from PyQt4 import QtGui, QtCore
 
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-try:
-    from matplotlib.backends.backend_qt4 import NavigationToolbar2QT as NavigationToolbar
-except ImportError:
-    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 from matplotlib.figure import Figure
-from ipet import integrals
-from PyQt4.Qt import QListWidget, QString, QAbstractItemView, QFileDialog, QApplication, QKeySequence, QAction, QIcon,\
-    QVariant, QFrame, QStringList, QListWidgetItem
+from PyQt4.Qt import QListWidget, QString, QAbstractItemView, QFileDialog, QApplication, QKeySequence, \
+    QFrame, QListWidgetItem
 from PyQt4.QtCore import SIGNAL
 from ipet.TestRun import TestRun
-from argparse import Action
 from ipet.integrals import getProcessPlotData, getMeanIntegral
 from qipet.IpetMainWindow import IpetMainWindow
 from ipet.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
@@ -71,6 +65,32 @@ class MyStaticMplCanvas(MyMplCanvas):
         self.axes.plot(t, s)
 
 
+class IpetNavigationToolBar(NavigationToolbar2QT):
+    '''
+    This class overrides some methods of the base navigation toolbar
+    '''
+    def edit_parameters(self):
+        theresult = NavigationToolbar2QT.edit_parameters(self)
+
+        # we update the legend ourselves
+        self.updateLegend()
+
+        return theresult
+
+    def updateLegend(self):
+        # update the legend
+        if self.canvas.axes.legend_ is not None:
+                old_legend = self.canvas.axes.get_legend()
+                new_legend = self.canvas.axes.legend(ncol = old_legend._ncol, fontsize = 8)
+                new_legend.draggable(old_legend._draggable is not None)
+        else:
+            new_legend = self.canvas.axes.legend(fontsize = 8)
+            if new_legend:
+                new_legend.draggable(True)
+
+        self.canvas.draw()
+
+
 class IpetPbHistoryWindow(IpetMainWindow):
 
     default_cmap = 'spectral'
@@ -101,10 +121,12 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         self.main_widget = QtGui.QWidget(self)
 
+
         lwframe = QFrame(self.main_widget)
         l = QtGui.QVBoxLayout(self.main_widget)
         self.sc = MyStaticMplCanvas(self.main_widget, width=5, height=4, dpi=100)
-        toolbar = NavigationToolbar(self.sc, self.main_widget)
+        toolbar = IpetNavigationToolBar(self.sc, self.main_widget)
+
         l.addWidget(toolbar)
         l.addWidget(self.sc)
         h = QtGui.QHBoxLayout(lwframe)
@@ -118,7 +140,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         self.connect(self.trListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
 
         self.trListWidget.itemChanged.connect(self.testrunItemChanged)
-        
+
         self.probListWidget = QListWidget()
 #         for item in list("12345"):
 #             self.probListWidget.addItem(QString(item))
@@ -130,7 +152,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         self.setCentralWidget(self.main_widget)
         self.testruns = []
         self.testrunnames = {}
-        
+
 #         self.primallines = {}
 #         self.duallines = {}
 #         self.primalpatches = {}
@@ -142,6 +164,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
     def getSelectedTestrunList(self):
         return [tr for idx, tr in enumerate(self.testruns) if self.trListWidget.isItemSelected(self.trListWidget.item(idx))]
+
 
     def selectionChanged(self):
         if len(self.testruns) == 0:
@@ -157,25 +180,25 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
 
         self.update_Axis(problist, testruns)
-        
+
     def testrunItemChanged(self):
         curritem = self.trListWidget.currentItem()
-        
+
         if not curritem:
             return
-        
+
         rowindex =  self.trListWidget.currentRow()
         if rowindex < 0 or rowindex > len(self.testruns):
             return
-        
+
         newtext = str(curritem.text())
         testrun = self.testruns[rowindex]
-        
+
         self.setTestrunName(testrun, newtext) 
     def resetSelectedTestrunNames(self):
         for tr in self.getSelectedTestrunList():
             self.resetTestrunName(tr)
-    
+
     def getTestrunName(self, testrun):
         '''
         returns the test run name as specified by the user

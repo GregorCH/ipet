@@ -305,6 +305,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         usenormalization = True
         showdualbound = True
         xmax = xmin = ymax = ymin = 0
+        labelorder = []
         for testrun in testruns:
             testrunname = self.getTestrunName(testrun)
 
@@ -339,14 +340,15 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
             # set special key words for the testrun
             kws[testrunname] = dict(alpha=0.1)
+            labelorder.append(testrunname)
                 # for now, only one color cycle exists
                 #colormap = cm.get_cmap(name='spectral', lut=128)
             #self.axes.set_color_cycle([colormap(i) for i in numpy.linspace(0.1, 0.9, len(self.gui.getTestrunList()))])
 
             # call the plot on the collected data
-        self.primalpatches, self.primallines, _ = self.axisPlotForTestrunData(x, y, baseline=baseline, legend=False, labelsuffix="_primal", plotkw=kws, barkw=kws)
+        self.primalpatches, self.primallines, _ = self.axisPlotForTestrunData(x, y, baseline = baseline, legend = False, labelsuffix = "_primal", plotkw = kws, barkw = kws, labelorder = labelorder)
         if showdualbound:
-            __ , self.duallines, _ = self.axisPlotForTestrunData(zx, z, step=False, baseline=0, legend=False, labelsuffix="_dual", plotkw=duallinekws, barkw=dualbarkws)
+            __ , self.duallines, _ = self.axisPlotForTestrunData(zx, z, step = False, baseline = 0, legend = False, labelsuffix = "_dual", plotkw = duallinekws, barkw = dualbarkws, labelorder = labelorder)
 
         # set a legend and limits
         self.sc.axes.legend(fontsize=8)
@@ -356,7 +358,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         self.sc.draw()
 
     def axisPlotForTestrunData(self, dataX, dataY, bars=False, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, legend=True, labelsuffix="",
-         colormapname="spectral", plotkw=None, barkw=None):
+         colormapname = "spectral", plotkw = None, barkw = None, labelorder = []):
         '''
         create a plot for your X and Y data. The data can either be specified as matrix, or as a dictionary
         specifying containing the labels as keys.
@@ -411,7 +413,10 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         patches = {}
         lines = {}
-        for label in labels:
+
+        if not labelorder:
+            labelorder = sorted(labels)
+        for label in labelorder:
             # retrieve special key words, or use the entire keyword dictionary
             if plotkw is not None:
                 linekw = plotkw.get(testrunnames[label], plotkw)

@@ -40,7 +40,9 @@ if __name__ == '__main__':
         n = vars(argparser.parse_args())
         globals().update(n)
     except:
-        print "Wrong Usage"
+        if not re.search(" --h", ' '.join(sys.argv)) :
+            print "Wrong Usage, use --help for more information."
+        exit()
     #if globals().get("help") is not None:
 
     #initialize a comparator
@@ -88,7 +90,7 @@ if __name__ == '__main__':
 
     if compformatstring is not None:
         theeval.setCompareColFormat(compformatstring)
-        
+
     if keysearch is not None:
         print "Starting key enumeration"
         for key in comp.getDatakeys():
@@ -96,7 +98,7 @@ if __name__ == '__main__':
                 print "    " + key
         print "End key enumeration"
         exit(0)
-        
+
     if showapp:
         application = QApplication(sys.argv)
         application.setApplicationName("Evaluation editor")

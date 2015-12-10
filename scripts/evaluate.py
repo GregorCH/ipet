@@ -40,7 +40,7 @@ if __name__ == '__main__':
         n = vars(argparser.parse_args())
         globals().update(n)
     except:
-        if not re.search(" --h", ' '.join(sys.argv)) :
+        if not re.search(" -+h", ' '.join(sys.argv)) :
             print "Wrong Usage, use --help for more information."
         exit()
     #if globals().get("help") is not None:

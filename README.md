@@ -16,7 +16,6 @@ Python 2.7 installation. On top of that, we require
  - Tkinter with Tcl/Tk version 8.5 or higher
  - pandas version 0.15.0 or higher
  - for some distributions, the Pillow library as a replacement for the PIL library.
-\end{itemize}
 
 In order to install the IPET-module and its contents to the python path and
 thus make it importable from every working directory you are in,

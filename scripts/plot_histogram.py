@@ -10,6 +10,8 @@ import pandas as pd
 from ipet.IPETPlotWindow import IPETPlotFrame
 from Tkinter import Tk
 from numpy import log
+import re
+
 # possible arguments in the form name,default,short,description #
 clarguments = [('--filename', None,'-f', "A csv file with the data"),
                ('--leftbin', -10,'-l', "Leftmost boundary of bins, only used when 'boundsfromdata' is set to False"),
@@ -33,7 +35,9 @@ if __name__ == '__main__':
         n = vars(argparser.parse_args())
         globals().update(n)
     except:
-        print "Wrong Usage"
+        if not re.search(" -+h", ' '.join(sys.argv)) :
+            print "Wrong Usage, use --help for more information."
+        exit()
     #if globals().get("help") is not None:
 
     #initialize a comparator

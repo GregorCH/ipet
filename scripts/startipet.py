@@ -7,6 +7,7 @@ from ipet.IpetApplication import IpetApplication
 from ipet.Comparator import Comparator
 import argparse
 import sys
+import re
 
 # possible arguments in the form name,default,short,description #
 clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read")]
@@ -24,7 +25,9 @@ if __name__ == '__main__':
         n = vars(argparser.parse_args())
         globals().update(n)
     except:
-        print "Wrong Usage"
+        if not re.search(" -+h", ' '.join(sys.argv)) :
+            print "Wrong Usage, use --help for more information."
+        exit()
     #if globals().get("help") is not None:
 
     #initialize a comparator

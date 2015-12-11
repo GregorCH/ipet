@@ -346,9 +346,9 @@ class IpetPbHistoryWindow(IpetMainWindow):
             #self.axes.set_color_cycle([colormap(i) for i in numpy.linspace(0.1, 0.9, len(self.gui.getTestrunList()))])
 
             # call the plot on the collected data
-        self.primalpatches, self.primallines, _ = self.axisPlotForTestrunData(x, y, baseline = baseline, legend = False, labelsuffix = "_primal", plotkw = kws, barkw = kws, labelorder = labelorder)
+        self.primalpatches, self.primallines, _ = self.axisPlotForTestrunData(x, y, baseline = baseline, legend = False, labelsuffix = " (primal)", plotkw = kws, barkw = kws, labelorder = labelorder)
         if showdualbound:
-            __ , self.duallines, _ = self.axisPlotForTestrunData(zx, z, step = False, baseline = 0, legend = False, labelsuffix = "_dual", plotkw = duallinekws, barkw = dualbarkws, labelorder = labelorder)
+            __ , self.duallines, _ = self.axisPlotForTestrunData(zx, z, step = False, baseline = 0, legend = False, labelsuffix = " (dual)", plotkw = duallinekws, barkw = dualbarkws, labelorder = labelorder)
 
         # set a legend and limits
         self.sc.axes.legend(fontsize=8)

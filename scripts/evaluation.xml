@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <Evaluation defaultgroup="default" groupkey="Settings">
-	<Column maxval="TimeLimit" minval="0.5" name="SolvingTime" nanrep="TimeLimit" origcolname="TotalTime_solving" translevel="0" comp="quot">
+	<Column maxval="TimeLimit" minval="0.5" name="Time" nanrep="TimeLimit" origcolname="TotalTime_solving" translevel="0" comp="quot">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>
 	<Column name="Nodes" origcolname="Nodes" comp="quot">
@@ -19,6 +19,9 @@
 	<Column origcolname="Status"/>
 	<FilterGroup name="all"/>
 	<FilterGroup name="alloptimal">
-		<Filter anytestrun="all" expression1="SolvingTime" expression2="7199.9" operator="le"/>
+		<Filter anytestrun="all" expression1="Time" expression2="7199.9" operator="le"/>
 	</FilterGroup>
+        <FilterGroup name="diff-timeouts">
+                <Filter anytestrun="one" expression1="Time" expression2="7200" operator="ge"/>
+        </FilterGroup>
 </Evaluation>

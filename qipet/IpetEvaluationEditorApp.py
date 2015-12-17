@@ -20,7 +20,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
     '''
     classdocs
     '''
-
+    addedcolumns = 0
 
     def __init__(self, parent=None):
         '''
@@ -99,7 +99,16 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         
     def addColumn(self):
         print "Add column"
-        pass
+        self.addedcolumns += 1
+        selectededitable = self.treewidget.getSelectedEditable()
+        newcolname = "New Column %d"%self.addedcolumns 
+        newcol = IPETEvaluationColumn(name=newcolname)
+        selectededitable.addChild(newcol)
+        
+        self.treewidget.populateTree(self.evaluation)
+        
+        self.treewidget.setSelectedEditable(newcol)
+        
     def addFilterGroup(self):
         print "Add filter group"
         pass
@@ -132,7 +141,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
                 ev = IPETEvaluation.fromXMLFile(filename)
                 message = "Loaded evaluation from %s"%filename
                 self.setEvaluation(ev)
-            except Exception, e:
+            except Exception:
                 message = "Error: Could not load evaluation from file %s"%filename
                 
             self.updateStatus(message)
@@ -160,7 +169,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         if not filename:
             return
         
-        Misc.saveAsXML(self.evaluation, filename)    
+        Misc.saveAsXML(self.evaluation, filename)
         self.filename = filename
         self.updateStatus("Saved evaluation to file %s"%filename)
         

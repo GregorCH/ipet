@@ -23,6 +23,6 @@
 	</FilterGroup>
         <FilterGroup name="diff-timeouts">
                 <Filter anytestrun="one" expression1="Time" expression2="7200" operator="ge"/>
-                <Filter anytestrun="all" expression1="Time" expression2="7199.9" operator="le"/>
+                <Filter anytestrun="one" expression1="Time" expression2="7199.9" operator="le"/>
         </FilterGroup>
 </Evaluation>

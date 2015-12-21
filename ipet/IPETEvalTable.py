@@ -10,6 +10,7 @@ from ipet.IPETFilter import IPETFilterGroup
 import numpy
 from ipet.Editable import Editable
 from ipet.IpetNode import IpetNode
+from ipet import Misc
 
 class IPETEvaluationColumn(Editable, IpetNode):
 
@@ -18,13 +19,25 @@ class IPETEvaluationColumn(Editable, IpetNode):
     editableAttributes = ["name", "origcolname", "formatstr","transformfunc", "constant",
                  "nanrep", "minval", "maxval", "comp", "translevel", "regex"]
 
-    possibletransformations = [None, "sum", "subtract", "divide", "log10", "log", "mean", "median", "std", "min", "max"]
-    possiblecomparisons = ["quot", "difference"] + ["quot shift. by %d"%shift for shift in (1,5,10,100,1000)]
+    possibletransformations = {None:(0,0), 
+                               "abs":(1,1),
+                               "prod":(1,-1),
+                               "sum":(1,-1),
+                               "subtract":(2,2), 
+                               "divide":(2, 2),
+                               "log10":(1, 1),
+                               "log":(1, 1),
+                               "mean":(1, -1),
+                               "median":(1, -1),
+                               "std":(1, -1),
+                               "min":(1, -1),
+                               "max":(1, -1)}
+    possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
     
     requiredOptions = {"comp":possiblecomparisons,
                        "origcolname":"datakey",
                        "translevel":[0,1],
-                       "transformfunc":possibletransformations}
+                       "transformfunc":possibletransformations.keys()}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
                  nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None):
@@ -79,6 +92,12 @@ class IPETEvaluationColumn(Editable, IpetNode):
     def checkAttributes(self):
         if self.origcolname is None and self.regex is None and self.transformfunc is None and self.constant is None:
             raise AttributeError("Error constructing this column: No origcolname, regex, constant, or transformfunction specified")
+        if self.transformfunc is not None:
+            if self.transformfunc not in self.possibletransformations:
+                raise AttributeError("Error: Column <%s> specified unknown transformation <%s>" % (self.getName(), self.transformfunc))
+            minval, maxval = self.possibletransformations[self.transformfunc]
+            if len(self.children) < minval or maxval != -1 and len(self.children) > maxval:
+                raise AttributeError("Error: Column <%s> specifies wrong number of children for transformation <%s>" % (self.getName(), self.transformfunc))
 
     def addChild(self, child):
         if not self.acceptsAsChild(child):
@@ -128,7 +147,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
         else:
             return self.transformfunc + ','.join((child.getName() for child in self.children))
 
-    def parseValue(self, val):
+    def parseValue(self, val, df = None):
         '''
         parse a value into an integer (prioritized) or float
         '''
@@ -137,6 +156,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
                 return conversion(val)
             except:
                 pass
+        if df is not None and val in df.columns:
+            return df[val]
         return None
 
     def parseConstant(self):
@@ -255,6 +276,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
                 result = df[self.getName()]
         else:
             # try to apply an element-wise transformation function to the children of this column
+            # gettattr is equivalent to numpy.__dict__[self.transformfunc]
             transformfunc = getattr(numpy, self.transformfunc)
 
             # concatenate the children data into a new data frame object
@@ -280,6 +302,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
 
                 # try to wrap things up in a temporary wrapper function that unpacks
                 # the series argument into its single values
+                # e.g., wrap transformfunc((x,y)) as transformfunc(x,y)
                 def tmpwrapper(*args):
                     return transformfunc(*(args[0].values))
 
@@ -287,21 +310,17 @@ class IPETEvaluationColumn(Editable, IpetNode):
                 result = argdf.apply(tmpwrapper, **applydict)
 
         if self.nanrep is not None:
-            nanrep = self.parseValue(self.nanrep)
+            nanrep = self.parseValue(self.nanrep, df)
             if nanrep is not None:
                 result = result.fillna(nanrep)
-            elif self.nanrep in df.columns:
-                result = result.fillna(df[self.nanrep])
         if self.minval is not None:
-            minval = self.parseValue(self.minval)
+            minval = self.parseValue(self.minval, df)
             if minval is not None:
                 result = numpy.maximum(result, minval)
         if self.maxval is not None:
-            maxval = self.parseValue(self.maxval)
+            maxval = self.parseValue(self.maxval, df)
             if maxval is not None:
                 result = numpy.minimum(result, maxval)
-            elif self.maxval in df.columns:
-                result = numpy.minimum(result, df[self.maxval])
 
         return result
 
@@ -671,6 +690,11 @@ class IPETEvaluation(Editable, IpetNode):
         rettab : an instance-wise table of the specified columns
         retagg : aggregated results for every filter group and every entry of the specified
         '''
+        for col in self.columns:
+            try:
+                col.checkAttributes()
+            except Exception, e:
+                raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
 
         #data is concatenated along the rows and eventually extended by external data
         data = comp.getJoinedData()
@@ -727,7 +751,7 @@ class IPETEvaluation(Editable, IpetNode):
         hasaggregation = False
         stop = False
         for col in self.columns:
-            for agg in col.aggregations:
+            for _ in col.aggregations:
                 hasaggregation = True
                 stop = True
                 break
@@ -738,10 +762,14 @@ class IPETEvaluation(Editable, IpetNode):
             return generalpart
 
         # column aggregations aggregate every column and every column aggregation
-        colaggpart = pd.concat([df[[col.getName(), self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col in self.columns for agg in col.aggregations], axis=1)
+        colaggpart = pd.concat((df[[col.getName(), self.groupkey]].pivot_table(index = self.groupkey, aggfunc = agg.aggregate) for col in self.columns for agg in col.aggregations), axis = 1)
 
+        # print df[["DualInt", "Settings"]].pivot_table(index = "Settings", aggfunc = numpy.min)
         # rename the column aggregations
-        colaggpart.columns = ['_'.join((col.getName(), agg.getName())) for col in self.columns for agg in col.aggregations]
+        # print colaggpart
+        newnames = ['_'.join((col.getName(), agg.getName())) for col in self.columns for agg in col.aggregations]
+        # print newnames
+        colaggpart.columns = newnames
 
         # determine the row in the aggregated table corresponding to the default group
         if self.defaultgroup in colaggpart.index:

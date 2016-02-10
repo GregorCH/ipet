@@ -27,7 +27,7 @@ class PluginStatisticsReader(StatisticReader):
    name = 'PluginStatisticsReader'
    plugintypes = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
               'Separators', 'Branching Rules', 'Diving Statistics', 'LP']
-   singlecolumnnames = ['Root Node', 'Total Time']
+   singlecolumnnames = ['Root Node', 'Total Time', 'B&B Tree']
    active = False
    spacesepcolumnnames = ['LP Iters']
    replacecolumnnames = [''.join(sscname.split()) for sscname in spacesepcolumnnames]

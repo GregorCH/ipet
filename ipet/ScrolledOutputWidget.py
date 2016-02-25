@@ -131,8 +131,15 @@ class ScrolledOutputWidget(Frame):
             self.removeText(tagname)
 
     def openReaderWizard(self):
+        try:
+            self.scrolledText.index(SEL_FIRST)
+        except:
+            self.gui.showStatusMessage("Please select a number from the output first!")
+            return
+
         lineidx = map(int, self.scrolledText.index(SEL_FIRST).split('.'))[0]
         colstartidx = map(int, self.scrolledText.index(SEL_FIRST).split('.'))[1]
+
         colidx = 0
         if len(self.scrolledText.tag_names(SEL_FIRST)) > 1:
             tagname = self.scrolledText.tag_names(SEL_FIRST)[-1]

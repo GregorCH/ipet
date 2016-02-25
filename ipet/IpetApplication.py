@@ -262,6 +262,10 @@ class IpetApplication(Tk):
         self.progressstatus.after(5000, self.progressstatus.update, "I am idle")
         self.updateGui()
 
+    def showStatusMessage(self, message):
+        self.progressstatus.update(message)
+        self.progressstatus.after(5000, self.progressstatus.update, "I am idle")
+
     def handleClickEventListbox(self, event):
         try:
             idx = int(event.widget.curselection()[0])

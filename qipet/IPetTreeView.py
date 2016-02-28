@@ -76,7 +76,14 @@ class IpetTreeView(QTreeWidget):
             return None
         
         return self.item2editable[item]
-        
+    
+    def getParentOfSelectedEditable(self):
+        try:
+            selecteditem = self.selectedItems()[0]
+            return self.item2editable[selecteditem.parent()]
+        except:
+            return None
+
     def setSelectedEditable(self, editable):
         self.setItemSelected(self.currentItem(), False)
         for item, editableval in self.item2editable.items():
@@ -128,7 +135,7 @@ if __name__ == "__main__":
     thewidget.setLayout(layout)
     mainwindow.setCentralWidget(thewidget)
     treeview.populateTree(ev)
-    def changeSelection():
+    def redrawEditFrameContent():
         item = treeview.selectedItems()[0]
         
         
@@ -141,7 +148,7 @@ if __name__ == "__main__":
         layout2.addWidget(textlabel, 0,0)
         layout2.addWidget(editframecontent, 1,0)
         
-    mainwindow.connect(treeview, SIGNAL("itemSelectionChanged()"), changeSelection)
+    mainwindow.connect(treeview, SIGNAL("itemSelectionChanged()"), redrawEditFrameContent)
     mainwindow.show()
     
     sys.exit(app.exec_())

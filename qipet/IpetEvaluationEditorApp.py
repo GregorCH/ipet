@@ -21,6 +21,10 @@ class IpetEvaluationEditorApp(IpetMainWindow):
     classdocs
     '''
     addedcolumns = 0
+    addedfiltergroups = 0
+    addedfilters = 0
+    addedaggregations = 0
+    addedinstances = 0
 
     def __init__(self, parent=None):
         '''
@@ -51,12 +55,12 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         self.defineActions()
         
     def initConnections(self):
-        self.connect(self.treewidget, SIGNAL("itemSelectionChanged()"), self.changeSelection)
+        self.connect(self.treewidget, SIGNAL("itemSelectionChanged()"), self.redrawEditFrameContent)
         
     def setEvaluation(self, evaluation):
         self.evaluation = evaluation
         self.treewidget.populateTree(evaluation)
-        self.changeSelection()
+        self.redrawEditFrameContent()
         
     def defineActions(self):
         menubar = self.menuBar()
@@ -96,38 +100,72 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         filetoolbar.addAction(self.addinstancenaction)
         filetoolbar.addAction(deletelementaction)
         
+    def addNewElementAsChildOfSelectedElement(self, newelement):
         
-    def addColumn(self):
-        print "Add column"
-        self.addedcolumns += 1
         selectededitable = self.treewidget.getSelectedEditable()
-        newcolname = "New Column %d"%self.addedcolumns 
-        newcol = IPETEvaluationColumn(name=newcolname)
-        selectededitable.addChild(newcol)
-        
+        selectededitable.addChild(newelement)
+        self.reselectAfterInsertOrRemoval(selectededitable)
+    
+    def reselectAfterInsertOrRemoval(self, newselection):
         self.treewidget.populateTree(self.evaluation)
         
-        self.treewidget.setSelectedEditable(selectededitable)
-
+        self.treewidget.setSelectedEditable(newselection)
+        
+        
+    def addColumn(self):
+        self.updateStatus("Add column")
+        self.addedcolumns += 1
+        newcolname = "New Column %d"%self.addedcolumns 
+        newcol = IPETEvaluationColumn(name=newcolname)
+        self.addNewElementAsChildOfSelectedElement(newcol)
         
     def addFilterGroup(self):
-        print "Add filter group"
-        pass
+        self.updateStatus("Add filter group")
+        self.addedfiltergroups += 1
+        newfiltergroupname = "New Group %d"%self.addedfiltergroups
+        newfiltergroup = IPETFilterGroup(newfiltergroupname)
+
+        self.addNewElementAsChildOfSelectedElement(newfiltergroup)
+        
     
     def addFilter(self):
-        print "Add filter"
-        pass
-    
+        self.updateStatus("Add filter")
+        self.addedfilters += 1
+        newfiltername = "New Filter %d"%self.addedfilters
+        newfilter = IPETFilter()
+        
+        self.addNewElementAsChildOfSelectedElement(newfilter)
+
+
     def addAggregation(self):
-        print "Add aggregation"
-        pass
-    
+        self.updateStatus("Add aggregation")
+        self.addedaggregations += 1
+        newaggregationname = "New Aggregation %d"%self.addedaggregations
+        newaggregation = Aggregation(newaggregationname)
+
+        self.addNewElementAsChildOfSelectedElement(newaggregation)
+
     def addInstance(self):
-        print "Add instance"
-        pass
+        self.updateStatus("Add instance")
+        self.addedinstances += 1
+        newinstancename = "new Instance %d"%self.addedinstances
+        newinstance = IPETInstance(newinstancename)
+        
+        self.addNewElementAsChildOfSelectedElement(newinstance)
     
     def deleteElement(self):
-        print "Delete Action"
+        self.updateStatus("Delete Element")
+        selectededitable = self.treewidget.getSelectedEditable()
+        parentofselectededitable = self.treewidget.getParentOfSelectedEditable()
+        if parentofselectededitable is not None:
+            children = parentofselectededitable.getChildren()
+            index = children.index(selectededitable)
+            if index == len(children) - 1:
+                newselectededitable = parentofselectededitable
+            else:
+                newselectededitable = children[index + 1]
+            parentofselectededitable.removeChild(selectededitable)
+            self.reselectAfterInsertOrRemoval(newselectededitable)
         
     def updateStatus(self, message):
         self.statusBar().showMessage(message, 5000)
@@ -188,21 +226,17 @@ class IpetEvaluationEditorApp(IpetMainWindow):
             child.widget().deleteLater()
 
 
-    def changeSelection(self):
-        
-        if len(self.treewidget.selectedItems()) > 0:
-            item = self.treewidget.selectedItems()[0]
-        else: item = None
-        
-        self.clearLayout(self.editframelayout)
-        
-        if item:
-            editframecontent = EditableForm(self.treewidget.item2editable[item], self.editframe)
-            textlabel = QLabel(QString("<b>Edit attributes for %s</b>"%(self.treewidget.item2editable[item].getName())))
+    def redrawEditFrameContent(self):
+
+        if self.treewidget.getSelectedEditable() is not None:
+            editable = self.treewidget.getSelectedEditable()
+            editframecontent = EditableForm(editable, self.editframe)
+            textlabel = QLabel(QString("<b>Edit attributes for %s</b>"%(editable.getName())))
         else:
             editframecontent = QLabel(QString("Select an element from the evaluation"))
             textlabel = QLabel(QString("<b>No element selected</b>"))
-            
+
+        self.clearLayout(self.editframelayout)
         textlabel.setMaximumHeight(20)
         textlabel.setMinimumHeight(20)
         textlabel.setAlignment(Qt.AlignCenter)
@@ -214,6 +248,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         
     def updateItem(self):
         self.treewidget.updateSelectedItem()
+        self.redrawEditFrameContent()
         
     def setComparator(self, comp):
         EditableForm.extendAvailableOptions("datakey", comp.getDatakeys())

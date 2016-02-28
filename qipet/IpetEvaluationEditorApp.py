@@ -3,9 +3,9 @@ Created on 26.03.2015
 
 @author: bzfhende
 '''
-from PyQt4.QtGui import QMainWindow, QGridLayout, QFrame, QWidget, QLabel,\
-    QApplication, QAction, QIcon, QKeySequence, QFileDialog, QLayout,\
-    QSizePolicy, QVBoxLayout, QHBoxLayout
+from PyQt4.QtGui import QFrame, QWidget, QLabel,\
+    QApplication, QKeySequence, QFileDialog, \
+    QVBoxLayout, QHBoxLayout
 from qipet.IPetTreeView import IpetTreeView
 from qipet.EditableForm import EditableForm
 from PyQt4.QtCore import QString, Qt, SIGNAL
@@ -107,7 +107,8 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         
         self.treewidget.populateTree(self.evaluation)
         
-        self.treewidget.setSelectedEditable(newcol)
+        self.treewidget.setSelectedEditable(selectededitable)
+
         
     def addFilterGroup(self):
         print "Add filter group"
@@ -180,15 +181,21 @@ class IpetEvaluationEditorApp(IpetMainWindow):
                 action.setEnabled(True)
             else:
                 action.setEnabled(False)
-            
-        
+
+    def clearLayout(self, layout):
+        while layout.count():
+            child = layout.takeAt(0)
+            child.widget().deleteLater()
+
+
     def changeSelection(self):
+        
         if len(self.treewidget.selectedItems()) > 0:
             item = self.treewidget.selectedItems()[0]
         else: item = None
         
-        for i in reversed(range(self.editframelayout.count())): 
-            self.editframelayout.itemAt(i).widget().close()
+        self.clearLayout(self.editframelayout)
+        
         if item:
             editframecontent = EditableForm(self.treewidget.item2editable[item], self.editframe)
             textlabel = QLabel(QString("<b>Edit attributes for %s</b>"%(self.treewidget.item2editable[item].getName())))

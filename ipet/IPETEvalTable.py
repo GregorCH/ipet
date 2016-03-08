@@ -495,10 +495,13 @@ class IPETEvaluation(Editable, IpetNode):
         return result
 
     def calculateNeededData(self, df):
-        df['_solved_'] = (df.SolvingTime < df.TimeLimit) & (df.Status != 'fail') & (df.Status != 'abort')
         df['_time_'] = (df.Status == 'timelimit')
+        df['_limits_'] = (df.Status.isin(['timelimit', 'nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
         df['_fail_'] = (df.Status == 'fail')
         df['_abort_'] = (df.Status == 'abort')
+
+        df['_solved_'] = ~df['_limits_'] & ~df['_fail_'] & ~df['_abort_']
+
         df['_count_'] = 1
         df['_unkn_'] = (df.Status == 'unknown')
         df['ProblemNames'] = df.index
@@ -745,7 +748,7 @@ class IPETEvaluation(Editable, IpetNode):
 
     def aggregateToPivotTable(self, df):
         # the general part sums up the number of instances falling into different categories
-        generalpart = df[['_count_', '_solved_', '_time_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
+        generalpart = df[['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index = self.groupkey, aggfunc = sum)
 
         # test if there is any aggregation to be calculated
         hasaggregation = False

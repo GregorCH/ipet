@@ -245,8 +245,7 @@ class TestRun(Editable):
         '''
         returns 0 if testrun has not failed on that instance
                 1 if solu file solution lies outside the interval [min(pb,db)-reltol, max(pb,db) + reltol]
-                2 if solution was reported although the instance is known to be infeasible
-                3 if best reported solution was not feasible for problem
+                2 if best reported solution was not feasible for problem
         '''
         optsol = self.problemGetOptimalSolution(probname)
         solustatus = self.problemGetSoluFileStatus(probname)
@@ -258,9 +257,6 @@ class TestRun(Editable):
             rightbound = max(pb, db) + reltol
             if optsol < leftbound or optsol > rightbound:
                 return 1
-        elif solustatus == 'inf':
-            if pb is not None:
-                return 2
         if self.problemGetData(probname, BestSolFeasReader.datakey) == True:
-            return 3
+            return 2
         return 0

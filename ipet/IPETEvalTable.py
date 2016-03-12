@@ -21,6 +21,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
 
     possibletransformations = {None:(0,0), 
                                "abs":(1,1),
+                               "getGap":(2, 2),
+                               "getCplexGap":(2, 2),
                                "prod":(1,-1),
                                "sum":(1,-1),
                                "subtract":(2,2), 
@@ -277,7 +279,10 @@ class IPETEvaluationColumn(Editable, IpetNode):
         else:
             # try to apply an element-wise transformation function to the children of this column
             # gettattr is equivalent to numpy.__dict__[self.transformfunc]
-            transformfunc = getattr(numpy, self.transformfunc)
+            try:
+                transformfunc = getattr(numpy, self.transformfunc)
+            except AttributeError:
+                transformfunc = getattr(Misc, self.transformfunc)
 
             # concatenate the children data into a new data frame object
             argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)
@@ -298,7 +303,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
                 # some transformations, e.g., the 'divide'-function of numpy because it
                 # requires two arguments instead of the series associated with each row
                 result = argdf.apply(transformfunc, **applydict)
-            except ValueError:
+            except (TypeError, ValueError):
 
                 # try to wrap things up in a temporary wrapper function that unpacks
                 # the series argument into its single values
@@ -496,11 +501,11 @@ class IPETEvaluation(Editable, IpetNode):
 
     def calculateNeededData(self, df):
         df['_time_'] = (df.Status == 'timelimit')
-        df['_limits_'] = (df.Status.isin(['timelimit', 'nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
+        df['_limit_'] = (df.Status.isin(['timelimit', 'nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
         df['_fail_'] = (df.Status == 'fail')
         df['_abort_'] = (df.Status == 'abort')
 
-        df['_solved_'] = ~df['_limits_'] & ~df['_fail_'] & ~df['_abort_']
+        df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_'])
 
         df['_count_'] = 1
         df['_unkn_'] = (df.Status == 'unknown')

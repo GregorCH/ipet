@@ -25,6 +25,8 @@ def floatPrint(number, digitsbef=16, digitsafter=9, dispchar='g' ):
 def getTexName(name):
     return name.replace('_', '\_')
 
+def getCplexGap(value, referencevalue):
+    return getGap(value, referencevalue, True)
 
 def getGap(value, referencevalue, useCplexGap=False):
     '''

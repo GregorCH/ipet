@@ -685,6 +685,17 @@ class IPETEvaluation(Editable, IpetNode):
 
 
 
+
+    def checkMembers(self):
+        '''
+        checks the evaluation members for inconsistencies
+        '''
+        for col in self.columns:
+            try:
+                col.checkAttributes()
+            except Exception as e:
+                raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
+
     def evaluate(self, comp):
         '''
         evaluate the data of a Comparator instance comp
@@ -698,14 +709,15 @@ class IPETEvaluation(Editable, IpetNode):
         rettab : an instance-wise table of the specified columns
         retagg : aggregated results for every filter group and every entry of the specified
         '''
-        for col in self.columns:
-            try:
-                col.checkAttributes()
-            except Exception, e:
-                raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
+        self.checkMembers()
 
         #data is concatenated along the rows and eventually extended by external data
         data = comp.getJoinedData()
+
+        if not self.groupkey in data.columns:
+            raise KeyError(" Group key is missing in data:", self.groupkey)
+        elif self.defaultgroup not in data[self.groupkey].values:
+            raise KeyError(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(data[self.groupkey].unique())))
 
         columndata = self.reduceToColumns(data)
 

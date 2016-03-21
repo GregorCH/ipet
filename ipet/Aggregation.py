@@ -16,7 +16,7 @@ class Aggregation(Editable.Editable, IpetNode):
     from Misc-module
     '''
     nodetag = "Aggregation"
-    possibleaggregations = ['shmean', 'gemean', 'min', 'max', 'mean', 'size', 'std', 'sum', 'median']
+    possibleaggregations = [None, 'shmean', 'gemean', 'min', 'max', 'mean', 'size', 'std', 'sum', 'median']
     agg2Stat = {'shmean':qWilcox}
     
     agg2keywords = {'shmean':[("shiftby", 10.0)]}
@@ -35,10 +35,14 @@ class Aggregation(Editable.Editable, IpetNode):
         '''
         self.name = name
         self.editableattributes = ['name', 'aggregation']
+        self.set_aggregation(None)
         if aggregation:
             self.set_aggregation(aggregation)
         elif name:
-            self.set_aggregation(name)
+            try:
+                self.set_aggregation(name)
+            except ValueError:
+                pass
             
         for key, val in kw.iteritems():
             setattr(self, key, float(val))
@@ -68,12 +72,15 @@ class Aggregation(Editable.Editable, IpetNode):
             raise ValueError("%s aggregation not supported" % (aggregation))
         
         self.aggregation = aggregation
+            
+        self.editableattributes = self.editableattributes[:2]
+        
+        if aggregation is None:
+            return
         try:
             self.aggrfunc = getattr(numpy, aggregation)
         except AttributeError:
             self.aggrfunc = getattr(Misc, aggregation)
-            
-        self.editableattributes = self.editableattributes[:2]
             
         attrlist = self.agg2keywords.get(aggregation)
         if attrlist:
@@ -82,10 +89,18 @@ class Aggregation(Editable.Editable, IpetNode):
                 self.editableattributes.append(key)
 
     def aggregate(self, valuelist):
+        if self.aggregation is None:
+            return numpy.NAN
         if len(self.getEditableAttributes()) > 2:
             return self.aggrfunc(valuelist, **{key:self.__dict__[key] for key in self.editableattributes[2:]})
         else:
             return self.aggrfunc(valuelist)
+        
+    def getRequiredOptionsByAttribute(self, attr):
+        if attr == "aggregation":
+            return self.possibleaggregations
+        else:
+            return None
 
     @staticmethod
     def getNodeTag():

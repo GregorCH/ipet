@@ -652,7 +652,8 @@ class IPETEvaluation(Editable, IpetNode):
         write txt output
         '''
         with open("%s.txt"%filebasename, "w") as txtfile:
-            df.to_string(txtfile, formatters = formatters)
+            df.to_string(txtfile, formatters = formatters, index_names = False)
+
 
     def findStatus(self, statuscol):
         uniques = set(statuscol.unique())
@@ -666,7 +667,6 @@ class IPETEvaluation(Editable, IpetNode):
         '''
         calculate optimal auto settings instancewise
         '''
-        aggfuncs = {'solved':numpy.max}
         print df.head(5)
         grouped = df.groupby(level=0)
 
@@ -677,7 +677,8 @@ class IPETEvaluation(Editable, IpetNode):
         optdf = pd.concat([optstatus, opttime, opttimelim], axis=1)
         optdf[self.groupkey] = "OPT. AUTO"
 
-        useroptdf = pd.concat([grouped[col].apply(numpy.min) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis=1)
+        aggfuncs = {'_solved_':numpy.max}
+        useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis = 1)
         optdf = pd.concat([optdf, useroptdf], axis=1)
 
 

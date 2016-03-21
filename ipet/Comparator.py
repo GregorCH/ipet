@@ -148,7 +148,7 @@ class Comparator(Observable):
         add a filename pointing to an external file, eg a solu file with additional information
         '''
         try:
-            self.externaldata = pd.read_table(filename, sep=",", skipinitialspace=True, index_col="Name")
+            self.externaldata = pd.read_table(filename, sep = " *", engine = 'python', header = 1, skipinitialspace = True)
         except:
             raise ValueError("Error reading file name %s"%filename)
 
@@ -219,7 +219,7 @@ class Comparator(Observable):
         for tr in self.testrunmanager.getManageables():
             trdata = tr.data
             if self.externaldata is not None:
-                trdata = trdata.merge(self.externaldata, left_index=True, right_index=True, how="left", suffixes=("_data", "_ext"))
+                trdata = trdata.merge(self.externaldata, left_index = True, right_index = True, how = "left", suffixes = ("", "_ext"))
             datalist.append(trdata)
 
         return pd.concat(datalist)

@@ -41,7 +41,10 @@ def quickAggregationOnIndex(df, col, aggfunc=np.min, threshold = None):
 
 def getWilcoxonQuotientSignificance(x,y, shiftby=10):
       shiftedquotients = (x + shiftby) / (y + shiftby)
-      logshifted = np.log(shiftedquotients)
+      logshifted = np.log2(shiftedquotients)
+
+      # filter elements that are too close to zero
+      logshifted = logshifted[np.abs(logshifted) >= np.log2(1 + 1e-2)]
       try:
           return stats.wilcoxon(logshifted.values)[1]
       except ValueError:

@@ -10,8 +10,40 @@ import sys
 from ipet.IPETEvalTable import IPETEvaluation
 import pandas as pd
 import re
+import textwrap
 from PyQt4.Qt import QApplication
 from qipet.IpetEvaluationEditorApp import IpetEvaluationEditorApp
+
+description = \
+'''
+    produces an table evaluation of test runs according to an evaluation XML-file
+
+    An evaluation file is an xml file that specifies a number of columns of the original log file data and a number of interesting groups of instances for which aggregated results of the data should be produced.
+
+    The script produces two tables: the first, instancewise table has all specified columns for every passed log file and one row per instance. The second, aggregated table shows aggregated statistics for all specified filter groups for this evaluation.
+'''
+
+epilog = \
+    '''
+    =================
+    Examples of Usage
+    =================
+
+    The simplest way to invoke the script is to specify the name of a parsed log file and the name of a valid evaluation file, e.g.,
+
+       python evaluate.py -t sometestrun.trn -e evaluation.xml
+
+    A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily available data like the number of solving nodes and the solving time in seconds.
+
+
+    Key Search
+    ==========
+
+
+
+
+    '''
+
 
 # possible arguments in the form name,default,short,description #
 clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read"),
@@ -26,8 +58,10 @@ clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must hav
                ('--prefix', None,'-p', "a prefix string for every file written, only useful combined with --filextension"),
                ('--keysearch', None,'-k', "a string containing a regular expression to search all columns that match this expression")]
 
-argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
-                                 description="evaluates experimental data according to an evaluation XML-file")
+argparser = argparse.ArgumentParser(prog="IPET command line evaluation", \
+                                 description=description,
+                                 epilog = textwrap.dedent(epilog),
+                                 formatter_class = argparse.RawDescriptionHelpFormatter)
 for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 

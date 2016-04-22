@@ -9,7 +9,7 @@ import sys
 import pandas as pd
 from ipet.IPETPlotWindow import IPETPlotFrame
 from Tkinter import Tk
-from numpy import log
+from numpy import log, log2, log10
 import re
 
 # possible arguments in the form name,default,short,description #
@@ -20,20 +20,22 @@ clarguments = [('--filename', None,'-f', "A csv file with the data"),
                ('--binwidth',1, '-w', "the width of every bin. Only used when 'nbins' is smaller than 0"),
                ('--nbins',10, '-n', "the total number of bins. Use a negative value for calculating the bins from bin width instead"),
                ('--columnname',None, '-c', "column name, e.g. 'SolvingTime', from which all suitable columns are inferred"),
-               ('--logarithmic',False, '-L', "should the data be transformed on a logarithmic scale first? ")
+               ('--logarithmic', None, '-L', "basis for logarithmic data transformation (use 2, e, or 10)"),
+               ('--title', None, '-T', "A custom title for this plot")
                ]
 argparser = argparse.ArgumentParser(prog="Ipet Histogram Plot Script", \
                                  description="plots a histogram of the specified data from a csv file")
 for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 
+argparser.add_argument("-D", "--legend", action = "store_true", default = False, help = "should a legend be shown?")
+argparser.add_argument("-e", "--epsilon", type = float, default = 1e-6, help = "epsilon threshold for data point absolute value")
 
 
 
 if __name__ == '__main__':
     try:
-        n = vars(argparser.parse_args())
-        globals().update(n)
+        arguments = argparser.parse_args()
     except:
         if not re.search(" -+h", ' '.join(sys.argv)) :
             print "Wrong Usage, use --help for more information."
@@ -41,43 +43,72 @@ if __name__ == '__main__':
     #if globals().get("help") is not None:
 
     #initialize a comparator
-    if filename is None or not filename.endswith(".csv"):
+    if arguments.filename is None or not arguments.filename.endswith(".csv"):
         print "please provide a csv file as filename!"
         sys.exit(0)
 
-    if columnname is None:
+    if arguments.columnname is None:
         print "please provide a column name!"
         sys.exit(0)
 
-    df = pd.DataFrame.from_csv(filename, sep=",",header=[0,1])
+    df = pd.DataFrame.from_csv(arguments.filename, sep = ",", header = [0, 1])
 
-    leftbin = float(leftbin)
-    rightbin = float(rightbin)
-    if boundsfromdata in ["True", True]:
+    leftbin = float(arguments.leftbin)
+    rightbin = float(arguments.rightbin)
+    if arguments.boundsfromdata in ["True", True]:
         boundsfromdata = True
     else:
         boundsfromdata = False
-    if logarithmic in ["True", True]:
-        logarithmic = True
+    if arguments.logarithmic:
+        logarithmic = arguments.logarithmic
+        if logarithmic == "2":
+            logfunction = log2
+        elif logarithmic == "e":
+            logfunction = log
+        elif logarithmic == "10":
+            logfunction = log10
+        else:
+            print "Wrong logarithm basis %s, must be in [2, e, 10]" % logarithmic
+            sys.exit(0)
     else:
         logarithmic = False
-    binwidth = float(binwidth)
-    nbins = int(nbins)
+    binwidth = float(arguments.binwidth)
+    nbins = int(arguments.nbins)
 
     # query the data frame for the desired column on first level
-    data = df.xs(columnname, level=1, axis=1).dropna()
+    data = df.xs(arguments.columnname, level = 1, axis = 1).dropna()
 
-
-    datavals = [data[col].values for col in data]
+    # apply a logarithmic transformation
     if logarithmic:
-        datavals = [log(col) for col in datavals]
+        data = data.apply(logfunction)
 
-    datalabels = [col for col in data]
+    # filter absolute values smaller than epsilon / too close to zero
+    if arguments.epsilon >= 0.0:
+        data = data[data.abs() >= arguments.epsilon]
+
+    # determine labels and values for the histogram. Note that columns may be dropped if they became empty after filtering
+    datalabels, datavals = zip(*[(col, data[col].dropna().values) for col in data if len(data[col].dropna()) > 0])
+
+    removedcolumns = [col for col in data.columns if not col in datalabels]
+    if removedcolumns:
+        print "Columns <%s> filtered out" % ", ".join(removedcolumns)
+
+
 
     root = Tk()
-    root.wm_title("Histogram for %s %s"%(str(columnname), logarithmic and " on logarithmic scale" or ""))
+
+    # give the window a nice title
+    if arguments.title:
+        root.wm_title(arguments.title)
+    else:
+        root.wm_title("Histogram for %s %s" % (str(arguments.columnname), logarithmic and " on logarithmic scale base %s" % logarithmic or ""))
+
     pw = IPETPlotFrame(master=root)
     pw.plothistogram(datavals, boundsfromdata, binwidth, leftbin, rightbin, nbins, datalabels)
+
+    # plot the legend
+    if arguments.legend:
+        pw.showLegend()
 
     pw.pack()
     root.mainloop()

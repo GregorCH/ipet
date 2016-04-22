@@ -71,7 +71,9 @@ class IPETPlotFrame(Frame):
 
         self.resetAxis()
         self.a.hist(data, bins=bins, label=datalabels, alpha=0.7)
-        self.a.legend()
+
+    def showLegend(self):
+        self.a.legend(loc = 'best')
 
 class IPETPlotWindow(Toplevel):
     '''

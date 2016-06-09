@@ -62,6 +62,7 @@ class ReaderManager(Manager):
             StatisticReader.setProblemName(namewithextension)
             if namewithextension in self.testrun.getProblems():
                 self.testrun.deleteProblemData(namewithextension)
+            self.testrun.addData(namewithextension, 'Settings', self.testrun.getSettings())
 
     def endOfInstanceReached(self, line):
         if ReaderManager.INSTANCE_END_EXPRESSION.match(line):

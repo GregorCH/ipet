@@ -61,7 +61,6 @@ class GeneralInformationReader(StatisticReader):
         '''
         version = line.split()[2]
         self.testrun.addData(self.problemname, 'Version', version)
-        self.testrun.addData(self.problemname, 'Settings', self.testrun.getSettings())
         for keyword in ["mode", "LP solver", 'GitHash']:
             data = re.search(r"\[%s: ([\w .-]+)\]" % keyword, line)
             if data:

@@ -6,11 +6,17 @@
 IPET: Interactive Performance Evaluation Tools
 ==============================================
 
+.. include:: description.md
+
 Contents:
+---------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+   installation.md
+   overview.md
+   exampleusage.md
    All modules of IPET <modules.rst>
 
 Indices and tables

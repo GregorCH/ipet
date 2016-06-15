@@ -346,7 +346,14 @@ class FormatFunc:
 
 class IPETEvaluation(Editable, IpetNode):
     '''
-    evaluates for a comparator with given group keys, columns, and filter groups
+    evaluates a comparator with given group keys, columns, and filter groups
+    
+    An evaluation transfers raw, collected data from a collection of testruns
+    into tables based on selected columns, filter groups, and aggregations.
+    An evaluation and its friends come with an easy-to-modify  
+    By defining multiple evaluations, 
+    it is therefore possible to view the same raw data through multiple angles
+    
     '''
     nodetag = "Evaluation"
     #todo put tex, csv etc. here as other possible streams for filter group output

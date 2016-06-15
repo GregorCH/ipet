@@ -465,11 +465,11 @@ canvases.
 It may be used and modified with no restriction; raw copies as well as
 modified versions may be distributed without limitation."""
                                 )
+if __name__ == "__main__":
 
+    qApp = QtGui.QApplication(sys.argv)
 
-qApp = QtGui.QApplication(sys.argv)
-
-aw = IpetPbHistoryWindow()
-aw.setWindowTitle("%s" % progname)
-aw.show()
-sys.exit(qApp.exec_())
+    aw = IpetPbHistoryWindow()
+    aw.setWindowTitle("%s" % progname)
+    aw.show()
+    sys.exit(qApp.exec_())

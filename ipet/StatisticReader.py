@@ -293,6 +293,25 @@ class NodesReader(StatisticReader):
     datatype = int
     lineindex = 3
 
+class ObjsenseReader(StatisticReader):
+    name = 'ObjsenseReader'
+    regular_exp = re.compile("^  Objective sense  : (\w*)")
+    datakey = "Objsense"
+    minimize = 1
+    maximize = -1
+
+    def extractStatistic(self, line):
+        match = self.regular_exp.match(line)
+
+        if match:
+            objsense = self.minimize
+            if match.groups()[0] == "maximize":
+                objsense = self.maximize
+
+            self.testrun.addData(self.problemname, self.datakey, objsense)
+
+
+
 
 
 class PrimalBoundReader(StatisticReader):

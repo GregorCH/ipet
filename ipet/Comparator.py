@@ -15,7 +15,7 @@ from Manager import Manager
 from StatisticReader_HeurReader import HeurDataReader
 from StatisticReader import PrimalBoundReader, DualBoundReader, GapReader, SolvingTimeReader, TimeLimitReader, \
    BestSolFeasReader, MaxDepthReader, LimitReachedReader, NodesReader, RootNodeFixingsReader, \
-   TimeToFirstReader, TimeToBestReader, ListReader
+   TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
 from StatisticReader_GeneralInformationReader import GeneralInformationReader
@@ -71,7 +71,7 @@ class Comparator(Observable):
 
         if testrun not in self.testrunmanager.getManageables():
             self.testrunmanager.addAndActivate(testrun)
-            
+
         self.updateDatakeys()
 
     def addSoluFile(self, solufilename):
@@ -236,9 +236,9 @@ class Comparator(Observable):
             # go through problems and calculate both primal and dual integrals
             for probname in self.probnamelist:
                 processplotdata = getProcessPlotData(testrun, probname)
-                
+
                 #check for well defined data (may not exist sometimes)
-                
+
                 if processplotdata:
                     try:
                         testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
@@ -394,6 +394,7 @@ class Comparator(Observable):
                   MaxDepthReader(),
                   LimitReachedReader(),
                   NodesReader(),
+                  ObjsenseReader(),
                   PluginStatisticsReader(),
                   PrimalBoundHistoryReader(),
                   PrimalBoundReader(),

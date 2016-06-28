@@ -102,7 +102,7 @@ if __name__ == '__main__':
         comp = Comparator()
 
     for trfile in testrunfiles:
-        comp.addLogFile(trfile)
+        comp.addOutputFile(trfile)
 
     if recollect is not False:
         print "Recollecting data"

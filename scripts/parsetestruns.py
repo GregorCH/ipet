@@ -50,7 +50,7 @@ if __name__ == '__main__':
             comparator.readermanager.registerReader(reader)
 
     for outfile in outfiles:
-        comparator.addLogFile(outfile)
+        comparator.addOutputFile(outfile)
 
     for solufile in solufiles:
         comparator.addSoluFile(solufile)

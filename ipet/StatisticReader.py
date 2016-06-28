@@ -5,6 +5,7 @@ import Misc
 import numpy as np
 import datetime
 
+
 class StatisticReader(Editable):
     '''
     base class for all statistic readers - readers should always inherit from this base class for minimal implementation
@@ -19,12 +20,20 @@ class StatisticReader(Editable):
     datatype = float
     lineindex = -1
     # print data#
-    problemname = ''
+    problemname = None
     problemnamelist = []
     numericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+)")
     tablenumericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+|cutoff)")
     wordExpression = re.compile(r'[^\s]+')
     useStringSplit = False
+
+    # constants that represent the different contexts that a reader should be active in
+    CONTEXT_LOGFILE = 1  # the log file of a solver which most readers are reading from
+    CONTEXT_ERRFILE = 2  # the error file of a solver
+    CONTEXT_SETFILE = 3  # the settings file used for solving
+    CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every instance
+
+    context = CONTEXT_LOGFILE
 
     sleepAfterReturn = True
     sleep = False
@@ -41,10 +50,14 @@ class StatisticReader(Editable):
     solvertype = SOLVERTYPE_SCIP
 
 
+    @staticmethod
+    def boolfunction(value):
+        """ parses string TRUE or FALSE and returns the boolean value of this expression """
+        return True if value == "TRUE" else False
 
+    @staticmethod
     def setProblemName(problemname):
         StatisticReader.problemname = problemname
-    setProblemName = staticmethod(setProblemName)
 
     @staticmethod
     def changeSolverType(newtype):
@@ -52,6 +65,16 @@ class StatisticReader(Editable):
 
     def setTestRun(self, testrun):
         self.testrun = testrun
+
+
+    def supportsContext(self, context):
+        '''
+        returns True if the reader supports a given context, otherwise False
+        '''
+        if type(self.context) is int:
+            return self.context == context
+        else:
+            return context in self.context
 
     def getSplitLineWithRegexp(self, regular_exp, line, index= -1, startofline=False):
         if startofline == True and not re.match(regular_exp, line):
@@ -234,6 +257,64 @@ class DualBoundReader(StatisticReader):
             except ValueError:
                 pass
 #               print line
+
+class ErrorFileReader(StatisticReader):
+    """
+    reads information from error files
+    """
+    name = "ErrorFileReader"
+    regular_exp = re.compile("returned with error code (\d+)")
+    datakey = "ReturnCode"
+    context = StatisticReader.CONTEXT_ERRFILE
+
+    def extractStatistic(self, line):
+        match = self.regular_exp.search(line)
+        if match:
+            returncode = match.groups()[0]
+            self.testrun.addData(self.problemname, self.datakey, int(returncode))
+
+class SettingsFileReader(StatisticReader):
+    """
+    parses settings from a settings file
+
+    parses the type, the default value, the name and the current value for every parameter
+    # [type: int, range: [-536870912,536870911], default: 100000]
+    nodeselection/bfs/stdpriority = 1000000
+    """
+    name = "SettingsFileReader"
+    regular_exp_name = re.compile("^([\w/]+) = ([\w\d]+)")
+    regular_exp_type = re.compile("^# \[type: (\w+), .* default: (-*[\w\d]+)\]")
+    context = StatisticReader.CONTEXT_SETFILE
+
+
+
+    typemap = {
+               "real" : float,
+               "char" : str,
+               "string" : str,
+               "int" : int,
+               "bool" : StatisticReader.boolfunction
+               }
+    """ map from a parameter type to a python standard data type """
+
+    def extractStatistic(self, line):
+        match_type = self.regular_exp_type.match(line)
+        if match_type:
+            self.type = match_type.groups()[0]
+            self.default = match_type.groups()[1]
+        else:
+            match_name = self.regular_exp_name.match(line)
+            if match_name:
+                name = match_name.groups()[0]
+                value = match_name.groups()[1]
+                typefunction = self.typemap.get(self.type, str)
+                try:
+                    self.testrun.addData(self.problemname, name, typefunction(value))
+                except ValueError:
+                    # when an error occurs, just return a string
+                    self.testrun.addData(self.problemname, name, value)
+
+
 
 class GapReader(StatisticReader):
     '''

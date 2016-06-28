@@ -361,7 +361,7 @@ class IpetApplication(Tk):
             filenames = [filenames]
         for filename in filenames:
             if filename:
-                self.comparator.addLogFile(filename)
+                self.comparator.addOutputFile(filename)
 
 #        self.updatelistbox(self.testrunsbox, self.getTestrunnames())
 

@@ -15,7 +15,9 @@ class TestRun(Editable):
     '''
     represents the collected data of a particular (set of) log file(s)
     '''
-    FILE_EXTENSION = ".trn"  # : the file extension for saving and loading test runs from
+    FILE_EXTENSION = ".trn"
+    """ the file extension for saving and loading test runs from """
+
     def __init__(self, filenames=[]):
         self.filenames = []
         for filename in filenames:
@@ -25,6 +27,8 @@ class TestRun(Editable):
 
         self.keyset = set()
         self.datadict = {}
+        self.metadatadict = {}
+        """ meta data represent instance-independent data """
 
 
     def appendFilename(self, filename):
@@ -45,12 +49,15 @@ class TestRun(Editable):
         after data was added, the method problemGetData() can be used for access
         '''
 
+        # check for the right dictionary to store the data
+        datadict = self.datadict if probname is not None else self.metadatadict
+
         if type(datakeys) is list and type(data) is list:
             for key, datum in zip(datakeys, data):
-                col = self.datadict.setdefault(key, {})
+                col = datadict.setdefault(key, {})
                 col[probname] = datum
         else:
-            col = self.datadict.setdefault(datakeys, {})
+            col = datadict.setdefault(datakeys, {})
             col[probname] = data
 
     def getKeySet(self):
@@ -77,6 +84,18 @@ class TestRun(Editable):
 
     def emptyData(self):
         self.data = DataFrame(dtype=object)
+
+    def getData(self):
+        """
+        returns a data frame object of the acquired data
+        """
+        return self.data
+
+    def getMetaData(self):
+        """
+        returns a data frame containing meta data
+        """
+        return DataFrame(self.metadatadict)
 
     def setupForDataCollection(self):
         self.datadict = self.data.to_dict()

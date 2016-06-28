@@ -13,9 +13,10 @@ except:
     import pickle
 from Manager import Manager
 from StatisticReader_HeurReader import HeurDataReader
-from StatisticReader import PrimalBoundReader, DualBoundReader, GapReader, SolvingTimeReader, TimeLimitReader, \
-   BestSolFeasReader, MaxDepthReader, LimitReachedReader, NodesReader, RootNodeFixingsReader, \
-   TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader
+from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
+    GapReader, SolvingTimeReader, TimeLimitReader, \
+    BestSolFeasReader, MaxDepthReader, LimitReachedReader, NodesReader, RootNodeFixingsReader, \
+    SettingsFileReader, TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
 from StatisticReader_GeneralInformationReader import GeneralInformationReader
@@ -44,7 +45,7 @@ class Comparator(Observable):
         self.datakeymanager = Manager()
 
         for filename in files:
-            self.addLogFile(filename)
+            self.addOutputFile(filename)
 
         self.readermanager = ReaderManager()
         #self.filtermanager = Manager()
@@ -53,20 +54,27 @@ class Comparator(Observable):
         self.installAggregations()
         self.solufiles = []
         self.externaldata = None
+        self.basename2testrun = {}
 
-    def addLogFile(self, filename, testrun=None):
-        '''
-        adds a log file to a testrun or create a new testrun object with the specified filename
-        '''
-        if os.path.splitext(filename)[-1] == TestRun.FILE_EXTENSION:
+    def addOutputFile(self, filename, testrun=None):
+        """
+        adds an output file to a testrun or create a new testrun object with the specified filename
+
+        the filename should be an out, error, or settings file
+        """
+        filebasename = os.path.splitext(os.path.basename(filename))[0]
+        fileextension = os.path.splitext(filename)[-1]
+
+        if fileextension == TestRun.FILE_EXTENSION:
             try:
                 testrun = TestRun.loadFromFile(filename)
             except IOError, e:
                 sys.stderr.write(" Loading testrun from file %s caused an exception\n%s\n" % (filename, e))
                 return
         elif testrun is None:
-            testrun = TestRun()
-        if os.path.splitext(filename)[-1] != TestRun.FILE_EXTENSION:
+            testrun = self.basename2testrun.setdefault(filebasename, TestRun())
+
+        if fileextension != TestRun.FILE_EXTENSION:
             testrun.appendFilename(filename)
 
         if testrun not in self.testrunmanager.getManageables():
@@ -387,6 +395,7 @@ class Comparator(Observable):
                   DateTimeReader(),
                   DualBoundReader(),
                   DualBoundHistoryReader(),
+                  ErrorFileReader(),
                   ParascipDualBoundHistoryReader(),
                   GapReader(),
                   GeneralInformationReader(),
@@ -400,6 +409,7 @@ class Comparator(Observable):
                   PrimalBoundReader(),
                   VariableReader(),
                   RootNodeFixingsReader(),
+                  SettingsFileReader(),
                   SolvingTimeReader(),
                   SoluFileReader(),
                   TimeLimitReader(),
@@ -456,10 +466,10 @@ class Comparator(Observable):
             return comp
 
     def getDataPanel(self, onlyactive=False):
-        '''
+        """
         returns a pandas Data Panel of testrun data
         creates a panel from testrun data, using the testrun settings as key
         set onlyactive to True to only get active testruns as defined by the testrun manager
-        '''
+        """
         trdatadict = {tr.getSettings():tr.data for tr in self.testrunmanager.getManageables(onlyactive)}
         return Panel(trdatadict)

@@ -20,7 +20,7 @@ class ComparatorTest(unittest.TestCase):
         self.comparator = Comparator()
 
     def test_datacollection(self):
-        self.comparator.addLogFile("check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out")
+        self.comparator.addOutputFile("check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out")
         self.comparator.addSoluFile("short.solu")
         self.comparator.collectData()
         print self.comparator.testrunmanager.getManageables()[0].data[['Datetime_Start', 'Settings', 'Datetime_End']]
@@ -30,7 +30,7 @@ class ComparatorTest(unittest.TestCase):
             entry = df.loc[index, column]
             self.assertEqual(entry, value, "Wrong value parsed for instance %s in column %s: should be %s, have %s" % (index, column, repr(value), repr(entry)))
     def test_saveAndLoad(self):
-        self.comparator.addLogFile("check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out")
+        self.comparator.addOutputFile("check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out")
         self.comparator.addSoluFile("short.solu")
         self.comparator.collectData()
         self.comparator.saveToFile(".testcomp.cmp")
@@ -47,7 +47,7 @@ class ComparatorTest(unittest.TestCase):
         #os.remove(".testcomp.cmp")
 
     def test_trnfileextension(self):
-        self.comparator.addLogFile(".testrun.trn")
+        self.comparator.addOutputFile(".testrun.trn")
         self.comparator.collectData()
 
 if __name__ == "__main__":

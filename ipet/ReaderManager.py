@@ -105,7 +105,7 @@ class ReaderManager(Manager):
         for reader in readers:
             self.addAndActivate(reader)
 
-    def updateProblemName(self, line):
+    def updateProblemName(self, line, currentcontext):
 
         if self.problemexpression.match(line):
             fullname = line.split()[1]
@@ -114,8 +114,11 @@ class ReaderManager(Manager):
             for extension in self.extensions:
                 namewithextension = namewithextension.split(extension)[0]
             StatisticReader.setProblemName(namewithextension)
-            if namewithextension in self.testrun.getProblems():
+
+            # overwrite previous output information from a log file
+            if namewithextension in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
                 self.testrun.deleteProblemData(namewithextension)
+
             self.testrun.addData(namewithextension, 'Settings', self.testrun.getSettings())
 
     def endOfInstanceReached(self, line):
@@ -176,7 +179,7 @@ class ReaderManager(Manager):
             StatisticReader.setProblemName(None)
 
             for line in f:
-                self.updateProblemName(line)
+                self.updateProblemName(line, filecontext)
                 if self.endOfInstanceReached(line):
                     for reader in readers:
                         reader.execEndOfProb()

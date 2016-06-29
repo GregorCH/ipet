@@ -19,10 +19,13 @@
 	<Column origcolname="Status"/>
 	<FilterGroup name="all"/>
 	<FilterGroup name="alloptimal">
-		<Filter anytestrun="all" expression1="Time" expression2="7199.9" operator="le"/>
+		<Filter anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>
 	</FilterGroup>
         <FilterGroup name="diff-timeouts">
-                <Filter anytestrun="one" expression1="Time" expression2="7200" operator="ge"/>
-                <Filter anytestrun="one" expression1="Time" expression2="7199.9" operator="le"/>
+                <Filter anytestrun="one" expression1="_solved_" expression2="1" operator="eq"/>
+                <Filter anytestrun="one" expression1="_solved_" expression2="0" operator="eq"/>
+        </FilterGroup>
+        <FilterGroup name="easyinstances">
+                <Filter anytestrun="all" expression1="Time" expression2="100" operator="le"/>
         </FilterGroup>
 </Evaluation>

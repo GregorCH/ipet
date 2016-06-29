@@ -42,7 +42,15 @@ class IPETComparison:
     comparison operators for filters. All standard binary comparisons + float comparisons (with tolerance)
     + percentage based inequality
     '''
-    comparisondict = {"le":"le", "ge":"ge", "eq":"eq", "neq":"neq", "contains":"cont"}
+    comparisondict = {
+                      "le":"le",
+                      "lt":"lt",
+                      "gt":"gt",
+                      "ge":"ge",
+                      "eq":"eq",
+                      "neq":"neq",
+                      "contains":"cont"
+                      }
 
     def __init__(self, operator, containset=None):
         '''
@@ -61,8 +69,12 @@ class IPETComparison:
 
     def method_le(self, x, y):
         return x <= y
+    def method_lt(self, x, y):
+        return x < y
     def method_ge(self, x, y):
         return x >= y
+    def method_gt(self, x, y):
+        return x > y
     def method_eq(self, x, y):
         return x == y
     def method_neq(self, x, y):

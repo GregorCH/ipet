@@ -1,6 +1,6 @@
 import Misc
 from StatisticReader import SolvingTimeReader, TimeLimitReader, PrimalBoundReader, TimeToBestReader, DualBoundReader, \
-   BestSolFeasReader
+   BestSolInfeasibleReader
 
 from Editable import Editable
 from pandas import DataFrame, notnull
@@ -276,6 +276,6 @@ class TestRun(Editable):
             rightbound = max(pb, db) + reltol
             if optsol < leftbound or optsol > rightbound:
                 return 1
-        if self.problemGetData(probname, BestSolFeasReader.datakey) == True:
+        if self.problemGetData(probname, BestSolInfeasibleReader.datakey) == True:
             return 2
         return 0

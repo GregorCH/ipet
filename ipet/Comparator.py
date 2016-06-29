@@ -15,7 +15,7 @@ from Manager import Manager
 from StatisticReader_HeurReader import HeurDataReader
 from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
     GapReader, SolvingTimeReader, TimeLimitReader, \
-    BestSolFeasReader, MaxDepthReader, LimitReachedReader, NodesReader, RootNodeFixingsReader, \
+    BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
@@ -358,32 +358,163 @@ class Comparator(Observable):
             agg.set_name("shifted geom. (%d)"%shift)
             self.aggregationmanager.addAndActivate(agg)
 
+    def isPrimalBoundBetter(self, testrun, probname):
+        """
+        returns True if the primal bound for the given problem exceeds the best known solution value
+        """
+        pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
+        objsense = testrun.problemGetData(probname, ObjsenseReader.datakey)
+        optval = testrun.problemGetData(probname, "OptVal")
+        reltol = 1e-5 * max(abs(pb), 1.0)
+
+        if objsense == ObjsenseReader.minimize and optval - pb > reltol:
+            return True
+        elif objsense == ObjsenseReader.maximize and pb - optval > reltol:
+            return True
+        return False
+
+    def isDualBoundBetter(self, testrun, probname):
+        """
+        returns True if the dual bound for the given problem exceeds the best known solution value
+        """
+        db = testrun.problemGetData(probname, DualBoundReader.datakey)
+        pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
+        objsense = testrun.problemGetData(probname, ObjsenseReader.datakey)
+        optval = testrun.problemGetData(probname, "OptVal")
+        reltol = 1e-5 * max(abs(pb), 1.0)
+
+        if objsense == ObjsenseReader.minimize and db - optval > reltol:
+            return True
+        elif objsense == ObjsenseReader.maximize and optval - db > reltol:
+            return True
+        return False
+
+    def determineStatusForOptProblem(self, testrun, probname):
+        """
+        determine status for a problem for which we know the optimal solution value
+        """
+        pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
+        db = testrun.problemGetData(probname, DualBoundReader.datakey)
+        limitreached = testrun.problemGetData(probname, LimitReachedReader.datakey)
+        objlimitreached = (limitreached == "objectiveLimit")
+        optval = testrun.problemGetData(probname, "OptVal")
+        objsense = testrun.problemGetData(probname, ObjsenseReader.datakey)
+        solfound = True if pb is not None else False
+
+        # the run failed because the primal or dual bound were better than the known optimal solution value
+        if solfound and (self.isPrimalBoundBetter(testrun, probname) or self.isDualBoundBetter(testrun, probname)):
+            testrun.addData(probname, 'Status', "fail (objective value)")
+
+        # the run finished correctly if an objective limit was given and the solver reported infeasibility
+        elif not solfound and objlimitreached:
+            objlimit = testrun.problemGetData(probname, ObjlimitReader.datakey)
+            reltol = 1e-5 * max(abs(optval), 1.0)
+
+            if (objsense == ObjsenseReader.minimize and optval - objlimit >= -reltol) or \
+                  (objsense == ObjsenseReader.maximize and objlimit - optval >= -reltol):
+                testrun.addData(probname, 'Status', "ok")
+            else:
+                testrun.addData(probname, 'Status', "fail (objective value)")
+        # the solver reached a limit
+        elif limitreached:
+            testrun.addData(probname, 'Status', limitreached)
+
+        # the solver reached
+        elif (db is None or Misc.getGap(pb, db) < 1e-4) and not self.isPrimalBoundBetter(testrun, probname):
+            testrun.addData(probname, 'Status', "ok")
+        else:
+            testrun.addData(probname, 'Status', "fail")
+
+    def determineStatusForBestProblem(self, testrun, probname):
+        """
+        determine status for a problem for which we only know a best solution value
+        """
+        pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
+        db = testrun.problemGetData(probname, DualBoundReader.datakey)
+        limitreached = testrun.problemGetData(probname, LimitReachedReader.datakey)
+
+        # we failed because dual bound is higher than the known value of a primal bound
+        if self.isDualBoundBetter(testrun, probname):
+            testrun.addData(probname, 'Status', "fail (dual bound)")
+
+        # solving reached a limit
+        elif limitreached:
+            testrun.addData(probname, 'Status', limitreached)
+            if self.isPrimalBoundBetter(testrun, probname):
+                testrun.addData(probname, 'Status', "better")
+
+        # primal and dual bound converged
+        elif Misc.getGap(pb, db) < 1e-4:
+            testrun.addData(probname, 'Status', "solved not verified")
+        else:
+            testrun.addData(probname, 'Status', "fail")
+
+    def determineStatusForUnknProblem(self, testrun, probname):
+        """
+        determine status for a problem for which we don't know anything about the feasibility or optimality
+        """
+        pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
+        db = testrun.problemGetData(probname, DualBoundReader.datakey)
+        limitreached = testrun.problemGetData(probname, LimitReachedReader.datakey)
+
+        if limitreached:
+            testrun.addData(probname, 'Status', limitreached)
+
+            if pb is not None:
+                testrun.addData(probname, 'Status', "better")
+        elif Misc.getGap(pb, db) < 1e-4:
+            testrun.addData(probname, 'Status', "solved not verified")
+        else:
+            testrun.addData(probname, 'Status', "unknown")
+
+    def determineStatusForInfProblem(self, testrun, probname):
+        """
+        determine status for a problem for which we know it's infeasible
+        """
+        pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
+        solfound = True if pb is not None else False
+
+        # no solution was found
+        if not solfound:
+            limitreached = testrun.problemGetData(probname, LimitReachedReader.datakey)
+            if limitreached in ['timeLimit', 'memoryLimit', 'nodeLimit']:
+                testrun.addData(probname, 'Status', limitreached)
+            else:
+                testrun.addData(probname, 'Status', "ok")
+        # a solution was found, that's not good
+        else:
+            testrun.addData(probname, 'Status', "fail (solution on infeasible instance)")
+
+
     def checkProblemStatus(self):
         '''
         checks a problem solving status
+
+        checks whether the solver's return status matches the information about the instances
         '''
         for testrun in self.testrunmanager.getManageables():
             for probname in testrun.getProblems():
                 solustatus = testrun.problemGetSoluFileStatus(probname)
-                pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
-                db = testrun.problemGetData(probname, DualBoundReader.datakey)
-                time = testrun.problemGetData(probname, SolvingTimeReader.datakey)
-                status = 'ok'
-                if solustatus is None:
-                    status = 'unknown'
+                errcode = testrun.problemGetData(probname, ErrorFileReader.datakey)
 
-                probgap = Misc.getGap(pb, db)
-                if probgap > 1e-4 and solustatus in ['opt', 'best', 'feas'] and testrun.problemGetData(probname, LimitReachedReader.datakey) is None:
-                    status = 'fail'
-                elif testrun.problemCheckFail(probname) > 0:
-                    status = 'fail'
-                elif testrun.problemGetData(probname, LimitReachedReader.datakey) is not None:
-                    status = testrun.problemGetData(probname, LimitReachedReader.datakey).lower()
+                # an error code means that the instance aborted
+                if errcode is not None:
+                    testrun.addData(probname, 'Status', "fail (abort)")
 
-                if time is None:
-                    status = 'abort'
+                # if the best solution was not feasible in the original problem, it's a fail
+                elif testrun.problemGetData(probname, BestSolInfeasibleReader.datakey) == True:
+                    testrun.addData(probname, 'Status', "fail (solution infeasible)")
 
-                testrun.addData(probname, 'Status', status)
+                # go through the possible solution statuses and determine the Status of the run accordingly
+                elif solustatus == 'opt':
+                    self.determineStatusForOptProblem(testrun, probname)
+                elif solustatus == "best":
+                    self.determineStatusForBestProblem(testrun, probname)
+                elif solustatus == "inf":
+                    self.determineStatusForInfProblem(testrun, probname)
+                else:
+                    self.determineStatusForUnknProblem(testrun, probname)
+
 
     def installAllReaders(self):
         '''
@@ -391,7 +522,7 @@ class Comparator(Observable):
         '''
         self.readermanager.registerListOfReaders([
  #                 ConsTimePropReader(),
-                  BestSolFeasReader(),
+                  BestSolInfeasibleReader(),
                   DateTimeReader(),
                   DualBoundReader(),
                   DualBoundHistoryReader(),

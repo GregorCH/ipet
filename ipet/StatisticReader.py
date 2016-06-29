@@ -171,27 +171,19 @@ class StatisticReader(Editable):
 ######################################################################################
 # DERIVED Classes
 
-class BestSolFeasReader(StatisticReader):
+class BestSolInfeasibleReader(StatisticReader):
     '''
     catches the expression 'best solution is not feasible in original problem'
 
     @return: False if above expression is found in the log and the best solution is thus not feasible, otherwise True
     '''
-    name = 'BestSolFeasReader'
-    regular_exp = 'best solution is not feasible in original problem'
-    datakey = 'Fail'
+    name = 'BestSolInfeasibleReader'
+    regular_exp = re.compile('best solution is not feasible in original problem')
+    datakey = 'BestSolInfeas'
 
-    bestsolfailedcheck = False
     def extractStatistic(self, line):
-        if re.search(self.regular_exp, line):
-            self.bestsolfailedcheck = True
-
-        return None
-
-    def execEndOfProb(self):
-        self.testrun.addData(self.problemname, self.datakey, self.bestsolfailedcheck)
-        self.bestsolfailedcheck = False
-
+        if self.regular_exp.search(line):
+            self.testrun.addData(self.problemname, self.datakey, True)
 
 
 class DateTimeReader(StatisticReader):
@@ -264,7 +256,7 @@ class ErrorFileReader(StatisticReader):
     """
     name = "ErrorFileReader"
     regular_exp = re.compile("returned with error code (\d+)")
-    datakey = "ReturnCode"
+    datakey = "ErrorCode"
     context = StatisticReader.CONTEXT_ERRFILE
 
     def extractStatistic(self, line):
@@ -391,7 +383,12 @@ class ObjsenseReader(StatisticReader):
 
             self.testrun.addData(self.problemname, self.datakey, objsense)
 
-
+class ObjlimitReader(StatisticReader):
+    name = "ObjlimitReader"
+    regular_exp = re.compile("objective value limit set to")
+    datakey = "Objlimit"
+    datatype = float
+    lineindex = 5
 
 
 

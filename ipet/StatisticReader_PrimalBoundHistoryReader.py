@@ -13,7 +13,9 @@ class PrimalBoundHistoryReader(StatisticReader):
     listOfPoints = []
     easyCPLEX = True
     totalnumberofsols = 0
-    heurdispcharexp = re.compile('^[a-zA-Z*][^a-zA-Z*]')
+    heurdispcharexp = re.compile('^[^ \d]')
+    """ all lines starting with a non-whitespace and non-digit character """
+
     shorttablecheckexp = re.compile('s\|')
     firstsolexp = re.compile('^  First Solution   :')
 

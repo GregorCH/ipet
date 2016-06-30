@@ -29,12 +29,13 @@ class DualBoundHistoryReader(StatisticReader):
         self.lasttime = -1
     
     def extractStatistic(self, line):
-     
-        # search for lines with at least 15 vertical bars - such lines are table lines
-         
-        #parse all numbers from the table, including '-' and '--'. If there are too few or no numbers,
-        # line is most certainly one of the less frequent table header lines and can be used to retrieve
-        # the index of the dual bound column
+        '''
+        search for lines with at least 15 vertical bars - such lines are table lines
+
+        parse all numbers from the table, including '-' and '--'. If there are too few or no numbers,
+         line is most certainly one of the less frequent table header lines and can be used to retrieve
+         the index of the dual bound column
+        '''
         if self.isTableLine(line):
             if self.dbindex == -1:
                 # parse index of dual bound entry

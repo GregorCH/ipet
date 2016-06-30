@@ -365,6 +365,10 @@ class Comparator(Observable):
         pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
         objsense = testrun.problemGetData(probname, ObjsenseReader.datakey)
         optval = testrun.problemGetData(probname, "OptVal")
+
+        if pb is None:
+            return False
+
         reltol = 1e-5 * max(abs(pb), 1.0)
 
         if objsense == ObjsenseReader.minimize and optval - pb > reltol:
@@ -379,9 +383,17 @@ class Comparator(Observable):
         """
         db = testrun.problemGetData(probname, DualBoundReader.datakey)
         pb = testrun.problemGetData(probname, PrimalBoundReader.datakey)
+
+        if db is None:
+            return False
+
         objsense = testrun.problemGetData(probname, ObjsenseReader.datakey)
         optval = testrun.problemGetData(probname, "OptVal")
-        reltol = 1e-5 * max(abs(pb), 1.0)
+
+        if pb is not None:
+            reltol = 1e-5 * max(abs(pb), 1.0)
+        else:
+            reltol = 1e-5 * max(abs(optval), 1.0)
 
         if objsense == ObjsenseReader.minimize and db - optval > reltol:
             return True
@@ -477,7 +489,7 @@ class Comparator(Observable):
         # no solution was found
         if not solfound:
             limitreached = testrun.problemGetData(probname, LimitReachedReader.datakey)
-            if limitreached in ['timeLimit', 'memoryLimit', 'nodeLimit']:
+            if limitreached in ['TimeLimit', 'MemoryLimit', 'NodeLimit']:
                 testrun.addData(probname, 'Status', limitreached)
             else:
                 testrun.addData(probname, 'Status', "ok")

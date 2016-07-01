@@ -8,18 +8,18 @@ class DualBoundHistoryReader(StatisticReader):
     time when a new dual bound was reported, and db is the dual bound value. Every t and db should occur only once
     in the final list
     '''
-    
+
     name = 'DualBoundHistoryReader'
     regular_exp =  re.compile('\|') # compile the regular expression to speed up reader
     datakey = 'dualboundhistory'
     dbindex = -1
     timeindex = 0
-    
-    
+
+
     def __init__(self):
         self.reset()
-    
-    
+
+
     def reset(self):
         '''
         reset all attributes to default values for a new problem
@@ -27,7 +27,7 @@ class DualBoundHistoryReader(StatisticReader):
         self.dualboundlist = []
         self.lastdb = Misc.FLOAT_INFINITY
         self.lasttime = -1
-    
+
     def extractStatistic(self, line):
         '''
         search for lines with at least 15 vertical bars - such lines are table lines
@@ -41,7 +41,7 @@ class DualBoundHistoryReader(StatisticReader):
                 # parse index of dual bound entry
                 splittedlinenowhitespace = map(str.strip, line.split('|'))
                 self.dbindex = splittedlinenowhitespace.index('dualbound')
-                
+
             try:
                 listofnumbersintable = self.tablenumericExpression.findall(line)
                 # parse time and dual bound from the table
@@ -49,12 +49,12 @@ class DualBoundHistoryReader(StatisticReader):
                 dualbound = float(listofnumbersintable[self.dbindex])
                 # store newly found (time, dual bound) tuple if it differs from the last dual bound
                 if self.lastdb != dualbound:
-              
+
                     # remove previous dual bound if time stamp is equal
                     if self.lasttime == time:
                         elembefore = self.dualboundlist.pop(-1)
                         assert self.lasttime == elembefore[0]
-              
+
                     # store new dual bound
                     self.dualboundlist.append((time, dualbound))
                     self.lastdb = dualbound

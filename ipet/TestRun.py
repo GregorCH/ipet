@@ -28,6 +28,8 @@ class TestRun(Editable):
         self.keyset = set()
         self.datadict = {}
         self.metadatadict = {}
+        self.parametervalues = {}
+        self.defaultparametervalues = {}
         """ meta data represent instance-independent data """
 
 
@@ -59,6 +61,25 @@ class TestRun(Editable):
         else:
             col = datadict.setdefault(datakeys, {})
             col[probname] = data
+
+    def addParameterValue(self, paramname, paramval):
+        '''
+        stores the value for a parameter of a given name for this test run
+        '''
+        self.parametervalues[paramname] = paramval
+
+    def addDefaultParameterValue(self, paramname, defaultval):
+        '''
+        stores the value for a parameter of a given name for this test run
+        '''
+        self.defaultparametervalues[paramname] = defaultval
+
+    def getParameterData(self):
+        '''
+        returns two dictionaries that map parameter names to  their value and default value
+        '''
+        return (self.parametervalues, self.defaultparametervalues)
+
 
     def getKeySet(self):
         if self.datadict != {}:
@@ -258,24 +279,3 @@ class TestRun(Editable):
         except KeyError:
             print self.getIdentification() + " has no solu file status for ", solufileprobname
             return None
-
-
-    def problemCheckFail(self, probname):
-        '''
-        returns 0 if testrun has not failed on that instance
-                1 if solu file solution lies outside the interval [min(pb,db)-reltol, max(pb,db) + reltol]
-                2 if best reported solution was not feasible for problem
-        '''
-        optsol = self.problemGetOptimalSolution(probname)
-        solustatus = self.problemGetSoluFileStatus(probname)
-        pb = self.problemGetData(probname, PrimalBoundReader.datakey)
-        db = self.problemGetData(probname, DualBoundReader.datakey)
-        if solustatus == 'opt' and pb is not None and db is not None:
-            reltol = 1e-5 * max(abs(pb), 1.0)
-            leftbound = min(pb, db) - reltol
-            rightbound = max(pb, db) + reltol
-            if optsol < leftbound or optsol > rightbound:
-                return 1
-        if self.problemGetData(probname, BestSolInfeasibleReader.datakey) == True:
-            return 2
-        return 0

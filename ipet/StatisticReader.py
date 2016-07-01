@@ -301,10 +301,12 @@ class SettingsFileReader(StatisticReader):
                 value = match_name.groups()[1]
                 typefunction = self.typemap.get(self.type, str)
                 try:
-                    self.testrun.addData(self.problemname, name, typefunction(value))
+                    self.testrun.addParameterValue(name, typefunction(value))
+                    self.testrun.addDefaultParameterValue(name, typefunction(self.default))
                 except ValueError:
                     # when an error occurs, just return a string
-                    self.testrun.addData(self.problemname, name, value)
+                    self.testrun.addParameterValue(name, value)
+                    self.testrun.addDefaultParameterValue(name, self.default)
 
 
 

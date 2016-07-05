@@ -274,8 +274,8 @@ class SettingsFileReader(StatisticReader):
     nodeselection/bfs/stdpriority = 1000000
     """
     name = "SettingsFileReader"
-    regular_exp_name = re.compile("^([\w/]+) = ([\w\d]+)")
-    regular_exp_type = re.compile("^# \[type: (\w+), .* default: (-*[\w\d]+)\]")
+    regular_exp_name = re.compile("^([\w/]+) = (.+)")
+    regular_exp_type = re.compile("^# \[type: (\w+), .* default: ([^\]]+)\]")
     context = StatisticReader.CONTEXT_SETFILE
 
 
@@ -285,7 +285,8 @@ class SettingsFileReader(StatisticReader):
                "char" : str,
                "string" : str,
                "int" : int,
-               "bool" : StatisticReader.boolfunction
+               "bool" : StatisticReader.boolfunction,
+               "longint" : int
                }
     """ map from a parameter type to a python standard data type """
 

@@ -509,8 +509,8 @@ class IPETEvaluation(Editable, IpetNode):
     def calculateNeededData(self, df):
         df['_time_'] = (df.Status == 'timelimit')
         df['_limit_'] = (df.Status.isin(['timelimit', 'nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
-        df['_fail_'] = (df.Status == 'fail')
-        df['_abort_'] = (df.Status == 'abort')
+        df['_fail_'] = (df.Status.apply(lambda x: True if x.startswith("fail") else False))
+        df['_abort_'] = (df.Status == 'fail (abort)')
 
         df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_'])
 

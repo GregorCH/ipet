@@ -50,6 +50,23 @@ class ComparatorTest(unittest.TestCase):
         self.comparator.addOutputFile(".testrun.trn")
         self.comparator.collectData()
 
+    def test_parsingOfSettingsFile(self):
+        self.comparator.addOutputFile("check.bugs.scip-221aa62.linux.x86_64.gnu.opt.spx.opt97.default.set")
+        self.comparator.collectData()
+        
+        tr = self.comparator.testrunmanager.getManageables()[0]
+        values, defaultvalues = tr.getParameterData()
+        
+        valuesamples = {"constraints/quadratic/scaling" : True,
+                        "conflict/bounddisjunction/continuousfrac" : 0.4,
+                        "constraints/soc/sparsifymaxloss" : 0.2,
+                        "separating/cgmip/nodelimit" : 10000,
+                        "presolving/abortfac" : 0.0001}
+
+        for key, val in valuesamples.iteritems():
+            self.assertEqual(val, values[key], "wrong parameter value %s parsed for parameter <%s>, should be %s" % (repr(values[key]), key, repr(val)))
+            self.assertEqual(val, defaultvalues[key], "wrong default value %s parsed for parameter <%s>, should be %s" % (repr(defaultvalues[key]), key, repr(val)))
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

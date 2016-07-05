@@ -429,7 +429,7 @@ class Comparator(Observable):
                 testrun.addData(probname, 'Status', "fail (objective value)")
         # the solver reached a limit
         elif limitreached:
-            testrun.addData(probname, 'Status', limitreached)
+            testrun.addData(probname, 'Status', limitreached.lower())
 
         # the solver reached
         elif (db is None or Misc.getGap(pb, db) < 1e-4) and not self.isPrimalBoundBetter(testrun, probname):
@@ -451,7 +451,7 @@ class Comparator(Observable):
 
         # solving reached a limit
         elif limitreached:
-            testrun.addData(probname, 'Status', limitreached)
+            testrun.addData(probname, 'Status', limitreached.lower())
             if self.isPrimalBoundBetter(testrun, probname):
                 testrun.addData(probname, 'Status', "better")
 
@@ -470,7 +470,7 @@ class Comparator(Observable):
         limitreached = testrun.problemGetData(probname, LimitReachedReader.datakey)
 
         if limitreached:
-            testrun.addData(probname, 'Status', limitreached)
+            testrun.addData(probname, 'Status', limitreached.lower())
 
             if pb is not None:
                 testrun.addData(probname, 'Status', "better")
@@ -490,7 +490,7 @@ class Comparator(Observable):
         if not solfound:
             limitreached = testrun.problemGetData(probname, LimitReachedReader.datakey)
             if limitreached in ['TimeLimit', 'MemoryLimit', 'NodeLimit']:
-                testrun.addData(probname, 'Status', limitreached)
+                testrun.addData(probname, 'Status', limitreached.lower())
             else:
                 testrun.addData(probname, 'Status', "ok")
         # a solution was found, that's not good

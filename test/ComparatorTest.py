@@ -51,21 +51,71 @@ class ComparatorTest(unittest.TestCase):
         self.comparator.collectData()
 
     def test_parsingOfSettingsFile(self):
-        self.comparator.addOutputFile("check.bugs.scip-221aa62.linux.x86_64.gnu.opt.spx.opt97.default.set")
+        inputfile = "check.bugs.scip-221aa62.linux.x86_64.gnu.opt.spx.opt97.default.set"
+        self.comparator.addOutputFile(inputfile)
         self.comparator.collectData()
         
         tr = self.comparator.testrunmanager.getManageables()[0]
         values, defaultvalues = tr.getParameterData()
         
+        import json
+        import re
+        import sys
+
+        def collect_settings(path):
+            '''
+            A crappy settings file parser
+            '''
+            with open(path, "r") as f:
+                settings_contents = f.readlines()
+
+            settings = {}
+            for line in settings_contents:
+                exclude = r"^\s*#"
+                comment_match = re.match(exclude, line)
+                if not comment_match and line != "\n":
+                    parts = line.split(" = ")
+                    settings[parts[0].strip()] = estimate_type(parts[1].strip())
+
+            return settings
+
+
+        def boolify(value):
+            if value.lower() == "true":
+                return True
+            elif value.lower() == "false":
+                return False
+            raise ValueError("{} is not a bool".format(value))
+
+
+        def estimate_type(var):
+            '''
+            Guesses the str representation of the variables type
+            '''
+            var = str(var)
+
+            for caster in (boolify, int, float):
+                try:
+                    return caster(var)
+                except ValueError:
+                    pass
+            return var
+
+        crappysettings = collect_settings(inputfile)
+
         valuesamples = {"constraints/quadratic/scaling" : True,
                         "conflict/bounddisjunction/continuousfrac" : 0.4,
                         "constraints/soc/sparsifymaxloss" : 0.2,
                         "separating/cgmip/nodelimit" : 10000,
-                        "presolving/abortfac" : 0.0001}
+                        "presolving/abortfac" : 0.0001,
+                        "vbc/filename": "\"-\""}
 
         for key, val in valuesamples.iteritems():
             self.assertEqual(val, values[key], "wrong parameter value %s parsed for parameter <%s>, should be %s" % (repr(values[key]), key, repr(val)))
             self.assertEqual(val, defaultvalues[key], "wrong default value %s parsed for parameter <%s>, should be %s" % (repr(defaultvalues[key]), key, repr(val)))
+
+        for key, val in crappysettings.iteritems():
+            self.assertEqual(val, values[key], "wrong parameter value %s parsed for parameter <%s>, should be %s" % (repr(values[key]), key, repr(val)))
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

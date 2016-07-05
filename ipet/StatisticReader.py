@@ -275,7 +275,7 @@ class SettingsFileReader(StatisticReader):
     """
     name = "SettingsFileReader"
     regular_exp_name = re.compile("^([\w/]+) = (.+)")
-    regular_exp_type = re.compile("^# \[type: (\w+), .* default: ([^\]]+)\]")
+    regular_exp_type = re.compile("^# \[type: (\w+),.*default: ([^\]]+)\]")
     context = StatisticReader.CONTEXT_SETFILE
 
 

@@ -105,9 +105,14 @@ class ReaderManager(Manager):
         for reader in readers:
             self.addAndActivate(reader)
 
-    def updateProblemName(self, line, currentcontext):
+    def updateProblemName(self, line, currentcontext, readers):
 
         if self.problemexpression.match(line):
+            
+            if StatisticReader.getProblemName() is not None:
+                for reader in readers:
+                    reader.execEndOfProb()
+                    
             fullname = line.split()[1]
             namewithextension = os.path.basename(fullname);
             namewithextension = os.path.splitext(namewithextension)[0]
@@ -179,15 +184,18 @@ class ReaderManager(Manager):
             StatisticReader.setProblemName(None)
 
             for line in f:
-                self.updateProblemName(line, filecontext)
+                self.updateProblemName(line, filecontext, readers)
                 if self.endOfInstanceReached(line):
-                    for reader in readers:
-                        reader.execEndOfProb()
-                    else:
-                        self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
+                    self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
                 else:
                     for reader in readers:
                         reader.extractStatistic(line)
+
+            else:
+                if StatisticReader.getProblemName() is not None:
+                    for reader in readers:
+                        reader.execEndOfProb()
+
 
 
             f.close()

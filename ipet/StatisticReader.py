@@ -60,6 +60,10 @@ class StatisticReader(Editable):
         StatisticReader.problemname = problemname
 
     @staticmethod
+    def getProblemName():
+        return StatisticReader.problemname
+
+    @staticmethod
     def changeSolverType(newtype):
         StatisticReader.solvertype = newtype
 
@@ -530,7 +534,7 @@ class ListReader(StatisticReader):
         match = self.regular_exp.match(line)
         if match is not None:
             datakey = match.group(0)
-            strval = self.getNumberAtIndex(line, 0)
+            strval = match.group(1)
             try:
                 val = int(strval)
             except ValueError:

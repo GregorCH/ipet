@@ -168,8 +168,6 @@ class IPETFilter(Editable, IpetNode):
         return self.attribute2Options.get(attr)
 
     def applyInstanceOperator(self, probname):
-        print probname
-        print [x.getName() for x in self.instances]
         contained = False
         # loop through instance set
         for name in (x.getName() for x in self.instances):

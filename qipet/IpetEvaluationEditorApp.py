@@ -131,9 +131,10 @@ class IpetEvaluationEditorApp(IpetMainWindow):
     def addFilter(self):
         self.updateStatus("Add filter")
         self.addedfilters += 1
-        newfiltername = "New Filter %d"%self.addedfilters
-        newfilter = IPETFilter()
-        
+        evalchildren = self.evaluation.getChildren()
+
+        newfilter = IPETFilter(expression1 = "CHANGE", expression2 = "CHANGE")
+        print newfilter.getName()
         self.addNewElementAsChildOfSelectedElement(newfilter)
 
 

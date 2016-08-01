@@ -43,8 +43,6 @@ class Comparator(Observable):
         self.testrunmanager = Manager()
         self.datakeymanager = Manager()
 
-        for filename in files:
-            self.addOutputFile(filename)
 
         self.readermanager = ReaderManager()
         #self.filtermanager = Manager()
@@ -54,6 +52,9 @@ class Comparator(Observable):
         self.solufiles = []
         self.externaldata = None
         self.basename2testrun = {}
+
+        for filename in files:
+            self.addOutputFile(filename)
 
     def addOutputFile(self, filename, testrun=None):
         """

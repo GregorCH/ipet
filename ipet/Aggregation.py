@@ -133,6 +133,6 @@ if __name__ == '__main__':
     agg2 = Aggregation('max')
     print agg.aggregate(arr), agg2.aggregate(arr)
     agg.set_aggregation('mean')
-    agg2 = Aggregation('listGetShiftedGeometricMean',  shiftby=30.0)
-    agg3 = Aggregation('listGetShiftedGeometricMean',  shiftby=300.0)
+    agg2 = Aggregation('shmean', shiftby = 30.0)
+    agg3 = Aggregation('shmean', shiftby = 300.0)
     print agg3.aggregate(arr), agg2.aggregate(arr)

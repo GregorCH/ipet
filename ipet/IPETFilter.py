@@ -48,11 +48,10 @@ class IPETComparison:
                       "gt":"gt",
                       "ge":"ge",
                       "eq":"eq",
-                      "neq":"neq",
-                      "contains":"cont"
+                      "neq":"neq"
                       }
 
-    def __init__(self, operator, containset=None):
+    def __init__(self, operator):
         '''
         constructs a comparison object by passing an appropriate operator as string
         '''
@@ -60,7 +59,6 @@ class IPETComparison:
             self.operator = str(operator)
         else:
             raise KeyError("Unknown key value %s" % (operator))
-        self.containset = containset
 
 
     def compare(self, x, y):
@@ -80,17 +78,18 @@ class IPETComparison:
     def method_neq(self, x, y):
         return x != y
 
-    def method_cont(self, x, y):
-        return x in self.containset or y in self.containset
-
 class IPETFilter(Editable, IpetNode):
     '''
     Filters are used for selecting subsets of problems to analyze.
     '''
-    attribute2Options = {"anytestrun":["one", "all"], "operator":IPETComparison.comparisondict.keys()}
+    instanceoperators = ["keep", "drop"]
+    attribute2Options = {
+                         "anytestrun":["one", "all"],
+                         "operator":IPETComparison.comparisondict.keys() + instanceoperators}
     nodetag = "Filter"
     
-    def __init__(self, expression1=None, expression2=None, operator="ge", anytestrun='all', containset=None):
+
+    def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = 'all'):
         '''
         filter constructor
         
@@ -106,13 +105,13 @@ class IPETFilter(Editable, IpetNode):
         self.expression2 = expression2
 
         self.anytestrun = anytestrun
+        self.instances = []
         
-        self.containset = containset
         self.set_operator(operator)
         
     def checkAttributes(self):
-        if self.operator == "contains" and self.containset is None:
-            raise ValueError("Error: Trying to initialize a filter with operator 'contains' but no 'containset'")
+        if self.operator in self.instanceoperators and self.instances == []:
+            raise ValueError("Error: Trying to initialize a filter with operator 'contains' but no 'instances'")
         
         
     @staticmethod
@@ -122,55 +121,79 @@ class IPETFilter(Editable, IpetNode):
 
         anytestrun = attrdict.get('anytestrun')
         operator = attrdict.get('operator')
-        containset = attrdict.get('containset')
 
-        return IPETFilter(expression1, expression2, operator, anytestrun, containset)
+        return IPETFilter(expression1, expression2, operator, anytestrun)
 
     def getName(self):
         prefix = self.anytestrun
-        return " ".join((prefix, self.expression1, self.operator, self.expression2))
+        if self.operator in self.instanceoperators:
+            return self.operator + " instance filter"
+        else:
+            return " ".join((prefix, self.expression1, self.operator, self.expression2))
 
     def set_operator(self, operator):
         self.operator = operator
-        self.comparison = IPETComparison(self.operator, self.containset)
+        if self.operator in IPETComparison.comparisondict.keys():
+            self.comparison = IPETComparison(self.operator)
 
     def getEditableAttributes(self):
-        return ['anytestrun', 'expression1', 'operator', 'expression2']
+        '''
+        returns editable attributes depending on the selected operator
+
+        if a binary operator is selected, two expressions as left and right hand side of operator must be chosen
+        For instance operators, no expressions are selectable.
+        '''
+        if self.operator in IPETComparison.comparisondict.keys():
+            return ['operator', 'anytestrun', 'expression1', 'expression2']
+        else:
+            return ['operator']
     
     @staticmethod
     def getNodeTag():
         return IPETFilter.nodetag
     
     def getChildren(self):
-        if self.containset is not None:
-            return map(IPETInstance, sorted(list(self.containset)))
-        else:
-            return None
+        return self.instances
         
     def acceptsAsChild(self, child):
         return child.__class__ is IPETInstance
     
     def addChild(self, child):
-        if self.containset is None:
-            self.containset = set()
-            
-        self.containset.add(child.getName())
+        self.instances.append(child)
         
     def removeChild(self, child):
-        if self.containset is not None:
-            self.containset.remove(child.getName())
+        self.instances.remove(child)
             
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2Options.get(attr)
+
+    def applyInstanceOperator(self, probname):
+        print probname
+        print [x.getName() for x in self.instances]
+        contained = False
+        # loop through instance set
+        for name in (x.getName() for x in self.instances):
+            if probname == name:
+                contained = True
+                break
+
+        if contained and self.operator == "keep":
+            return True
+        elif self.operator == "drop":
+            return (not contained)
+
+        return False
 
     def filterProblem(self, probname, testruns=[]):
         '''
         return True or False depending on the evaluation of the filter operator comparison
         '''
-        if self.operator == 'contains':
-            if probname in self.containset:
-                return True
-            return False
+
+        # apply an instance operator directly
+        if self.operator in self.instanceoperators:
+            return self.applyInstanceOperator(probname)
+
+        # evaluate the two expressions and filter according to the anytestrun attribute if one or all match the requirement
         for testrun in testruns:
             x = self.evaluate(self.expression1, probname, testrun)
             y = self.evaluate(self.expression2, probname, testrun)
@@ -185,8 +208,9 @@ class IPETFilter(Editable, IpetNode):
 
 
     def filterDataFrame(self, df):
-        if self.operator == 'contains':
-            return np.all(df.index.isin(self.containset))
+        if self.operator in self.instanceoperators:
+            return self.applyInstanceOperator(df.index[0])
+
         x = self.evaluateValueDataFrame(df, self.expression1)
         y = self.evaluateValueDataFrame(df, self.expression2)
         booleanseries = self.comparison.compare(x, y)
@@ -233,14 +257,13 @@ class IPETFilter(Editable, IpetNode):
         myattributes = self.attributesToDict()
         mystrattributes = {key:str(myattributes[key]) for key in self.getEditableAttributes()}
         me = ElementTree.Element('Filter', mystrattributes)
-        if self.containset is not None:
-            for containelem in sorted(list(self.containset)):
-                me.append(ElementTree.Element("Instance", {"name":containelem}))
+        for instance in self.instances:
+            me.append(ElementTree.Element("Instance", {"name":instance.getName()}))
         return me
 
 class IPETFilterGroup(Editable, IpetNode):
     '''
-    represents a list of filters or filter groups, has a name attribute for quick tabular representation
+    represents a list of filters, has a name attribute for quick tabular representation
 
     a filter group collects
     '''
@@ -271,6 +294,9 @@ class IPETFilterGroup(Editable, IpetNode):
     def getChildren(self):
         return self.filters
     
+    def addChild(self, child):
+        self.addFilter(child)
+
     def acceptsAsChild(self, child):
         return child.__class__ is IPETFilter
     
@@ -290,7 +316,7 @@ class IPETFilterGroup(Editable, IpetNode):
 
         Parameters
         ----------
-        filter_ : an instance of IPETFilter or IPETFilterGroup
+        filter_ : an instance of IPETFilter
         '''
         self.filters.append(filter_)
 
@@ -380,14 +406,14 @@ class IPETFilterGroup(Editable, IpetNode):
 if __name__ == '__main__':
     from Comparator import Comparator
     print "Hallo"
-    comp = Comparator(files=['../../check/results/check.short.scip-3.0.2.1.linux.x86_64.gnu.opt.spx.opt83.zib.de.default.out'])
-    comp.addSoluFile('../../check/testset/short.solu')
+    comp = Comparator(files = ['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
+    comp.addSoluFile('../test/short.solu')
     comp.collectData()
     operator = 'ge'
     expression1 = 'Nodes'
     expression2 = '2'
-    filter1 = IPETFilter(expression1, expression2, operator, anytestrun=False)
-    filter2 = IPETFilter(expression1, expression2, operator, anytestrun=True)
+    filter1 = IPETFilter(expression1, expression2, operator, anytestrun = "all")
+    filter2 = IPETFilter(expression1, expression2, operator, anytestrun = "one")
     print filter1.getName()
     print len(comp.getProblems())
     print len(filter1.getFilteredList(comp.getProblems(), comp.getManager('testrun').getManageables()))

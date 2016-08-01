@@ -12,7 +12,6 @@ try:
 except:
     import pickle
 from Manager import Manager
-from StatisticReader_HeurReader import HeurDataReader
 from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
     GapReader, SolvingTimeReader, TimeLimitReader, \
     BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
@@ -542,7 +541,6 @@ class Comparator(Observable):
                   ParascipDualBoundHistoryReader(),
                   GapReader(),
                   GeneralInformationReader(),
-                  HeurDataReader(),
                   MaxDepthReader(),
                   LimitReachedReader(),
                   NodesReader(),

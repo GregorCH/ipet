@@ -13,7 +13,10 @@ import numpy
 class ComparatorTest(unittest.TestCase):
     datasamples = [("meanvarx", 'Datetime_Start', "2014-08-01 16:57:10"),
                    ("lseu", 'Settings', 'testmode'),
-                   ("misc03", "Datetime_End", "2014-08-01 16:56:37")
+                   ("misc03", "Datetime_End", "2014-08-01 16:56:37"),
+                   ("linking", "LineNumbers_BeginLogFile", 4),
+                   ("j301_2", "LineNumbers_BeginLogFile", 273),
+                   ("j301_2", "LineNumbers_EndLogFile", 569)
                    ]
 
     def setUp(self):
@@ -23,7 +26,7 @@ class ComparatorTest(unittest.TestCase):
         self.comparator.addOutputFile("check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out")
         self.comparator.addSoluFile("short.solu")
         self.comparator.collectData()
-        print self.comparator.testrunmanager.getManageables()[0].data[['Datetime_Start', 'Settings', 'Datetime_End']]
+        # print self.comparator.testrunmanager.getManageables()[0].data[['Datetime_Start', 'Settings', 'Datetime_End']]
 
         df = self.comparator.testrunmanager.getManageables()[0].data
         for index, column, value in self.datasamples:

@@ -105,25 +105,41 @@ class ReaderManager(Manager):
         for reader in readers:
             self.addAndActivate(reader)
 
-    def updateProblemName(self, line, currentcontext, readers):
+    def updateLineNumberData(self, linenumber, problemname, currentcontext, prefix):
+        context2string = {StatisticReader.CONTEXT_LOGFILE:"LogFile",
+                          StatisticReader.CONTEXT_ERRFILE:"ErrFile"}
+        if problemname is None:
+            return
+        contextstring = context2string.get(currentcontext)
+        if contextstring is None:
+            return
+        self.testrun.addData(problemname, "%s%s" % (prefix, contextstring), linenumber)
 
-        if self.problemexpression.match(line):
+
+    def updateProblemName(self, line, currentcontext, readers):
+        '''
+        sets up data structures for a new problem instance if necessary
+        '''
+
+        if self.problemexpression.match(line[1]):
             
             if StatisticReader.getProblemName() is not None:
                 for reader in readers:
                     reader.execEndOfProb()
                     
-            fullname = line.split()[1]
+            fullname = line[1].split()[1]
             namewithextension = os.path.basename(fullname);
             namewithextension = os.path.splitext(namewithextension)[0]
             for extension in self.extensions:
                 namewithextension = namewithextension.split(extension)[0]
             StatisticReader.setProblemName(namewithextension)
 
+
             # overwrite previous output information from a log file
             if namewithextension in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
                 self.testrun.deleteProblemData(namewithextension)
 
+            self.updateLineNumberData(line[0], StatisticReader.getProblemName(), currentcontext, "LineNumbers_Begin")
             self.testrun.addData(namewithextension, 'Settings', self.testrun.getSettings())
 
     def endOfInstanceReached(self, line):
@@ -183,13 +199,15 @@ class ReaderManager(Manager):
             # reset the problem name before a new problem is read in
             StatisticReader.setProblemName(None)
 
-            for line in f:
+            # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
+            for line in enumerate(f):
                 self.updateProblemName(line, filecontext, readers)
-                if self.endOfInstanceReached(line):
+                if self.endOfInstanceReached(line[1]):
+                    self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
                     self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
                 else:
                     for reader in readers:
-                        reader.extractStatistic(line)
+                        reader.extractStatistic(line[1])
 
             else:
                 if StatisticReader.getProblemName() is not None:

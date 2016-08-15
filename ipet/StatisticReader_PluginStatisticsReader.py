@@ -26,7 +26,7 @@ class PluginStatisticsReader(StatisticReader):
    '''
    name = 'PluginStatisticsReader'
    plugintypes = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
-              'Separators', 'Branching Rules', 'Diving Statistics', 'LP', 'Branching Analysis']
+              'Separators', 'Branching Rules', 'Diving Statistics', 'LP', 'Branching Analysis', 'External Solvers']
    singlecolumnnames = ['Root Node', 'Total Time', 'B&B Tree']
    active = False
    spacesepcolumnnames = ['LP Iters']

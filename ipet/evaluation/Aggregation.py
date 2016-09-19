@@ -4,13 +4,14 @@ Created on 30.12.2013
 @author: bzfhende
 '''
 import numpy
-import Misc, Editable
+from ipet.misc import Misc
+from ipet.concepts.Editable import Editable
 from xml.etree import ElementTree
 from _functools import partial
-from ipet.quick_Pandas import getWilcoxonQuotientSignificance as qWilcox
-from ipet.IpetNode import IpetNode
+from ipet.misc.quick_Pandas import getWilcoxonQuotientSignificance as qWilcox
+from ipet.concepts.IPETNode import IpetNode
 
-class Aggregation(Editable.Editable, IpetNode):
+class Aggregation(Editable, IpetNode):
     '''
     aggregates a list of values into a single value, as, e.g., a mean. Allows functions from numpy and
     from Misc-module

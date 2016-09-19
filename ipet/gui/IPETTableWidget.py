@@ -11,11 +11,11 @@ import pandas as pd
 
 from ttk import Treeview, Separator, Entry
 import os
-from IPETDataTable import IPETDataTableFrame
-from IpetParam import IPETParam
-from IPETBrowser import IPETTypeWidget
+from ipet.gui.IPETDataTable import IPETDataTableFrame
+from ipet.gui.IPETParam import IPETParam
+from ipet.gui.IPETBrowser import IPETTypeWidget
 from Manager import Manager
-from ipet.IpetImageButton import IpetImageButton
+from ipet.gui import IPETImageButton
 from functools import partial
 import numpy
 
@@ -48,14 +48,14 @@ class IpetTableWidget(IpetWidget):
         Button(exportframe, text="Export", command=self.export).pack(side=Tkconstants.LEFT, padx=2)
         Entry(exportframe, textvariable=self.exportfilenamevar).pack(side=Tkconstants.LEFT, padx=2)
         Separator(exportframe, orient=Tkconstants.VERTICAL).pack(side=Tkconstants.LEFT, padx=5)
-        IpetImageButton(exportframe, "Refresh-icon", "Refresh the data frame", self.update).pack(side=Tkconstants.LEFT, padx=2)
+        IPETImageButton(exportframe, "Refresh-icon", "Refresh the data frame", self.update).pack(side=Tkconstants.LEFT, padx=2)
         Separator(exportframe, orient=Tkconstants.VERTICAL).pack(side=Tkconstants.LEFT, padx=5)
-        IpetImageButton(exportframe, "arrow-left-icon", "Move selected column left", partial(self.move, where= -1))\
+        IPETImageButton(exportframe, "arrow-left-icon", "Move selected column left", partial(self.move, where= -1))\
         .pack(side=Tkconstants.LEFT, padx=2)
-        IpetImageButton(exportframe, "arrow-right-icon", "Move selected column to the right", partial(self.move, where= +1)).pack(side=Tkconstants.LEFT, padx=2)
+        IPETImageButton(exportframe, "arrow-right-icon", "Move selected column to the right", partial(self.move, where= +1)).pack(side=Tkconstants.LEFT, padx=2)
 
-        IpetImageButton(exportframe, "sort-ascending-icon", "Sort selected column in ascending order", self.update).pack(side=Tkconstants.LEFT, padx=2)
-        IpetImageButton(exportframe, "sort-descending-icon", "Sort selected column in descending order", self.update).pack(side=Tkconstants.LEFT, padx=2)
+        IPETImageButton(exportframe, "sort-ascending-icon", "Sort selected column in ascending order", self.update).pack(side=Tkconstants.LEFT, padx=2)
+        IPETImageButton(exportframe, "sort-descending-icon", "Sort selected column in descending order", self.update).pack(side=Tkconstants.LEFT, padx=2)
 
         self.optionsbutton = Button(exportframe, text="Show Options", command=self.showOptions)
         self.optionsbutton.pack(side=Tkconstants.RIGHT)

@@ -9,11 +9,12 @@ from PyQt4.QtGui import QFrame, QWidget, QLabel,\
 from qipet.IPetTreeView import IpetTreeView
 from qipet.EditableForm import EditableForm
 from PyQt4.QtCore import QString, Qt, SIGNAL
-from ipet.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
+from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
-from ipet import Misc
-from ipet.Aggregation import Aggregation
-from ipet.IPETFilter import IPETFilterGroup, IPETFilter, IPETInstance
+from ipet.misc import Misc
+from ipet.evaluation.Aggregation import Aggregation
+from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
+from ipet.evaluation.IPETFilter import IPETFilter
 from qipet.IpetMainWindow import IpetMainWindow
 
 class IpetEvaluationEditorApp(IpetMainWindow):
@@ -251,8 +252,8 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         self.treewidget.updateSelectedItem()
         self.redrawEditFrameContent()
         
-    def setComparator(self, comp):
-        EditableForm.extendAvailableOptions("datakey", comp.getDatakeys())
+    def setExperiment(self, experiment):
+        EditableForm.extendAvailableOptions("datakey", experiment.getDatakeys())
 
     
 if __name__ == "__main__":

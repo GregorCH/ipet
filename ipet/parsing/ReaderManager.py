@@ -1,10 +1,22 @@
-from StatisticReader import StatisticReader, ListReader
-from StatisticReader_CustomReader import CustomReader
+from ipet.parsing.StatisticReader import StatisticReader, ListReader
+from ipet.parsing.StatisticReader_CustomReader import CustomReader
 import os
 import re
-from Manager import Manager
-from ipet.IPETMessageStream import Message
+from ipet.concepts.Manager import Manager
+from ipet.gui.IPETMessageStream import Message
 import xml.etree.ElementTree as ElementTree
+from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
+    GapReader, SolvingTimeReader, TimeLimitReader, \
+    BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
+    SettingsFileReader, TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader, DateTimeReader
+from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader, ParascipDualBoundHistoryReader
+from StatisticReader_GeneralInformationReader import GeneralInformationReader
+from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
+from StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
+from StatisticReader_VariableReader import VariableReader
+from StatisticReader_SoluFileReader import SoluFileReader
+import logging
+
 
 class ReaderManager(Manager):
     """
@@ -50,6 +62,7 @@ class ReaderManager(Manager):
         """
         changes the testrun for reading to the new testrun
         """
+        logging.debug("Setting testrun to %s" % testrun.getName())
         self.testrun = testrun
         self.filestrings = testrun.filenames
         for reader in self.getManageables():
@@ -104,6 +117,34 @@ class ReaderManager(Manager):
     def registerListOfReaders(self, readers):
         for reader in readers:
             self.addAndActivate(reader)
+
+    def registerDefaultReaders(self):
+
+        self.registerListOfReaders([
+             BestSolInfeasibleReader(),
+             DateTimeReader(),
+             DualBoundReader(),
+             DualBoundHistoryReader(),
+             ErrorFileReader(),
+             ParascipDualBoundHistoryReader(),
+             GapReader(),
+             GeneralInformationReader(),
+             MaxDepthReader(),
+             LimitReachedReader(),
+             NodesReader(),
+             ObjsenseReader(),
+             PluginStatisticsReader(),
+             PrimalBoundHistoryReader(),
+             PrimalBoundReader(),
+             VariableReader(),
+             RootNodeFixingsReader(),
+             SettingsFileReader(),
+             SolvingTimeReader(),
+             SoluFileReader(),
+             TimeLimitReader(),
+             TimeToFirstReader(),
+             TimeToBestReader(),
+             ])
 
     def updateLineNumberData(self, linenumber, problemname, currentcontext, prefix):
         context2string = {StatisticReader.CONTEXT_LOGFILE:"LogFile",
@@ -207,7 +248,7 @@ class ReaderManager(Manager):
                     self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
                 else:
                     for reader in readers:
-                        reader.extractStatistic(line[1])
+                        reader.operateOnLine(line[1])
 
             else:
                 if StatisticReader.getProblemName() is not None:

@@ -10,7 +10,7 @@ from SCIPguiSelectionLabel import SCIPguiSelectionLabel
 import matplotlib
 from Tkconstants import TOP, BOTH, BOTTOM
 import numpy
-from ipet.IPETPlotWindow import IpetNavigationToolBar
+from ipet.gui.IPETPlotWindow import IpetNavigationToolBar
 matplotlib.use('TkAgg')
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg

@@ -24,10 +24,10 @@ from PyQt4.Qt import QListWidget, QString, QAbstractItemView, QFileDialog, QAppl
     QFrame, QListWidgetItem
 from PyQt4.QtCore import SIGNAL
 from ipet.TestRun import TestRun
-from ipet.integrals import getProcessPlotData, getMeanIntegral
+from ipet.misc.integrals import getProcessPlotData, getMeanIntegral
 from qipet.IpetMainWindow import IpetMainWindow
-from ipet.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
-from ipet.StatisticReader import DualBoundReader
+from ipet.parsing.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
+from ipet.parsing.StatisticReader import DualBoundReader
 from matplotlib.pyplot import cm
 import numpy
 

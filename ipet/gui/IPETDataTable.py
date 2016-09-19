@@ -13,10 +13,10 @@ import pandas as pd
 import numpy as np
 from pandas import MultiIndex
 from functools import partial
-from Editable import Editable
+from ipet.concepts import Editable
 from IpetParam import IPETParam
 from ipet.IPETPlotWindow import IPETPlotWindow
-from ipet.IPETBrowser import IPETTypeWidget
+from ipet.gui.IPETBrowser import IPETTypeWidget
 from ipet.Manager import Manager
 
 class IPETDataTableFrame(Frame):

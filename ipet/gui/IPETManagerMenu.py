@@ -4,7 +4,7 @@ Created on 28.12.2013
 @author: bzfhende
 '''
 from Tkinter import Menu, Toplevel
-from IPETBrowser import IPETBrowser
+from ipet.gui import IPETBrowser
 from Tkconstants import BOTH
 from ipet import Misc
 import tkFileDialog

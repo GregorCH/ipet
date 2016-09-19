@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
-from Editable import Editable
-import Misc
-import numpy as np
+from ipet.concepts.Editable import Editable
+from ipet.misc import Misc
 import datetime
-
+from ipet.gui.IPETMessageStream import Message, processMessage
+import logging
 
 class StatisticReader(Editable):
     '''
@@ -126,8 +126,7 @@ class StatisticReader(Editable):
 
     def extractStatistic(self, line):
         '''
-        overwrite this method for own reader subclasses - make sure that a return statement different from 'None'
-        is only accepted once on each instance of the log file
+        overwrite this method for own reader subclasses
         '''
         try:
             if self.regular_exp.search(line):
@@ -141,12 +140,10 @@ class StatisticReader(Editable):
                 except TypeError:
 #                  print self.name, " failed data conversion"
                     raise TypeError("Type error during data conversion in line <%s>"%line)
-                self.testrun.addData(self.problemname, self.datakey, data)
+                self.addData(self.datakey, data)
         except AttributeError:
 #          print self.name, " has no such attribute"
             pass
-
-        return None
 
 
     def execEndOfProb(self):
@@ -158,6 +155,10 @@ class StatisticReader(Editable):
 
     def operateOnLine(self, line):
         self.extractStatistic(line)
+
+    def addData(self, datakey, data):
+        logging.debug("Adding data; Reader %s Datakey %s, %s to prob %s" % (self.getName(), datakey, repr(data), self.problemname))
+        self.testrun.addData(self.problemname, datakey, data)
 
     def turnIntoFloat(self, astring):
         '''
@@ -187,7 +188,7 @@ class BestSolInfeasibleReader(StatisticReader):
 
     def extractStatistic(self, line):
         if self.regular_exp.search(line):
-            self.testrun.addData(self.problemname, self.datakey, True)
+            self.addData(self.datakey, True)
 
 
 class DateTimeReader(StatisticReader):
@@ -210,7 +211,7 @@ class DateTimeReader(StatisticReader):
             if matched:
                 timestamp = long(matched.groups()[0])
                 time = datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
-                self.testrun.addData(self.problemname, key, time)
+                self.addData(key, time)
                 break
 
 class DualLPTimeReader(StatisticReader):
@@ -249,7 +250,7 @@ class DualBoundReader(StatisticReader):
             try:
                 db = float(db)
                 if abs(db) != Misc.FLOAT_INFINITY:
-                    self.testrun.addData(self.problemname, self.datakey, db)
+                    self.addData(self.datakey, db)
             except ValueError:
                 pass
 #               print line
@@ -267,7 +268,7 @@ class ErrorFileReader(StatisticReader):
         match = self.regular_exp.search(line)
         if match:
             returncode = match.groups()[0]
-            self.testrun.addData(self.problemname, self.datakey, int(returncode))
+            self.addData(self.datakey, int(returncode))
 
 class SettingsFileReader(StatisticReader):
     """
@@ -332,7 +333,7 @@ class GapReader(StatisticReader):
             # if the gap is infinite, no data is passed to the test run
             if gapasword != "infinite":
                 gap = self.turnIntoFloat(gapasword)
-                self.testrun.addData(self.problemname, self.datakey, gap)
+                self.addData(self.datakey, gap)
 
 
 class LimitReachedReader(StatisticReader):
@@ -351,7 +352,7 @@ class LimitReachedReader(StatisticReader):
             if match is not None:
                 stringexpression = match.groups()[0]
                 limit = "".join((part.capitalize() for part in stringexpression.split()))
-                self.testrun.addData(self.problemname, self.datakey, limit)
+                self.addData(self.datakey, limit)
 
 class MaxDepthReader(StatisticReader):
     '''
@@ -388,7 +389,7 @@ class ObjsenseReader(StatisticReader):
             if match.groups()[0] == "maximize":
                 objsense = self.maximize
 
-            self.testrun.addData(self.problemname, self.datakey, objsense)
+            self.addData(self.datakey, objsense)
 
 class ObjlimitReader(StatisticReader):
     name = "ObjlimitReader"
@@ -421,7 +422,7 @@ class PrimalBoundReader(StatisticReader):
             if pb != '-':
                 pb = float(pb)
                 if abs(pb) != Misc.FLOAT_INFINITY:
-                    self.testrun.addData(self.problemname, self.datakey, pb)
+                    self.addData(self.datakey, pb)
 
 
 class RootNodeFixingsReader(StatisticReader):
@@ -464,7 +465,7 @@ class SolvingTimeReader(StatisticReader):
         if re.search(self.solvingtimereadkeys[StatisticReader.solvertype], line):
             solvingtime = self.getWordAtIndex(line, self.solvingtimelineindex[StatisticReader.solvertype])
             solvingtime = solvingtime[:solvingtime.find('s')]
-            self.testrun.addData(self.problemname, self.datakey, float(solvingtime))
+            self.addData(self.datakey, float(solvingtime))
 
 class TimeLimitReader(StatisticReader):
     '''
@@ -483,7 +484,7 @@ class TimeLimitReader(StatisticReader):
 
     def extractStatistic(self, line):
         if re.search(self.timelimitreadkeys[StatisticReader.solvertype], line):
-            self.testrun.addData(self.problemname, self.datakey, float(line.split()[-1]))
+            self.addData(self.datakey, float(line.split()[-1]))
 
 class TimeToBestReader(StatisticReader):
     name = 'TimeToBestReader'
@@ -495,7 +496,7 @@ class TimeToBestReader(StatisticReader):
     def extractStatistic(self, line):
         if self.regular_exp.match(line):
             try:
-                self.testrun.addData(self.problemname, self.datakey, float(self.getNumberAtIndex(line, self.lineindex)))
+                self.addData(self.datakey, float(self.getNumberAtIndex(line, self.lineindex)))
             except TypeError:
                 pass
 
@@ -510,7 +511,7 @@ class TimeToFirstReader(StatisticReader):
         if self.regular_exp.match(line):
             try:
                 timetofirst = float(self.getNumberAtIndex(line, self.lineindex))
-                self.testrun.addData(self.problemname, self.datakey, timetofirst)
+                self.addData(self.datakey, timetofirst)
 
             except TypeError:
                 pass
@@ -539,7 +540,7 @@ class ListReader(StatisticReader):
                 val = int(strval)
             except ValueError:
                 val = float(strval)
-            self.testrun.addData(self.problemname, datakey, val)
+            self.addData(datakey, val)
 
 
     def getEditableAttributes(self):

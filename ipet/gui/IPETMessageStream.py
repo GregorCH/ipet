@@ -14,7 +14,8 @@ class Message:
     MESSAGETYPE_WARNING = 1
     MESSAGETYPE_ERROR = 2
     MESSAGETYPE_INFO = 3
-    messagetypes = {MESSAGETYPE_WARNING, MESSAGETYPE_INFO, MESSAGETYPE_ERROR}
+    MESSAGETYPE_DEBUG = 4
+    messagetypes = {MESSAGETYPE_WARNING, MESSAGETYPE_INFO, MESSAGETYPE_ERROR, MESSAGETYPE_DEBUG}
 
     def __init__(self, stringmessage, messagetype):
         '''
@@ -54,7 +55,6 @@ class InfoMessage(Message):
 class WarningMessage(Message):
     '''
     subclass of message to represent warning messages
-    
     '''
     def __init__(self, stringmessage):
         '''
@@ -62,9 +62,20 @@ class WarningMessage(Message):
         '''
         Message.__init__(self, stringmessage, Message.MESSAGETYPE_WARNING)
 
+class DebugMessage(Message):
+    '''
+    subclass of message to represent warning messages
+    '''
+    def __init__(self, stringmessage):
+        '''
+        constructs a debug message
+        '''
+        Message.__init__(self, stringmessage, Message.MESSAGETYPE_DEBUG)
+
 streams = {Message.MESSAGETYPE_ERROR:sys.stderr,
            Message.MESSAGETYPE_INFO:sys.stdout,
-           Message.MESSAGETYPE_WARNING:sys.stderr}
+           Message.MESSAGETYPE_WARNING:sys.stderr,
+           Message.MESSAGETYPE_DEBUG:None}
 
 def processMessage(message):
     '''
@@ -73,10 +84,17 @@ def processMessage(message):
     :param message:Message object
     '''
     stream = streams.get(message.messagetype, sys.stdout)
-    stream.write(str(message))
+    if stream:
+        stream.write(str(message))
+
+def enableDebugMessages(stream = sys.stdout):
+    setStream(Message.MESSAGETYPE_DEBUG, stream)
+
+def disableDebugMessages():
+    setStream(Message.MESSAGETYPE_DEBUG, None)
 
 def setStream(messagetype, stream):
-    if not hasattr(stream, 'write') or not callable(getattr(stream, 'write')):
+    if stream is not None and (not hasattr(stream, 'write') or not callable(getattr(stream, 'write'))):
         raise ValueError(ErrorMessage("stream object has no 'write'-method"))
     streams[messagetype] = stream
 
@@ -85,10 +103,15 @@ if __name__ == '__main__':
     # create some messages and print them
     message1 = Message("Hello Info\n", Message.MESSAGETYPE_INFO)
     message2 = ErrorMessage("Hello Error\n")
+    message3 = DebugMessage("DebugMessage\n")
     map(processMessage, [message1, message2])
-
+    processMessage(message3)
     setStream(Message.MESSAGETYPE_ERROR, sys.stdout)
     setStream(Message.MESSAGETYPE_INFO, sys.stderr)
+
+    enableDebugMessages()
+    disableDebugMessages()
+    processMessage(message3)
 
     map(processMessage, [message1, message2])
 

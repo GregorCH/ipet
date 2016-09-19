@@ -8,9 +8,9 @@ from matplotlib.figure import Figure
 from matplotlib import markers
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 import Tkconstants
-from ipet.IpetParam import IPETParam, IPETColorParam
+from ipet.gui.IPETParam import IPETParam, IPETColorParam
 from ipet.Manager import Manager
-from IPETBrowser import IPETTypeWidget
+from ipet.gui.IPETBrowser import IPETTypeWidget
 from tkColorChooser import askcolor
 from ttk import Frame, Notebook, LabelFrame, OptionMenu, Entry
 from functools import partial

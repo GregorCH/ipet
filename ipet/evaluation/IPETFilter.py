@@ -3,11 +3,11 @@ Created on 16.12.2013
 
 @author: bzfhende
 '''
-from Editable import Editable
+from ipet.concepts.Editable import Editable
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 import pandas as pd
-from ipet.IpetNode import IpetNode
+from ipet.concepts.IPETNode import IpetNode
 
 class IPETInstance(IpetNode, Editable):
     nodetag = "Instance"

@@ -1,6 +1,6 @@
 from StatisticReader import StatisticReader
 import re
-import Misc
+from ipet.misc import Misc
 
 class DualBoundHistoryReader(StatisticReader):
     '''

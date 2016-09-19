@@ -5,7 +5,7 @@ Created on 07.03.2013
 '''
 from Tkinter import Frame, StringVar, Radiobutton, Label, Scrollbar, Menu
 from Tkconstants import LEFT, RIGHT, END, W, GROOVE, SUNKEN, VERTICAL
-from SCIPguiSelectionLabel import SCIPguiSelectionLabel
+from ipet import IPETSelectionLabel
 
 class TableEntry(Frame):
    '''
@@ -22,7 +22,7 @@ class TableEntry(Frame):
       self.v = StringVar()
       self.v.set(key)
 
-      self.selectionlabel=SCIPguiSelectionLabel(self, gui.getAllDatakeys, self.v, self.query, width=30)
+      self.selectionlabel=IPETSelectionLabel(self, gui.getAllDatakeys, self.v, self.query, width=30)
       self.selectionlabel.pack()
       self.gui = gui
 

@@ -7,7 +7,7 @@ The PbHistoryWidget features methods to visualize the history of primal and dual
 Testruns can be activated/dectivated. The normalization can be chosen (no normalization (values on the real primal
 and dual scale) or Cplex Gap)
 '''
-from IpetWidget import IpetWidget
+from ipet.gui import IPETWidget
 from Tkinter import IntVar, Checkbutton, Toplevel, Button, StringVar
 from Tkconstants import LEFT, BOTH, TOP, VERTICAL, HORIZONTAL
 import matplotlib
@@ -18,17 +18,17 @@ import numpy
 from matplotlib.pyplot import cm
 import matplotlib.pylab as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-import Misc
+from ipet import Misc
 from ttk import Panedwindow, LabelFrame, Treeview, Frame, OptionMenu, Label
 import Tkconstants
-from IpetParam import IPETParam
+from ipet.gui.IPETParam import IPETParam
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from StatisticReader import PrimalBoundReader, DualBoundReader
-from IPETBrowser import IPETTypeWidget
-from Manager import Manager
-from IPETPlotWindow import IPETPlotFrame
+from ipet.gui.IPETBrowser import IPETTypeWidget
+from ipet.concepts import Manager
+from ipet.gui.IPETPlotWindow import IPETPlotFrame
 
-class SCIPguiPbHistoryWidget(IpetWidget):
+class SCIPguiPbHistoryWidget(IPETWidget):
 
     '''
     classdocs
@@ -48,7 +48,7 @@ class SCIPguiPbHistoryWidget(IpetWidget):
         - master is the Tk container frame for the widget
         - gui is the central gui instance to retrieve data and events from
         '''
-        IpetWidget.__init__(self, master, gui, **kw)
+        IPETWidget.__init__(self, master, gui, **kw)
         
         self.boolVars = {}
         self.buttons = {}

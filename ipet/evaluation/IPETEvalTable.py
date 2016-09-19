@@ -4,13 +4,13 @@ Created on 24.02.2015
 @author: Gregor Hendel
 '''
 import pandas as pd
-from Aggregation import Aggregation
+from ipet.evaluation.Aggregation import Aggregation
 import xml.etree.ElementTree as ElementTree
-from ipet.IPETFilter import IPETFilterGroup
+from IPETFilter import IPETFilterGroup
 import numpy
-from ipet.Editable import Editable
-from ipet.IpetNode import IpetNode
-from ipet import Misc
+from ipet.concepts.Editable import Editable
+from ipet.concepts.IPETNode import IpetNode
+from ipet.misc import Misc
 
 class IPETEvaluationColumn(Editable, IpetNode):
 

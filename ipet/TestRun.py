@@ -1,11 +1,7 @@
-import Misc
-from StatisticReader import SolvingTimeReader, TimeLimitReader, PrimalBoundReader, TimeToBestReader, DualBoundReader, \
-   BestSolInfeasibleReader
-
-from Editable import Editable
+from ipet.misc import Misc
+from ipet.concepts.Editable import Editable
 from pandas import DataFrame, notnull
 import os
-from Tix import ROW
 try:
     import cPickle as pickle
 except:

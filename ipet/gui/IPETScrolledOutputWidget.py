@@ -6,7 +6,7 @@ Created on 12.03.2013
 from Tkinter import Frame, IntVar, Checkbutton, Button
 from ScrolledText import ScrolledText
 from Tkconstants import END, BOTH, LEFT, SEL_FIRST, SEL_LAST, CURRENT, SEL, RIGHT, Y
-from IpetReaderWizard import IpetReaderWizard
+from ipet.gui import IPETReaderWizard
 
 class ScrolledOutputWidget(Frame):
     '''
@@ -147,6 +147,6 @@ class ScrolledOutputWidget(Frame):
         else:
             tagname = "@01"
         line = self.scrolledText.get("%d.%d" % (lineidx, colidx), "%d.end" % lineidx)
-        window = IpetReaderWizard(line, colstartidx - 1, self.gui, tagname)
+        window = IPETReaderWizard(line, colstartidx - 1, self.gui, tagname)
 
         window.mainloop()

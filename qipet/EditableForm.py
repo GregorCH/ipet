@@ -22,7 +22,7 @@ class EditableForm(QWidget):
     
     @staticmethod
     def extendAvailableOptions(key, moreoptions):
-        currentoptionsforkey = EditableForm.availableOptions.get(key, [])
+        currentoptionsforkey = EditableForm.availableOptions.get(key, [None, ])
         EditableForm.availableOptions[key] = sorted(currentoptionsforkey + moreoptions)
         
     def __init__(self, editable, parent=None):

@@ -144,6 +144,8 @@ class IPETEvaluationColumn(Editable, IpetNode):
             return self.name
         elif self.origcolname is not None:
             return self.origcolname
+        elif self.regex is not None:
+            return self.regex
         elif self.constant is not None:
             return "Const_%s"%self.constant
         else:

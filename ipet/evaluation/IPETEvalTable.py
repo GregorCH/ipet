@@ -23,6 +23,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
                                "abs":(1,1),
                                "getGap":(2, 2),
                                "getCplexGap":(2, 2),
+                               "getVariabilityScore":(1, -1),
                                "prod":(1,-1),
                                "sum":(1,-1),
                                "subtract":(2,2), 

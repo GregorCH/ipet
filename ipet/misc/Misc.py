@@ -2,7 +2,7 @@
 from math import *
 from xml.dom.minidom import parseString
 import xml.etree.ElementTree as ElementTree
-
+import numpy as np
 '''
    Various methods for evaluation such as gap calculation, geometric means etc. and some printing methods
 '''
@@ -99,6 +99,12 @@ def listGetShiftedGeometricMean(listofnumbers, shiftby=10.0):
         geommean = pow(geommean, (nitems - 1)/float(nitems)) * pow(nextnumber, 1 / float(nitems))
     return geommean - shiftby
 
+def getVariabilityScore(listofnumbers):
+    if len(listofnumbers) == 0:
+        return 0.0
+    arrayofnumbers = np.array(listofnumbers)
+
+    return np.sqrt(np.sum((arrayofnumbers - arrayofnumbers.mean()) ** 2)) / arrayofnumbers.sum()
 
 def cutString(string, char = '_', maxlength = -1):
     iscuttable = True

@@ -198,4 +198,4 @@ class PrimalBoundHistoryReader(StatisticReader):
         PrimalBoundHistoryReader.totalnumberofsols += len(theList)
         # print " solutions added:", PrimalBoundHistoryReader.totalnumberofsols
         #print self.problemname, theList
-        self.testrun.addData(self.problemname, self.datakey, theList)
+        self.addData(self.datakey, theList)

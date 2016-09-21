@@ -83,7 +83,7 @@ class DualBoundHistoryReader(StatisticReader):
         if self.dualboundlist != []:
             
             #only copy nonempty lists, otherwise Parascipdualboundhistoryreader and this one will overwrite each others data
-            self.testrun.addData(self.problemname, self.datakey, self.dualboundlist[:])
+            self.addData(self.datakey, self.dualboundlist[:])
         
         self.reset()
         

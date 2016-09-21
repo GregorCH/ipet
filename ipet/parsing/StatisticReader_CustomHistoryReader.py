@@ -92,5 +92,5 @@ class CustomHistoryReader(StatisticReader):
       '''
       copies the aquired list of value tuples into testrun data
       '''
-      self.testrun.addData(self.problemname, self.datakey, self.valuehistory[:])
+      self.addData(self.datakey, self.valuehistory[:])
       self.reset()

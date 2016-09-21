@@ -93,7 +93,7 @@ class PluginStatisticsReader(StatisticReader):
          # determine minimum length (necessary if more headers were recognized than actual available data)
          minlen = min(len(datakeys), len(data))
 
-         self.testrun.addData(StatisticReader.problemname, datakeys[:minlen], data[:minlen])
+         self.addData(datakeys[:minlen], data[:minlen])
 
    def execEndOfProb(self):
       self.active = False

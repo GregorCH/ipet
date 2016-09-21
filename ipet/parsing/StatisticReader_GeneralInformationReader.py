@@ -34,24 +34,24 @@ class GeneralInformationReader(StatisticReader):
             return
 
         if re.search(self.versionkeys[StatisticReader.solvertype], line):
-            self.testrun.addData(self.problemname, 'Solver', StatisticReader.solvertype)
+            self.addData('Solver', StatisticReader.solvertype)
 
             if StatisticReader.solvertype == StatisticReader.SOLVERTYPE_SCIP:
                 self.__handleVersion(line)
             else:
-                self.testrun.addData(self.problemname, 'Version', line.split()[self.versionlineindices[StatisticReader.solvertype]])
+                self.addData('Version', line.split()[self.versionlineindices[StatisticReader.solvertype]])
         elif  StatisticReader.solvertype == StatisticReader.SOLVERTYPE_SCIP:
             if line.startswith('loaded parameter file'):
 #               loaded parameter file </nfs/optimi/kombadon/bzfhende/projects/scip-git/check/../settings/testmode.set>
                 absolutesettingspath = line[len('loaded parameter file '):].strip('<>')
-                self.testrun.addData(self.problemname, 'AbsolutePathSettings', absolutesettingspath)
+                self.addData('AbsolutePathSettings', absolutesettingspath)
                 settings = os.path.basename(absolutesettingspath)
                 settings = os.path.splitext(settings)[0]
 
 
         elif StatisticReader.solvertype == StatisticReader.SOLVERTYPE_CPLEX:
             if "CPLEX> Non-default parameters written to file" in line:
-                self.testrun.addData(self.problemname, 'Settings', line.split('.')[-3])
+                self.addData('Settings', line.split('.')[-3])
 
     def __handleVersion(self, line):
         '''
@@ -60,10 +60,10 @@ class GeneralInformationReader(StatisticReader):
         SCIP version 3.1.0.1 [precision: 8 byte] [memory: block] [mode: debug] [LP solver: SoPlex 2.0.0.1] [GitHash: 825e268-dirty]
         '''
         version = line.split()[2]
-        self.testrun.addData(self.problemname, 'Version', version)
+        self.addData('Version', version)
         for keyword in ["mode", "LP solver", 'GitHash']:
             data = re.search(r"\[%s: ([\w .-]+)\]" % keyword, line)
             if data:
-                self.testrun.addData(self.problemname, keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
+                self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
 
 

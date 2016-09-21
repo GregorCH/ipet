@@ -18,12 +18,12 @@ class VariableReader(StatisticReader):
         elif self.problemtype and self.varexp.match(line):
             nvariables = map(int, self.numericExpression.findall(line))
             datakeys = ["%s_%s"%(self.problemtype,key) for key in self.datakeys]
-            self.testrun.addData(StatisticReader.problemname, datakeys, nvariables)
+            self.addData(datakeys, nvariables)
         elif self.problemtype and self.consexp.match(line):
             nconns = map(int, self.numericExpression.findall(line))
 
             datakeys = ["%s_%s"%(self.problemtype,key) for key in ["InitialNCons", "MaxNCons"]]
-            self.testrun.addData(StatisticReader.problemname, datakeys, nconns)
+            self.addData(datakeys, nconns)
             self.problemtype = None
             
         return None

@@ -60,16 +60,16 @@ class CustomReader(StatisticReader):
 
                 if self.method == CustomReader.METHOD_FIRST:
                     if previousdata is None:
-                        self.testrun.addData(self.problemname, self.datakey, data)
+                        self.addData(self.datakey, data)
 
                 elif self.method == CustomReader.METHOD_LAST:
-                    self.testrun.addData(self.problemname, self.datakey, data)
+                    self.addData(self.datakey, data)
 
                 elif self.method == CustomReader.METHOD_SUM:
                     if previousdata is None:
                         previousdata = 0
 
-                    self.testrun.addData(self.problemname, self.datakey, data + previousdata)
+                    self.addData(self.datakey, data + previousdata)
 
 
 

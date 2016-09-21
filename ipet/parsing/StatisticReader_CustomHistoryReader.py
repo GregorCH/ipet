@@ -1,7 +1,7 @@
 from StatisticReader import StatisticReader
 import re
 from StatisticReader_CustomReader import CustomReader
-from ipet.misc import Misc
+from ipet.misc import misc
 import numpy as np
 
 class CustomHistoryReader(StatisticReader):

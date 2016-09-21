@@ -4,17 +4,17 @@ Created on 30.12.2013
 @author: bzfhende
 '''
 import numpy
-from ipet.misc import Misc
-from ipet.concepts.Editable import Editable
+from ipet.misc import misc
+from ipet.concepts import Editable
 from xml.etree import ElementTree
 from _functools import partial
 from ipet.misc.quick_Pandas import getWilcoxonQuotientSignificance as qWilcox
-from ipet.concepts.IPETNode import IpetNode
+from ipet.concepts import IpetNode
 
 class Aggregation(Editable, IpetNode):
     '''
     aggregates a list of values into a single value, as, e.g., a mean. Allows functions from numpy and
-    from Misc-module
+    from misc-module
     '''
     nodetag = "Aggregation"
     possibleaggregations = [None, 'shmean', 'gemean', 'min', 'max', 'mean', 'size', 'std', 'sum', 'median']
@@ -81,7 +81,7 @@ class Aggregation(Editable, IpetNode):
         try:
             self.aggrfunc = getattr(numpy, aggregation)
         except AttributeError:
-            self.aggrfunc = getattr(Misc, aggregation)
+            self.aggrfunc = getattr(misc, aggregation)
             
         attrlist = self.agg2keywords.get(aggregation)
         if attrlist:

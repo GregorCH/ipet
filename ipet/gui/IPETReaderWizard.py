@@ -5,11 +5,10 @@ Created on 27.03.2013
 '''
 from Tkinter import Toplevel, Label, Entry, StringVar, Button, Frame
 from Tkconstants import LEFT, RIGHT, TOP
-from StatisticReader_CustomReader import CustomReader
+from ipet.parsing import CustomReader
 import Tkconstants
-from ipet.StatisticReader import StatisticReader
-from ipet.ReaderManager import ReaderManager
-from ipet.IpetToolTip import createToolTip
+from ipet.parsing import StatisticReader
+from IPETToolTip import createToolTip
 class IpetReaderWizard(Toplevel):
     '''
     form to create a new Reader through the user interface

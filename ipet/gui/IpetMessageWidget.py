@@ -3,10 +3,10 @@ Created on 08.08.2014
 
 @author: Customer
 '''
-from IpetWidget import IpetWidget
+from IPETWidget import IpetWidget
 from ScrolledText import ScrolledText
 import Tkconstants
-import sys
+
 class IpetMessageWidget(IpetWidget):
     '''
     prints all messages during the process of collecting data

@@ -11,7 +11,7 @@ from qipet.EditableForm import EditableForm
 from PyQt4.QtCore import QString, Qt, SIGNAL
 from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
-from ipet.misc import Misc
+from ipet.misc import misc
 from ipet.evaluation.Aggregation import Aggregation
 from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
 from ipet.evaluation.IPETFilter import IPETFilter
@@ -199,7 +199,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         if not filename:
             return
         
-        Misc.saveAsXML(self.evaluation, filename)
+        misc.saveAsXML(self.evaluation, filename)
         self.filename = filename
         self.updateStatus("Saved evaluation to file %s"%filename)
         
@@ -210,7 +210,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         if not filename:
             return
         
-        Misc.saveAsXML(self.evaluation, filename)
+        misc.saveAsXML(self.evaluation, filename)
         self.filename = filename
         self.updateStatus("Saved evaluation to file %s"%filename)
         

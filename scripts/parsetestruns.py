@@ -4,9 +4,9 @@ Created on 24.02.2015
 @author: bzfhende
 '''
 
-from ipet.Experiment import Experiment
-from ipet.parsing.ReaderManager import ReaderManager
-from ipet.TestRun import TestRun
+from ipet import Experiment
+from ipet.parsing import ReaderManager
+from ipet import TestRun
 import argparse
 import sys
 import os
@@ -16,8 +16,8 @@ import logging
 # possible arguments in the form name,default,short,description #
 clarguments = []
 
-argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
-                                 description="starts the IPET graphical user interface")
+argparser = argparse.ArgumentParser(prog = "Ipet Parsing script", \
+                                 description = "parses test run log files and saves parsed data")
 for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 

@@ -3,10 +3,10 @@ Created on 30.04.2013
 
 @author: bzfhende
 '''
-from IpetWidget import IpetWidget
-from Tkconstants import Y, RIGHT, TOP
+from IPETWidget import IpetWidget
+from Tkconstants import TOP
 import Tkconstants
-from ScrolledOutputWidget import ScrolledOutputWidget
+from IPETScrolledOutputWidget import ScrolledOutputWidget
 from ttk import Frame, OptionMenu, Label
 from Tkinter import StringVar
 

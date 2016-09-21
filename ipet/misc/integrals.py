@@ -6,7 +6,7 @@ this module features methods that facilitate the handling of integrals for vario
 @author: bzfhende
 '''
 import numpy as np
-import Misc
+from ipet.misc import misc
 import numpy
 
 DEFAULT_HISTORYTOUSE = 'PrimalBoundHistory'
@@ -72,7 +72,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
         try:
             lastbound = history[-1][1]
         except:
-            lastbound = Misc.FLOAT_INFINITY
+            lastbound = misc.FLOAT_INFINITY
         
     if len(history) > 0:
         x, y = zip(*history)
@@ -84,7 +84,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
         
     if normalize:
         x.insert(0, 0.0)
-        y.insert(0, Misc.FLOAT_INFINITY)
+        y.insert(0, misc.FLOAT_INFINITY)
         
     if xaftersolve is not None and lastbound is not None:
         x.append(xaftersolve)
@@ -92,7 +92,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
          
     # depending on the normalization parameter, the normfunction used is either the CPlex gap, or the identity  
     if normalize:
-        normfunction = lambda z : min(cutoffgap, Misc.getGap(z, optimum, True))
+        normfunction = lambda z : min(cutoffgap, misc.getGap(z, optimum, True))
     else:
         normfunction = lambda z : z
         

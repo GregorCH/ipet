@@ -7,11 +7,10 @@ from ttk import Treeview, Frame, Panedwindow, Labelframe, Checkbutton, LabelFram
     OptionMenu
 from Tkconstants import VERTICAL, BOTH, TRUE, END, HORIZONTAL, LEFT, TOP
 from ScrolledText import ScrolledText
-from Manager import Manager
+from ipet.concepts import Manager
 from Tkinter import Tk, IntVar, StringVar
-from Comparator import Comparator
+from ipet import Experiment
 import Tkconstants
-import tkFont
 from numpy import float16, float32, float64
 
 class IPETTreeview(Frame):
@@ -268,7 +267,7 @@ class IPETBrowser(Frame):
 # testing method
 if __name__ == '__main__':
     root = Tk()
-    comp = Comparator()
+    comp = Experiment()
     manager = Manager(listofmanageables=comp.datacollector.listofreaders)
     browser = IPETBrowser(root, manager, height=root.winfo_screenheight(), width=root.winfo_screenwidth())
     browser.pack(expand=TRUE, fill=Tkconstants.BOTH)

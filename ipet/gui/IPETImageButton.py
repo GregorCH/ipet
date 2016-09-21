@@ -9,8 +9,7 @@ try:
 except:
     import PIL
     from PIL.ImageTk import PhotoImage
-from ipet.IpetToolTip import createToolTip
-import sys
+from IPETToolTip import createToolTip
 import os
 
 class IpetImageButton(Button):
@@ -27,7 +26,7 @@ class IpetImageButton(Button):
 
     @staticmethod
     def createImageLib():
-        iconpath = os.path.join(os.path.dirname(__file__), os.path.pardir, "images")
+        iconpath = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, "images")
         IpetImageButton.iconlib = il = {}
         print iconpath
         for image in os.listdir(iconpath):

@@ -4,13 +4,13 @@ Created on 24.02.2015
 @author: Gregor Hendel
 '''
 import pandas as pd
-from ipet.evaluation.Aggregation import Aggregation
+from ipet.evaluation import Aggregation
 import xml.etree.ElementTree as ElementTree
 from IPETFilter import IPETFilterGroup
 import numpy
 from ipet.concepts.Editable import Editable
 from ipet.concepts.IPETNode import IpetNode
-from ipet.misc import Misc
+from ipet.misc import misc
 
 class IPETEvaluationColumn(Editable, IpetNode):
 
@@ -285,7 +285,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
             try:
                 transformfunc = getattr(numpy, self.transformfunc)
             except AttributeError:
-                transformfunc = getattr(Misc, self.transformfunc)
+                transformfunc = getattr(misc, self.transformfunc)
 
             # concatenate the children data into a new data frame object
             argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)

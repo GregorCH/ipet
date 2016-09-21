@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<!-- this reader file defines a reader that should read the depth of the first solution that was found.
+    the line to be parsed looks like this:
+    
+    First Solution   : +3.29530000000000e+04   (in run 1, after 1 nodes, 0.38 seconds, depth 9363, found by <shiftandpropagate>)
+    (index)
+    1.) We specify the data key under which the parsed data should be stored for every instance in the test run.
+    2.) The data type should be 'int' or 'float'
+    3.) the index is the zero-based index of this number in the parsed line, i.e. 4 in the case of the depth.
+    
+    First Solution   : +3.29530000000000e+04   (in run 1, after 1 nodes, 0.38 seconds, depth 9363, found by <shiftandpropagate>)
+    (index)            0                               1        2        3                   4
+    
+    4.) The reader has to have a meaningful name. If omitted, the data key is taken and extended by "Reader".
+    5.) The regpattern should be a part of the line to recognize matches. Regular expressions can be used.
+    6.) The method determines how multiple matches within one instance output should be treated. Either take the 'first' or 'last', 
+        or use 'sum' to sum up the numbers.
+    -->
+<Readers>
+    <CustomReader datakey="FirstSolDepth" datatype="int" index="4" name="FirstSolDepthReader" regpattern="^  First Solution   :" method="last"/>
+</Readers>

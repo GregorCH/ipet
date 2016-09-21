@@ -7,28 +7,24 @@ The PbHistoryWidget features methods to visualize the history of primal and dual
 Testruns can be activated/dectivated. The normalization can be chosen (no normalization (values on the real primal
 and dual scale) or Cplex Gap)
 '''
-from ipet.gui import IPETWidget
+from IPETWidget import IpetWidget
 from Tkinter import IntVar, Checkbutton, Toplevel, Button, StringVar
-from Tkconstants import LEFT, BOTH, TOP, VERTICAL, HORIZONTAL
+from Tkconstants import BOTH, TOP, HORIZONTAL
 import matplotlib
 matplotlib.use('TkAgg')
-from matplotlib.figure import Figure
-from StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
 import numpy
 from matplotlib.pyplot import cm
 import matplotlib.pylab as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-from ipet import Misc
+from ipet import misc
 from ttk import Panedwindow, LabelFrame, Treeview, Frame, OptionMenu, Label
 import Tkconstants
-from ipet.gui.IPETParam import IPETParam
-from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
-from StatisticReader import PrimalBoundReader, DualBoundReader
-from ipet.gui.IPETBrowser import IPETTypeWidget
+from IPETParam import IPETParam
+from ipet.parsing import PrimalBoundHistoryReader, DualBoundHistoryReader, PrimalBoundReader, DualBoundReader
+from IPETBrowser import IPETTypeWidget
 from ipet.concepts import Manager
-from ipet.gui.IPETPlotWindow import IPETPlotFrame
+from IPETPlotWindow import IPETPlotFrame
 
-class SCIPguiPbHistoryWidget(IPETWidget):
+class IPETBoundHistoryWidget(IpetWidget):
 
     '''
     classdocs
@@ -48,7 +44,7 @@ class SCIPguiPbHistoryWidget(IPETWidget):
         - master is the Tk container frame for the widget
         - gui is the central gui instance to retrieve data and events from
         '''
-        IPETWidget.__init__(self, master, gui, **kw)
+        IpetWidget.__init__(self, master, gui, **kw)
         
         self.boolVars = {}
         self.buttons = {}
@@ -142,14 +138,14 @@ class SCIPguiPbHistoryWidget(IPETWidget):
             history.append((solvingtime, testrun.problemGetData(probname, lastdatakey)))
         
         if normalize:
-            history.insert(0, (0.0, Misc.FLOAT_INFINITY))
+            history.insert(0, (0.0, misc.FLOAT_INFINITY))
         
         thelist = map(list, zip(*history))
         x = numpy.array(thelist[0])
         
         # depending on the normalization parameter, the normfunction used is either the CPlex gap, or the identity
         if normalize:
-            normfunction = lambda x : min(100.0, Misc.getGap(x, optsol, True))
+            normfunction = lambda x : min(100.0, misc.getGap(x, optsol, True))
         else:
             normfunction = lambda x : x
         y = numpy.array(map(normfunction, thelist[1]))

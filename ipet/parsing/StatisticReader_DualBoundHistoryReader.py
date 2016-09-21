@@ -1,6 +1,6 @@
 from StatisticReader import StatisticReader
 import re
-from ipet.misc import Misc
+from ipet.misc import misc
 
 class DualBoundHistoryReader(StatisticReader):
     '''
@@ -25,7 +25,7 @@ class DualBoundHistoryReader(StatisticReader):
         reset all attributes to default values for a new problem
         '''
         self.dualboundlist = []
-        self.lastdb = Misc.FLOAT_INFINITY
+        self.lastdb = misc.FLOAT_INFINITY
         self.lasttime = -1
 
     def extractStatistic(self, line):

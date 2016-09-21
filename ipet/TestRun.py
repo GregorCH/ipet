@@ -1,5 +1,5 @@
-from ipet.misc import Misc
-from ipet.concepts.Editable import Editable
+import ipet.misc as misc
+from ipet.concepts import Editable
 from pandas import DataFrame, notnull
 import os
 try:
@@ -251,7 +251,7 @@ class TestRun(Editable):
         '''
         returns a short identification which only includes the settings of this test run
         '''
-        return Misc.cutString(self.getSettings(), char, maxlength)
+        return misc.cutString(self.getSettings(), char, maxlength)
 
 
     def problemGetOptimalSolution(self, solufileprobname):

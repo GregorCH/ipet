@@ -4,30 +4,30 @@ Created on 06.03.2013
 @author: bzfhende
 '''
 from Tkinter import Tk, Listbox, Menu
-from Comparator import Comparator
+from ipet import Experiment
 # from IpetScatterWidget import IpetScatterWidget
 from Tkconstants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END, BOTTOM
-# from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
-from IpetTableWidget import IpetTableWidget
-from TestRun import TestRun
+# from IPETBoundHistoryWidget import IPETBoundHistoryWidget
+from IPETTableWidget import IpetTableWidget
+from ipet import TestRun
 import ttk
-from IpetOutputWidget import IpetOutputWidget
+from IPETOutputWidget import IpetOutputWidget
 import tkFileDialog
 from IPETManagerMenu import IPETManagerMenu
 from ttk import Frame, Label, Button, Scrollbar, Separator
 import Tkconstants
-from SCIPguiPbHistoryWidget import SCIPguiPbHistoryWidget
+from IPETBoundHistoryWidget import IPETBoundHistoryWidget
 from IpetMessageWidget import IpetMessageWidget
-from IpetScatterWidget import IpetScatterWidget
-from ipet.IpetProgressWindow import IpetProgressStatus
-from ipet.IpetImageButton import IpetImageButton
+from IPETScatterWidget import IpetScatterWidget
+from IPETProgressStatus import IpetProgressStatus
+from IPETImageButton import IpetImageButton
 
 class IpetApplication(Tk):
     DEFAULT_BORDERWIDTH = 15
 
     selected_problem = ''
     selected_testrun = None
-    comparator = None
+    experiment = None
 
     listboxlistmap = {}
     listToActionDict = {}
@@ -37,10 +37,10 @@ class IpetApplication(Tk):
 
 
 
-    def __init__(self, comparator=None, show=True):
+    def __init__(self, experiment = None, show = True):
         '''
-        initializes a IpetApplication. Pass an existing comparator or None to make the GUI create a new, empty
-        comparator instance
+        initializes a IpetApplication. Pass an existing experiment or None to make the GUI create a new, empty
+        experiment instance
         '''
         Tk.__init__(self)
         self.wm_title(IpetApplication.TITLE)
@@ -78,7 +78,7 @@ class IpetApplication(Tk):
 #        recollectDataButton.pack(side=TOP)
 
         # make the remaining window show a tabbed panel with the different widgets
-        widgets = [IpetTableWidget, IpetOutputWidget, IpetMessageWidget, IpetScatterWidget, SCIPguiPbHistoryWidget]
+        widgets = [IpetTableWidget, IpetOutputWidget, IpetMessageWidget, IpetScatterWidget, IPETBoundHistoryWidget]
         tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:
@@ -88,7 +88,7 @@ class IpetApplication(Tk):
         self.progressstatus = IpetProgressStatus(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight() / 12)
         self.progressstatus.pack(side=BOTTOM, fill=Tkconstants.X)
         tabbedFrame.pack(side=BOTTOM, fill=BOTH, expand=1)
-        self.setComparator(comparator)
+        self.setExperiment(experiment)
 
         self.setupMenu()
 
@@ -100,12 +100,12 @@ class IpetApplication(Tk):
     def createNavBar(self):
         navbar = Frame(self, width=self.winfo_screenwidth(), height=16)
         buttons = (
-                   ("edit-new-document-icon", "Create new comparator", self.resetComparator),
-                   ("Load-icon", "Load Comparator from .cmp file", self.loadComparator),
-                   ("disk-icon", "Save Comparator to .cmp format", self.saveComparator),
+                   ("edit-new-document-icon", "Create new experiment", self.resetExperiment),
+                   ("Load-icon", "Load Experiment from .cmp file", self.loadExperiment),
+                   ("disk-icon", "Save Experiment to .cmp format", self.saveExperiment),
                    None,
-                   ("document-add-icon", "Add log file(s) to current comparator", self.addLogFiles),
-                   ("coin-add-icon", "Add solution file(s) to current comparator", self.addSolufiles),
+                   ("document-add-icon", "Add log file(s) to current experiment", self.addLogFiles),
+                   ("coin-add-icon", "Add solution file(s) to current experiment", self.addSolufiles),
                    None,
                    ("reload-icon", "Collect data", self.reCollectData)
                    )
@@ -194,10 +194,10 @@ class IpetApplication(Tk):
 
     def getAllDatakeys(self):
         '''
-        get all data keys (i.e., column names) of the data of this comparator
+        get all data keys (i.e., column names) of the data of this experiment
         '''
         try:
-            return self.comparator.getDatakeys()
+            return self.experiment.getDatakeys()
         except:
             return []
 
@@ -209,16 +209,16 @@ class IpetApplication(Tk):
         all optionally filtered problem instances as a list
 
         returns the list of problem instances which may have been filtered first through the list of active
-        comparator filters
+        experiment filters
 
-        :param onlyfiltered: set to :code:`True` for filtering problems through the set of active filters of the comparator instance
+        :param onlyfiltered: set to :code:`True` for filtering problems through the set of active filters of the experiment instance
 
         :return: all optionally filtered problem instances as a list
         '''
         try:
-            probnamelist = self.comparator.probnamelist
+            probnamelist = self.experiment.probnamelist
             if onlyfiltered:
-                filters = self.comparator.getManager('filter').getManageables(onlyactive=True)
+                filters = self.experiment.getManager('filter').getManageables(onlyactive = True)
                 testruns = self.getTestrunList(onlyactive=True)
                 for filterelem in filters:
                     probnamelist = filterelem.getFilteredList(probnamelist, testruns)
@@ -231,31 +231,31 @@ class IpetApplication(Tk):
         returns the list of testruns instances as list
 
         :param onlyactive: set to :code:`False` to get all instead of only the currently active test runs. The testrun manager
-        of the comparator object decides if testruns are active
+        of the experiment object decides if testruns are active
         '''
         try:
-            return self.comparator.getManager('testrun').getManageables(onlyactive)
+            return self.experiment.getManager('testrun').getManageables(onlyactive)
         except AttributeError:
             return []
 
     def addReader(self, reader):
         '''
-        adds a reader to the comparator object
+        adds a reader to the experiment object
 
         :param reader: an instance of :ipet:`StatisticReader`
         '''
-        self.comparator.addReader(reader)
+        self.experiment.addReader(reader)
 
     def reCollectData(self):
         '''
         invokes data recollection and an update of the GUI
         '''
 #        progress.setUpdateStep(1 / float(len(self.getTestrunList(False))))
-        rm = self.comparator.getManager('reader')
+        rm = self.experiment.getManager('reader')
         rm.addObserver(self.progressstatus)
         self.progressstatus.start()
         self.progressstatus.update("Collecting Data")
-        self.comparator.collectData()
+        self.experiment.collectData()
         rm.removeObserver(self.progressstatus)
         self.progressstatus.update("Finished Data Collection")
         self.progressstatus.stop()
@@ -282,64 +282,64 @@ class IpetApplication(Tk):
         self.menu = Menu(self)
         self.config(menu=self.menu)
         compMenu = Menu(self.menu)
-        self.menu.add_cascade(menu=compMenu, label="Comparator")
-        compMenu.add_command(label="New", command=self.resetComparator)
-        compMenu.add_command(label="Save", command=self.saveComparator)
-        compMenu.add_command(label="Load", command=self.loadComparator)
+        self.menu.add_cascade(menu = compMenu, label = "Experiment")
+        compMenu.add_command(label = "New", command = self.resetExperiment)
+        compMenu.add_command(label = "Save", command = self.saveExperiment)
+        compMenu.add_command(label = "Load", command = self.loadExperiment)
         compMenu.add_separator()
         compMenu.add_command(label=" Add Log Files", command=self.addLogFiles)
         compMenu.add_command(label=" Add Solu Files", command=self.addSolufiles)
         compMenu.add_separator()
         compMenu.add_command(label=" Recollect Data", command=self.reCollectData)
 
-        if self.comparator is not None:
-            for managername, manager in self.comparator.getManagers().iteritems():
+        if self.experiment is not None:
+            for managername, manager in self.experiment.getManagers().iteritems():
                 managermenu = IPETManagerMenu(self.menu, manager)
                 self.menu.add_cascade(menu=managermenu, label=managername.capitalize())
 
         self.file_opt = options = {}
         options['defaultextension'] = '.*'
-        options['filetypes'] = [('all files', '.*'), ('out-files', r'.out'), ('Comparator files', r'.cmp'), ('Solu Files', r'.solu')]
+        options['filetypes'] = [('all files', '.*'), ('out-files', r'.out'), ('Experiment files', r'.cmp'), ('Solu Files', r'.solu')]
 
-    def loadComparator(self):
+    def loadExperiment(self):
         '''
-        load method to ask for comparator instance to be loaded
+        load method to ask for experiment instance to be loaded
         '''
         self.file_opt['defaultextension'] = r'.cmp'
         filename = tkFileDialog.askopenfilename(**self.file_opt)
         if filename:
-            compy = self.comparator.loadFromFile(filename)
+            compy = self.experiment.loadFromFile(filename)
             if not compy is None:
-                self.setComparator(compy)
+                self.setExperiment(compy)
 
-    def saveComparator(self):
+    def saveExperiment(self):
         '''
-        saves the comparator instance to a file
+        saves the experiment instance to a file
         '''
         self.file_opt['defaultextension'] = r'.cmp'
         filename = tkFileDialog.asksaveasfilename(**self.file_opt)
         if filename:
-            self.comparator.saveToFile(filename)
+            self.experiment.saveToFile(filename)
 
-    def resetComparator(self):
+    def resetExperiment(self):
         '''
-        replaces the current comparator instance by an empty comparator.
+        replaces the current experiment instance by an empty experiment.
         '''
-        self.setComparator(None)
+        self.setExperiment(None)
 
-    def setComparator(self, comparator):
+    def setExperiment(self, experiment):
         '''
-        replaces the current comparator instance by :code:`comparator`
+        replaces the current experiment instance by :code:`experiment`
 
-        :param comparator: new comparator instance to replace current comparator
+        :param experiment: new experiment instance to replace current experiment
         '''
-        if comparator is not None:
-            self.comparator = comparator
+        if experiment is not None:
+            self.experiment = experiment
         else:
-            self.comparator = Comparator()
+            self.experiment = Experiment()
         try:
-            self.selected_testrun = self.comparator.testruns[0]
-            self.selected_problem = self.comparator.probnamelist[0]
+            self.selected_testrun = self.experiment.testruns[0]
+            self.selected_problem = self.experiment.probnamelist[0]
         except:
             self.selected_testrun = None
             self.selected_problem = None
@@ -352,7 +352,7 @@ class IpetApplication(Tk):
 
     def addLogFiles(self):
         '''
-        opens a file dialog and adds log files by creating new test runs to the current comparator
+        opens a file dialog and adds log files by creating new test runs to the current experiment
         '''
         self.file_opt['defaultextension'] = r".out"
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)
@@ -361,7 +361,7 @@ class IpetApplication(Tk):
             filenames = [filenames]
         for filename in filenames:
             if filename:
-                self.comparator.addOutputFile(filename)
+                self.experiment.addOutputFile(filename)
 
 #        self.updatelistbox(self.testrunsbox, self.getTestrunnames())
 
@@ -376,4 +376,4 @@ class IpetApplication(Tk):
             filenames = [filenames]
         for filename in filenames:
             if filename:
-                self.comparator.addSoluFile(filename)
+                self.experiment.addSoluFile(filename)

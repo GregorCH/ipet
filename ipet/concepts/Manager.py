@@ -4,7 +4,7 @@ Created on 25.12.2013
 @author: bzfhende
 '''
 from Observer import Observable
-from ipet.gui.IPETMessageStream import Message
+from IPETMessageStream import Message
 class Manager(Observable):
     '''
     manages all manageables of a certain type of which many objects might exist and need to be listed / browsed frequently

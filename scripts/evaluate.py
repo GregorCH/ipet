@@ -4,19 +4,19 @@ Created on 24.02.2015
 @author: bzfhende
 '''
 
-from ipet.Experiment import Experiment
+from ipet import Experiment
 import argparse
 import sys
-from ipet.evaluation.IPETEvalTable import IPETEvaluation
+from ipet.evaluation import IPETEvaluation
 
 import re
 import textwrap
 from PyQt4.Qt import QApplication
-from qipet.IpetEvaluationEditorApp import IpetEvaluationEditorApp
+from qipet import IpetEvaluationEditorApp
 
 description = \
 '''
-    produces an table evaluation of test runs according to an evaluation XML-file
+    produces a table evaluation of test runs according to an evaluation XML-file
 
     An evaluation file is an xml file that specifies a number of columns of the original log file data and a number of interesting groups of instances for which aggregated results of the data should be produced.
 

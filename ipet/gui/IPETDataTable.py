@@ -9,15 +9,13 @@ from Tkconstants import TOP, END
 from ScrolledText import ScrolledText
 from Tkinter import Menu, Toplevel, StringVar
 from cStringIO import StringIO
-import pandas as pd
 import numpy as np
 from pandas import MultiIndex
 from functools import partial
-from ipet.concepts import Editable
-from IpetParam import IPETParam
-from ipet.IPETPlotWindow import IPETPlotWindow
-from ipet.gui.IPETBrowser import IPETTypeWidget
-from ipet.Manager import Manager
+from IPETParam import IPETParam
+from IPETPlotWindow import IPETPlotWindow
+from IPETBrowser import IPETTypeWidget
+from ipet.concepts import Manager
 
 class IPETDataTableFrame(Frame):
     '''

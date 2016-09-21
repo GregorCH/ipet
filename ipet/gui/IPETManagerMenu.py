@@ -6,7 +6,7 @@ Created on 28.12.2013
 from Tkinter import Menu, Toplevel
 from ipet.gui import IPETBrowser
 from Tkconstants import BOTH
-from ipet import Misc
+from ipet import misc
 import tkFileDialog
 
 class IPETManagerMenu(Menu):
@@ -57,4 +57,4 @@ class IPETManagerMenu(Menu):
         '''
         filename = tkFileDialog.asksaveasfilename()
         if filename:
-            Misc.saveAsXML(self.manager, filename)
+            misc.saveAsXML(self.manager, filename)

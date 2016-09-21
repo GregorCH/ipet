@@ -3,7 +3,7 @@ from ipet.parsing.StatisticReader_CustomReader import CustomReader
 import os
 import re
 from ipet.concepts.Manager import Manager
-from ipet.gui.IPETMessageStream import Message
+from ipet.concepts.IPETMessageStream import Message
 import xml.etree.ElementTree as ElementTree
 from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
     GapReader, SolvingTimeReader, TimeLimitReader, \

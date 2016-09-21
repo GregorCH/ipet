@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import re
 from ipet.concepts.Editable import Editable
-from ipet.misc import Misc
+from ipet.misc import misc
 import datetime
-from ipet.gui.IPETMessageStream import Message, processMessage
+from ipet.concepts.IPETMessageStream import Message, processMessage
 import logging
 
 class StatisticReader(Editable):
@@ -249,7 +249,7 @@ class DualBoundReader(StatisticReader):
             db = db.strip(',');
             try:
                 db = float(db)
-                if abs(db) != Misc.FLOAT_INFINITY:
+                if abs(db) != misc.FLOAT_INFINITY:
                     self.addData(self.datakey, db)
             except ValueError:
                 pass
@@ -421,7 +421,7 @@ class PrimalBoundReader(StatisticReader):
             pb = pb.strip(',')
             if pb != '-':
                 pb = float(pb)
-                if abs(pb) != Misc.FLOAT_INFINITY:
+                if abs(pb) != misc.FLOAT_INFINITY:
                     self.addData(self.datakey, pb)
 
 

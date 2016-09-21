@@ -3,9 +3,9 @@ Created on 08.03.2013
 
 @author: bzfhende
 '''
-from IpetWidget import IpetWidget
+from IPETWidget import IpetWidget
 from Tkinter import StringVar, Label, Frame, Toplevel
-from SCIPguiSelectionLabel import SCIPguiSelectionLabel
+from IPETSelectionLabel import SCIPguiSelectionLabel
 
 import matplotlib
 from Tkconstants import TOP, BOTH, BOTTOM
@@ -13,7 +13,7 @@ import numpy
 from ipet.gui.IPETPlotWindow import IpetNavigationToolBar
 matplotlib.use('TkAgg')
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # implement the default mpl key bindings
 from matplotlib.backend_bases import key_press_handler
 

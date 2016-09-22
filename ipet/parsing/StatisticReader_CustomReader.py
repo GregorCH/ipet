@@ -22,9 +22,30 @@ class CustomReader(StatisticReader):
                   }
 
 
-
+    requiredoptions = {
+            "datatype" : ["float", "int"],
+            "method" : str2method.keys()
+        }
 
     def __init__(self, name = None, regpattern = None, datakey = None, index = 0, datatype = "float", method = "last"):
+        '''
+        constructor of a custom reader to parse additional simple solver output from log file context
+
+        Parameters:
+        -----------
+
+        name : a name to distinguish this reader from the others
+
+        regpattern : A string or regular expression pattern to detect lines from which output should be read
+
+        datakey : The data key under which the parsed datum gets stored for every instance
+
+        index : The zero-based index of the number in the specified line (only numbers count)
+
+        datatype : choose 'int' or 'float'
+
+        method : how to treat multiple occurrences of this data within one instance; parse 'first', 'last', or 'sum'
+        '''
 
         if regpattern is None:
             raise ValueError("Error: No 'regpattern' specified for reader with name %s" % str(name))
@@ -37,17 +58,23 @@ class CustomReader(StatisticReader):
             datakey = CustomReader.datakey + regpattern
         self.datakey = datakey
 
+
+        self.set_index(index)
+
         self.regpattern = regpattern
-        self.regexp = re.compile(regpattern)
-        self.index = int(index)
+        self.set_regpattern(regpattern)
 
-        self.method = self.str2method[method]
+        self.method = method
+        self.methodint = self.METHOD_LAST
+        self.set_method(method)
 
-        self.datatype = datatype
-        self.setDataType(datatype)
+        self.set_datatype(datatype)
 
     def getEditableAttributes(self):
         return ['name', 'regpattern', 'datakey', 'index', 'datatype', 'method']
+
+    def getRequiredOptionsByAttribute(self, attr):
+        return self.requiredoptions.get(attr, None)
 
     def extractStatistic(self, line):
         if self.regexp.search(line):
@@ -58,14 +85,14 @@ class CustomReader(StatisticReader):
 
                 previousdata = self.testrun.problemGetData(self.problemname, self.datakey)
 
-                if self.method == CustomReader.METHOD_FIRST:
+                if self.methodint == CustomReader.METHOD_FIRST:
                     if previousdata is None:
                         self.addData(self.datakey, data)
 
-                elif self.method == CustomReader.METHOD_LAST:
+                elif self.methodint == CustomReader.METHOD_LAST:
                     self.addData(self.datakey, data)
 
-                elif self.method == CustomReader.METHOD_SUM:
+                elif self.methodint == CustomReader.METHOD_SUM:
                     if previousdata is None:
                         previousdata = 0
 
@@ -86,6 +113,22 @@ class CustomReader(StatisticReader):
         '''
         try:
             self.datatypemethod = getattr(__builtin__, sometype)
+            self.datatype = sometype
         except:
             print "Error: Could not recognize data type, using float", sometype
             self.datatypemethod = float
+            self.datatype = 'float'
+            
+    def set_datatype(self, datatype):
+        self.setDataType(datatype)
+
+    def set_method(self, method):
+        self.methodint = self.str2method.get(method, self.methodint)
+        self.method = method
+
+    def set_regpattern(self, regpattern):
+        self.regexp = re.compile(regpattern)
+        self.regpattern = regpattern
+
+    def set_index(self, index):
+        self.index = int(index)

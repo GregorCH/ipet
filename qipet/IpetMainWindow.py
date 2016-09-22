@@ -11,36 +11,29 @@ class IpetMainWindow(QMainWindow):
     classdocs
     '''
 
-
-    imagepath = osp.sep.join((osp.dirname(__file__), osp.pardir, "images"))
+    menus = {}
+    toolbars = {}
+    statusbar = None
     def __init__(self, parent=None):
         '''
         Constructor
         '''
         super(IpetMainWindow, self).__init__(parent)
         
-        print self.imagepath
-        
         self.setGeometry(300, 300, 800, 500)
+        IpetMainWindow.statusbar = self.statusBar()
         
+    
+        
+    def populateMenu(self, ipetapplicationtab):
+        for menuname, actions in ipetapplicationtab.getMenuActions():
+            menu = self.menus.setdefault(menuname, self.menuBar().addMenu(menuname))
+            for action in actions:
+                menu.addAction(action)
 
-    def createAction(self, text, slot=None, shortcut=None, icon=None,
-        tip=None, checkable=False, signal="triggered()"):
-        action = QAction(text, self)
-        if icon is not None:
-            action.setIcon(QIcon(osp.sep.join((self.imagepath,"%s.png" % icon))))
-        if shortcut is not None:
-            action.setShortcut(shortcut)
-        if tip is not None:
-            action.setToolTip(tip)
-            action.setStatusTip(tip)
-        if slot is not None:
-            self.connect(action, SIGNAL(signal), slot)
-        if checkable:
-            action.setCheckable(True)
-            
-        return action
-    
-        
-    
+    def populateToolBar(self, ipetapplicationtab):
+        for toolbarname, actions in ipetapplicationtab.getToolBarActions():
+            toolbar = self.toolbars.setdefault(toolbarname, self.addToolBar("toolbarname"))
+            for action in actions:
+                toolbar.addAction(action)
     

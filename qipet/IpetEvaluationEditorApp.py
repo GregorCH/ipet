@@ -16,11 +16,12 @@ from ipet.evaluation.Aggregation import Aggregation
 from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
 from ipet.evaluation.IPETFilter import IPETFilter
 from qipet.IpetMainWindow import IpetMainWindow
+from EditableBrowser import EditableBrowser
+from IPETApplicationTab import IPETApplicationTab
+from EditableBrowser import EditableBrowser
+from PyQt4.Qt import QLayout
 
-class IpetEvaluationEditorApp(IpetMainWindow):
-    '''
-    classdocs
-    '''
+class EvaluationEditorWindow(IPETApplicationTab):
     addedcolumns = 0
     addedfiltergroups = 0
     addedfilters = 0
@@ -31,49 +32,34 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         '''
         Constructor
         '''
-        super(IpetEvaluationEditorApp, self).__init__(parent)
+        super(EvaluationEditorWindow, self).__init__(parent)
         
-        self.setGeometry(300, 300, 800, 500)
-        self.setWindowTitle("Evaluation Editor")
-        thewidget = QWidget(self)
-        self.treewidget = IpetTreeView(self)
-        layout = QHBoxLayout()
-        layout.addWidget(self.treewidget, 3)
-        self.editframe = QFrame(thewidget)
-        layout.addWidget(self.editframe, 2)
-
-        self.editframelayout = QVBoxLayout()
-
-        self.editframe.setLayout(self.editframelayout)
-    
-        thewidget.setLayout(layout)
-        self.setCentralWidget(thewidget)
+        self.browser = EditableBrowser(self)
         self.evaluation = None
-        self.statusBar().showMessage("Ready", 5000)
         self.filename = None
+        layout = QHBoxLayout()
+        layout.addWidget(self.browser)
+        layout.setSizeConstraint(QLayout.SetMaximumSize)
+        self.setLayout(layout)
         
-        self.initConnections()
+
         self.defineActions()
+        self.initConnections()
         
     def initConnections(self):
-        self.connect(self.treewidget, SIGNAL("itemSelectionChanged()"), self.redrawEditFrameContent)
-        
+        self.connect(self.browser, SIGNAL(EditableBrowser.ITEMEVENT), self.enableOrDisableActions)
+
     def setEvaluation(self, evaluation):
+        self.browser.setRootElement(evaluation)
         self.evaluation = evaluation
-        self.treewidget.populateTree(evaluation)
-        self.redrawEditFrameContent()
         
     def defineActions(self):
-        menubar = self.menuBar()
-        filemenu = menubar.addMenu("&File")
         
-        filetoolbar = self.addToolBar("File")
-        
-        loadaction = self.createAction("&Load", self.loadEvaluation, QKeySequence.Open, icon="Load-icon", 
+        self.loadaction = self.createAction("&Load", self.loadEvaluation, QKeySequence.Open, icon = "Load-icon",
                                        tip="Load evaluation from XML file (current evaluation gets discarded)")
-        saveaction = self.createAction("&Save", self.saveEvaluation, QKeySequence.Save, icon="disk-icon", 
+        self.saveaction = self.createAction("&Save", self.saveEvaluation, QKeySequence.Save, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
-        saveasaction = self.createAction("&Save as", self.saveEvaluationAs, QKeySequence.SaveAs, icon="disk-icon", 
+        self.saveasaction = self.createAction("&Save as", self.saveEvaluationAs, QKeySequence.SaveAs, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
         self.addcolaction = self.createAction("Add &Column", self.addColumn, "Alt+C", icon="Letter-C-violet-icon", 
                                          tip="Add new column as a child of the currently selected element")
@@ -86,39 +72,29 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         self.addinstancenaction = self.createAction("Add &Instance", self.addInstance, "Alt+I", icon="Letter-I-blue-icon", 
                                             tip="Add instance as child of the current filter")
         
-        deletelementaction = self.createAction("&Delete Element", self.deleteElement, QKeySequence.Delete, "delete-icon", 
+        self.deletelementaction = self.createAction("&Delete Element", self.browser.deleteElement, QKeySequence.Delete, "delete-icon",
                                                tip="Delete currently selected element")
-        filemenu.addAction(loadaction)
-        filemenu.addAction(saveaction)
-        filemenu.addAction(saveasaction)
-        filetoolbar.addAction(saveaction)
-        filetoolbar.addAction(loadaction)
-        filetoolbar.addSeparator()
-        filetoolbar.addAction(self.addcolaction)
-        filetoolbar.addAction(self.addfiltergroupaction)
-        filetoolbar.addAction(self.addfilteraction)
-        filetoolbar.addAction(self.addaggregationaction)
-        filetoolbar.addAction(self.addinstancenaction)
-        filetoolbar.addAction(deletelementaction)
-        
-    def addNewElementAsChildOfSelectedElement(self, newelement):
-        
-        selectededitable = self.treewidget.getSelectedEditable()
-        selectededitable.addChild(newelement)
-        self.reselectAfterInsertOrRemoval(selectededitable)
+
+    def getMenuActions(self):
+        return (("&File", [self.loadaction, self.saveaction, self.saveasaction]),)
     
-    def reselectAfterInsertOrRemoval(self, newselection):
-        self.treewidget.populateTree(self.evaluation)
-        
-        self.treewidget.setSelectedEditable(newselection)
-        
-        
+    def getToolBarActions(self):
+        return (("File", [self.saveaction, self.loadaction]),
+                ("Evaluation", [self.addcolaction,
+                                self.addfiltergroupaction,
+                                self.addfilteraction,
+                                self.addaggregationaction,
+                                self.addinstancenaction,
+                                self.deletelementaction]
+                 ),
+                )
+
     def addColumn(self):
         self.updateStatus("Add column")
         self.addedcolumns += 1
         newcolname = "New Column %d"%self.addedcolumns 
         newcol = IPETEvaluationColumn(name=newcolname)
-        self.addNewElementAsChildOfSelectedElement(newcol)
+        self.browser.addNewElementAsChildOfSelectedElement(newcol)
         
     def addFilterGroup(self):
         self.updateStatus("Add filter group")
@@ -126,17 +102,16 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         newfiltergroupname = "New Group %d"%self.addedfiltergroups
         newfiltergroup = IPETFilterGroup(newfiltergroupname)
 
-        self.addNewElementAsChildOfSelectedElement(newfiltergroup)
+        self.browser.addNewElementAsChildOfSelectedElement(newfiltergroup)
         
     
     def addFilter(self):
         self.updateStatus("Add filter")
         self.addedfilters += 1
-        evalchildren = self.evaluation.getChildren()
 
         newfilter = IPETFilter(expression1 = "CHANGE", expression2 = "CHANGE")
         print newfilter.getName()
-        self.addNewElementAsChildOfSelectedElement(newfilter)
+        self.browser.addNewElementAsChildOfSelectedElement(newfilter)
 
 
     def addAggregation(self):
@@ -145,7 +120,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         newaggregationname = "New Aggregation %d"%self.addedaggregations
         newaggregation = Aggregation(newaggregationname)
 
-        self.addNewElementAsChildOfSelectedElement(newaggregation)
+        self.browser.addNewElementAsChildOfSelectedElement(newaggregation)
 
     def addInstance(self):
         self.updateStatus("Add instance")
@@ -153,25 +128,7 @@ class IpetEvaluationEditorApp(IpetMainWindow):
         newinstancename = "new Instance %d"%self.addedinstances
         newinstance = IPETInstance(newinstancename)
         
-        self.addNewElementAsChildOfSelectedElement(newinstance)
-    
-    def deleteElement(self):
-        self.updateStatus("Delete Element")
-        selectededitable = self.treewidget.getSelectedEditable()
-        parentofselectededitable = self.treewidget.getParentOfSelectedEditable()
-        if parentofselectededitable is not None:
-            children = parentofselectededitable.getChildren()
-            index = children.index(selectededitable)
-            if index == len(children) - 1:
-                newselectededitable = parentofselectededitable
-            else:
-                newselectededitable = children[index + 1]
-            parentofselectededitable.removeChild(selectededitable)
-            self.reselectAfterInsertOrRemoval(newselectededitable)
-        
-    def updateStatus(self, message):
-        self.statusBar().showMessage(message, 5000)
-        
+        self.browser.addNewElementAsChildOfSelectedElement(newinstance)
         
     def loadEvaluation(self):
         thedir = unicode(".")
@@ -217,40 +174,31 @@ class IpetEvaluationEditorApp(IpetMainWindow):
     def enableOrDisableActions(self):
         for action, addclass in zip([self.addcolaction, self.addfiltergroupaction, self.addfilteraction, self.addaggregationaction, self.addinstancenaction],
                                     [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETInstance()]):
-            if self.treewidget.currentItemAcceptsClassAsChild(addclass):
+            if self.browser.treewidget.currentItemAcceptsClassAsChild(addclass):
                 action.setEnabled(True)
             else:
                 action.setEnabled(False)
 
-    def clearLayout(self, layout):
-        while layout.count():
-            child = layout.takeAt(0)
-            child.widget().deleteLater()
 
 
-    def redrawEditFrameContent(self):
+class IpetEvaluationEditorApp(IpetMainWindow):
+    '''
+    classdocs
+    '''
 
-        if self.treewidget.getSelectedEditable() is not None:
-            editable = self.treewidget.getSelectedEditable()
-            editframecontent = EditableForm(editable, self.editframe)
-            textlabel = QLabel(QString("<b>Edit attributes for %s</b>"%(editable.getName())))
-        else:
-            editframecontent = QLabel(QString("Select an element from the evaluation"))
-            textlabel = QLabel(QString("<b>No element selected</b>"))
+    def __init__(self, parent = None):
+        super(IpetEvaluationEditorApp, self).__init__(parent)
+        self.evaluationeditorwindow = EvaluationEditorWindow()
+        self.populateMenu(self.evaluationeditorwindow)
+        self.populateToolBar(self.evaluationeditorwindow)
+        self.setCentralWidget(self.evaluationeditorwindow)
 
-        self.clearLayout(self.editframelayout)
-        textlabel.setMaximumHeight(20)
-        textlabel.setMinimumHeight(20)
-        textlabel.setAlignment(Qt.AlignCenter)
-        textlabel.setBuddy(editframecontent)
-        self.editframelayout.addWidget(textlabel)
-        self.editframelayout.addWidget(editframecontent)
-        self.connect(editframecontent, SIGNAL(EditableForm.USERINPUT_SIGNAL), self.updateItem)
-        self.enableOrDisableActions()
-        
-    def updateItem(self):
-        self.treewidget.updateSelectedItem()
-        self.redrawEditFrameContent()
+    def setEvaluation(self, evaluation):
+        self.evaluationeditorwindow.setEvaluation(evaluation)
+
+
+
+
         
     def setExperiment(self, experiment):
         EditableForm.extendAvailableOptions("datakey", experiment.getDatakeys())
@@ -261,11 +209,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("Evaluation editor")
     mainwindow = IpetEvaluationEditorApp()
-    try:
-        ev = IPETEvaluation.fromXMLFile("test/testevaluate.xml")
-        mainwindow.setEvaluation(ev)
-    except:
-        pass
+    ev = IPETEvaluation.fromXMLFile("../test/testevaluate.xml")
+    mainwindow.setEvaluation(ev)
     mainwindow.show()
     
     sys.exit(app.exec_())

@@ -1,4 +1,4 @@
-from ipet.parsing.StatisticReader import StatisticReader, ListReader
+from StatisticReader import StatisticReader, ListReader
 from ipet.parsing.StatisticReader_CustomReader import CustomReader
 import os
 import re
@@ -15,16 +15,17 @@ from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
 from StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
 from StatisticReader_VariableReader import VariableReader
 from StatisticReader_SoluFileReader import SoluFileReader
+from TraceFileReader import TraceFileReader
 import logging
+from ipet.concepts import IpetNode, Editable
 
 
-class ReaderManager(Manager):
+class ReaderManager(Manager, IpetNode, Editable):
     """
     acquires test run data. subclasses of manager, managing readers by their unique name
     """
-    problemexpression = re.compile(r'^@01')
-    extensions = [".mps", ".cip", ".fzn", ".pip", ".lp"]
-    INSTANCE_END_EXPRESSION = re.compile('^=ready=')
+    extensions = [".mps", ".cip", ".fzn", ".pip", ".lp", ".gms"]
+    nodetag = "Readers"
 
     solvertype_recognition = {
                               StatisticReader.SOLVERTYPE_SCIP:"SCIP version ",
@@ -43,7 +44,8 @@ class ReaderManager(Manager):
                              ".err" : StatisticReader.CONTEXT_ERRFILE,
                              ".out" : StatisticReader.CONTEXT_LOGFILE,
                              ".set" : StatisticReader.CONTEXT_SETFILE,
-                             ".solu": StatisticReader.CONTEXT_SOLUFILE
+                             ".solu": StatisticReader.CONTEXT_SOLUFILE,
+                             ".trc" : StatisticReader.CONTEXT_TRACEFILE
                              }
     """map for file extensions to the file contexts to specify the relevant readers"""
 
@@ -51,12 +53,50 @@ class ReaderManager(Manager):
                        StatisticReader.CONTEXT_ERRFILE : 2,
                        StatisticReader.CONTEXT_LOGFILE : 1,
                        StatisticReader.CONTEXT_SETFILE : 3,
-                       StatisticReader.CONTEXT_SOLUFILE : 4
+                       StatisticReader.CONTEXT_SOLUFILE : 4,
+                       StatisticReader.CONTEXT_TRACEFILE : 5
                        }
     """ defines a sorting order for file contexts """
 
 
     xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
+
+    def __init__(self, problemexpression = "@01", problemendexpression = "=ready="):
+        '''
+        constructs a new reader Manager
+
+        Parameters:
+        -----------
+
+        problemexpression : an expression that accompanies the start of a new instance in a log file context
+
+        problemendexpression : an expression that signals the end of an instance in a log file context
+        '''
+        Manager.__init__(self)
+        self.problemexpression = problemexpression
+        self.problemendexpression = problemendexpression
+
+    def getEditableAttributes(self):
+        return ["problemexpression", "problemendexpression"]
+
+    def getName(self):
+        return "ReaderManager"
+
+    def addChild(self, child):
+        self.registerReader(child)
+
+    def removeChild(self, child):
+        self.deleteManageable(child)
+
+    def acceptsAsChild(self, child):
+        return child.__class__() in self.xmlfactorydict.values()
+
+    def getChildren(self):
+        return sorted([m for m in self.getManageables(False) if m.__class__ in self.xmlfactorydict.values()], key = lambda x:x.getName())
+
+    @staticmethod
+    def getNodeTag():
+        return ReaderManager.nodetag
 
     def setTestRun(self, testrun):
         """
@@ -144,6 +184,7 @@ class ReaderManager(Manager):
              TimeLimitReader(),
              TimeToFirstReader(),
              TimeToBestReader(),
+             TraceFileReader()
              ])
 
     def updateLineNumberData(self, linenumber, problemname, currentcontext, prefix):
@@ -162,7 +203,7 @@ class ReaderManager(Manager):
         sets up data structures for a new problem instance if necessary
         '''
 
-        if self.problemexpression.match(line[1]):
+        if line.startswith(self.problemexpression):
             
             if StatisticReader.getProblemName() is not None:
                 for reader in readers:
@@ -184,7 +225,7 @@ class ReaderManager(Manager):
             self.testrun.addData(namewithextension, 'Settings', self.testrun.getSettings())
 
     def endOfInstanceReached(self, line):
-        if ReaderManager.INSTANCE_END_EXPRESSION.match(line):
+        if line.startswith(self.problemendexpression):
             return True
         else:
             return False
@@ -245,6 +286,9 @@ class ReaderManager(Manager):
                 self.updateProblemName(line, filecontext, readers)
                 if self.endOfInstanceReached(line[1]):
                     self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
+                    if StatisticReader.getProblemName() is not None:
+                        for reader in readers:
+                            reader.execEndOfProb()
                     self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
                 else:
                     for reader in readers:
@@ -263,7 +307,7 @@ class ReaderManager(Manager):
 
     ### XML IO methods
     def toXMLElem(self):
-        me = ElementTree.Element('Readers')
+        me = ElementTree.Element(ReaderManager.getNodeTag())
         readers = self.getManageables(False)
         for reader in readers:
             if reader.__class__ in ReaderManager.xmlfactorydict.values():
@@ -288,7 +332,7 @@ class ReaderManager(Manager):
 
     @staticmethod
     def processXMLElem(elem):
-        if elem.tag == 'Readers':
+        if elem.tag == ReaderManager.getNodeTag():
             rm = ReaderManager()
         for child in elem:
             reader = ReaderManager.xmlfactorydict[child.tag](**child.attrib)

@@ -32,7 +32,7 @@ class StatisticReader(Editable):
     CONTEXT_ERRFILE = 2  # the error file of a solver
     CONTEXT_SETFILE = 3  # the settings file used for solving
     CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every instance
-
+    CONTEXT_TRACEFILE = 5
     context = CONTEXT_LOGFILE
 
     sleepAfterReturn = True

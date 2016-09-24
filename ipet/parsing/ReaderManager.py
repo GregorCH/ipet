@@ -203,7 +203,7 @@ class ReaderManager(Manager, IpetNode, Editable):
         sets up data structures for a new problem instance if necessary
         '''
 
-        if line.startswith(self.problemexpression):
+        if line[1].startswith(self.problemexpression):
             
             if StatisticReader.getProblemName() is not None:
                 for reader in readers:

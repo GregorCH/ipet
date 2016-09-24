@@ -5,7 +5,7 @@ Created on 21.09.2016
 '''
 from IpetMainWindow import IpetMainWindow
 from PyQt4.QtGui import QLayout, QHBoxLayout
-from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QFileDialog, QString
+from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QFileDialog, QString, QKeySequence, QTextBrowser, QComboBox
 from IPetTreeView import IpetTreeView
 import sys
 from qipet.EditableBrowser import EditableBrowser
@@ -14,6 +14,45 @@ from ipet.parsing import ReaderManager
 from ipet import misc
 from ipet.parsing.StatisticReader_CustomReader import CustomReader
 from ipet.parsing.StatisticReader import ListReader
+from EditableForm import OptionsComboBox
+import ExperimentManagement
+
+class IPETLogFileView(QWidget):
+    '''
+    a view of a log file, with selection mechanisms for the desired test run and instance that should be shown
+    '''
+    def __init__(self, parent = None):
+        super(IPETLogFileView, self).__init__(parent)
+        vlayout = QVBoxLayout(self)
+        self.textbrowser = QTextBrowser(self)
+        self.testrunselection = OptionsComboBox(self)
+        self.instanceselection = OptionsComboBox(self)
+        vlayout.addWidget(self.textbrowser)
+        hlayout = QHBoxLayout()
+        hlayout.addWidget(self.testrunselection)
+        hlayout.addWidget(self.instanceselection)
+        vlayout.addLayout(hlayout)
+        self.setLayout(vlayout)
+
+    def getProblem(self):
+        problem = self.instanceselection.currentText()
+        return problem
+
+    def getTestRun(self):
+        testrun = self.testrunselection.currentText()
+
+
+
+    def updateSelection(self):
+        self.testrunselection.clear()
+        self.instanceselection.clear()
+        
+        testruns = ExperimentManagement.getExperiment().getTestruns()
+        problems = ExperimentManagement.getExperiment().getProblems()
+
+
+
+
 
 class IPETParserWindow(IPETApplicationTab):
 
@@ -24,7 +63,7 @@ class IPETParserWindow(IPETApplicationTab):
         vlayout = QVBoxLayout()
         self.editablebrowser = EditableBrowser()
         vlayout.addWidget(self.editablebrowser)
-        vlayout.addWidget(QTextEdit(self))
+        vlayout.addWidget(IPETLogFileView(self))
 
         self.setLayout(vlayout)
         self.parser = None
@@ -48,11 +87,20 @@ class IPETParserWindow(IPETApplicationTab):
         self.addlistreaderaction = self.createAction("Add List Reader", self.addListReader, "Alt+L", icon = "list-icon",
                                                       tip = "Add a list reader to this parser")
 
+        self.deleteaction = self.createAction("Delete reader", self.editablebrowser.deleteElement, QKeySequence.Delete, "delete-Icon",
+                                              tip = "Delete selected reader ")
+        self.recollectdataaction = self.createAction("Recollect Data", self.recollectData, QKeySequence.Refresh, "Refresh-icon",
+                                                     tip = "Recollect data with specified readers")
+
+
+    def recollectData(self):
+        self.updateStatus("This action is not yet supported")
+        pass
     def getMenuActions(self):
-        return (("&File", [self.loadaction, self.saveaction, self.saveasaction]), ("&Readers", [self.addcustomreaderaction, self.addlistreaderaction]))
+        return (("&File", [self.loadaction, self.saveaction, self.saveasaction, self.recollectdataaction]), ("&Readers", [self.addcustomreaderaction, self.addlistreaderaction, self.deleteaction]))
 
     def getToolBarActions(self):
-        return (("&File", [self.loadaction, self.saveaction, self.saveasaction]), ("&Readers", [self.addcustomreaderaction, self.addlistreaderaction]))
+        return (("&File", [self.loadaction, self.saveaction, self.recollectdataaction]), ("&Readers", [self.addcustomreaderaction, self.addlistreaderaction, self.deleteaction]))
 
     def loadParser(self):
         thedir = unicode(".")

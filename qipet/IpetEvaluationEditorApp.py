@@ -183,7 +183,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
 
 class IpetEvaluationEditorApp(IpetMainWindow):
     '''
-    classdocs
+    This app represents the Editable Browser in a single, executable window
     '''
 
     def __init__(self, parent = None):

@@ -34,6 +34,14 @@ class StatisticReader(Editable):
     CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every instance
     CONTEXT_TRACEFILE = 5
     context = CONTEXT_LOGFILE
+    
+    contextname2contexts = {
+            "log" : CONTEXT_LOGFILE,
+            "err" : CONTEXT_ERRFILE,
+            "set" : CONTEXT_SETFILE,
+            "solu" : CONTEXT_SOLUFILE,
+            "trace" : CONTEXT_TRACEFILE
+        }
 
     sleepAfterReturn = True
     sleep = False
@@ -522,7 +530,25 @@ class ListReader(StatisticReader):
     '''
     name = "ListReader"
 
-    def __init__(self, regpattern=None, name=None):
+    def __init__(self, regpattern = None, name = None):
+        '''
+        construct a new list reader to parse key-value pairs from a given context
+
+        List readers parse key-value pairs of the form
+
+        (regpattern-match 1) value
+        (regpattern-match 2) value
+        (regpattern-match 3) value
+
+        The matching regpattern is used as data key
+
+        Parameters:
+        -----------
+
+        regpattern : a pattern (regular expression supported) that suitable lines must match
+
+        name : a name for this reader
+        '''
         if regpattern is None:
             raise ValueError("Error: No 'regpattern' specified for reader %s"%str(name))
         self.regular_exp = re.compile(regpattern)
@@ -530,6 +556,17 @@ class ListReader(StatisticReader):
         if name is None:
             name = ListReader.name
         self.name = name
+
+    def getEditableAttributes(self):
+        return ["name", "regpattern"]
+
+    def set_context(self, contextname):
+        self.context = self.contextname2contexts.get(contextname, self.context)
+
+    def getRequiredOptionsByAttribute(self, attr):
+        if attr == "context":
+            return self.contextname2contexts.keys()
+        return None
 
     def extractStatistic(self, line):
         match = self.regular_exp.match(line)
@@ -542,9 +579,6 @@ class ListReader(StatisticReader):
                 val = float(strval)
             self.addData(datakey, val)
 
-
-    def getEditableAttributes(self):
-        return ['name', 'regpattern']
 
 
 

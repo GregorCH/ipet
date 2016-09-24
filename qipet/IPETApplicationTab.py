@@ -32,6 +32,7 @@ class IPETApplicationTab(QWidget):
 
         just a list of actions is fine, using nested lists will tell the caller where to put separators
         '''
+        return None
 
     def createAction(self, text, slot = None, shortcut = None, icon = None,
         tip = None, checkable = False, signal = "triggered()"):

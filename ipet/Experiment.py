@@ -105,6 +105,9 @@ class Experiment(Observable):
         '''
         return self.probnamelist
 
+    def getTestRuns(self):
+        return self.testrunmanager.getManageables()
+
     def updateDatakeys(self):
         '''
         union of all data keys over all instances

@@ -36,4 +36,5 @@ class IpetMainWindow(QMainWindow):
             toolbar = self.toolbars.setdefault(toolbarname, self.addToolBar("toolbarname"))
             for action in actions:
                 toolbar.addAction(action)
-    
+
+

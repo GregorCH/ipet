@@ -22,6 +22,7 @@ from pandas import Panel
 import pandas as pd
 import os
 import sys
+import logging
 
 class Experiment(Observable):
     '''
@@ -518,6 +519,8 @@ class Experiment(Observable):
                     self.determineStatusForInfProblem(testrun, probname)
                 else:
                     self.determineStatusForUnknProblem(testrun, probname)
+
+                logging.debug("Problem %s in testrun %s solustatus %s, errorcode %s -> Status %s" % (probname, testrun.getName(), repr(solustatus), repr(errcode), testrun.problemGetData(probname, "Status")))
 
     def saveToFile(self, filename):
         '''

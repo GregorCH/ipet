@@ -421,7 +421,7 @@ class PrimalBoundReader(StatisticReader):
             pb = pb.strip(',')
             if pb != '-':
                 pb = float(pb)
-                if abs(pb) != misc.FLOAT_INFINITY:
+                if abs(pb) < misc.FLOAT_INFINITY:
                     self.addData(self.datakey, pb)
 
 

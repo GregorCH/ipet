@@ -270,7 +270,7 @@ class Experiment(Observable):
                 if pb is None or db is None:
                     continue
                 status = '=unkn='
-                infinite = (pb == misc.FLOAT_INFINITY or pb == -misc.FLOAT_INFINITY)
+                infinite = (pb >= misc.FLOAT_INFINITY or pb <= -misc.FLOAT_INFINITY)
                 sense = 0
                 if pb < db:
                     sense = 1

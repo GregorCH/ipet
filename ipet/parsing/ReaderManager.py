@@ -205,7 +205,7 @@ class ReaderManager(Manager, IpetNode, Editable):
 
         if line[1].startswith(self.problemexpression):
             
-            if StatisticReader.getProblemName() is not None:
+            if currentcontext == StatisticReader.CONTEXT_ERRFILE and StatisticReader.getProblemName() is not None:
                 for reader in readers:
                     reader.execEndOfProb()
                     
@@ -284,18 +284,20 @@ class ReaderManager(Manager, IpetNode, Editable):
             # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
             for line in enumerate(f):
                 self.updateProblemName(line, filecontext, readers)
+
                 if self.endOfInstanceReached(line[1]):
                     self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
                     if StatisticReader.getProblemName() is not None:
                         for reader in readers:
                             reader.execEndOfProb()
+
                     self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
                 else:
                     for reader in readers:
                         reader.operateOnLine(line[1])
 
             else:
-                if StatisticReader.getProblemName() is not None:
+                if filecontext == StatisticReader.CONTEXT_ERRFILE and StatisticReader.getProblemName() is not None:
                     for reader in readers:
                         reader.execEndOfProb()
 

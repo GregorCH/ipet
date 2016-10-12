@@ -243,19 +243,18 @@ class Experiment(Observable):
                 if processplotdata:
                     try:
                         testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
+                        logging.debug("Computed primal integral %.1f for problem %s, data %s"  % (testrun.problemGetData(probname, 'PrimalIntegral'), probname, repr(processplotdata)))
                     except AssertionError, e:
-                        print e
-                        print "Error for primal bound on problem %s, list: "%(probname)
-                        print testrun.getProbData(probname)
+                        logging.error("Error for primal bound on problem %s, list: %s"%(probname, processplotdata))
+
                 processplotdata = getProcessPlotData(testrun, probname, **dualargs)
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     try:
                         testrun.addData(probname, 'DualIntegral', calcIntegralValue(processplotdata, pwlinear=True))
                     except AssertionError, e:
-                        print e
-                        print "Error for dual bound on problem %s, list: "%(probname), processplotdata
-                        print testrun.getProbData(probname)
+                        logging.error("Error for dual bound on problem %s, list: %s "%(probname, processplotdata))
+
 
     def writeSolufile(self):
         '''

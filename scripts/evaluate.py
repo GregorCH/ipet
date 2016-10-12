@@ -4,19 +4,19 @@ Created on 24.02.2015
 @author: bzfhende
 '''
 
-from ipet.Comparator import Comparator
+from ipet import Experiment
 import argparse
 import sys
-from ipet.IPETEvalTable import IPETEvaluation
-import pandas as pd
+from ipet.evaluation import IPETEvaluation
+
 import re
 import textwrap
 from PyQt4.Qt import QApplication
-from qipet.IpetEvaluationEditorApp import IpetEvaluationEditorApp
+from qipet import IpetEvaluationEditorApp
 
 description = \
 '''
-    produces an table evaluation of test runs according to an evaluation XML-file
+    produces a table evaluation of test runs according to an evaluation XML-file
 
     An evaluation file is an xml file that specifies a number of columns of the original log file data and a number of interesting groups of instances for which aggregated results of the data should be produced.
 
@@ -46,10 +46,10 @@ epilog = \
 
 
 # possible arguments in the form name,default,short,description #
-clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read"),
+clarguments = [('--experimentfile', None, '-x', "An experiment file name (must have .ipx file extension) in cmp-format to read"),
                ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
-               ('--recollect', False,'-r', "Should the loaded comparator recollect data before proceeding?"),
-               ('--savecomparator', False,'-s', "Should the comparator data be overwritten? Makes only sense if combined with '--recollect True'"),
+               ('--recollect', False, '-r', "Should the loaded experiment recollect data before proceeding?"),
+               ('--saveexperiment', False, '-s', "Should the experiment data be overwritten? Makes only sense if combined with '--recollect True'"),
                ('--externaldata', None,'-E', "Should external data such as additional instance information be used?"),
                ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation"),
                ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
@@ -79,16 +79,16 @@ if __name__ == '__main__':
         exit()
     #if globals().get("help") is not None:
 
-    #initialize a comparator
-    comparator = None
+    # initialize a experiment
+    experiment = None
     print n
     if evalfile is None:
         print "please provide an eval file!"
         sys.exit(0)
 
 
-    if comparatorfile is None and testrunfiles == []:
-        print "please provide either a comparatorfile or (multiple, if needed) .trn testrun files"
+    if experimentfile is None and testrunfiles == []:
+        print "please provide either a experimentfile or (multiple, if needed) .trn testrun files"
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
 
@@ -96,20 +96,20 @@ if __name__ == '__main__':
         theeval.setEvaluateOptAuto(False)
     else:
         theeval.setEvaluateOptAuto(True)
-    if comparatorfile is not None:
-        comp = Comparator.loadFromFile(comparatorfile)
+    if experimentfile is not None:
+        experiment = Experiment.loadFromFile(experimentfile)
     else:
-        comp = Comparator()
+        experiment = Experiment()
 
     for trfile in testrunfiles:
-        comp.addOutputFile(trfile)
+        experiment.addOutputFile(trfile)
 
     if recollect is not False:
         print "Recollecting data"
-        comp.collectData()
+        experiment.collectData()
 
-    if savecomparator is not False:
-        comp.saveToFile(comparatorfile)
+    if saveexperiment is not False:
+        experiment.saveToFile(experimentfile)
 
     if defaultgroup is not None:
         theeval.setDefaultGroup(defaultgroup)
@@ -118,16 +118,16 @@ if __name__ == '__main__':
         theeval.setGroupKey(groupkey)
 
     if externaldata is not None:
-        comp.addExternalDataFile(externaldata)
+        experiment.addExternalDataFile(externaldata)
     else:
-        comp.externaldata = None
+        experiment.externaldata = None
 
     if compformatstring is not None:
         theeval.setCompareColFormat(compformatstring)
 
     if keysearch is not None:
         print "Starting key enumeration"
-        for key in comp.getDatakeys():
+        for key in experiment.getDatakeys():
             if re.search(keysearch, key):
                 print "    " + key
         print "End key enumeration"
@@ -141,12 +141,12 @@ if __name__ == '__main__':
             mainwindow.setEvaluation(theeval)
         except:
             pass
-        mainwindow.setComparator(comp)
+        mainwindow.setExperiment(experiment)
         mainwindow.show()
 
         sys.exit(application.exec_())
 
-    rettab, retagg = theeval.evaluate(comp)
+    rettab, retagg = theeval.evaluate(experiment)
 
 
     theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")

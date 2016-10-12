@@ -4,26 +4,27 @@ Created on 24.02.2015
 @author: bzfhende
 '''
 
-from ipet.Comparator import Comparator
-from ipet.ReaderManager import ReaderManager
-from ipet.TestRun import TestRun
+from ipet import Experiment
+from ipet.parsing import ReaderManager
+from ipet import TestRun
 import argparse
 import sys
-from ipet.IPETEvalTable import IPETEvaluation
 import os
 import re
+import logging
 
 # possible arguments in the form name,default,short,description #
 clarguments = []
 
-argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
-                                 description="starts the IPET graphical user interface")
+argparser = argparse.ArgumentParser(prog = "Ipet Parsing script", \
+                                 description = "parses test run log files and saves parsed data")
 for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 
-argparser.add_argument('outfiles', nargs='*', help="list of outfiles that should be parsed")
+argparser.add_argument('-l','--logfiles', nargs='*', help="list of outfiles that should be parsed")
 argparser.add_argument('-r','--readers', nargs='*', default=[], help="list of additional readers in xml format that should be used for parsing")
 argparser.add_argument('-s','--solufiles', nargs='*', default=[], help="list of solu files that should be taken into account")
+argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
 
 
 if __name__ == '__main__':
@@ -36,28 +37,36 @@ if __name__ == '__main__':
         exit()
     #if globals().get("help") is not None:
     print globals()
-    if outfiles is None:
+    if logfiles is None:
         print "We need out files"
         sys.exit(0)
 
 
-    #initialize a comparator
-    comparator = Comparator()
+    # initialize an experiment
+    experiment = Experiment()
+
+    if debug:
+        logger = logging.getLogger()
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
 
     for additionalfile in readers:
         rm = ReaderManager.fromXMLFile(additionalfile)
         for reader in rm.getManageables(False):
-            comparator.readermanager.registerReader(reader)
+            experiment.readermanager.registerReader(reader)
 
-    for outfile in outfiles:
-        comparator.addOutputFile(outfile)
+    for logfile in logfiles:
+        experiment.addOutputFile(logfile)
 
     for solufile in solufiles:
-        comparator.addSoluFile(solufile)
+        experiment.addSoluFile(solufile)
 
-    comparator.collectData()
+    experiment.collectData()
 
-    for tr in comparator.testrunmanager.getManageables():
+    for tr in experiment.testrunmanager.getManageables():
         try:
             filename = tr.filenames[0]
             newfilename = "%s%s"%(os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)

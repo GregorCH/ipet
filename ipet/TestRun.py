@@ -1,11 +1,7 @@
-import Misc
-from StatisticReader import SolvingTimeReader, TimeLimitReader, PrimalBoundReader, TimeToBestReader, DualBoundReader, \
-   BestSolInfeasibleReader
-
-from Editable import Editable
+import ipet.misc as misc
+from ipet.concepts import Editable
 from pandas import DataFrame, notnull
 import os
-from Tix import ROW
 try:
     import cPickle as pickle
 except:
@@ -30,6 +26,7 @@ class TestRun(Editable):
         self.metadatadict = {}
         self.parametervalues = {}
         self.defaultparametervalues = {}
+        self.instanceset = set()
         """ meta data represent instance-independent data """
 
 
@@ -53,6 +50,9 @@ class TestRun(Editable):
 
         # check for the right dictionary to store the data
         datadict = self.datadict if probname is not None else self.metadatadict
+
+        if probname not in self.instanceset:
+            self.instanceset.add(probname)
 
         if type(datakeys) is list and type(data) is list:
             for key, datum in zip(datakeys, data):
@@ -126,12 +126,15 @@ class TestRun(Editable):
         self.data = DataFrame(self.datadict)
         self.datadict = {}
 
+    def hasInstance(self, instancename):
+        return instancename in self.instanceset
+
     def getProblems(self):
         '''
         returns an (unsorted) list of problems
         '''
         if self.datadict != {}:
-            return list(set([problem for col in self.datadict.keys() for problem in self.datadict[col].keys()]))
+            return list(self.instanceset)
         else:
             return list(self.data.index.get_values())
 
@@ -255,7 +258,7 @@ class TestRun(Editable):
         '''
         returns a short identification which only includes the settings of this test run
         '''
-        return Misc.cutString(self.getSettings(), char, maxlength)
+        return misc.cutString(self.getSettings(), char, maxlength)
 
 
     def problemGetOptimalSolution(self, solufileprobname):

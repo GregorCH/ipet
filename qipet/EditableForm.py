@@ -6,9 +6,10 @@ Created on 21.03.2015
 from PyQt4.QtGui import QDialog, QFormLayout, QLabel, QLineEdit, QApplication,\
     QComboBox, QCompleter, QWidget, QMainWindow
 import sys
-from ipet.IPETEvalTable import IPETEvaluationColumn, IPETEvaluation
+from ipet.evaluation.IPETEvalTable import IPETEvaluationColumn, IPETEvaluation
 from PyQt4.QtCore import QStringList, SIGNAL
-from ipet.IPETFilter import IPETFilterGroup, IPETFilter
+from ipet.evaluation.IPETFilter import IPETFilterGroup
+from ipet.evaluation.IPETFilter import IPETFilter
 
 class EditableForm(QWidget):
     '''
@@ -21,7 +22,7 @@ class EditableForm(QWidget):
     
     @staticmethod
     def extendAvailableOptions(key, moreoptions):
-        currentoptionsforkey = EditableForm.availableOptions.get(key, [])
+        currentoptionsforkey = EditableForm.availableOptions.get(key, [None, ])
         EditableForm.availableOptions[key] = sorted(currentoptionsforkey + moreoptions)
         
     def __init__(self, editable, parent=None):

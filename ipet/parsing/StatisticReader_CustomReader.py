@@ -1,0 +1,134 @@
+from StatisticReader import StatisticReader
+import re
+import __builtin__
+
+class CustomReader(StatisticReader):
+    '''
+    Reader to be initialised interactively through IPET or from an interactive python shell
+    '''
+    name = 'CustomReader'
+    regexp = 'Custom'
+    datakey = 'Custom'
+    data = None
+
+    METHOD_FIRST = 1
+    METHOD_LAST = 2
+    METHOD_SUM = 3
+
+    str2method = {
+                  "first" : METHOD_FIRST,
+                  "last" : METHOD_LAST,
+                  "sum" : METHOD_SUM
+                  }
+
+
+    requiredoptions = {
+            "datatype" : ["float", "int"],
+            "method" : str2method.keys()
+        }
+
+    def __init__(self, name = None, regpattern = None, datakey = None, index = 0, datatype = "float", method = "last"):
+        '''
+        constructor of a custom reader to parse additional simple solver output from log file context
+
+        Parameters:
+        -----------
+
+        name : a name to distinguish this reader from the others
+
+        regpattern : A string or regular expression pattern to detect lines from which output should be read
+
+        datakey : The data key under which the parsed datum gets stored for every instance
+
+        index : The zero-based index of the number in the specified line (only numbers count)
+
+        datatype : choose 'int' or 'float'
+
+        method : how to treat multiple occurrences of this data within one instance; parse 'first', 'last', or 'sum'
+        '''
+
+        if regpattern is None:
+            raise ValueError("Error: No 'regpattern' specified for reader with name %s" % str(name))
+
+        if name is None:
+            name = CustomReader.name + regpattern
+        self.name = name
+
+        if datakey is None:
+            datakey = CustomReader.datakey + regpattern
+        self.datakey = datakey
+
+
+        self.set_index(index)
+
+        self.regpattern = regpattern
+        self.set_regpattern(regpattern)
+
+        self.method = method
+        self.methodint = self.METHOD_LAST
+        self.set_method(method)
+
+        self.set_datatype(datatype)
+
+    def getEditableAttributes(self):
+        return ['name', 'regpattern', 'datakey', 'index', 'datatype', 'method']
+
+    def getRequiredOptionsByAttribute(self, attr):
+        return self.requiredoptions.get(attr, None)
+
+    def extractStatistic(self, line):
+        if self.regexp.search(line):
+
+            try:
+                data = self.getNumberAtIndex(line, self.index)
+                data = self.datatypemethod(data)
+
+                previousdata = self.testrun.problemGetData(self.problemname, self.datakey)
+
+                if self.methodint == CustomReader.METHOD_FIRST:
+                    if previousdata is None:
+                        self.addData(self.datakey, data)
+
+                elif self.methodint == CustomReader.METHOD_LAST:
+                    self.addData(self.datakey, data)
+
+                elif self.methodint == CustomReader.METHOD_SUM:
+                    if previousdata is None:
+                        previousdata = 0
+
+                    self.addData(self.datakey, data + previousdata)
+
+
+
+            except:
+                print "Error when parsing data -> using default value", self.name
+                pass
+
+
+        return None
+
+    def setDataType(self, sometype):
+        '''
+        recognizes data types (e.g., 'float' or 'int') and sets reader data type to this value
+        '''
+        try:
+            self.datatypemethod = getattr(__builtin__, sometype)
+            self.datatype = sometype
+        except:
+            print "Error: Could not recognize data type, using float", sometype
+            self.datatypemethod = float
+            self.datatype = 'float'
+            
+    def set_datatype(self, datatype):
+        self.setDataType(datatype)
+
+    def set_method(self, method):
+        self.methodint = self.str2method.get(method, self.methodint)
+        self.method = method
+
+    def set_regpattern(self, regpattern):
+        self.regexp = re.compile(regpattern)
+        self.regpattern = regpattern
+
+    def set_index(self, index):
+        self.index = int(index)

@@ -3,14 +3,14 @@ Created on 02.08.2014
 
 @author: Gregor Hendel
 '''
-from ipet.IpetApplication import IpetApplication
-from ipet.Comparator import Comparator
+from ipet.gui import IpetApplication
+from ipet import Experiment
 import argparse
 import sys
 import re
 
 # possible arguments in the form name,default,short,description #
-clarguments = [('--comparatorfile', None,'-c', "A comparator file name (must have .cmp file extension) in cmp-format to read")]
+clarguments = [('--experimentfile', None, '-e', "An experiment file name (must have .cmp file extension) in cmp-format to read")]
 
 argparser = argparse.ArgumentParser(prog="Ipet Startup Script", \
                                  description="starts the IPET graphical user interface")
@@ -30,13 +30,13 @@ if __name__ == '__main__':
         exit()
     #if globals().get("help") is not None:
 
-    #initialize a comparator
-    comparator = None
-    if comparatorfile is not None:
+    # initialize a experiment
+    experiment = None
+    if experimentfile is not None:
         try:
-            comparator = Comparator.loadFromFile(comparatorfile)
+            experiment = Experiment.loadFromFile(experimentfile)
         except NameError:
             pass
 
-    gui = IpetApplication(comparator)
+    gui = IpetApplication(experiment)
     gui.mainloop()

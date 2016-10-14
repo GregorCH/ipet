@@ -1,6 +1,7 @@
 from StatisticReader import StatisticReader
 import re
 import __builtin__
+import logging
 
 class CustomReader(StatisticReader):
     '''
@@ -101,7 +102,7 @@ class CustomReader(StatisticReader):
 
 
             except:
-                print "Error when parsing data -> using default value", self.name
+                logging.debug("Error when parsing data -> using default value")
                 pass
 
 

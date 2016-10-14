@@ -29,41 +29,43 @@ argparser.add_argument("-D", "--debug", action = "store_true", default = False, 
 
 if __name__ == '__main__':
     try:
-        n = vars(argparser.parse_args())
-        globals().update(n)
+        arguments = argparser.parse_args()
     except:
         if not re.search(" -+h", ' '.join(sys.argv)) :
             print "Wrong Usage, use --help for more information."
         exit()
     #if globals().get("help") is not None:
-    print globals()
-    if logfiles is None:
-        print "We need out files"
+    logger = logging.getLogger()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    if arguments.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    if arguments.logfiles is None:
+        logging.info("No testruns specified, exiting")
         sys.exit(0)
 
 
     # initialize an experiment
     experiment = Experiment()
 
-    if debug:
-        logger = logging.getLogger()
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        logger.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler()
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
 
-    for additionalfile in readers:
+    for additionalfile in arguments.readers:
         rm = ReaderManager.fromXMLFile(additionalfile)
         for reader in rm.getManageables(False):
             experiment.readermanager.registerReader(reader)
 
-    for logfile in logfiles:
+    for logfile in arguments.logfiles:
         experiment.addOutputFile(logfile)
 
-    for solufile in solufiles:
+    for solufile in arguments.solufiles:
         experiment.addSoluFile(solufile)
 
+    logging.info("Start parsing process")
     experiment.collectData()
 
     for tr in experiment.testrunmanager.getManageables():
@@ -71,7 +73,7 @@ if __name__ == '__main__':
             filename = tr.filenames[0]
             newfilename = "%s%s"%(os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
             tr.saveToFile(newfilename)
-            print "converted %s --> %s"%(filename, newfilename)
+            logging.info("converted %s --> %s" % (filename, newfilename))
         except:
-            print "skipped testrun %s"%tr.getIdentification()
+            logging.info("skipped testrun %s" % tr.getIdentification())
 

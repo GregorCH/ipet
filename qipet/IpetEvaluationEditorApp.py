@@ -20,6 +20,7 @@ from EditableBrowser import EditableBrowser
 from IPETApplicationTab import IPETApplicationTab
 from EditableBrowser import EditableBrowser
 from PyQt4.Qt import QLayout
+from SimpleQIPETDataView import IPETDataTableView
 
 class EvaluationEditorWindow(IPETApplicationTab):
     addedcolumns = 0
@@ -37,10 +38,14 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.browser = EditableBrowser(self)
         self.evaluation = None
         self.filename = None
+        vlayout = QVBoxLayout()
         layout = QHBoxLayout()
         layout.addWidget(self.browser)
         layout.setSizeConstraint(QLayout.SetMaximumSize)
-        self.setLayout(layout)
+        self.tableview = IPETDataTableView(None, self)
+        vlayout.addLayout(layout)
+        vlayout.addWidget(self.tableview)
+        self.setLayout(vlayout)
         
 
         self.defineActions()

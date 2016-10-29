@@ -5,13 +5,13 @@ Created on 25.03.2015
 '''
 from PyQt4.QtGui import QTreeWidget, QTreeWidgetItem, QMainWindow, QApplication,\
     QWidget, QHBoxLayout, QFrame, QIcon, QLabel, QVBoxLayout, QGridLayout
-from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
+from ipet.evaluation import IPETEvaluation, IPETEvaluationColumn
 import sys
 from PyQt4.QtCore import SIGNAL, QString, Qt
 from qipet.EditableForm import EditableForm
-from ipet.evaluation.Aggregation import Aggregation
-from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
-from ipet.evaluation.IPETFilter import IPETFilter
+from ipet.evaluation import Aggregation
+from ipet.evaluation import IPETFilterGroup, IPETInstance
+from ipet.evaluation import IPETFilter
 from PyQt4 import QtCore
 import os.path as osp
 class IpetTreeView(QTreeWidget):

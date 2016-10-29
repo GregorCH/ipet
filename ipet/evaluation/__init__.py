@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 from Aggregation import Aggregation
-from IPETEvalTable import IPETEvaluation
-from IPETFilter import IPETFilter, IPETFilterGroup
+from IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
+from IPETFilter import IPETFilter, IPETFilterGroup, IPETInstance
 __all__ = []

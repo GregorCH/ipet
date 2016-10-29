@@ -1,0 +1,151 @@
+'''
+Created on 29.10.2016
+
+@author: gregor
+'''
+from PyQt4.Qt import QAbstractTableModel, QDialog, QLabel, QTableView,\
+    QVBoxLayout, QVariant, SIGNAL
+
+from PyQt4 import QtCore, QtGui
+import sys
+from PyQt4.QtCore import Qt
+
+class IpetTableDataModel(QAbstractTableModel):
+    '''
+    represents a model for pandas data frames
+    '''
+    SORT_INDEX = 0
+    SORT_UP = 1
+    SORT_DOWN = 2
+    
+
+    def __init__(self, dataframe):
+        '''
+       Constructor for a data table model
+        '''
+        super(IpetTableDataModel, self).__init__()
+        self.dataframe = dataframe
+        self.sorted = self.SORT_INDEX
+        self.sortcolumn = None
+       
+
+    def sortTable(self, section):
+        '''
+        sort the table by the given column indexed by the section
+        
+        sorting is iterated for a column in the order ascending, nonascending, and by index (e.g., unsorted)
+        '''
+        if self.sortcolumn != self.dataframe.columns[section]:
+            self.sorted = self.SORT_UP
+        else:
+            self.sorted += 1
+            self.sorted %= 3
+        self.sortcolumn = self.dataframe.columns[section]
+        
+        print "Calling sort method on column %s, sorting is %d" % (self.sortcolumn, self.sorted) 
+        if self.sorted == self.SORT_INDEX:
+            self.dataframe = self.dataframe.sort_index()
+            self.sortcolumn = None
+        elif self.sorted == self.SORT_UP:
+            self.dataframe = self.dataframe.sort_values(by=self.sortcolumn, ascending=True)
+        else:
+            self.dataframe = self.dataframe.sort_values(by=self.sortcolumn, ascending=False)
+        print self.dataframe
+        
+        self.reset()
+        
+        
+    def rowCount(self, *args, **kwargs):
+        if not self.dataframe:
+            return 0
+        return len(self.dataframe)
+    
+    def columnCount(self, *args, **kwargs):
+        if not self.dataframe:
+            return 0
+        return len(self.dataframe.columns)
+    
+    def data(self, index, role=QtCore.Qt.DisplayRole):
+        '''
+        returns the data to be displayed
+        '''
+        if role == QtCore.Qt.DisplayRole:
+            i = index.row()
+            j = index.column()
+            return '{0}'.format(self.dataframe.iat[i, j])
+        else:
+            return QtCore.QVariant()
+        
+    def getDataFrame(self):
+        '''
+        returns the data frame for this model
+        '''
+        return self.dataframe
+    
+    
+    
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
+        '''
+        get header data at the given orientation
+        '''
+        if role == Qt.TextAlignmentRole:
+            if orientation == Qt.Horizontal:
+                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+            return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+        if role != Qt.DisplayRole:
+            return QVariant()
+        if orientation == Qt.Horizontal:
+            return QVariant(self.dataframe.columns[section])
+        return QVariant(self.dataframe.index[section])
+    
+    def flags(self, index):
+        '''
+        return the item flags
+        '''
+        if not index.isValid():
+            return Qt.ItemIsEnabled
+        return Qt.ItemFlags(QAbstractTableModel.flags(self, index))
+    
+    
+class IPETDataTableView(QTableView):
+    def __init__(self, dataframe, parent = None):
+        super(IPETDataTableView, self).__init__(parent)
+        self.model = IpetTableDataModel(dataframe)
+        self.setModel(self.model)
+        
+        header = self.horizontalHeader()
+        self.connect(header, SIGNAL("sectionClicked(int)"), self.sortTable)
+        
+    def sortTable(self, section):
+        self.model.sortTable(section)
+        
+    def resizeColumns(self):
+        self.resizeColumnsToContents()
+    
+        
+class MainForm(QDialog):
+    def __init__(self, dataframe, parent=None):
+        super(MainForm, self).__init__(parent)
+        
+        tableLabel = QLabel("Table &1")
+        self.tableView = IPETDataTableView(dataframe, self)
+        tableLabel.setBuddy(self.tableView)
+        layout = QVBoxLayout()
+        layout.addWidget(tableLabel)
+        layout.addWidget(self.tableView)
+        self.setLayout(layout)
+        
+        self.tableView.resizeColumns()
+        
+if __name__ == "__main__":
+    import pandas as pd
+    df = pd.DataFrame(data=[[1,2,3,4], [5,6,7,8], [12,34,56,78], [98,87,76,75]], index=list("ABCD"), columns=["First", "Second", "Third", "Fourth"])
+    
+    qApp = QtGui.QApplication(sys.argv)
+
+    aw = MainForm(df)
+    aw.setWindowTitle("Test of data model")
+    aw.show()
+    sys.exit(qApp.exec_())
+    
+        

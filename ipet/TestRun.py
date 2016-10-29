@@ -26,6 +26,7 @@ class TestRun(Editable):
         self.metadatadict = {}
         self.parametervalues = {}
         self.defaultparametervalues = {}
+        self.instanceset = set()
         """ meta data represent instance-independent data """
 
 
@@ -49,6 +50,9 @@ class TestRun(Editable):
 
         # check for the right dictionary to store the data
         datadict = self.datadict if probname is not None else self.metadatadict
+
+        if probname not in self.instanceset:
+            self.instanceset.add(probname)
 
         if type(datakeys) is list and type(data) is list:
             for key, datum in zip(datakeys, data):
@@ -122,12 +126,15 @@ class TestRun(Editable):
         self.data = DataFrame(self.datadict)
         self.datadict = {}
 
+    def hasInstance(self, instancename):
+        return instancename in self.instanceset
+
     def getProblems(self):
         '''
         returns an (unsorted) list of problems
         '''
         if self.datadict != {}:
-            return list(set([problem for col in self.datadict.keys() for problem in self.datadict[col].keys()]))
+            return list(self.instanceset)
         else:
             return list(self.data.index.get_values())
 

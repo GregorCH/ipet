@@ -20,6 +20,7 @@ class ExperimentTest(unittest.TestCase):
                    ("j301_2", "LineNumbers_EndLogFile", 569)
                    ]
 
+
     def setUp(self):
         self.experiment = Experiment()
 

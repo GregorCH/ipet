@@ -30,11 +30,8 @@ class SoluFileReader(StatisticReader):
 
 
     def storeToStatistics(self, instance, objval, status):
-        try:
-            if instance in self.testrun.getProblems():
-                self.addData(self.datakeys, [float(objval), status])
-        except:
-            pass
+        if self.testrun.hasInstance(instance):
+            self.testrun.addData(instance, self.datakeys, [float(objval), status])
 
 
 

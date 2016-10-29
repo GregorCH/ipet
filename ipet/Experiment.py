@@ -22,6 +22,7 @@ from pandas import Panel
 import pandas as pd
 import os
 import sys
+import logging
 
 class Experiment(Observable):
     '''
@@ -245,19 +246,18 @@ class Experiment(Observable):
                 if processplotdata:
                     try:
                         testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
+                        logging.debug("Computed primal integral %.1f for problem %s, data %s"  % (testrun.problemGetData(probname, 'PrimalIntegral'), probname, repr(processplotdata)))
                     except AssertionError, e:
-                        print e
-                        print "Error for primal bound on problem %s, list: "%(probname)
-                        print testrun.getProbData(probname)
+                        logging.error("Error for primal bound on problem %s, list: %s"%(probname, processplotdata))
+
                 processplotdata = getProcessPlotData(testrun, probname, **dualargs)
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     try:
                         testrun.addData(probname, 'DualIntegral', calcIntegralValue(processplotdata, pwlinear=True))
                     except AssertionError, e:
-                        print e
-                        print "Error for dual bound on problem %s, list: "%(probname), processplotdata
-                        print testrun.getProbData(probname)
+                        logging.error("Error for dual bound on problem %s, list: %s "%(probname, processplotdata))
+
 
     def writeSolufile(self):
         '''
@@ -272,7 +272,7 @@ class Experiment(Observable):
                 if pb is None or db is None:
                     continue
                 status = '=unkn='
-                infinite = (pb == misc.FLOAT_INFINITY or pb == -misc.FLOAT_INFINITY)
+                infinite = (pb >= misc.FLOAT_INFINITY or pb <= -misc.FLOAT_INFINITY)
                 sense = 0
                 if pb < db:
                     sense = 1
@@ -521,6 +521,8 @@ class Experiment(Observable):
                     self.determineStatusForInfProblem(testrun, probname)
                 else:
                     self.determineStatusForUnknProblem(testrun, probname)
+
+                logging.debug("Problem %s in testrun %s solustatus %s, errorcode %s -> Status %s" % (probname, testrun.getName(), repr(solustatus), repr(errcode), testrun.problemGetData(probname, "Status")))
 
     def saveToFile(self, filename):
         '''

@@ -12,7 +12,7 @@ from ipet.evaluation import IPETEvaluation
 import re
 import textwrap
 from PyQt4.Qt import QApplication
-from qipet import IpetEvaluationEditorApp
+
 import logging
 
 description = \
@@ -134,6 +134,7 @@ if __name__ == '__main__':
         exit(0)
 
     if arguments.showapp:
+        from qipet import IpetEvaluationEditorApp, ExperimentManagement
         application = QApplication(sys.argv)
         application.setApplicationName("Evaluation editor")
         mainwindow = IpetEvaluationEditorApp()
@@ -141,7 +142,9 @@ if __name__ == '__main__':
             mainwindow.setEvaluation(theeval)
         except:
             pass
-        mainwindow.setExperiment(experiment)
+        ExperimentManagement.setExperiment(experiment)
+        mainwindow.setExperiment(ExperimentManagement.getExperiment())
+        theeval.evaluate(ExperimentManagement.getExperiment())
         mainwindow.show()
 
         sys.exit(application.exec_())

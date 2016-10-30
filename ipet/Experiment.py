@@ -185,7 +185,7 @@ class Experiment(Observable):
             self.testrunmanager.reinsertManageable(tr)
 
 
-        print 'Checking problem status'
+        
         # post processing steps: things like primal integrals depend on several, independent data
         self.updateDatakeys()
 
@@ -499,6 +499,7 @@ class Experiment(Observable):
 
         checks whether the solver's return status matches the information about the instances
         '''
+        logging.debug('Checking problem status')
         for testrun in self.testrunmanager.getManageables():
             for probname in testrun.getProblems():
                 solustatus = testrun.problemGetSoluFileStatus(probname)

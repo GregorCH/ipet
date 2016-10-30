@@ -385,15 +385,27 @@ class IPETEvaluation(Editable, IpetNode):
         self.defaultgroup = defaultgroup
         self.comparecolformat = comparecolformat[:]
         self.columns = []
-        self.evaluateoptauto = bool(evaluateoptauto)
+        self.set_evaluateoptauto(evaluateoptauto)
         self.sortlevel = int(sortlevel)
-
+        self.evaluated = False
 
     def getName(self):
         return self.nodetag
+    
+    def isEvaluated(self):
+        '''
+        returns whether this evaluation has been evaluated since its columns or filter groups have been modified
+        '''
+        return self.evaluated
+    
+    def setEvaluated(self, evaluated):
+        '''
+        change the flag if this evaluation has been evaluated since its last modification
+        '''
+        self.evaluated = evaluated
 
     def set_evaluateoptauto(self, evaluateoptauto):
-        self.evaluateoptauto = bool(evaluateoptauto)
+        self.evaluateoptauto = True if evaluateoptauto in [True, "True"] else False
 
     def set_sortlevel(self, sortlevel):
         self.sortlevel = int(sortlevel)
@@ -422,12 +434,16 @@ class IPETEvaluation(Editable, IpetNode):
             self.columns.append(child)
         elif child.__class__ is IPETFilterGroup:
             self.filtergroups.append(child)
+            
+        self.setEvaluated(False)
 
     def removeChild(self, child):
         if child.__class__ is IPETEvaluationColumn:
             self.columns.remove(child)
         elif child.__class__ is IPETFilterGroup:
             self.filtergroups.remove(child)
+            
+        self.setEvaluated(False)
 
     def getRequiredOptionsByAttribute(self, attr):
         return self.attributes2Options.get(attr)
@@ -438,9 +454,11 @@ class IPETEvaluation(Editable, IpetNode):
             raise ValueError("Error: Filter group of name <%s> already existing in current evaluation!" % fg.getName())
 
         self.filtergroups.append(fg)
+        self.setEvaluated(False)
 
     def removeFilterGroup(self, fg):
         self.filtergroups.remove(fg)
+        self.setEvaluated(False)
 
     def setGroupKey(self, gk):
         self.groupkey = gk
@@ -448,12 +466,15 @@ class IPETEvaluation(Editable, IpetNode):
 
     def setDefaultGroup(self, dg):
         self.defaultgroup = dg
+        self.setEvaluated(False)
 
     def addColumn(self, col):
         self.columns.append(col)
+        self.setEvaluated(False)
 
     def removeColumn(self, col):
         self.columns.remove(col)
+        self.setEvaluated(False)
 
     def setEvaluateOptAuto(self, evaloptauto):
         '''
@@ -694,9 +715,6 @@ class IPETEvaluation(Editable, IpetNode):
 
         return optdf
 
-
-
-
     def checkMembers(self):
         '''
         checks the evaluation members for inconsistencies
@@ -706,14 +724,28 @@ class IPETEvaluation(Editable, IpetNode):
                 col.checkAttributes()
             except Exception as e:
                 raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
+            
+    def getAggregatedGroupData(self, filtergroup):
+        if not filtergroup in self.filtergroups:
+            raise ValueError("Filter group %s (name:%s) is not contained in evaluation filter groups")
+        return self.filtered_agg[filtergroup.getName()]
+    
+    def getInstanceGroupData(self, filtergroup):
+        return self.filtered_instancewise[filtergroup.getName()]
+    
+    def getAggregatedData(self):
+        return self.retagg
+    
+    def getInstanceData(self):
+        return self.rettab
 
-    def evaluate(self, comp):
+    def evaluate(self, exp):
         '''
-        evaluate the data of a Comparator instance comp
+        evaluate the data of an Experiment instance exp
 
         Parameters
         ----------
-        comp : a Comparator instance for which data has already been collected
+        exp : an experiment instance for which data has already been collected
 
         Returns
         -------
@@ -723,7 +755,7 @@ class IPETEvaluation(Editable, IpetNode):
         self.checkMembers()
 
         #data is concatenated along the rows and eventually extended by external data
-        data = comp.getJoinedData()
+        data = exp.getJoinedData()
 
         if not self.groupkey in data.columns:
             raise KeyError(" Group key is missing in data:", self.groupkey)
@@ -742,9 +774,9 @@ class IPETEvaluation(Editable, IpetNode):
         ret = self.convertToHorizontalFormat(columndata)
         if self.levelonedf is not None:
             self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
-            rettab = pd.concat([ret, self.levelonedf], axis=1)
+            self.rettab = pd.concat([ret, self.levelonedf], axis=1)
         else:
-            rettab = ret
+            self.rettab = ret
 
 
         self.instance_wise = ret
@@ -762,11 +794,12 @@ class IPETEvaluation(Editable, IpetNode):
         if len(self.filtergroups) > 0:
             dfs = [self.filtered_agg[fg.name] for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
             names = [fg.name for fg in self.filtergroups if not self.filtered_agg[fg.name].empty]
-            retagg = pd.concat(dfs, keys=names, names=['Group'])
+            self.retagg = pd.concat(dfs, keys=names, names=['Group'])
         else:
-            retagg = pd.DataFrame()
+            self.retagg = pd.DataFrame()
 
-        return rettab, retagg
+        self.setEvaluated(True)
+        return self.rettab, self.retagg
     '''
         for fg in self.filtergroups:
             self.applyFilterGroup(columndata, fg, comp)

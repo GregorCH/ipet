@@ -125,7 +125,7 @@ class Aggregation(Editable, IpetNode):
         method = self.agg2Stat.get(self.name)
         if len(self.getEditableAttributes()) > 1 and method is not None:
             method = partial(method, **{key:self.__dict__[key] for key in self.editableattributes[2:]})
-            method.__name__ = self.getName()
+            method.__name__ = self.getName() + "p"
         return method
 
 if __name__ == '__main__':

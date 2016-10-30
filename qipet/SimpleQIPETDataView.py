@@ -4,7 +4,7 @@ Created on 29.10.2016
 @author: gregor
 '''
 from PyQt4.Qt import QAbstractTableModel, QDialog, QLabel, QTableView,\
-    QVBoxLayout, QVariant, SIGNAL
+    QVBoxLayout, QVariant, SIGNAL, QString
 
 from PyQt4 import QtCore, QtGui
 import sys
@@ -42,7 +42,6 @@ class IpetTableDataModel(QAbstractTableModel):
             self.sorted %= 3
         self.sortcolumn = self.dataframe.columns[section]
         
-        print "Calling sort method on column %s, sorting is %d" % (self.sortcolumn, self.sorted) 
         if self.sorted == self.SORT_INDEX:
             self.dataframe = self.dataframe.sort_index()
             self.sortcolumn = None
@@ -50,18 +49,17 @@ class IpetTableDataModel(QAbstractTableModel):
             self.dataframe = self.dataframe.sort_values(by=self.sortcolumn, ascending=True)
         else:
             self.dataframe = self.dataframe.sort_values(by=self.sortcolumn, ascending=False)
-        print self.dataframe
         
         self.reset()
         
         
     def rowCount(self, *args, **kwargs):
-        if not self.dataframe:
+        if self.dataframe is None:
             return 0
         return len(self.dataframe)
     
     def columnCount(self, *args, **kwargs):
-        if not self.dataframe:
+        if self.dataframe is None:
             return 0
         return len(self.dataframe.columns)
     
@@ -72,7 +70,7 @@ class IpetTableDataModel(QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             i = index.row()
             j = index.column()
-            return '{0}'.format(self.dataframe.iat[i, j])
+            return '{0}'.format(self.dataframe.loc[self.dataframe.index[i], self.dataframe.columns[j]])
         else:
             return QtCore.QVariant()
         
@@ -82,7 +80,18 @@ class IpetTableDataModel(QAbstractTableModel):
         '''
         return self.dataframe
     
+    def setDataFrame(self, dataframe):
+        self.dataframe = dataframe
+        self.reset()
+        
     
+    def getString(self, stringortuple):
+        if type(stringortuple) is str:
+            return stringortuple
+        elif type(stringortuple) is tuple:
+            return ":".join(stringortuple)
+        else:
+            raise TypeError("Wrong type %s, expected string or tuple" % type(stringortuple))
     
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         '''
@@ -95,8 +104,8 @@ class IpetTableDataModel(QAbstractTableModel):
         if role != Qt.DisplayRole:
             return QVariant()
         if orientation == Qt.Horizontal:
-            return QVariant(self.dataframe.columns[section])
-        return QVariant(self.dataframe.index[section])
+            return QVariant(self.getString(self.dataframe.columns[section]))
+        return QVariant(QString(self.getString(self.dataframe.index[section])))
     
     def flags(self, index):
         '''
@@ -121,6 +130,10 @@ class IPETDataTableView(QTableView):
         
     def resizeColumns(self):
         self.resizeColumnsToContents()
+        
+    def setDataFrame(self, dataframe):
+        self.model.setDataFrame(dataframe)
+        self.resizeColumns()
     
         
 class MainForm(QDialog):

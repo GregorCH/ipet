@@ -6,21 +6,21 @@ Created on 26.03.2015
 from PyQt4.QtGui import QFrame, QWidget, QLabel,\
     QApplication, QKeySequence, QFileDialog, \
     QVBoxLayout, QHBoxLayout
-from qipet.IPetTreeView import IpetTreeView
-from qipet.EditableForm import EditableForm
+from IPetTreeView import IpetTreeView
+from EditableForm import EditableForm
 from PyQt4.QtCore import QString, Qt, SIGNAL
+from PyQt4.Qt import QLayout, QTabWidget
 from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
 from ipet.misc import misc
 from ipet.evaluation.Aggregation import Aggregation
 from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
 from ipet.evaluation.IPETFilter import IPETFilter
-from qipet.IpetMainWindow import IpetMainWindow
+from IpetMainWindow import IpetMainWindow
 from EditableBrowser import EditableBrowser
 from IPETApplicationTab import IPETApplicationTab
-from EditableBrowser import EditableBrowser
-from PyQt4.Qt import QLayout
 from SimpleQIPETDataView import IPETDataTableView
+import ExperimentManagement
 
 class EvaluationEditorWindow(IPETApplicationTab):
     addedcolumns = 0
@@ -38,21 +38,27 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.browser = EditableBrowser(self)
         self.evaluation = None
         self.filename = None
+        self.lastfiltergroup = None
         vlayout = QVBoxLayout()
         layout = QHBoxLayout()
         layout.addWidget(self.browser)
         layout.setSizeConstraint(QLayout.SetMaximumSize)
-        self.tableview = IPETDataTableView(None, self)
         vlayout.addLayout(layout)
-        vlayout.addWidget(self.tableview)
+        tabwidget = QTabWidget(self)
+        self.tableview = IPETDataTableView(None, self)
+        self.aggtableview = IPETDataTableView(None, self)
+        tabwidget.addTab(self.tableview, QString("Instances"))
+        tabwidget.addTab(self.aggtableview, QString("Aggregated"))
+        vlayout.addWidget(tabwidget)
         self.setLayout(vlayout)
         
 
         self.defineActions()
         self.initConnections()
+        self.passGroupToTableViews()
         
     def initConnections(self):
-        self.connect(self.browser, SIGNAL(EditableBrowser.ITEMEVENT), self.enableOrDisableActions)
+        self.connect(self.browser, SIGNAL(EditableBrowser.ITEMEVENT), self.itemChanged)
 
     def setEvaluation(self, evaluation):
         self.browser.setRootElement(evaluation)
@@ -79,9 +85,11 @@ class EvaluationEditorWindow(IPETApplicationTab):
         
         self.deletelementaction = self.createAction("&Delete Element", self.browser.deleteElement, QKeySequence.Delete, "delete-icon",
                                                tip="Delete currently selected element")
+        self.reevaluateaction = self.createAction("Reevaluate", self.reevaluate, "F5", icon="reevaluate-icon", 
+                                        tip="Reevaluate the current evaluation on the _experiment")
 
     def getMenuActions(self):
-        return (("&File", [self.loadaction, self.saveaction, self.saveasaction]),)
+        return (("&File", [self.loadaction, self.saveaction, self.saveasaction]),("&Data", [self.reevaluateaction]))
     
     def getToolBarActions(self):
         return (("File", [self.saveaction, self.loadaction]),
@@ -92,6 +100,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
                                 self.addinstancenaction,
                                 self.deletelementaction]
                  ),
+                ("Data", [self.reevaluateaction])
                 )
 
     def addColumn(self):
@@ -115,7 +124,6 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.addedfilters += 1
 
         newfilter = IPETFilter(expression1 = "CHANGE", expression2 = "CHANGE")
-        print newfilter.getName()
         self.browser.addNewElementAsChildOfSelectedElement(newfilter)
 
 
@@ -183,8 +191,33 @@ class EvaluationEditorWindow(IPETApplicationTab):
                 action.setEnabled(True)
             else:
                 action.setEnabled(False)
+    
+    def itemChanged(self):
+        self.enableOrDisableActions()
+        self.passGroupToTableViews()
+                
+    def passGroupToTableViews(self):
+        selectedfiltergroup = None
+        if self.browser.treewidget.getSelectedEditable().__class__ is IPETFilterGroup:
+            selectedfiltergroup = self.browser.treewidget.getSelectedEditable()
+            
+        if selectedfiltergroup != self.lastfiltergroup:
+            if selectedfiltergroup is not None:
+                self.updateStatus("Display data for selected filter group \"%s\"" % selectedfiltergroup.getName())
+                self.tableview.setDataFrame(self.evaluation.getInstanceGroupData(selectedfiltergroup))
+                self.aggtableview.setDataFrame(self.evaluation.getAggregatedGroupData(selectedfiltergroup))
+            else:
+                self.updateStatus("Display data for all instances")
+                self.tableview.setDataFrame(self.evaluation.getInstanceData())
+                self.aggtableview.setDataFrame(self.evaluation.getAggregatedData())
+                
+        self.lastfiltergroup = selectedfiltergroup
 
-
+    def reevaluate(self):
+        if self.evaluation is not None:
+            rettab, retagg = self.evaluation.evaluate(ExperimentManagement.getExperiment())
+            self.tableview.setDataFrame(rettab)
+            self.aggtableview.setDataFrame(retagg)
 
 class IpetEvaluationEditorApp(IpetMainWindow):
     '''
@@ -200,13 +233,9 @@ class IpetEvaluationEditorApp(IpetMainWindow):
 
     def setEvaluation(self, evaluation):
         self.evaluationeditorwindow.setEvaluation(evaluation)
-
-
-
-
         
-    def setExperiment(self, experiment):
-        EditableForm.extendAvailableOptions("datakey", experiment.getDatakeys())
+    def setExperiment(self, _experiment):
+        EditableForm.extendAvailableOptions("datakey", _experiment.getDatakeys())
 
     
 if __name__ == "__main__":
@@ -215,7 +244,13 @@ if __name__ == "__main__":
     app.setApplicationName("Evaluation editor")
     mainwindow = IpetEvaluationEditorApp()
     ev = IPETEvaluation.fromXMLFile("../test/testevaluate.xml")
+    ev.setDefaultGroup('testmode')
+    ExperimentManagement.addOutputFiles(["../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"])
+    ExperimentManagement.getExperiment().collectData()
     mainwindow.setEvaluation(ev)
+    mainwindow.setExperiment(ExperimentManagement.getExperiment())
+    mainwindow.evaluationeditorwindow.reevaluate()
+    IpetMainWindow.getStatusBar().showMessage("I am a working status bar", 5000)
     mainwindow.show()
     
     sys.exit(app.exec_())

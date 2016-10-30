@@ -27,7 +27,7 @@ class IpetApplication(Tk):
 
     selected_problem = ''
     selected_testrun = None
-    experiment = None
+    _experiment = None
 
     listboxlistmap = {}
     listToActionDict = {}
@@ -37,10 +37,10 @@ class IpetApplication(Tk):
 
 
 
-    def __init__(self, experiment = None, show = True):
+    def __init__(self, _experiment = None, show = True):
         '''
-        initializes a IpetApplication. Pass an existing experiment or None to make the GUI create a new, empty
-        experiment instance
+        initializes a IpetApplication. Pass an existing _experiment or None to make the GUI create a new, empty
+        _experiment instance
         '''
         Tk.__init__(self)
         self.wm_title(IpetApplication.TITLE)
@@ -88,7 +88,7 @@ class IpetApplication(Tk):
         self.progressstatus = IpetProgressStatus(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight() / 12)
         self.progressstatus.pack(side=BOTTOM, fill=Tkconstants.X)
         tabbedFrame.pack(side=BOTTOM, fill=BOTH, expand=1)
-        self.setExperiment(experiment)
+        self.setExperiment(_experiment)
 
         self.setupMenu()
 
@@ -100,12 +100,12 @@ class IpetApplication(Tk):
     def createNavBar(self):
         navbar = Frame(self, width=self.winfo_screenwidth(), height=16)
         buttons = (
-                   ("edit-new-document-icon", "Create new experiment", self.resetExperiment),
+                   ("edit-new-document-icon", "Create new _experiment", self.resetExperiment),
                    ("Load-icon", "Load Experiment from .cmp file", self.loadExperiment),
                    ("disk-icon", "Save Experiment to .cmp format", self.saveExperiment),
                    None,
-                   ("document-add-icon", "Add log file(s) to current experiment", self.addLogFiles),
-                   ("coin-add-icon", "Add solution file(s) to current experiment", self.addSolufiles),
+                   ("document-add-icon", "Add log file(s) to current _experiment", self.addLogFiles),
+                   ("coin-add-icon", "Add solution file(s) to current _experiment", self.addSolufiles),
                    None,
                    ("reload-icon", "Collect data", self.reCollectData)
                    )
@@ -194,7 +194,7 @@ class IpetApplication(Tk):
 
     def getAllDatakeys(self):
         '''
-        get all data keys (i.e., column names) of the data of this experiment
+        get all data keys (i.e., column names) of the data of this _experiment
         '''
         try:
             return self.experiment.getDatakeys()
@@ -209,9 +209,9 @@ class IpetApplication(Tk):
         all optionally filtered problem instances as a list
 
         returns the list of problem instances which may have been filtered first through the list of active
-        experiment filters
+        _experiment filters
 
-        :param onlyfiltered: set to :code:`True` for filtering problems through the set of active filters of the experiment instance
+        :param onlyfiltered: set to :code:`True` for filtering problems through the set of active filters of the _experiment instance
 
         :return: all optionally filtered problem instances as a list
         '''
@@ -231,7 +231,7 @@ class IpetApplication(Tk):
         returns the list of testruns instances as list
 
         :param onlyactive: set to :code:`False` to get all instead of only the currently active test runs. The testrun manager
-        of the experiment object decides if testruns are active
+        of the _experiment object decides if testruns are active
         '''
         try:
             return self.experiment.getManager('testrun').getManageables(onlyactive)
@@ -240,7 +240,7 @@ class IpetApplication(Tk):
 
     def addReader(self, reader):
         '''
-        adds a reader to the experiment object
+        adds a reader to the _experiment object
 
         :param reader: an instance of :ipet:`StatisticReader`
         '''
@@ -303,7 +303,7 @@ class IpetApplication(Tk):
 
     def loadExperiment(self):
         '''
-        load method to ask for experiment instance to be loaded
+        load method to ask for _experiment instance to be loaded
         '''
         self.file_opt['defaultextension'] = r'.cmp'
         filename = tkFileDialog.askopenfilename(**self.file_opt)
@@ -314,7 +314,7 @@ class IpetApplication(Tk):
 
     def saveExperiment(self):
         '''
-        saves the experiment instance to a file
+        saves the _experiment instance to a file
         '''
         self.file_opt['defaultextension'] = r'.cmp'
         filename = tkFileDialog.asksaveasfilename(**self.file_opt)
@@ -323,18 +323,18 @@ class IpetApplication(Tk):
 
     def resetExperiment(self):
         '''
-        replaces the current experiment instance by an empty experiment.
+        replaces the current _experiment instance by an empty _experiment.
         '''
         self.setExperiment(None)
 
-    def setExperiment(self, experiment):
+    def setExperiment(self, _experiment):
         '''
-        replaces the current experiment instance by :code:`experiment`
+        replaces the current _experiment instance by :code:`_experiment`
 
-        :param experiment: new experiment instance to replace current experiment
+        :param _experiment: new _experiment instance to replace current _experiment
         '''
-        if experiment is not None:
-            self.experiment = experiment
+        if _experiment is not None:
+            self.experiment = _experiment
         else:
             self.experiment = Experiment()
         try:
@@ -352,7 +352,7 @@ class IpetApplication(Tk):
 
     def addLogFiles(self):
         '''
-        opens a file dialog and adds log files by creating new test runs to the current experiment
+        opens a file dialog and adds log files by creating new test runs to the current _experiment
         '''
         self.file_opt['defaultextension'] = r".out"
         filenames = tkFileDialog.askopenfilenames(**self.file_opt)

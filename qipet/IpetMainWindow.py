@@ -13,17 +13,25 @@ class IpetMainWindow(QMainWindow):
 
     menus = {}
     toolbars = {}
-    statusbar = None
+    _statusbar = None
     def __init__(self, parent=None):
         '''
         Constructor
         '''
         super(IpetMainWindow, self).__init__(parent)
         
-        self.setGeometry(300, 300, 800, 500)
-        IpetMainWindow.statusbar = self.statusBar()
+        self.setGeometry(100, 100, 1200, 800)
+        print "status bar"
+        IpetMainWindow.setStatusBar(self.statusBar())
+        print IpetMainWindow.getStatusBar()
         
+    @staticmethod
+    def getStatusBar():
+        return IpetMainWindow._statusbar
     
+    @staticmethod
+    def setStatusBar(statusbar):
+        IpetMainWindow._statusbar = statusbar
         
     def populateMenu(self, ipetapplicationtab):
         for menuname, actions in ipetapplicationtab.getMenuActions():

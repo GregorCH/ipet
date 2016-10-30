@@ -52,4 +52,4 @@ class IPETApplicationTab(QWidget):
         return action
 
     def updateStatus(self, message):
-        IpetMainWindow.statusbar.showMessage(message, 5000)
+        IpetMainWindow.getStatusBar().showMessage(message, 5000)

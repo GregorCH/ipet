@@ -698,7 +698,6 @@ class IPETEvaluation(Editable, IpetNode):
         '''
         calculate optimal auto settings instancewise
         '''
-        print df.head(5)
         grouped = df.groupby(level=0)
 
         optstatus = grouped["Status"].apply(self.findStatus)

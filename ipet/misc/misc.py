@@ -139,14 +139,14 @@ def listGetMinColWidth(listofitems):
             maxlen = len(item)
     return maxlen
 
-def saveAsXML(object, filename):
+def saveAsXML(nodeobject, filename):
     '''
     save object as XML file under the specified filename
 
     object must have a 'toXMLElem'-method
     '''
 
-    xml = object.toXMLElem()
+    xml = nodeobject.toXMLElem()
 
     dom = parseString(ElementTree.tostring(xml))
 

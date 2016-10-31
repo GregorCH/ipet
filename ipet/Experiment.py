@@ -122,6 +122,12 @@ class Experiment(Observable):
                 self.datakeymanager.addManageable(key)
             except KeyError:
                 pass
+        if self.externaldata is not None:
+            for key in self.externaldata.columns:
+                try:
+                    self.datakeymanager.addManageable(key)
+                except KeyError:
+                    pass
 
     def makeProbNameList(self):
         problemset = set()
@@ -153,6 +159,9 @@ class Experiment(Observable):
         '''
         try:
             self.externaldata = pd.read_table(filename, sep = " *", engine = 'python', header = 1, skipinitialspace = True)
+            self.updateDatakeys()
+            logging.debug("Experiment read external data file %s" % filename)
+            logging.debug("%s" % self.externaldata.head(5))
         except:
             raise ValueError("Error reading file name %s"%filename)
 

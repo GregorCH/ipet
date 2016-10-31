@@ -56,8 +56,9 @@ if __name__ == '__main__':
 
     for additionalfile in arguments.readers:
         rm = ReaderManager.fromXMLFile(additionalfile)
-        for reader in rm.getManageables(False):
+        for reader in rm.getManageables():
             experiment.readermanager.registerReader(reader)
+            logging.info("Registered reader with name %s" % reader.getName())
 
     for logfile in arguments.logfiles:
         experiment.addOutputFile(logfile)

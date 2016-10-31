@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ElementTree
 from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
     GapReader, SolvingTimeReader, TimeLimitReader, \
     BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
-    SettingsFileReader, TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader, DateTimeReader
+    SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
 from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader, ParascipDualBoundHistoryReader
 from StatisticReader_GeneralInformationReader import GeneralInformationReader
 from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
@@ -24,7 +24,7 @@ class ReaderManager(Manager, IpetNode, Editable):
     """
     acquires test run data. subclasses of manager, managing readers by their unique name
     """
-    extensions = [".mps", ".cip", ".fzn", ".pip", ".lp", ".gms"]
+    extensions = [".mps", ".cip", ".fzn", ".pip", ".lp", ".gms", ".dat"]
     nodetag = "Readers"
 
     solvertype_recognition = {
@@ -197,6 +197,16 @@ class ReaderManager(Manager, IpetNode, Editable):
             return
         self.testrun.addData(problemname, "%s%s" % (prefix, contextstring), linenumber)
 
+    def getProblemName(self, line):
+        fullname = line.split()[1]
+        namewithextension = os.path.basename(fullname)
+        if namewithextension.endswith("gz"):
+            namewithextension = os.path.splitext(namewithextension)[0]
+        for extension in self.extensions:
+            if namewithextension.endswith(extension):
+                namewithextension = os.path.splitext(namewithextension)[0]
+
+        return namewithextension
 
     def updateProblemName(self, line, currentcontext, readers):
         '''
@@ -209,22 +219,16 @@ class ReaderManager(Manager, IpetNode, Editable):
                 for reader in readers:
                     reader.execEndOfProb()
                     
-            fullname = line[1].split()[1]
-            namewithextension = os.path.basename(fullname)
-            if namewithextension.endswith("gz"):
-                namewithextension = os.path.splitext(namewithextension)[0]
-            for extension in self.extensions:
-                if namewithextension.endswith(extension):
-                    namewithextension = os.path.splitext(namewithextension)[0]
-            StatisticReader.setProblemName(namewithextension)
+            problemname = self.getProblemName(line[1])
+            StatisticReader.setProblemName(problemname)
 
 
             # overwrite previous output information from a log file
-            if namewithextension in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
-                self.testrun.deleteProblemData(namewithextension)
+            if problemname in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
+                self.testrun.deleteProblemData(problemname)
+            self.testrun.addData(problemname, 'Settings', self.testrun.getSettings())
 
             self.updateLineNumberData(line[0], StatisticReader.getProblemName(), currentcontext, "LineNumbers_Begin")
-            self.testrun.addData(namewithextension, 'Settings', self.testrun.getSettings())
 
     def endOfInstanceReached(self, line):
         if line.startswith(self.problemendexpression):

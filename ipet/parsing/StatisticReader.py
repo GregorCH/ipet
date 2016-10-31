@@ -568,16 +568,22 @@ class ListReader(StatisticReader):
             return self.contextname2contexts.keys()
         return None
 
-    def extractStatistic(self, line):
+    def getLineData(self, line):
         match = self.regular_exp.match(line)
         if match is not None:
-            datakey = match.group(0)
-            strval = match.group(1)
+            datakey = match.group(1)
+            strval = match.group(2)
             try:
                 val = int(strval)
             except ValueError:
                 val = float(strval)
-            self.addData(datakey, val)
+            return (datakey, val)
+        return None
+
+    def extractStatistic(self, line):
+        data = self.getLineData(line)
+        if data is not None:
+            self.addData(data[0], data[1])
 
 
 

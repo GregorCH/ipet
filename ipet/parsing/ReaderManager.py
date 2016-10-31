@@ -210,10 +210,12 @@ class ReaderManager(Manager, IpetNode, Editable):
                     reader.execEndOfProb()
                     
             fullname = line[1].split()[1]
-            namewithextension = os.path.basename(fullname);
-            namewithextension = os.path.splitext(namewithextension)[0]
+            namewithextension = os.path.basename(fullname)
+            if namewithextension.endswith("gz"):
+                namewithextension = os.path.splitext(namewithextension)[0]
             for extension in self.extensions:
-                namewithextension = namewithextension.split(extension)[0]
+                if namewithextension.endswith(extension):
+                    namewithextension = os.path.splitext(namewithextension)[0]
             StatisticReader.setProblemName(namewithextension)
 
 

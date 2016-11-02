@@ -197,6 +197,11 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.passGroupToTableViews()
                 
     def passGroupToTableViews(self):
+        
+        if self.evaluation is None or not self.evaluation.isEvaluated():
+            self.updateStatus("Refresh evaluation first to update results")
+            return
+        
         selectedfiltergroup = None
         if self.browser.treewidget.getSelectedEditable().__class__ is IPETFilterGroup:
             selectedfiltergroup = self.browser.treewidget.getSelectedEditable()

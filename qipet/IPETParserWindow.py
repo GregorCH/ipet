@@ -5,54 +5,120 @@ Created on 21.09.2016
 '''
 from IpetMainWindow import IpetMainWindow
 from PyQt4.QtGui import QLayout, QHBoxLayout
-from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QFileDialog, QString, QKeySequence, QTextBrowser, QComboBox
+from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QFileDialog, QString, QKeySequence, QTextBrowser, QComboBox,\
+    QLabel, SIGNAL, QTextCursor
 from IPetTreeView import IpetTreeView
 import sys
 from qipet.EditableBrowser import EditableBrowser
 from IPETApplicationTab import IPETApplicationTab
 from ipet.parsing import ReaderManager
 from ipet import misc
-from ipet.parsing.StatisticReader_CustomReader import CustomReader
-from ipet.parsing.StatisticReader import ListReader
+from ipet.parsing import CustomReader
+from ipet.parsing import ListReader
+from ipet.parsing import StatisticReader
 from EditableForm import OptionsComboBox
 import ExperimentManagement
 
 class IPETLogFileView(QWidget):
+    StyleSheet = """
+        QComboBox { color: darkblue; }
+        QTextEdit { font-family : monospace;
+                    font-size : 12px; }
+        """
+
+
     '''
     a view of a log file, with selection mechanisms for the desired test run and instance that should be shown
     '''
     def __init__(self, parent = None):
         super(IPETLogFileView, self).__init__(parent)
         vlayout = QVBoxLayout(self)
-        self.textbrowser = QTextBrowser(self)
+        self.textbrowser = QTextEdit(self)
+        self.textbrowser.setReadOnly(True)
         self.testrunselection = OptionsComboBox(self)
         self.instanceselection = OptionsComboBox(self)
         vlayout.addWidget(self.textbrowser)
+        self.setStyleSheet(self.StyleSheet)
         hlayout = QHBoxLayout()
-        hlayout.addWidget(self.testrunselection)
-        hlayout.addWidget(self.instanceselection)
+        testrunselectionlabel = QLabel("Select a test run", self)
+        instanceselectionlabel = QLabel("Select an instance", self)
+        testrunselectionlabel.setBuddy(self.testrunselection)
+        instanceselectionlabel.setBuddy(self.instanceselection)
+        for l,s in [(testrunselectionlabel, self.testrunselection),
+                    (instanceselectionlabel, self.instanceselection)]:
+            v = QVBoxLayout(self)
+            v.addWidget(l)
+            v.addWidget(s)
+            hlayout.addLayout(v)
         vlayout.addLayout(hlayout)
         self.setLayout(vlayout)
+        
+        self.initConnections()
 
     def getProblem(self):
         problem = self.instanceselection.currentText()
         return problem
+    
+    def getSelectedText(self):
+        return self.textbrowser.textCursor().selection(QTextCursor.LineUnderCursor)
+    
+    def getLineSelectionIndex(self):
+        c = self.textbrowser.textCursor()
+        if c.anchor() < c.position():
+            # normal left to right selection
+            return (c.positionInBlock() - (c.selectionEnd() - c.selectionStart()) , 
+                    c.positionInBlock())
+        else:
+            return (c.positionInBlock(), 
+                    c.positionInBlock() + (c.selectionEnd() - c.selectionStart()))
+    
+    def getSelectedLine(self):
+        return self.text[self.textbrowser.textCursor().blockNumber()]
+    
 
     def getTestRun(self):
-        testrun = self.testrunselection.currentText()
+        testruntext = self.testrunselection.currentText()
+        for t in ExperimentManagement.getExperiment().getTestRuns():
+            if t.getName() == testruntext:
+                return t
+        return None
+        
+    def initConnections(self):
+        for s in (self.testrunselection, self.instanceselection):
+            self.connect(s, SIGNAL("currentIndexChanged(int)"), self.updateView)
+        
 
 
 
-    def updateSelection(self):
+    def updateExperimentData(self):
         self.testrunselection.clear()
         self.instanceselection.clear()
         
-        testruns = ExperimentManagement.getExperiment().getTestruns()
+        testruns = ExperimentManagement.getExperiment().getTestRuns()
         problems = ExperimentManagement.getExperiment().getProblems()
 
+        self.testrunselection.addItems([t.getName() for t in testruns])
+        self.instanceselection.addItems([p for p in problems])
 
+    def updateView(self):
+        selectedtestrun = self.getTestRun()
+        selectedproblem = self.getProblem()
+        if selectedtestrun is None:
+            return
+        outfile = selectedtestrun.getLogFile()
 
-
+        with open(outfile, 'r') as in_file:
+            linesstart = selectedtestrun.problemGetData(str(selectedproblem), "LineNumbers_BeginLogFile")
+            linesend = selectedtestrun.problemGetData(str(selectedproblem), "LineNumbers_EndLogFile")
+            self.text = []
+            print linesstart, linesend
+            for idx, line in enumerate(in_file):
+                if idx > linesend:
+                    break
+                elif idx >= linesstart:
+                    self.text.append(line)
+            self.textbrowser.setText("".join(self.text))
+            self.textbrowser.update()
 
 class IPETParserWindow(IPETApplicationTab):
 
@@ -63,12 +129,15 @@ class IPETParserWindow(IPETApplicationTab):
         vlayout = QVBoxLayout()
         self.editablebrowser = EditableBrowser()
         vlayout.addWidget(self.editablebrowser)
-        vlayout.addWidget(IPETLogFileView(self))
+        self.logfileview = IPETLogFileView(self)
+        vlayout.addWidget(self.logfileview)
 
         self.setLayout(vlayout)
         self.parser = None
         self.filename = None
         self.defineActions()
+        
+        self.logfileview.updateExperimentData()
 
     def setParser(self, parser):
         self.editablebrowser.setRootElement(parser)
@@ -79,7 +148,7 @@ class IPETParserWindow(IPETApplicationTab):
                                        tip = "Load parser from XML file (current parser gets discarded)")
         self.saveaction = self.createAction("Save parser", self.saveParser, None, icon = "disk-icon",
                                         tip = "Save parser to a file")
-        self.saveasaction = self.createAction("Save parser", self.saveParserAs, None, icon = "disk-icon",
+        self.saveasaction = self.createAction("Save parser as", self.saveParserAs, None, icon = "disk-icon",
                                         tip = "Save parser to a file of a specified name")
 
         self.addcustomreaderaction = self.createAction("Add Custom Reader", self.addCustomReader, None, icon = "3d-glasses-icon",
@@ -87,17 +156,44 @@ class IPETParserWindow(IPETApplicationTab):
         self.addlistreaderaction = self.createAction("Add List Reader", self.addListReader, "Alt+L", icon = "list-icon",
                                                       tip = "Add a list reader to this parser")
 
-        self.deleteaction = self.createAction("Delete reader", self.editablebrowser.deleteElement, QKeySequence.Delete, "delete-Icon",
+        self.deleteaction = self.createAction("Delete reader", self.editablebrowser.deleteElement, QKeySequence.Delete, "delete-icon",
                                               tip = "Delete selected reader ")
-        self.recollectdataaction = self.createAction("Recollect Data", self.recollectData, QKeySequence.Refresh, "Refresh-icon",
-                                                     tip = "Recollect data with specified readers")
+        self.recollectdataaction = self.createAction("Parse experimental Data", self.recollectData, QKeySequence.Refresh, "Refresh-icon",
+                                                     tip = "Parse experimental data")
+        
+        self.loadlogfilesaction = self.createAction("&Load Output Files", self.loadOutputFiles, QKeySequence.Open, icon="Load-icon",
+                                       tip="Load log files for the different contexts, or readily parsed test runs")
+        
+    def loadOutputFiles(self):
+        thedir = unicode(".")
+        filenames = QFileDialog.getOpenFileNames(self, caption=QString("%s - Load Output Files"%QApplication.applicationName()),
+                                               directory=thedir, filter=unicode("All files (*.out)"))
+        if filenames:
+            loadedtrs = 0
+            notloadedtrs = 0
+            for filename in filenames:
+                try:
+                    print filename
+                    ExperimentManagement.addOutputFiles([str(filename)])
+                    
+                    loadedtrs += 1
+                except Exception, e:
+                    self.updateStatus(e)
+                    notloadedtrs += 1
+
+            message = "Loaded %d/%d output files"%(loadedtrs, loadedtrs + notloadedtrs)
+            self.logfileview.updateExperimentData()
+            self.updateStatus(message)
 
 
     def recollectData(self):
-        self.updateStatus("This action is not yet supported")
-        pass
+        ExperimentManagement.getExperiment().collectData()
+        self.updateStatus("Data collection finished")
+
     def getMenuActions(self):
-        return (("&File", [self.loadaction, self.saveaction, self.saveasaction, self.recollectdataaction]), ("&Readers", [self.addcustomreaderaction, self.addlistreaderaction, self.deleteaction]))
+        return (("&File", [self.loadaction, self.saveaction, self.saveasaction]),
+                ("&Readers", [self.addcustomreaderaction, self.addlistreaderaction, self.deleteaction]),
+                ("Experiment", [self.loadlogfilesaction, self.recollectdataaction]))
 
     def getToolBarActions(self):
         return (("&File", [self.loadaction, self.saveaction, self.recollectdataaction]), ("&Readers", [self.addcustomreaderaction, self.addlistreaderaction, self.deleteaction]))
@@ -115,9 +211,23 @@ class IPETParserWindow(IPETApplicationTab):
                 message = "Error: Could not load parser from file %s" % filename
 
             self.updateStatus(message)
+            
+    def getTextSelectionHint(self):
+        selectedline = self.logfileview.getSelectedLine()
+        indices = self.logfileview.getLineSelectionIndex()
+        startofline = selectedline[:indices[0]]
+        lineincludingselection = selectedline[:indices[1]]
+        print startofline, lineincludingselection
+        
+        ne = StatisticReader.numericExpression
+        nhitsstartofline = len(ne.findall(startofline))
+        nhitslineincludingselection = len(ne.findall(lineincludingselection))
+        
+        print "Have %d numbers in selection: %s" %((nhitslineincludingselection - nhitsstartofline), ",".join(ne.findall(lineincludingselection)[nhitsstartofline:nhitslineincludingselection]))
 
     def addCustomReader(self):
         self.naddedreaders += 1
+        self.getTextSelectionHint()
         reader = CustomReader("New Custom Reader %d" % self.naddedreaders, "regpattern", "datakey")
         self.editablebrowser.addNewElementAsChildOfSelectedElement(reader)
 
@@ -166,10 +276,11 @@ if __name__ == '__main__':
     imw = IpetMainWindow()
     imw.setWindowTitle("Parser Window")
 
-    app.setApplicationName("Evaluation editor")
+    app.setApplicationName("Parser Window")
 
     readermanager = ReaderManager.fromXMLFile("../scripts/readers-example.xml")
-
+    ExperimentManagement.addOutputFiles(['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
+    ExperimentManagement.getExperiment().collectData()
     parserwindow = IPETParserWindow()
     parserwindow.setParser(readermanager)
     imw.setCentralWidget(parserwindow)

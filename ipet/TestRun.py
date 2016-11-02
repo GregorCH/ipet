@@ -81,6 +81,11 @@ class TestRun(Editable):
         return (self.parametervalues, self.defaultparametervalues)
 
 
+    def getLogFile(self, fileextension=".out"):
+        for filename in self.filenames:
+            if filename.endswith(fileextension):
+                return filename
+        return None
     def getKeySet(self):
         if self.datadict != {}:
             return self.datadict.keys()

@@ -110,7 +110,7 @@ class EditableBrowser(QWidget):
             editframecontent = EditableForm(editable, self.editframe)
             textlabel = QLabel(QString("<b>Edit attributes for %s</b>" % (editable.getName())))
         else:
-            editframecontent = QLabel(QString("Select an element from the evaluation"))
+            editframecontent = QLabel(QString("Select an element first to modify its properties"))
             textlabel = QLabel(QString("<b>No element selected</b>"))
 
         self.clearLayout(self.editframelayout)

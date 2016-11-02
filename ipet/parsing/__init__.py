@@ -12,5 +12,5 @@ from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader,
     GapReader, SolvingTimeReader, TimeLimitReader, \
     BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader, DateTimeReader
-
+from StatisticReader import StatisticReader
 __all__ = []

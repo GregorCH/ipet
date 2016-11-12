@@ -51,14 +51,14 @@ class CustomReader(StatisticReader):
         if regpattern is None:
             raise ValueError("Error: No 'regpattern' specified for reader with name %s" % str(name))
 
-        if name is None:
-            name = CustomReader.name + regpattern
-        self.name = name
+        if name in [None, ""]:
+            self.name = datakey + "Reader"
+            self.username = False
+        else:
+            self.name = name
+            self.username = True
 
-        if datakey is None:
-            datakey = CustomReader.datakey + regpattern
-        self.datakey = datakey
-
+        self.set_datakey(datakey)
 
         self.set_index(index)
 
@@ -102,7 +102,7 @@ class CustomReader(StatisticReader):
 
 
             except:
-                logging.debug("Error when parsing data -> using default value")
+                logging.debug("Reader %s could not retrieve data at index %d from matching line '%s'", self.getName(), self.index, line)
                 pass
 
 
@@ -116,7 +116,7 @@ class CustomReader(StatisticReader):
             self.datatypemethod = getattr(__builtin__, sometype)
             self.datatype = sometype
         except:
-            print "Error: Could not recognize data type, using float", sometype
+            logging.debug("Error: Could not recognize data type %s, using float" % sometype)
             self.datatypemethod = float
             self.datatype = 'float'
             
@@ -130,6 +130,22 @@ class CustomReader(StatisticReader):
     def set_regpattern(self, regpattern):
         self.regexp = re.compile(regpattern)
         self.regpattern = regpattern
+        
+    def set_name(self, name):
+        if name == self.getName():
+            return
+        if name in ["", None]:
+            self.name = self.datakey + "Reader"
+            self.username = False
+        else:
+            self.name = name
+            self.username = True
+        
+        
+    def set_datakey(self, datakey):
+        self.datakey = datakey
+        if not self.username:
+            self.name = self.datakey + "Reader"
 
     def set_index(self, index):
         self.index = int(index)

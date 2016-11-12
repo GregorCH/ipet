@@ -39,7 +39,7 @@ class IpetMainWindow(QMainWindow):
 
     def populateToolBar(self, ipetapplicationtab):
         for toolbarname, actions in ipetapplicationtab.getToolBarActions():
-            toolbar = self.toolbars.setdefault(toolbarname, self.addToolBar("toolbarname"))
+            toolbar = self.toolbars.setdefault(toolbarname, self.addToolBar(toolbarname))
             for action in actions:
                 toolbar.addAction(action)
 

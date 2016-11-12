@@ -175,7 +175,7 @@ class IPETParserWindow(IPETApplicationTab):
             notloadedtrs = 0
             for filename in filenames:
                 try:
-                    ExperimentManagement.addOutputFiles([str(filename)])
+                    ExperimentManagement.getExperiment().addOutputFile(str(filename))
                     
                     loadedtrs += 1
                 except Exception, e:
@@ -189,6 +189,7 @@ class IPETParserWindow(IPETApplicationTab):
 
     def recollectData(self):
         ExperimentManagement.getExperiment().collectData()
+        self.logfileview.updateExperimentData()
         self.updateStatus("Data collection finished")
 
     def getMenuActions(self):
@@ -289,14 +290,6 @@ class IPETParserWindow(IPETApplicationTab):
         misc.saveAsXML(self.parser, filename)
         self.filename = filename
         self.updateStatus("Saved parser to file %s" % filename)
-#
-#     def enableOrDisableActions(self):
-#         for action, addclass in zip([self.addcolaction, self.addfiltergroupaction, self.addfilteraction, self.addaggregationaction, self.addinstancenaction],
-#                                     [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETInstance()]):
-#             if self.browser.treewidget.currentItemAcceptsClassAsChild(addclass):
-#                 action.setEnabled(True)
-#             else:
-#                 action.setEnabled(False)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

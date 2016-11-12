@@ -21,9 +21,7 @@ class IpetMainWindow(QMainWindow):
         super(IpetMainWindow, self).__init__(parent)
         
         self.setGeometry(100, 100, 1200, 800)
-        print "status bar"
         IpetMainWindow.setStatusBar(self.statusBar())
-        print IpetMainWindow.getStatusBar()
         
     @staticmethod
     def getStatusBar():

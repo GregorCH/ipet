@@ -60,7 +60,7 @@ class IPETLogFileView(QWidget):
         return problem
     
     def getSelectedText(self):
-        return self.textbrowser.textCursor().selection(QTextCursor.LineUnderCursor)
+        return self.textbrowser.textCursor().selection()
     
     def getLineSelectionIndex(self):
         c = self.textbrowser.textCursor()
@@ -73,7 +73,9 @@ class IPETLogFileView(QWidget):
                     c.positionInBlock() + (c.selectionEnd() - c.selectionStart()))
     
     def getSelectedLine(self):
-        return self.text[self.textbrowser.textCursor().blockNumber()]
+        cursor = self.textbrowser.textCursor()
+        cursor.select(QTextCursor.LineUnderCursor)
+        return str(cursor.selectedText())
     
 
     def getTestRun(self):
@@ -111,13 +113,13 @@ class IPETLogFileView(QWidget):
             linesstart = selectedtestrun.problemGetData(str(selectedproblem), "LineNumbers_BeginLogFile")
             linesend = selectedtestrun.problemGetData(str(selectedproblem), "LineNumbers_EndLogFile")
             self.text = []
-            print linesstart, linesend
             for idx, line in enumerate(in_file):
                 if idx > linesend:
                     break
                 elif idx >= linesstart:
                     self.text.append(line)
-            self.textbrowser.setText("".join(self.text))
+            self.text = "".join(self.text)
+            self.textbrowser.setText(self.text)
             self.textbrowser.update()
 
 class IPETParserWindow(IPETApplicationTab):
@@ -173,7 +175,6 @@ class IPETParserWindow(IPETApplicationTab):
             notloadedtrs = 0
             for filename in filenames:
                 try:
-                    print filename
                     ExperimentManagement.addOutputFiles([str(filename)])
                     
                     loadedtrs += 1
@@ -217,24 +218,50 @@ class IPETParserWindow(IPETApplicationTab):
         indices = self.logfileview.getLineSelectionIndex()
         startofline = selectedline[:indices[0]]
         lineincludingselection = selectedline[:indices[1]]
-        print startofline, lineincludingselection
         
         ne = StatisticReader.numericExpression
         nhitsstartofline = len(ne.findall(startofline))
         nhitslineincludingselection = len(ne.findall(lineincludingselection))
         
-        print "Have %d numbers in selection: %s" %((nhitslineincludingselection - nhitsstartofline), ",".join(ne.findall(lineincludingselection)[nhitsstartofline:nhitslineincludingselection]))
+        # the first word in the line is the text hint for the data key
+        datakeytexthint = ne.split(lineincludingselection, 1)[0]
+        return (datakeytexthint, nhitsstartofline, nhitslineincludingselection)
 
     def addCustomReader(self):
-        self.naddedreaders += 1
-        self.getTextSelectionHint()
-        reader = CustomReader("New Custom Reader %d" % self.naddedreaders, "regpattern", "datakey")
-        self.editablebrowser.addNewElementAsChildOfSelectedElement(reader)
-
+        oldnaddedreaders = self.naddedreaders
+        hint, a, b = self.getTextSelectionHint()
+        
+        if a == b:
+            self.naddedreaders += 1
+            reader = CustomReader("New Custom Reader %d" % self.naddedreaders, "regpattern", "datakey")
+            self.editablebrowser.addNewElementAsChildOfRootElement(reader)
+            self.updateStatus("Line selection does not contain numeric, parsable information, added 1 reader")
+            return
+        
+        # prepare the base data key from the hint    
+        hint = hint.rstrip(" :")
+        datakeytexthint = "".join(hint.split())        
+        for specialchar in ".<>#():+/":
+            datakeytexthint = datakeytexthint.replace(specialchar, '')
+            
+        # add data key for all selected numbers from this line
+        for i in xrange(a,b):
+            datakey = datakeytexthint + str(i)
+            regpattern = hint
+            readername = None
+            reader = CustomReader(readername, regpattern=regpattern, datakey=datakey, index=i)
+            try:
+                self.editablebrowser.addNewElementAsChildOfRootElement(reader)
+                self.naddedreaders += 1
+            except KeyError:
+                pass
+        
+        self.updateStatus("Added %d/%d readers for selected line" % (self.naddedreaders - oldnaddedreaders, b - a))
+        
     def addListReader(self):
         self.naddedreaders += 1
         reader = ListReader("cleverRegpattern", name = "new List Reader %d" % self.naddedreaders)
-        self.editablebrowser.addNewElementAsChildOfSelectedElement(reader)
+        self.editablebrowser.addNewElementAsChildOfRootElement(reader)
 
 
     def saveParser(self):

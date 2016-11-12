@@ -71,6 +71,11 @@ class EditableBrowser(QWidget):
 
     def getToolBarActions(self):
         return {}
+    
+    def addNewElementAsChildOfRootElement(self, newelement):
+        rootelement = self.getRootElement()
+        rootelement.addChild(newelement)
+        self.reselectAfterInsertOrRemoval(rootelement)
 
     def addNewElementAsChildOfSelectedElement(self, newelement):
 

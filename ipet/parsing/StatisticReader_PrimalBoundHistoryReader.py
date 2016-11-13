@@ -36,6 +36,10 @@ class PrimalBoundHistoryReader(StatisticReader):
                     self.inTable = True
                     self.ugmode = True
 
+            elif line.startswith("SCIP Status") and self.inTable:
+                self.inTable = False
+                self.ugmode = False
+
             # history reader should be in a table. check if a display char indicates a new primal bound
             elif self.inTable and self.heurdispcharexp.match(line):
 
@@ -58,9 +62,6 @@ class PrimalBoundHistoryReader(StatisticReader):
                     self.lastPrimalBound = PrimalBound
                     self.listOfPoints.append((float(pointInTime), float(PrimalBound)))
 
-            elif line.startswith("SCIP Status") and self.inTable:
-                self.inTable = False
-                self.ugmode = False
             elif not self.inTable and self.firstsolexp.match(line):
                 matches = self.numericExpression.findall(line)
                 PrimalBound = matches[0]

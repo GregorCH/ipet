@@ -71,6 +71,7 @@ argparser.add_argument("-n", "--nooptauto", action="store_true", default=False, 
 
 argparser.add_argument("-A", "--showapp", action = "store_true", default = False, help = "Display the Evaluation Editor app to modify the evaluation")
 argparser.add_argument("-l", "--long", action = "store_true", default = False, help = "use for long output (instancewise and aggregated results)")
+argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
 if __name__ == '__main__':
     try:
         arguments = argparser.parse_args()
@@ -79,7 +80,15 @@ if __name__ == '__main__':
             print "Wrong Usage, use --help for more information."
         exit()
     #if globals().get("help") is not None:
-
+    logger = logging.getLogger()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    if arguments.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
     # initialize a experiment
     experiment = None
     if arguments.evalfile is None:
@@ -119,7 +128,9 @@ if __name__ == '__main__':
 
     if arguments.externaldata is not None:
         experiment.addExternalDataFile(arguments.externaldata)
+        logging.info("Added external data file %s" % arguments.externaldata)
     else:
+        logging.info("No external data file")
         experiment.externaldata = None
 
     if arguments.compformatstring is not None:

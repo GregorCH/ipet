@@ -51,9 +51,33 @@ class ExperimentTest(unittest.TestCase):
 
         #os.remove(".testcomp.cmp")
 
+    def test_problemNameRecognition(self):
+        from ipet.parsing import ReaderManager
+        rm = ReaderManager()
+
+        problemnames2line = {}
+        with open("problemnames.txt", "r") as problemNames:
+            for line in problemNames:
+                parsedName = rm.getProblemName(line)
+                self.assertIsNotNone(parsedName, "'%s' problem name line was parsed to None" % line)
+                self.assertFalse((parsedName in problemnames2line), "Error in line '%s'\n: '%s' already contained in line '%s'" % (line, parsedName, \
+                                 problemnames2line.get(parsedName))
+                                  )
+                problemnames2line[parsedName] = line[:]
+
+
     def test_trnfileextension(self):
         self.experiment.addOutputFile(".testrun.trn")
         self.experiment.collectData()
+
+    def test_ListReader(self):
+        from ipet.parsing import ListReader
+        lr = ListReader("([ab]c) +([^ ]*)", "testlr")
+        lines = ("ac 1", "bc 2", "ab 3")
+        correctanswers = (("ac", 1), ("bc", 2), None)
+        for idx, line in enumerate(lines):
+            lrlinedata = lr.getLineData(line)
+            self.assertEqual(lrlinedata, correctanswers[idx], "Wrongly parsed line '%s'" % line)
 
     def test_parsingOfSettingsFile(self):
         inputfile = "check.bugs.scip-221aa62.linux.x86_64.gnu.opt.spx.opt97.default.set"

@@ -22,9 +22,13 @@ class QIPETApplication(IpetMainWindow):
         super(QIPETApplication, self).__init__(parent)
 
         tabwidget = QTabWidget()
-        tabwidget.addTab(IPETParserWindow(), "Parser")
-        tabwidget.addTab(EvaluationEditorWindow(), "Evaluation")
-
+        for widget, name in [(IPETParserWindow(), "Parser"), \
+                             (EvaluationEditorWindow(), "Evaluation") \
+                             ]:
+            tabwidget.addTab(widget, name)
+            self.populateMenu(widget)
+            self.populateToolBar(widget)
+        
         self.setCentralWidget(tabwidget)
 
 

@@ -139,6 +139,8 @@ class IPETParserWindow(IPETApplicationTab):
         self.filename = None
         self.defineActions()
         
+        self.setParser(ExperimentManagement.getExperiment().getReaderManager())
+        
         self.logfileview.updateExperimentData()
 
     def setParser(self, parser):
@@ -188,6 +190,7 @@ class IPETParserWindow(IPETApplicationTab):
 
 
     def recollectData(self):
+        ExperimentManagement.addReaders(self.parser)
         ExperimentManagement.getExperiment().collectData()
         self.logfileview.updateExperimentData()
         self.updateStatus("Data collection finished")

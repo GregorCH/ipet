@@ -45,6 +45,7 @@ class Experiment(Observable):
         self.solufiles = []
         self.externaldata = None
         self.basename2testrun = {}
+        self.probnamelist = []
 
         for filename in files:
             self.addOutputFile(filename)
@@ -108,6 +109,9 @@ class Experiment(Observable):
 
     def getTestRuns(self):
         return self.testrunmanager.getManageables()
+    
+    def getReaderManager(self):
+        return self.readermanager
 
     def updateDatakeys(self):
         '''
@@ -129,7 +133,7 @@ class Experiment(Observable):
             for problem in testrun.getProblems():
                 problemset.add(problem)
 
-        self.probnamelist = list(problemset)
+        self.probnamelist = sorted(list(problemset))
 
     def getManager(self, managedclass):
         '''

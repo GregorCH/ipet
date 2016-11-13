@@ -11,6 +11,7 @@ import numpy
 from ipet.concepts.Editable import Editable
 from ipet.concepts.IPETNode import IpetNode
 from ipet.misc import misc
+import logging
 
 class IPETEvaluationColumn(Editable, IpetNode):
 
@@ -664,7 +665,7 @@ class IPETEvaluation(Editable, IpetNode):
         '''
         print to console
         '''
-        print "Data for %s:"%filebasename
+        print "%s:"%filebasename
         print df.to_string(formatters=formatters)
 
     def streamDataFrame_tex(self, df, filebasename, formatters = {}):
@@ -698,7 +699,6 @@ class IPETEvaluation(Editable, IpetNode):
         '''
         calculate optimal auto settings instancewise
         '''
-        print df.head(5)
         grouped = df.groupby(level=0)
 
         optstatus = grouped["Status"].apply(self.findStatus)
@@ -724,6 +724,8 @@ class IPETEvaluation(Editable, IpetNode):
                 col.checkAttributes()
             except Exception as e:
                 raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
+            
+
             
     def getAggregatedGroupData(self, filtergroup):
         if not filtergroup in self.filtergroups:
@@ -756,12 +758,15 @@ class IPETEvaluation(Editable, IpetNode):
 
         #data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData()
-
+        
         if not self.groupkey in data.columns:
             raise KeyError(" Group key is missing in data:", self.groupkey)
         elif self.defaultgroup not in data[self.groupkey].values:
-            raise KeyError(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(data[self.groupkey].unique())))
-
+            possiblebasegroups = sorted(data[self.groupkey].unique())
+            logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
+            self.defaultgroup = possiblebasegroups[0]
+            logging.info(" Using value <%s> % as base group"%(self.defaultgroup))
+            
         columndata = self.reduceToColumns(data)
 
         if self.evaluateoptauto:
@@ -869,12 +874,13 @@ class IPETEvaluation(Editable, IpetNode):
         stats = []
         names = []
         for col in self.columns:
-            # iterate through the columns
+            if len(col.getStatsTests()) == 0:
+                continue
             defaultvalues = None
             try:
                 defaultvalues = groupeddata[self.defaultgroup][col.getName()]
             except KeyError:
-                print "Sorry, cannot retrieve default values for column %s, key %s"%(col.getName(), self.defaultgroup)
+                logging.info("Sorry, cannot retrieve default values for column %s, key %s for applying statistical test)"%(col.getName(), self.defaultgroup))
                 continue
 
             # iterate through the stats tests associated with each column

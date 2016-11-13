@@ -53,16 +53,35 @@ if __name__ == '__main__':
     # initialize an experiment
     experiment = Experiment()
 
+    if arguments.readers == []:
+        readers = []
+        for _file in os.listdir('./'):
+            if _file.endswith(".xml") or _file.endswith(".ipr"):
+                try:
+                    rm = ReaderManager.fromXMLFile(_file)
+                    readers.append(_file)
+                except:
+                    pass
+        logging.info("No additional readers specified. Found following %d reader files (.ipr, .xml) in directory: [%s]", len(readers), ", ".join(readers))
+    else:
+        readers = arguments.readers
 
-    for additionalfile in arguments.readers:
+    for additionalfile in readers:
         rm = ReaderManager.fromXMLFile(additionalfile)
         for reader in rm.getManageables(False):
             experiment.readermanager.registerReader(reader)
 
     for logfile in arguments.logfiles:
         experiment.addOutputFile(logfile)
+        
+    # search for solu files in current directory
+    if arguments.solufiles == []:
+        solufiles = [_file for _file in os.listdir("./") if _file.endswith(".solu")]
+        logging.info("No '.solu'-files specified. Found %d .solu files in directory: %s", len(solufiles), ", ".join(solufiles))
+    else:
+        solufiles = []
 
-    for solufile in arguments.solufiles:
+    for solufile in solufiles:
         experiment.addSoluFile(solufile)
 
     logging.info("Start parsing process")

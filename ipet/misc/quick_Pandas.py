@@ -45,6 +45,8 @@ def getWilcoxonQuotientSignificance(x,y, shiftby=10):
 
       # filter elements that are too close to zero
       logshifted = logshifted[np.abs(logshifted) >= np.log2(1 + 1e-2)]
+      if logshifted.size < 10:
+          return np.nan
       try:
           return stats.wilcoxon(logshifted.values)[1]
       except ValueError:

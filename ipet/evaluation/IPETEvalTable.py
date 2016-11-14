@@ -635,7 +635,7 @@ class IPETEvaluation(Editable, IpetNode):
                     tuples = df.xs(col.getName(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
 
                 else:
-                    tuples = [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and not dfcol.endswith("Q")]
+                    tuples = [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and not dfcol.endswith("Q") and not dfcol.endswith("p")]
             except KeyError:
                 # the column name is not contained in the final df
                 continue

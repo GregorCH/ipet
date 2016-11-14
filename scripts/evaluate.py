@@ -11,6 +11,7 @@ from ipet.evaluation import IPETEvaluation
 
 import re
 import textwrap
+import os
 from PyQt4.Qt import QApplication
 
 import logging
@@ -92,14 +93,34 @@ if __name__ == '__main__':
     # initialize a experiment
     experiment = None
     if arguments.evalfile is None:
-        print "please provide an eval file!"
-        sys.exit(0)
-
+        evalfile = None
+        # search for files in the current directory that might contain an evaluation, stop with the first evaluation
+        for _file in os.listdir("./"):
+            if _file.endswith(".xml") or _file.endswith(".ipe"):
+                try:
+                    _ = IPETEvaluation.fromXMLFile(_file)
+                    evalfile = _file
+                    logging.info("No eval-file specified, using evaluation %s from current directory" % evalfile)
+                    break
+                except:
+                    continue
+        # take the standard evaluation, if no evaluation could be found in current directory
+        if evalfile is None:
+            evalfile = os.path.join(os.path.dirname(__file__), 'evaluation.xml')
+            try:
+                _ = IPETEvaluation.fromXMLFile(evalfile)
+            except:
+                logging.info("No eval-file specified, and standard evaluation %s could not be loaded -- Stopping")
+                sys.exit(0)
+            logging.info("No eval-file specified, using standard evaluation %s" % evalfile)
+    else: 
+        evalfile = arguments.evalfile
+            
 
     if arguments.experimentfile is None and arguments.testrunfiles == []:
         print "please provide either a experimentfile or (multiple, if needed) .trn testrun files"
         sys.exit(0)
-    theeval = IPETEvaluation.fromXMLFile(arguments.evalfile)
+    theeval = IPETEvaluation.fromXMLFile(evalfile)
 
     if arguments.nooptauto:
         theeval.setEvaluateOptAuto(False)

@@ -29,10 +29,7 @@ class Manager(Observable):
         add manageable to dictionary - ensures that only one manageable with that string representation is stored
         '''
         stringrepresentation = self.getStringRepresentation(manageable)
-        if self.stringrepresentations.has_key(stringrepresentation):
-            raise KeyError("Already have key %s" % (stringrepresentation))
-        else:
-            self.stringrepresentations[stringrepresentation] = manageable
+        self.stringrepresentations[stringrepresentation] = manageable
 
     def getStringRepresentation(self, manageable):
         '''

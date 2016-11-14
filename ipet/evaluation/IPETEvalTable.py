@@ -765,7 +765,7 @@ class IPETEvaluation(Editable, IpetNode):
             possiblebasegroups = sorted(data[self.groupkey].unique())
             logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
             self.defaultgroup = possiblebasegroups[0]
-            logging.info(" Using value <%s> % as base group"%(self.defaultgroup))
+            logging.info(" Using value <%s> as base group"%(self.defaultgroup))
             
         columndata = self.reduceToColumns(data)
 

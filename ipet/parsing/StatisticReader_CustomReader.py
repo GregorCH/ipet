@@ -17,13 +17,15 @@ class CustomReader(StatisticReader):
     METHOD_SUM = 3
     METHOD_MIN = 4
     METHOD_MAX = 5
+    METHOD_COUNT = 6
 
     str2method = {
                   "first" : METHOD_FIRST,
                   "last" : METHOD_LAST,
                   "sum" : METHOD_SUM,
                   "min" : METHOD_MIN,
-                  "max" : METHOD_MAX
+                  "max" : METHOD_MAX,
+                  "count" : METHOD_COUNT
                   }
 
 
@@ -49,7 +51,7 @@ class CustomReader(StatisticReader):
 
         datatype : choose 'int' or 'float'
 
-        method : how to treat multiple occurrences of this data within one instance; parse 'first', 'last', 'sum', 'min' or 'max'
+        method : how to treat multiple occurrences of this data within one instance; 'count' occurrences or parse 'first', 'last', 'sum', 'min' or 'max'
         '''
 
         if regpattern is None:
@@ -114,6 +116,11 @@ class CustomReader(StatisticReader):
                         self.addData(self.datakey, data)
                     elif data > previousdata:
                         self.addData(self.datakey, data)
+                elif self.methodint == CustomReader.METHOD_COUNT:
+                    if previousdata is None:
+                        self.addData(self.datakey, 1)
+                    else:
+                        self.addData(self.datakey, previousdata + 1)
 
 
 

@@ -80,7 +80,7 @@ if __name__ == '__main__':
         solufiles = [_file for _file in os.listdir("./") if _file.endswith(".solu")]
         logging.info("No '.solu'-files specified. Found %d .solu files in directory: %s", len(solufiles), ", ".join(solufiles))
     else:
-        solufiles = []
+        solufiles = arguments.solufiles
 
     for solufile in solufiles:
         experiment.addSoluFile(solufile)

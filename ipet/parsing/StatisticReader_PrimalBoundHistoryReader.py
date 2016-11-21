@@ -14,6 +14,7 @@ class PrimalBoundHistoryReader(StatisticReader):
     easyCPLEX = True
     totalnumberofsols = 0
     heurdispcharexp = re.compile('^[^ \d]')
+    heurdispcharexpugmode = re.compile('^\*')
     """ all lines starting with a non-whitespace and non-digit character """
 
     shorttablecheckexp = re.compile('s\|')
@@ -41,7 +42,8 @@ class PrimalBoundHistoryReader(StatisticReader):
                 self.ugmode = False
 
             # history reader should be in a table. check if a display char indicates a new primal bound
-            elif self.inTable and self.heurdispcharexp.match(line):
+            elif self.inTable and self.heurdispcharexp.match(line) and not self.ugmode or \
+		 self.inTable and self.heurdispcharexpugmode.match(line) and self.ugmode:
 
                 if not (self.shorttablecheckexp.search(line) or self.ugmode):
                     return

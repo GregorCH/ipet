@@ -4,6 +4,7 @@ from TestRun import TestRun
 from ipet import misc
 from ipet.concepts.Observer import Observable
 import pandas
+from ipet.parsing import SolvingTimeReader
 
 try:
     import cPickle as pickle
@@ -519,7 +520,7 @@ class Experiment(Observable):
                 errcode = testrun.problemGetData(probname, ErrorFileReader.datakey)
 
                 # an error code means that the instance aborted
-                if errcode is not None:
+                if errcode is not None or testrun.problemGetData(probname, SolvingTimeReader.datakey) is None:
                     testrun.addData(probname, 'Status', "fail (abort)")
 
                 # if the best solution was not feasible in the original problem, it's a fail

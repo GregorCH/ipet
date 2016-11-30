@@ -3,13 +3,13 @@ Created on 14.08.2014
 
 @author: Customer
 '''
-from ttk import Button
+from tkinter.ttk import Button
 try:
     from ImageTk import PhotoImage
 except:
     import PIL
     from PIL.ImageTk import PhotoImage
-from IPETToolTip import createToolTip
+from .IPETToolTip import createToolTip
 import os
 
 class IpetImageButton(Button):
@@ -28,7 +28,7 @@ class IpetImageButton(Button):
     def createImageLib():
         iconpath = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, "images")
         IpetImageButton.iconlib = il = {}
-        print iconpath
+        print(iconpath)
         for image in os.listdir(iconpath):
             im = PhotoImage(file=iconpath + os.sep + image)
             il[os.path.splitext(image)[0]] = im

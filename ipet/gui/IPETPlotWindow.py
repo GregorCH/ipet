@@ -3,16 +3,16 @@ Created on 31.01.2014
 
 @author: Customer
 '''
-from Tkinter import Toplevel, StringVar, Button, Frame
+from tkinter import Toplevel, StringVar, Button, Frame
 from matplotlib.figure import Figure
 from matplotlib import markers
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-import Tkconstants
+import tkinter.constants
 from ipet.gui.IPETParam import IPETParam, IPETColorParam
 from ipet.concepts import Manager
-from IPETBrowser import IPETTypeWidget
-from tkColorChooser import askcolor
-from ttk import Frame, Notebook, LabelFrame, OptionMenu, Entry
+from .IPETBrowser import IPETTypeWidget
+from tkinter.colorchooser import askcolor
+from tkinter.ttk import Frame, Notebook, LabelFrame, OptionMenu, Entry
 from functools import partial
 import numpy as np
 
@@ -24,13 +24,13 @@ class IPETPlotFrame(Frame):
         self.a = f.add_subplot(111)
 
         self.canvas = FigureCanvasTkAgg(f, master=self)
-        self.canvas.get_tk_widget().pack(side=Tkconstants.BOTTOM, fill=Tkconstants.BOTH, expand=1)
+        self.canvas.get_tk_widget().pack(side=tkinter.constants.BOTTOM, fill=tkinter.constants.BOTH, expand=1)
 
         self.toolbar = IpetNavigationToolBar(self.canvas, self)
         self.toolbar.update()
 
 
-        self.canvas._tkcanvas.pack(side=Tkconstants.TOP, fill=Tkconstants.BOTH, expand=1)
+        self.canvas._tkcanvas.pack(side=tkinter.constants.TOP, fill=tkinter.constants.BOTH, expand=1)
 
     def resetAxis(self):
         while len(self.a.patches) > 0:
@@ -65,7 +65,7 @@ class IPETPlotFrame(Frame):
             bins = np.linspace(leftbin, rightbin, nbins + 1, endpoint=True)
 
         if datalabels is None:
-            datalabels = map(str, np.arange(len(data)))
+            datalabels = list(map(str, np.arange(len(data))))
         elif len(datalabels) != len(data):
             raise ValueError("Error: Length of data labels (%d) and of data (%d) mismatch!"%(len(datalabels),len(data)))
 
@@ -109,7 +109,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
               'none': 'none'
               }
 
-    MARKERS = {val:key for key, val in markers.MarkerStyle.markers.iteritems()}
+    MARKERS = {val:key for key, val in markers.MarkerStyle.markers.items()}
 
     COLORS = {'b': '#0000ff', 'g': '#00ff00', 'r': '#ff0000', 'c': '#ff00ff',
           'm': '#ff00ff', 'y': '#ffff00', 'k': '#000000', 'w': '#ffffff'}
@@ -159,7 +159,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
             # do this conversion to please Tkinter on Unix systems were unicode is used
             name = str("%s:%s" % (label, param.getName()))
             self.paramtovar[param] = StringVar(name=name, value=param.getValue())
-            OptionMenu(labelframe, self.paramtovar[param], param.getValue(), *list(param.getPossibleValues())).pack(side=Tkconstants.LEFT, fill=Tkconstants.X, expand=True)
+            OptionMenu(labelframe, self.paramtovar[param], param.getValue(), *list(param.getPossibleValues())).pack(side=tkinter.constants.LEFT, fill=tkinter.constants.X, expand=True)
 
             self.paramtovar[param].trace('w', self.change_var)
             return labelframe
@@ -167,7 +167,7 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
             labelframe = LabelFrame(masterwindow, text=param.getName(), width=85)
             thebutton = Button(labelframe, text="", command=partial(self.changeColorVar, *[param]), background=param.getValue())
             self.colorparambuttons[param] = thebutton
-            thebutton.pack(side=Tkconstants.LEFT, fill=Tkconstants.X, expand=True)
+            thebutton.pack(side=tkinter.constants.LEFT, fill=tkinter.constants.X, expand=True)
             return labelframe
         else:
             return IPETTypeWidget(masterwindow, param.getName(), param, self.generalmanager, attribute=param.getValue())
@@ -196,12 +196,12 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
             notebook.add(curveframe, text=label)
 
 
-        notebook.pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=1)
+        notebook.pack(side=tkinter.constants.TOP, fill=tkinter.constants.X, expand=1)
 
         buttonbox = Frame(self.tl)
-        Button(buttonbox, text='Ok', command=self.tl.destroy).pack(side=Tkconstants.LEFT)
-        Button(buttonbox, text='Apply', command=self.applyChanges).pack(side=Tkconstants.LEFT)
-        buttonbox.pack(side=Tkconstants.TOP, fill=Tkconstants.X)
+        Button(buttonbox, text='Ok', command=self.tl.destroy).pack(side=tkinter.constants.LEFT)
+        Button(buttonbox, text='Apply', command=self.applyChanges).pack(side=tkinter.constants.LEFT)
+        buttonbox.pack(side=tkinter.constants.TOP, fill=tkinter.constants.X)
         self.window.wait_window(self.tl)
         self.tl.mainloop()
 
@@ -210,8 +210,8 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
 
     def createParams(self):
         ax = self.canvas.figure.get_axes()[0]
-        xmin, xmax = map(float, ax.get_xlim())
-        ymin, ymax = map(float, ax.get_ylim())
+        xmin, xmax = list(map(float, ax.get_xlim()))
+        ymin, ymax = list(map(float, ax.get_ylim()))
         self.general = [IPETParam("Title", ax.get_title(), [], "Title for the axis"),
                    IPETParam("X-Min", xmin, [], "Minimum x"),
                    IPETParam("X-Max", xmax, [], "Maximum x"),
@@ -232,8 +232,8 @@ class IpetNavigationToolBar(NavigationToolbar2TkAgg):
                 continue
             linedict[label] = line
         self.curves = []
-        linestyles = IpetNavigationToolBar.LINESTYLES.values()
-        markerkeys = IpetNavigationToolBar.MARKERS.keys()
+        linestyles = list(IpetNavigationToolBar.LINESTYLES.values())
+        markerkeys = list(IpetNavigationToolBar.MARKERS.keys())
         curvelabels = sorted(linedict.keys())
         for label in curvelabels:
             line = linedict[label]
@@ -290,6 +290,6 @@ if __name__ == "__main__":
     window = IPETPlotWindow(width=200, height=200)
     lines, = window.a.plot(x, x ** 2, label="Quadrat")
     lines.set_linestyle('None')
-    print lines.get_linestyle()
+    print(lines.get_linestyle())
     window.a.legend()
     window.mainloop()

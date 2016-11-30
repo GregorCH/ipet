@@ -3,10 +3,10 @@ Created on 12.03.2013
 
 @author: bzfhende
 '''
-from Tkinter import Frame, IntVar, Checkbutton, Button
-from ScrolledText import ScrolledText
-from Tkconstants import END, BOTH, LEFT, SEL_FIRST, SEL_LAST, CURRENT, SEL, RIGHT, Y
-from IPETReaderWizard import IpetReaderWizard
+from tkinter import Frame, IntVar, Checkbutton, Button
+from tkinter.scrolledtext import ScrolledText
+from tkinter.constants import END, BOTH, LEFT, SEL_FIRST, SEL_LAST, CURRENT, SEL, RIGHT, Y
+from .IPETReaderWizard import IpetReaderWizard
 
 class ScrolledOutputWidget(Frame):
     '''

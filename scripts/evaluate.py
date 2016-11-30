@@ -78,7 +78,7 @@ if __name__ == '__main__':
         arguments = argparser.parse_args()
     except:
         if not re.search(" -+h", ' '.join(sys.argv)) :
-            print "Wrong Usage, use --help for more information."
+            print("Wrong Usage, use --help for more information.")
         exit()
     #if globals().get("help") is not None:
     logger = logging.getLogger()
@@ -118,7 +118,7 @@ if __name__ == '__main__':
             
 
     if arguments.experimentfile is None and arguments.testrunfiles == []:
-        print "please provide either a experimentfile or (multiple, if needed) .trn testrun files"
+        print("please provide either a experimentfile or (multiple, if needed) .trn testrun files")
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
 

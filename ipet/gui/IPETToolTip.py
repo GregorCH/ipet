@@ -3,7 +3,7 @@ Created on 14.08.2014
 adapts recipe from http://www.voidspace.org.uk/python/weblog/arch_d7_2006_07_01.shtml
 @author: Customer
 '''
-from Tkinter import *
+from tkinter import *
 
 class ToolTip(object):
 

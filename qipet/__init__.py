@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from IpetEvaluationEditorApp import IpetEvaluationEditorApp
-from IpetPbHistoryWindow import IpetPbHistoryWindow
+from .IpetEvaluationEditorApp import IpetEvaluationEditorApp
+from .IpetPbHistoryWindow import IpetPbHistoryWindow
 __all__ = ["ExperimentManagement",
 ]

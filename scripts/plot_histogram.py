@@ -8,7 +8,7 @@ import argparse
 import sys
 import pandas as pd
 from ipet.IPETPlotWindow import IPETPlotFrame
-from Tkinter import Tk
+from tkinter import Tk
 from numpy import log, log2, log10
 import re
 
@@ -38,17 +38,17 @@ if __name__ == '__main__':
         arguments = argparser.parse_args()
     except:
         if not re.search(" -+h", ' '.join(sys.argv)) :
-            print "Wrong Usage, use --help for more information."
+            print("Wrong Usage, use --help for more information.")
         exit()
     #if globals().get("help") is not None:
 
     #initialize a comparator
     if arguments.filename is None or not arguments.filename.endswith(".csv"):
-        print "please provide a csv file as filename!"
+        print("please provide a csv file as filename!")
         sys.exit(0)
 
     if arguments.columnname is None:
-        print "please provide a column name!"
+        print("please provide a column name!")
         sys.exit(0)
 
     df = pd.DataFrame.from_csv(arguments.filename, sep = ",", header = [0, 1])
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         elif logarithmic == "10":
             logfunction = log10
         else:
-            print "Wrong logarithm basis %s, must be in [2, e, 10]" % logarithmic
+            print("Wrong logarithm basis %s, must be in [2, e, 10]" % logarithmic)
             sys.exit(0)
     else:
         logarithmic = False
@@ -87,11 +87,11 @@ if __name__ == '__main__':
         data = data[data.abs() >= arguments.epsilon]
 
     # determine labels and values for the histogram. Note that columns may be dropped if they became empty after filtering
-    datalabels, datavals = zip(*[(col, data[col].dropna().values) for col in data if len(data[col].dropna()) > 0])
+    datalabels, datavals = list(zip(*[(col, data[col].dropna().values) for col in data if len(data[col].dropna()) > 0]))
 
     removedcolumns = [col for col in data.columns if not col in datalabels]
     if removedcolumns:
-        print "Columns <%s> filtered out" % ", ".join(removedcolumns)
+        print("Columns <%s> filtered out" % ", ".join(removedcolumns))
 
 
 

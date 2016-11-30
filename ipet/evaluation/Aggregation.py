@@ -45,7 +45,7 @@ class Aggregation(Editable, IpetNode):
             except ValueError:
                 pass
             
-        for key, val in kw.iteritems():
+        for key, val in kw.items():
             setattr(self, key, float(val))
 
     def set_name(self, newname):
@@ -129,11 +129,11 @@ class Aggregation(Editable, IpetNode):
         return method
 
 if __name__ == '__main__':
-    arr = range(10)
+    arr = list(range(10))
     agg = Aggregation('min')
     agg2 = Aggregation('max')
-    print agg.aggregate(arr), agg2.aggregate(arr)
+    print(agg.aggregate(arr), agg2.aggregate(arr))
     agg.set_aggregation('mean')
     agg2 = Aggregation('shmean', shiftby = 30.0)
     agg3 = Aggregation('shmean', shiftby = 300.0)
-    print agg3.aggregate(arr), agg2.aggregate(arr)
+    print(agg3.aggregate(arr), agg2.aggregate(arr))

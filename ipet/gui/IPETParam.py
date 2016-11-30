@@ -62,7 +62,7 @@ class IPETParam:
         '''
 
         # convert between strings and unicodes, but keep internal type consistent
-        if type(newvalue) in [str, unicode] and type(self.value) in [str, unicode]:
+        if type(newvalue) in [str, str] and type(self.value) in [str, str]:
             self.value = type(self.value)(newvalue)
             return True
         elif type(newvalue) != type(self.getValue()) and self.getValue() is not None:

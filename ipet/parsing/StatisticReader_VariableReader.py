@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 import re
 
 class VariableReader(StatisticReader):
@@ -16,11 +16,11 @@ class VariableReader(StatisticReader):
             self.problemtype = "OriginalProblem"
      
         elif self.problemtype and self.varexp.match(line):
-            nvariables = map(int, self.numericExpression.findall(line))
+            nvariables = list(map(int, self.numericExpression.findall(line)))
             datakeys = ["%s_%s"%(self.problemtype,key) for key in self.datakeys]
             self.addData(datakeys, nvariables)
         elif self.problemtype and self.consexp.match(line):
-            nconns = map(int, self.numericExpression.findall(line))
+            nconns = list(map(int, self.numericExpression.findall(line)))
 
             datakeys = ["%s_%s"%(self.problemtype,key) for key in ["InitialNCons", "MaxNCons"]]
             self.addData(datakeys, nconns)

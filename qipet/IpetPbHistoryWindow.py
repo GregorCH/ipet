@@ -9,7 +9,7 @@
 # modified with no restriction; raw copies as well as modified versions
 # may be distributed without limitation.
 
-from __future__ import unicode_literals
+
 import sys
 import os
 
@@ -252,25 +252,25 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
     def debugMessage(self, message):
         if self.DEBUG:
-            print message
+            print(message)
         else:
             pass
 
     def loadTestruns(self):
-        thedir = unicode(".")
+        thedir = str(".")
         filenames = QFileDialog.getOpenFileNames(self, caption=QString("%s - Load testruns"%QApplication.applicationName()),
-                                               directory=thedir, filter=unicode("Testrun files (*.trn)"))
+                                               directory=thedir, filter=str("Testrun files (*.trn)"))
         if filenames:
             loadedtrs = 0
             notloadedtrs = 0
             for filename in filenames:
                 try:
-                    print filename
+                    print(filename)
                     tr = TestRun.loadFromFile(str(filename))
                     try:
                         self.addTestrun(tr)
-                    except Exception, e:
-                        print e
+                    except Exception as e:
+                        print(e)
 
                     loadedtrs += 1
                 except Exception:
@@ -310,7 +310,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
             testrunname = self.getTestrunName(testrun)
 
             if len(probnames) == 1:
-                x[testrunname], y[testrunname] = zip(*getProcessPlotData(testrun, probnames[0], usenormalization))
+                x[testrunname], y[testrunname] = list(zip(*getProcessPlotData(testrun, probnames[0], usenormalization)))
             else:
                 y[testrunname], scale = getMeanIntegral(testrun, probnames, 200)
                 x[testrunname] = numpy.arange(200) * scale
@@ -324,7 +324,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
             if showdualbound:
                 arguments = {"historytouse":DualBoundHistoryReader.datakey, "boundkey":DualBoundReader.datakey}
                 if len(probnames) == 1:
-                    zx[testrunname], z[testrunname] = zip(*getProcessPlotData(testrun, probnames[0], usenormalization, **arguments))
+                    zx[testrunname], z[testrunname] = list(zip(*getProcessPlotData(testrun, probnames[0], usenormalization, **arguments)))
                 else:
                     z[testrunname], scale = getMeanIntegral(testrun, probnames, 200, **arguments)
                     zx[testrunname] = numpy.arange(200) * scale
@@ -389,12 +389,12 @@ class IpetPbHistoryWindow(IpetMainWindow):
         # index everything by labels, either given as dictionary keys, or integer indices ranging from 0 to len(dataX) - 1
         assert type(dataX) is type(dataY)
         if type(dataX) is dict:
-            labels = dataX.keys()
+            labels = list(dataX.keys())
             if testrunnames is None:
                 testrunnames = {label:label for label in labels}
         else:
             assert type(dataX) is list
-            labels = range(len(dataX))
+            labels = list(range(len(dataX)))
 
             if testrunnames is None:
                 testrunnames = {label:repr(label) for label in labels}
@@ -404,7 +404,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         try:
             colormap = cm.get_cmap(name=colormapname, lut=128)
         except ValueError:
-            print "Colormap of name ", colormapname, " does not exist"
+            print("Colormap of name ", colormapname, " does not exist")
             colormap = cm.get_cmap(name=IpetPbHistoryWindow.default_cmap, lut=128)
         colortransform = numpy.linspace(0.1, 0.9, len(labels))
 

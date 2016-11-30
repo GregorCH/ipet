@@ -6,7 +6,7 @@ Created on 24.02.2015
 import pandas as pd
 from ipet.evaluation import Aggregation
 import xml.etree.ElementTree as ElementTree
-from IPETFilter import IPETFilterGroup
+from .IPETFilter import IPETFilterGroup
 import numpy
 from ipet.concepts.Editable import Editable
 from ipet.concepts.IPETNode import IpetNode
@@ -41,7 +41,7 @@ class IPETEvaluationColumn(Editable, IpetNode):
     requiredOptions = {"comp":possiblecomparisons,
                        "origcolname":"datakey",
                        "translevel":[0,1],
-                       "transformfunc":possibletransformations.keys()}
+                       "transformfunc":list(possibletransformations.keys())}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
                  nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None):
@@ -268,10 +268,10 @@ class IPETEvaluationColumn(Editable, IpetNode):
             if self.origcolname is not None:
                 try:
                     result = df[self.origcolname]
-                except KeyError, e:
+                except KeyError as e:
                     # print an error message and make a series with NaN's
-                    print e
-                    print "Could not retrieve data %s"%self.origcolname
+                    print(e)
+                    print("Could not retrieve data %s"%self.origcolname)
                     result = pd.Series(numpy.nan, index=df.index)
 
 
@@ -665,8 +665,8 @@ class IPETEvaluation(Editable, IpetNode):
         '''
         print to console
         '''
-        print "%s:"%filebasename
-        print df.to_string(formatters=formatters)
+        print("%s:"%filebasename)
+        print(df.to_string(formatters=formatters))
 
     def streamDataFrame_tex(self, df, filebasename, formatters = {}):
         '''
@@ -927,8 +927,8 @@ if __name__ == '__main__':
     comp = Comparator.loadFromFile('../test/.testcomp.cmp')
     comp.externaldata = None
     rettab, retagg = ev.evaluate(comp)
-    print rettab.to_string()
-    print retagg.to_string()
+    print(rettab.to_string())
+    print(retagg.to_string())
     xml = ev.toXMLElem()
     from xml.dom.minidom import parseString
     dom = parseString(ElementTree.tostring(xml))

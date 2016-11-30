@@ -3,9 +3,9 @@ Created on 08.08.2014
 
 @author: Customer
 '''
-from IPETWidget import IpetWidget
-from ScrolledText import ScrolledText
-import Tkconstants
+from .IPETWidget import IpetWidget
+from tkinter.scrolledtext import ScrolledText
+import tkinter.constants
 
 class IpetMessageWidget(IpetWidget):
     '''
@@ -15,7 +15,7 @@ class IpetMessageWidget(IpetWidget):
     def __init__(self, master, gui):
         IpetWidget.__init__(self, master, gui)
         self.text = ScrolledText(self)
-        self.text.pack(side=Tkconstants.LEFT, expand=True, fill=Tkconstants.BOTH)
+        self.text.pack(side=tkinter.constants.LEFT, expand=True, fill=tkinter.constants.BOTH)
 
 #        sys.stdout = TextRedirector(self.text, 'stdout')
 #        sys.stderr = TextRedirector(self.text, 'stderr')
@@ -24,7 +24,7 @@ class IpetMessageWidget(IpetWidget):
         self.text.tag_config('stderr', background='grey', foreground='red')
 
     def reset(self):
-        self.text.delete("1.0", Tkconstants.END)
+        self.text.delete("1.0", tkinter.constants.END)
 
 class TextRedirector(object):
     def __init__(self, widget, tag="stdout"):

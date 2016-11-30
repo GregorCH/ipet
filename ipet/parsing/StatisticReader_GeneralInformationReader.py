@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 import re
 import os
 class GeneralInformationReader(StatisticReader):

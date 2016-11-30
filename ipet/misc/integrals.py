@@ -29,7 +29,7 @@ def calcIntegralValue(thedatalist, pwlinear=False):
     assert len(thedatalist) >= 2
     
     # unzip the datalist
-    times, gaps = zip(*thedatalist)
+    times, gaps = list(zip(*thedatalist))
     times = np.array(times)
     gaps = np.array(gaps)
     
@@ -75,7 +75,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
             lastbound = misc.FLOAT_INFINITY
         
     if len(history) > 0:
-        x, y = zip(*history)
+        x, y = list(zip(*history))
         x = list(x)
         y = list(y)
     else:
@@ -97,10 +97,10 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
         normfunction = lambda z : z
         
     x = numpy.array(x)
-    y = numpy.array(map(normfunction, y))
+    y = numpy.array(list(map(normfunction, y)))
         
     
-    return zip(x,y)
+    return list(zip(x,y))
 
 def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
     '''
@@ -119,8 +119,8 @@ def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
         plotpoints = getProcessPlotData(testrun, probname, **kw)
         try:
             it = plotpoints[1:].__iter__()
-        except Exception, e:
-            print probname, e
+        except Exception as e:
+            print(probname, e)
             continue
         lastX = -1.0
         lastgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)

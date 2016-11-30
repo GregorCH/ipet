@@ -1,21 +1,21 @@
-from StatisticReader import StatisticReader, ListReader
+from .StatisticReader import StatisticReader, ListReader
 from ipet.parsing.StatisticReader_CustomReader import CustomReader
 import os
 import re
 from ipet.concepts.Manager import Manager
 from ipet.concepts.IPETMessageStream import Message
 import xml.etree.ElementTree as ElementTree
-from StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
+from .StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
     GapReader, SolvingTimeReader, TimeLimitReader, \
     BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
-from StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader, ParascipDualBoundHistoryReader
-from StatisticReader_GeneralInformationReader import GeneralInformationReader
-from StatisticReader_PluginStatisticsReader import PluginStatisticsReader
-from StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
-from StatisticReader_VariableReader import VariableReader
-from StatisticReader_SoluFileReader import SoluFileReader
-from TraceFileReader import TraceFileReader
+from .StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader, ParascipDualBoundHistoryReader
+from .StatisticReader_GeneralInformationReader import GeneralInformationReader
+from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
+from .StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
+from .StatisticReader_VariableReader import VariableReader
+from .StatisticReader_SoluFileReader import SoluFileReader
+from .TraceFileReader import TraceFileReader
 import logging
 from ipet.concepts import IpetNode, Editable
 
@@ -37,7 +37,7 @@ class ReaderManager(Manager, IpetNode, Editable):
                               }
     """recognition patterns to distinguish between solver types"""
 
-    othersolvers = [solver for solver in solvertype_recognition.keys() if solver != StatisticReader.solvertype]
+    othersolvers = [solver for solver in list(solvertype_recognition.keys()) if solver != StatisticReader.solvertype]
     
 
     fileextension2context = {
@@ -89,10 +89,10 @@ class ReaderManager(Manager, IpetNode, Editable):
         self.deleteManageable(child)
 
     def acceptsAsChild(self, child):
-        return child.__class__() in self.xmlfactorydict.values()
+        return child.__class__() in list(self.xmlfactorydict.values())
 
     def getChildren(self):
-        return sorted([m for m in self.getManageables(False) if m.__class__ in self.xmlfactorydict.values()], key = lambda x:x.getName())
+        return sorted([m for m in self.getManageables(False) if m.__class__ in list(self.xmlfactorydict.values())], key = lambda x:x.getName())
 
     @staticmethod
     def getNodeTag():
@@ -254,10 +254,10 @@ class ReaderManager(Manager, IpetNode, Editable):
 
         with open(filename, "r") as currentfile:
             for line in currentfile:
-                for key in ReaderManager.solvertype_recognition.keys():
+                for key in list(ReaderManager.solvertype_recognition.keys()):
                     if line.startswith(ReaderManager.solvertype_recognition[key]):
                         StatisticReader.changeSolverType(key)
-                        ReaderManager.othersolvers = [solver for solver in ReaderManager.solvertype_recognition.keys() \
+                        ReaderManager.othersolvers = [solver for solver in list(ReaderManager.solvertype_recognition.keys()) \
                                                       if solver != StatisticReader.solvertype]
                         return
 
@@ -285,7 +285,7 @@ class ReaderManager(Manager, IpetNode, Editable):
             try:
                 f = open(filename, 'r')
             except IOError:
-                print 'File', filename, "doesn't exist!"
+                print('File', filename, "doesn't exist!")
                 continue
 
             # only enable readers that support the file context
@@ -322,10 +322,10 @@ class ReaderManager(Manager, IpetNode, Editable):
         me = ElementTree.Element(ReaderManager.getNodeTag())
         readers = self.getManageables(False)
         for reader in readers:
-            if reader.__class__ in ReaderManager.xmlfactorydict.values():
+            if reader.__class__ in list(ReaderManager.xmlfactorydict.values()):
                 readerattrs = reader.attributesToDict()
-                readerstrattrs = {key:str(val) for key, val in readerattrs.iteritems()}
-                for key in ReaderManager.xmlfactorydict.keys():
+                readerstrattrs = {key:str(val) for key, val in readerattrs.items()}
+                for key in list(ReaderManager.xmlfactorydict.keys()):
                     if reader.__class__ is ReaderManager.xmlfactorydict[key]:
                         break
                 me.append(ElementTree.Element(key, readerstrattrs))

@@ -37,7 +37,7 @@ class EditableForm(QWidget):
         
         self.key2val = {}
         
-        for key, val in sorted(editable.attributesToDict().iteritems()):
+        for key, val in sorted(editable.attributesToDict().items()):
             label = QLabel(key)
             helptext = editable.getAttrDocumentation(key)
             if helptext is not None:
@@ -73,9 +73,9 @@ class EditableForm(QWidget):
         
     def convertListOptions(self, optioninlist):
         if optioninlist is None:
-            return unicode(self.NOSELECTIONTEXT)
+            return str(self.NOSELECTIONTEXT)
         else:
-            return unicode(optioninlist)
+            return str(optioninlist)
         
     def valToWidget(self, attr, val):
         requiredOptions = self.editable.getRequiredOptionsByAttribute(attr)
@@ -100,7 +100,7 @@ class EditableForm(QWidget):
             combobox = OptionsComboBox()
             combobox.addItems(options)
             if val is not None:
-                combobox.setCurrentIndex(options.index(unicode(val)))
+                combobox.setCurrentIndex(options.index(str(val)))
             self.key2val[attr] = combobox.currentText
             self.connect(combobox, SIGNAL("currentIndexChanged(int)"), self.reactOnUserInput)
             return combobox

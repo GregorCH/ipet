@@ -3,8 +3,8 @@ Created on 25.12.2013
 
 @author: bzfhende
 '''
-from Observer import Observable
-from IPETMessageStream import Message
+from .Observer import Observable
+from .IPETMessageStream import Message
 class Manager(Observable):
     '''
     manages all manageables of a certain type of which many objects might exist and need to be listed / browsed frequently
@@ -54,7 +54,7 @@ class Manager(Observable):
         '''
         delete an manageable from the manager
         '''
-        for key, val in self.stringrepresentations.items():
+        for key, val in list(self.stringrepresentations.items()):
             if val == manageable:
                 oldstringrepresentation = key
                 break
@@ -82,7 +82,7 @@ class Manager(Observable):
         oldname = self.getStringRepresentation(manageable)
         manageable.editAttribute(attributename, newattribute)
         newname = self.getStringRepresentation(manageable)
-        print newname, newattribute
+        print(newname, newattribute)
         if oldname != newname:
             self.chgManageableName(manageable, oldname, newname)
         self.notify(Message("Changed attribute %s of %s to %s" % (attributename, newname, newattribute), Message.MESSAGETYPE_INFO))
@@ -105,14 +105,14 @@ class Manager(Observable):
         if onlyactive:
             return list(self.activeset)
         else:
-            return self.stringrepresentations.values()
+            return list(self.stringrepresentations.values())
 
     def getAllRepresentations(self, onlyactive=False):
         '''
         returns a list of all string representations
         '''
         if not onlyactive:
-            return self.stringrepresentations.keys()
+            return list(self.stringrepresentations.keys())
         else:
             return [self.getStringRepresentation(manageable) for manageable in self.activeset]
 
@@ -121,7 +121,7 @@ class Manager(Observable):
         adds a manageable to the active set
         '''
         for manageable in manageables:
-            if not self.stringrepresentations.has_key(self.getStringRepresentation(manageable)):
+            if self.getStringRepresentation(manageable) not in self.stringrepresentations:
                 raise KeyError("%s is not managed by this manager - call addManageable() first" % (self.getStringRepresentation(manageable)))
             if not manageable in self.activeset:
                 self.activeset.add(manageable)
@@ -161,7 +161,7 @@ class Manager(Observable):
         if onlyactive:
             return len(self.activeset)
         else:
-            return len(self.stringrepresentations.keys())
+            return len(list(self.stringrepresentations.keys()))
 
     def isActive(self, manageable):
         '''

@@ -1,4 +1,4 @@
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 import re
 import numpy as np
 

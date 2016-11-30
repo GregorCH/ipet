@@ -1,4 +1,4 @@
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 import re
 from ipet.misc import misc
 
@@ -39,7 +39,7 @@ class DualBoundHistoryReader(StatisticReader):
         if self.isTableLine(line):
             if self.dbindex == -1:
                 # parse index of dual bound entry
-                splittedlinenowhitespace = map(str.strip, line.split('|'))
+                splittedlinenowhitespace = list(map(str.strip, line.split('|')))
                 self.dbindex = splittedlinenowhitespace.index('dualbound')
 
             try:

@@ -4,7 +4,7 @@ Created on 31.07.2013
 @author: bzfhende
 '''
 import re
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 
 class PluginStatisticsReader(StatisticReader):
    '''
@@ -51,7 +51,7 @@ class PluginStatisticsReader(StatisticReader):
          try:
             colonidx = line.index(':')
          except:
-            print StatisticReader.problemname, line
+            print(StatisticReader.problemname, line)
             raise Exception()
          plugintype = line[:colonidx].rstrip()
          self.plugintype = ''.join(plugintype.split())
@@ -84,7 +84,7 @@ class PluginStatisticsReader(StatisticReader):
 
             # treat tables (tables with at least two data columns)
             datakeys = ['_'.join((self.plugintype, column, pluginname)) for column in self.columns]
-            data = map(self.convertToFloat, StatisticReader.numericExpression.findall(line[colonidx+1:]))
+            data = list(map(self.convertToFloat, StatisticReader.numericExpression.findall(line[colonidx+1:])))
          else:
             # treat vectors (tables with only one data column)
             datakeys = ['_'.join((self.plugintype, pluginname))]

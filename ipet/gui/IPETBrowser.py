@@ -3,14 +3,14 @@ Created on 25.12.2013
 
 @author: bzfhende
 '''
-from ttk import Treeview, Frame, Panedwindow, Labelframe, Checkbutton, LabelFrame, Entry, Button, Label, PanedWindow, \
+from tkinter.ttk import Treeview, Frame, Panedwindow, Labelframe, Checkbutton, LabelFrame, Entry, Button, Label, PanedWindow, \
     OptionMenu
-from Tkconstants import VERTICAL, BOTH, TRUE, END, HORIZONTAL, LEFT, TOP
-from ScrolledText import ScrolledText
+from tkinter.constants import VERTICAL, BOTH, TRUE, END, HORIZONTAL, LEFT, TOP
+from tkinter.scrolledtext import ScrolledText
 from ipet.concepts import Manager
-from Tkinter import Tk, IntVar, StringVar
+from tkinter import Tk, IntVar, StringVar
 from ipet import Experiment
-import Tkconstants
+import tkinter.constants
 from numpy import float16, float32, float64
 
 class IPETTreeview(Frame):
@@ -30,7 +30,7 @@ class IPETTreeview(Frame):
         buttons = self.createButtons(buttonframe)
         for button in buttons:
            button.pack(side=LEFT)
-        buttonframe.pack(side=TOP, fill=Tkconstants.X)
+        buttonframe.pack(side=TOP, fill=tkinter.constants.X)
 
         self.treeview = Treeview(self)
         self.treeview.pack(side=TOP)
@@ -40,10 +40,10 @@ class IPETTreeview(Frame):
         '''
         fill the tree view
         '''
-        print "active: ", map(self.manager.getStringRepresentation, self.manager.getActiveSet())
+        print("active: ", list(map(self.manager.getStringRepresentation, self.manager.getActiveSet())))
         sortedkeys = sorted(self.manager.getAllRepresentations())
         for key in sortedkeys:
-            print key, self.manager.isActive(self.manager.getManageable(key))
+            print(key, self.manager.isActive(self.manager.getManageable(key)))
             if self.manager.isActive(self.manager.getManageable(key)):
                 tag = 'active'
             else:
@@ -64,7 +64,7 @@ class IPETTreeview(Frame):
             self.treeview.tag_configure('inactive', background='red')
 
     def quit(self):
-        print 'deleting'
+        print('deleting')
         self.manager.removeObserver(self)
         self.destroy()
 
@@ -75,7 +75,7 @@ class IPETTreeview(Frame):
         return self.treeview.selection()
 
     def update(self, manager):
-        map(self.treeview.delete, self.treeview.get_children())
+        list(map(self.treeview.delete, self.treeview.get_children()))
         self.fill()
 
     def createButtons(self, master):
@@ -86,14 +86,14 @@ class IPETTreeview(Frame):
         '''
         activates the current selection
         '''
-        manageables = map(self.manager.getManageable, self.getSelection())
+        manageables = list(map(self.manager.getManageable, self.getSelection()))
         self.manager.activate(manageables)
 
     def deactivateSelection(self):
         '''
         deactivates the current selection
         '''
-        manageables = map(self.manager.getManageable, self.getSelection())
+        manageables = list(map(self.manager.getManageable, self.getSelection()))
         self.manager.deactivate(manageables)
 
 
@@ -157,12 +157,12 @@ class IPETTypeWidget(Frame):
         if attribute is None:
             attribute = getattr(self.objecttoedit, self.attributename)
 
-        print "Attribute type %s" % type(attribute)
+        print("Attribute type %s" % type(attribute))
         if type(attribute) is bool:
             self.var = IntVar()
             # bools get checkboxes.
             Checkbutton(self, text=attributename, variable=self.var, command=self.commandTypeSafe).pack()
-        elif type(attribute) in [str, unicode]:
+        elif type(attribute) in [str, str]:
             # string elements get an entry
             self.var = StringVar()
             self.createCompositeEditWidget(attributename)
@@ -200,8 +200,8 @@ class IPETTypeWidget(Frame):
         strings
         '''
         newattribute = self.var.get()
-        print self.currattribute, "-->", newattribute
-        print type(self.currattribute), "-->", type(newattribute)
+        print(self.currattribute, "-->", newattribute)
+        print(type(self.currattribute), "-->", type(newattribute))
         if type(self.currattribute) is not type(newattribute):
             try:
                 # try a conversion
@@ -213,7 +213,7 @@ class IPETTypeWidget(Frame):
         # new attribute is safe for type conversion
         self.setVariableValue(newattribute)
         self.manager.editObjectAttribute(self.objecttoedit, self.attributename, newattribute)
-        print self.var.get()
+        print(self.var.get())
 
 
     def getVariable(self):
@@ -224,7 +224,7 @@ class IPETTypeWidget(Frame):
 
     def createCompositeEditWidget(self, attributename):
         labelframe = LabelFrame(self, text=attributename)
-        print "Label Frame for attribute %s, variable value %s" % (attributename, str(self.var.get()))
+        print("Label Frame for attribute %s, variable value %s" % (attributename, str(self.var.get())))
         Entry(labelframe, textvariable=self.var, validate="focusout", validatecommand=self.commandTypeSafe).pack(side=LEFT)
         Button(labelframe, text="Go", command=self.commandTypeSafe).pack(side=LEFT)
         labelframe.pack()
@@ -257,7 +257,7 @@ class IPETBrowser(Frame):
         every selection of an object yields an update of the object representation
         '''
         selection = self.treeview.getSelection()[0]
-        print selection
+        print(selection)
         selectedobject = self.manager.getManageable(selection)
         if selectedobject is not None:
             self.objectrepresentation.displayObject(self.manager, selectedobject)
@@ -270,5 +270,5 @@ if __name__ == '__main__':
     comp = Experiment()
     manager = Manager(listofmanageables=comp.datacollector.listofreaders)
     browser = IPETBrowser(root, manager, height=root.winfo_screenheight(), width=root.winfo_screenwidth())
-    browser.pack(expand=TRUE, fill=Tkconstants.BOTH)
+    browser.pack(expand=TRUE, fill=tkinter.constants.BOTH)
     root.mainloop()

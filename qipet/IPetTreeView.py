@@ -87,7 +87,7 @@ class IpetTreeView(QTreeWidget):
 
     def setSelectedEditable(self, editable):
         self.setItemSelected(self.currentItem(), False)
-        for item, editableval in self.item2editable.items():
+        for item, editableval in list(self.item2editable.items()):
             if editable == editableval:
                 #we need to set both the selected and the current item
                 self.setItemSelected(item, True)
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         item = treeview.selectedItems()[0]
         
         
-        for i in reversed(range(layout2.count())): 
+        for i in reversed(list(range(layout2.count()))): 
             layout2.itemAt(i).widget().close()
         editframecontent = EditableForm(treeview.item2editable[item], editframe)
         textlabel = QLabel(QString("Edit attributes for %s"%(treeview.item2editable[item].getName())))

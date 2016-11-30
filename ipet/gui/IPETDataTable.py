@@ -3,18 +3,18 @@ Created on 31.01.2014
 
 @author: Customer
 '''
-from ttk import Frame, OptionMenu, Button, Label
-import Tkconstants
-from Tkconstants import TOP, END
-from ScrolledText import ScrolledText
-from Tkinter import Menu, Toplevel, StringVar
-from cStringIO import StringIO
+from tkinter.ttk import Frame, OptionMenu, Button, Label
+import tkinter.constants
+from tkinter.constants import TOP, END
+from tkinter.scrolledtext import ScrolledText
+from tkinter import Menu, Toplevel, StringVar
+from io import StringIO
 import numpy as np
 from pandas import MultiIndex
 from functools import partial
-from IPETParam import IPETParam
-from IPETPlotWindow import IPETPlotWindow
-from IPETBrowser import IPETTypeWidget
+from .IPETParam import IPETParam
+from .IPETPlotWindow import IPETPlotWindow
+from .IPETBrowser import IPETTypeWidget
 from ipet.concepts import Manager
 
 class IPETDataTableFrame(Frame):
@@ -35,8 +35,8 @@ class IPETDataTableFrame(Frame):
         '''
         Frame.__init__(self, master=master, **kw)
 
-        self.text = ScrolledText(self, wrap=Tkconstants.NONE)
-        self.text.pack(side=TOP, expand=1, fill=Tkconstants.BOTH)
+        self.text = ScrolledText(self, wrap=tkinter.constants.NONE)
+        self.text.pack(side=TOP, expand=1, fill=tkinter.constants.BOTH)
         self.text.bind('<Motion>', self.highlightCurrentWord)
         self.text.bind('<Button-1>', self.highlightCurrentColumn)
         self.text.bind('<Button-3>', self.openContextMenu)
@@ -88,7 +88,7 @@ class IPETDataTableFrame(Frame):
             self.ncollevels = 1
 
         # determine the number of characters that should be removed from every line if long indices are present
-        maximumindexwidth = max(map(len, self.dataframe.index))
+        maximumindexwidth = max(list(map(len, self.dataframe.index)))
         self.ncharsindexremoval = max(0, maximumindexwidth - self.maxindexwidth)
 
         oldparamval = self.param_scatter_secondcolumn.getValue()
@@ -132,7 +132,7 @@ class IPETDataTableFrame(Frame):
 
             else:
                 # line is a row of the data frame
-                for colidx in xrange(len(self.dataframe.columns)):
+                for colidx in range(len(self.dataframe.columns)):
                     leftcolwidth, rightcolwidth = self.colwidths[colidx]
                     if leftcolwidth < 0 or rightcolwidth < 0:
                         raise ValueError("Error: Have uninitialized pair of col widths (%d,%d)" % (leftcolwidth, rightcolwidth))
@@ -149,14 +149,14 @@ class IPETDataTableFrame(Frame):
         '''
         highlight word under mouse pointer
         '''
-        self.text.tag_remove('hover', 1.0, Tkconstants.END)
-        startofword = "%s+1c" % self.text.search(r'\s', Tkconstants.CURRENT, backwards=True, regexp=True)
-        endofword = self.text.search(r'\s', Tkconstants.CURRENT, regexp=True)
+        self.text.tag_remove('hover', 1.0, tkinter.constants.END)
+        startofword = "%s+1c" % self.text.search(r'\s', tkinter.constants.CURRENT, backwards=True, regexp=True)
+        endofword = self.text.search(r'\s', tkinter.constants.CURRENT, regexp=True)
         self.text.tag_add('hover', startofword, endofword)
         self.text.tag_config('hover', background='gray85')
 
     def highlightCurrentColumn(self, event):
-        self.text.tag_remove('columntag', 1.0, Tkconstants.END)
+        self.text.tag_remove('columntag', 1.0, tkinter.constants.END)
         currentcolumnindex = self.getCurrentColumnIndex(event)
         if currentcolumnindex == -1:
             return
@@ -164,7 +164,7 @@ class IPETDataTableFrame(Frame):
             return
         left, right = self.colwidths[currentcolumnindex]
 
-        for line in xrange(1, self.dataframe.index.size + self.ncollevels + 1):
+        for line in range(1, self.dataframe.index.size + self.ncollevels + 1):
             self.text.tag_add('columntag', "%d.%d" % (line, left), "%d.%d" % (line, right))
 
         self.text.tag_config('columntag', background=self.text.cget('selectbackground'))
@@ -172,8 +172,8 @@ class IPETDataTableFrame(Frame):
 
 
     def getCurrentColumnIndex(self, event):
-        currentchar = map(int, self.text.index(Tkconstants.INSERT).split('.'))[1]
-        print currentchar, self.colwidths
+        currentchar = map(int, self.text.index(tkinter.constants.INSERT).split('.'))[1]
+        print(currentchar, self.colwidths)
         for idx, elem in enumerate(self.colwidths):
             left = elem[0]
             right = elem[1]
@@ -208,16 +208,16 @@ class IPETDataTableFrame(Frame):
             tl.title("Choose Second Column")
             var = StringVar(value=str(param.getValue()))
 
-            Label(tl, text="Selected X-Axis:%s" % str(self.dataframe.columns[self.getCurrentColumnIndex(None)])).pack(side=Tkconstants.TOP, fill=Tkconstants.X)
+            Label(tl, text="Selected X-Axis:%s" % str(self.dataframe.columns[self.getCurrentColumnIndex(None)])).pack(side=tkinter.constants.TOP, fill=tkinter.constants.X)
             possiblecolumns = {str(col):col for col in param.getPossibleValues()}
             om = OptionMenu(tl, var, str(param.getValue()), *list(map(str, param.getPossibleValues())))
-            om.pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=True)
+            om.pack(side=tkinter.constants.TOP, fill=tkinter.constants.X, expand=True)
 
         elif kind == 'histogram':
             tl.title("Adjust bin properties")
             paramManager = Manager([getattr(self, paramname) for paramname in dir(self) if paramname.startswith("param_histogram")])
             for param in paramManager.getManageables():
-                IPETTypeWidget(tl, param.getName(), param, paramManager, param.getValue()).pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=True)
+                IPETTypeWidget(tl, param.getName(), param, paramManager, param.getValue()).pack(side=tkinter.constants.TOP, fill=tkinter.constants.X, expand=True)
         def show():
             newplot = newplotparam.getValue() or not hasattr(self, 'plotwindow')
             if newplot:
@@ -237,12 +237,12 @@ class IPETDataTableFrame(Frame):
                     self.histogramcolumns = []
                 self.histogramcolumns.append(self.dataframe.columns[self.getCurrentColumnIndex(None)])
 
-                leftbin, rightbin, binwidth, nbins = map(IPETParam.getValue, [self.param_histogram_leftbin, self.param_histogram_rightbin, self.param_histogram_binwidth, self.param_histogram_nbins])
+                leftbin, rightbin, binwidth, nbins = list(map(IPETParam.getValue, [self.param_histogram_leftbin, self.param_histogram_rightbin, self.param_histogram_binwidth, self.param_histogram_nbins]))
                 if nbins <= 0:
                     bins = np.arange(leftbin, rightbin, step=binwidth)
                 else:
                     bins = np.linspace(leftbin, rightbin, nbins + 1, endpoint=True)
-                print "self.dataframe[self.histogramcolumns] = %s" % self.dataframe[self.histogramcolumns]
+                print("self.dataframe[self.histogramcolumns] = %s" % self.dataframe[self.histogramcolumns])
                 data = [self.dataframe[col] for col in self.histogramcolumns]
                 self.plotwindow.resetAxis()
                 self.plotwindow.a.hist(data, bins=bins, label=self.histogramcolumns, alpha=0.7)
@@ -255,13 +255,13 @@ class IPETDataTableFrame(Frame):
 
         if not hasattr(self, 'plotwindow'):
             newplotparam.checkAndChange(True)
-        IPETTypeWidget(tl, newplotparam.getName(), newplotparam, Manager([newplotparam]), newplotparam.getValue()).pack(side=Tkconstants.TOP)
+        IPETTypeWidget(tl, newplotparam.getName(), newplotparam, Manager([newplotparam]), newplotparam.getValue()).pack(side=tkinter.constants.TOP)
         buttonFrame = Frame(tl)
         buttonyes = Button(buttonFrame, text='OK', command=show)
         buttonno = Button(buttonFrame, text='Cancel', command=tl.destroy)
-        buttonyes.pack(side=Tkconstants.LEFT)
-        buttonno.pack(side=Tkconstants.LEFT)
-        buttonFrame.pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=True)
+        buttonyes.pack(side=tkinter.constants.LEFT)
+        buttonno.pack(side=tkinter.constants.LEFT)
+        buttonFrame.pack(side=tkinter.constants.TOP, fill=tkinter.constants.X, expand=True)
         tl.mainloop()
 
     def openContextMenu(self, event):

@@ -16,8 +16,8 @@ class ExperimentTest(unittest.TestCase):
                    ("misc03", "Datetime_End", "2014-08-01 16:56:37"),
                    ("findRoot", "Nodes", 8),
                    ("linking", "LineNumbers_BeginLogFile", 4),
-                   ("j301_2", "LineNumbers_BeginLogFile", 273),
-                   ("j301_2", "LineNumbers_EndLogFile", 569)
+                   ("j301_2", "LineNumbers_BeginLogFile", 276),
+                   ("j301_2", "LineNumbers_EndLogFile", 575)
                    ]
 
 
@@ -139,11 +139,11 @@ class ExperimentTest(unittest.TestCase):
                         "presolving/abortfac" : 0.0001,
                         "vbc/filename": "\"-\""}
 
-        for key, val in valuesamples.iteritems():
+        for key, val in valuesamples.items():
             self.assertEqual(val, values[key], "wrong parameter value %s parsed for parameter <%s>, should be %s" % (repr(values[key]), key, repr(val)))
             self.assertEqual(val, defaultvalues[key], "wrong default value %s parsed for parameter <%s>, should be %s" % (repr(defaultvalues[key]), key, repr(val)))
 
-        for key, val in crappysettings.iteritems():
+        for key, val in crappysettings.items():
             self.assertEqual(val, values[key], "wrong parameter value %s parsed for parameter <%s>, should be %s" % (repr(values[key]), key, repr(val)))
 
 if __name__ == "__main__":

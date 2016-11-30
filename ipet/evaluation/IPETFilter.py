@@ -6,8 +6,8 @@ Created on 16.12.2013
 from ipet.concepts import Editable
 import xml.etree.ElementTree as ElementTree
 import numpy as np
-import pandas as pd
 from ipet.concepts import IpetNode
+from ipet import Experiment
 
 class IPETInstance(IpetNode, Editable):
     nodetag = "Instance"
@@ -55,7 +55,7 @@ class IPETComparison:
         '''
         constructs a comparison object by passing an appropriate operator as string
         '''
-        if IPETComparison.comparisondict.has_key(str(operator)):
+        if str(operator) in IPETComparison.comparisondict:
             self.operator = str(operator)
         else:
             raise KeyError("Unknown key value %s" % (operator))
@@ -85,7 +85,7 @@ class IPETFilter(Editable, IpetNode):
     instanceoperators = ["keep", "drop"]
     attribute2Options = {
                          "anytestrun":["one", "all"],
-                         "operator":IPETComparison.comparisondict.keys() + instanceoperators}
+                         "operator":list(IPETComparison.comparisondict.keys()) + instanceoperators}
     nodetag = "Filter"
     
 
@@ -133,7 +133,7 @@ class IPETFilter(Editable, IpetNode):
 
     def set_operator(self, operator):
         self.operator = operator
-        if self.operator in IPETComparison.comparisondict.keys():
+        if self.operator in list(IPETComparison.comparisondict.keys()):
             self.comparison = IPETComparison(self.operator)
 
     def getEditableAttributes(self):
@@ -143,7 +143,7 @@ class IPETFilter(Editable, IpetNode):
         if a binary operator is selected, two expressions as left and right hand side of operator must be chosen
         For instance operators, no expressions are selectable.
         '''
-        if self.operator in IPETComparison.comparisondict.keys():
+        if self.operator in list(IPETComparison.comparisondict.keys()):
             return ['operator', 'anytestrun', 'expression1', 'expression2']
         else:
             return ['operator']
@@ -402,9 +402,7 @@ class IPETFilterGroup(Editable, IpetNode):
 
 
 if __name__ == '__main__':
-    from Comparator import Comparator
-    print "Hallo"
-    comp = Comparator(files = ['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
+    comp = Experiment(files = ['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
     comp.addSoluFile('../test/short.solu')
     comp.collectData()
     operator = 'ge'
@@ -412,10 +410,10 @@ if __name__ == '__main__':
     expression2 = '2'
     filter1 = IPETFilter(expression1, expression2, operator, anytestrun = "all")
     filter2 = IPETFilter(expression1, expression2, operator, anytestrun = "one")
-    print filter1.getName()
-    print len(comp.getProblems())
-    print len(filter1.getFilteredList(comp.getProblems(), comp.getManager('testrun').getManageables()))
-    print len(filter2.getFilteredList(comp.getProblems(), comp.getManager('testrun').getManageables()))
+    print(filter1.getName())
+    print(len(comp.getProblems()))
+    print(len(filter1.getFilteredList(comp.getProblems(), comp.getManager('testrun').getManageables())))
+    print(len(filter2.getFilteredList(comp.getProblems(), comp.getManager('testrun').getManageables())))
 
 
     group = IPETFilterGroup('new')
@@ -434,4 +432,4 @@ if __name__ == '__main__':
     group3 = IPETFilterGroup.fromXMLFile('myfile.xml')
     xml = group3.toXMLElem()
     dom = parseString(ElementTree.tostring(xml))
-    print dom.toprettyxml()
+    print(dom.toprettyxml())

@@ -3,8 +3,8 @@ Created on 08.03.2013
 
 @author: bzfhende
 '''
-from Tkinter import Frame
-from Tkconstants import GROOVE
+from tkinter import Frame
+from tkinter.constants import GROOVE
 
 class IpetWidget(Frame):
     '''

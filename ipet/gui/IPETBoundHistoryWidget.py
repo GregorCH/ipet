@@ -7,22 +7,22 @@ The PbHistoryWidget features methods to visualize the history of primal and dual
 Testruns can be activated/dectivated. The normalization can be chosen (no normalization (values on the real primal
 and dual scale) or Cplex Gap)
 '''
-from IPETWidget import IpetWidget
-from Tkinter import IntVar, Checkbutton, Toplevel, Button, StringVar
-from Tkconstants import BOTH, TOP, HORIZONTAL
+from .IPETWidget import IpetWidget
+from tkinter import IntVar, Checkbutton, Toplevel, Button, StringVar
+from tkinter.constants import BOTH, TOP, HORIZONTAL
 import matplotlib
 matplotlib.use('TkAgg')
 import numpy
 from matplotlib.pyplot import cm
 import matplotlib.pylab as plt
 from ipet import misc
-from ttk import Panedwindow, LabelFrame, Treeview, Frame, OptionMenu, Label
-import Tkconstants
-from IPETParam import IPETParam
+from tkinter.ttk import Panedwindow, LabelFrame, Treeview, Frame, OptionMenu, Label
+import tkinter.constants
+from .IPETParam import IPETParam
 from ipet.parsing import PrimalBoundHistoryReader, DualBoundHistoryReader, PrimalBoundReader, DualBoundReader
-from IPETBrowser import IPETTypeWidget
+from .IPETBrowser import IPETTypeWidget
 from ipet.concepts import Manager
-from IPETPlotWindow import IPETPlotFrame
+from .IPETPlotWindow import IPETPlotFrame
 
 class IPETBoundHistoryWidget(IpetWidget):
 
@@ -58,7 +58,7 @@ class IPETBoundHistoryWidget(IpetWidget):
         Label(self.navpanel, text="select test run and instance:").grid(row=0, column=1)
         
         self.probvar = StringVar(value=str(None))
-        self.navpanel.pack(side=TOP, fill=Tkconstants.X)
+        self.navpanel.pack(side=TOP, fill=tkinter.constants.X)
         
         # init a canvas
         self.pw.pack(side=TOP, fill=BOTH, expand=1)
@@ -105,12 +105,12 @@ class IPETBoundHistoryWidget(IpetWidget):
         while len(self.a.patches) > 0:
             p = self.a.patches[-1]
             p.remove()
-        for testrunname in self.primallines.keys():
+        for testrunname in list(self.primallines.keys()):
             try:
                 self.a.lines.remove(self.primallines[testrunname])
             except:
                 pass
-        for testrunname in self.duallines.keys():
+        for testrunname in list(self.duallines.keys()):
             try:
                 self.a.lines.remove(self.duallines[testrunname])
             except:
@@ -122,13 +122,13 @@ class IPETBoundHistoryWidget(IpetWidget):
         '''
         optsol = testrun.problemGetOptimalSolution(probname)
         if optsol is None:
-            print "cannot normalize because of missing solu file data"
+            print("cannot normalize because of missing solu file data")
             normalize = False
         # we don't want the gui to crash because of a missing history - just continue with next testrun
         try:
             history = testrun.problemGetData(probname, datakey)[:]
         except TypeError:
-            print testrun.getSettings(), " has no history for ", probname
+            print(testrun.getSettings(), " has no history for ", probname)
             history = []
         
         # retrieve some instance problem data
@@ -140,7 +140,7 @@ class IPETBoundHistoryWidget(IpetWidget):
         if normalize:
             history.insert(0, (0.0, misc.FLOAT_INFINITY))
         
-        thelist = map(list, zip(*history))
+        thelist = list(map(list, list(zip(*history))))
         x = numpy.array(thelist[0])
         
         # depending on the normalization parameter, the normfunction used is either the CPlex gap, or the identity
@@ -148,7 +148,7 @@ class IPETBoundHistoryWidget(IpetWidget):
             normfunction = lambda x : min(100.0, misc.getGap(x, optsol, True))
         else:
             normfunction = lambda x : x
-        y = numpy.array(map(normfunction, thelist[1]))
+        y = numpy.array(list(map(normfunction, thelist[1])))
         
         return (x, y)
     def update(self, *args):
@@ -248,12 +248,12 @@ class IPETBoundHistoryWidget(IpetWidget):
         # index everything by labels, either given as dictionary keys, or integer indices ranging from 0 to len(dataX) - 1
         assert type(dataX) is type(dataY)
         if type(dataX) is dict:
-            labels = dataX.keys()
+            labels = list(dataX.keys())
             if testrunnames is None:
                 testrunnames = {label:label for label in labels}
         else:
             assert type(dataX) is list
-            labels = range(len(dataX))
+            labels = list(range(len(dataX)))
            
             if testrunnames is None:
                 testrunnames = {label:repr(label) for label in labels}
@@ -263,7 +263,7 @@ class IPETBoundHistoryWidget(IpetWidget):
         try:
             colormap = cm.get_cmap(name=colormapname, lut=128)
         except ValueError:
-            print "Colormap of name ", colormapname, " does not exist"
+            print("Colormap of name ", colormapname, " does not exist")
             colormap = cm.get_cmap(name=SCIPguiPbHistoryWidget.default_cmap, lut=128)
         colortransform = numpy.linspace(0.1, 0.9, len(labels))
         
@@ -341,9 +341,9 @@ class PbConfigurationFrame(Toplevel):
         self.treeviewkeys = Treeview(dataselectionframe)
         # add two buttons to (unselect) testruns for the primal integral
         buttons = Frame(dataselectionframe)
-        buttons.pack(fill=Tkconstants.X);
-        Button(buttons, text="SHOW Sel", command=self.selectitems).pack(side=Tkconstants.LEFT)
-        Button(buttons, text="HIDE Sel", command=self.unselectitems).pack(side=Tkconstants.LEFT)
+        buttons.pack(fill=tkinter.constants.X);
+        Button(buttons, text="SHOW Sel", command=self.selectitems).pack(side=tkinter.constants.LEFT)
+        Button(buttons, text="HIDE Sel", command=self.unselectitems).pack(side=tkinter.constants.LEFT)
         
         self.treeviewkeys.pack()
         self.iids = {}

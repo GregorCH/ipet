@@ -3,12 +3,12 @@ Created on 08.03.2013
 
 @author: bzfhende
 '''
-from IPETWidget import IpetWidget
-from Tkinter import StringVar, Label, Frame, Toplevel
-from IPETSelectionLabel import SCIPguiSelectionLabel
+from .IPETWidget import IpetWidget
+from tkinter import StringVar, Label, Frame, Toplevel
+from .IPETSelectionLabel import SCIPguiSelectionLabel
 
 import matplotlib
-from Tkconstants import TOP, BOTH, BOTTOM
+from tkinter.constants import TOP, BOTH, BOTTOM
 import numpy
 from ipet.gui.IPETPlotWindow import IpetNavigationToolBar
 matplotlib.use('TkAgg')
@@ -109,7 +109,7 @@ class IpetScatterWidget(IpetWidget):
         ydata = thisline.get_ydata()
         ind = event.ind
 #        matplotlib.artist.setp(thisline, color=colors)
-        points = zip(self.problist[ind], self.x[ind], self.y[ind])
+        points = list(zip(self.problist[ind], self.x[ind], self.y[ind]))
         if self.pointwindow != None:
             self.pointwindow.destroy()
         if self.markerline != None:

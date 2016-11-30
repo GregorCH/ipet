@@ -4,14 +4,14 @@ Created on 22.09.2016
 @author: Gregor Hendel
 '''
 
-from IpetMainWindow import IpetMainWindow
+from .IpetMainWindow import IpetMainWindow
 from PyQt4.QtGui import QLayout, QHBoxLayout
 from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QTabWidget
-from IPetTreeView import IpetTreeView
+from .IPetTreeView import IpetTreeView
 import sys
-from EditableBrowser import EditableBrowser
-from IPETParserWindow import IPETParserWindow
-from IpetEvaluationEditorApp import EvaluationEditorWindow
+from .EditableBrowser import EditableBrowser
+from .IPETParserWindow import IPETParserWindow
+from .IpetEvaluationEditorApp import EvaluationEditorWindow
 
 class QIPETApplication(IpetMainWindow):
     '''

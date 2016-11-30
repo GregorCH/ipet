@@ -1,6 +1,6 @@
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 import re
-from StatisticReader_CustomReader import CustomReader
+from .StatisticReader_CustomReader import CustomReader
 from ipet.misc import misc
 import numpy as np
 
@@ -84,8 +84,8 @@ class CustomHistoryReader(StatisticReader):
 
          elif -1 in self.listofindices:
             # parse indices of columns corresponding to the headers
-            splittedlinenowhitespace = map(str.strip, line.split('|'))
-            self.listofindices = map(splittedlinenowhitespace.index, self.listofheaders)
+            splittedlinenowhitespace = list(map(str.strip, line.split('|')))
+            self.listofindices = list(map(splittedlinenowhitespace.index, self.listofheaders))
 
 
    def execEndOfProb(self):

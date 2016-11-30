@@ -3,19 +3,19 @@ Created on 02.04.2013
 
 @author: bzfhende
 '''
-from IPETWidget import IpetWidget
-from Tkinter import StringVar, Scrollbar, Button, Frame, Toplevel, PanedWindow, LabelFrame
+from .IPETWidget import IpetWidget
+from tkinter import StringVar, Scrollbar, Button, Frame, Toplevel, PanedWindow, LabelFrame
 
-import Tkconstants
+import tkinter.constants
 import pandas as pd
 
-from ttk import Treeview, Separator, Entry
+from tkinter.ttk import Treeview, Separator, Entry
 import os
-from IPETDataTable import IPETDataTableFrame
-from IPETParam import IPETParam
-from IPETBrowser import IPETTypeWidget
+from .IPETDataTable import IPETDataTableFrame
+from .IPETParam import IPETParam
+from .IPETBrowser import IPETTypeWidget
 from ipet.concepts import Manager
-from IPETImageButton import IpetImageButton
+from .IPETImageButton import IpetImageButton
 from functools import partial
 
 class IpetTableWidget(IpetWidget):
@@ -33,8 +33,8 @@ class IpetTableWidget(IpetWidget):
         constructs a table widget
         '''
         IpetWidget.__init__(self, master, gui, **kw)
-        paned = PanedWindow(self, orient=Tkconstants.VERTICAL)
-        scrollbar = Scrollbar(self, orient=Tkconstants.HORIZONTAL)
+        paned = PanedWindow(self, orient=tkinter.constants.VERTICAL)
+        scrollbar = Scrollbar(self, orient=tkinter.constants.HORIZONTAL)
         self.tableframe = IPETDataTableFrame(paned, scrollbar=scrollbar)
         paned.add(self.tableframe)
 
@@ -43,24 +43,24 @@ class IpetTableWidget(IpetWidget):
 
         self.exportfilenamevar = StringVar(value='newtable.txt')
         exportframe = Frame(self)
-        Button(exportframe, text="Create Table", command=self.openTableCreationFrame).pack(side=Tkconstants.LEFT, padx=2)
-        Button(exportframe, text="Export", command=self.export).pack(side=Tkconstants.LEFT, padx=2)
-        Entry(exportframe, textvariable=self.exportfilenamevar).pack(side=Tkconstants.LEFT, padx=2)
-        Separator(exportframe, orient=Tkconstants.VERTICAL).pack(side=Tkconstants.LEFT, padx=5)
-        IpetImageButton(exportframe, "Refresh-icon", "Refresh the data frame", self.update).pack(side = Tkconstants.LEFT, padx = 2)
-        Separator(exportframe, orient=Tkconstants.VERTICAL).pack(side=Tkconstants.LEFT, padx=5)
+        Button(exportframe, text="Create Table", command=self.openTableCreationFrame).pack(side=tkinter.constants.LEFT, padx=2)
+        Button(exportframe, text="Export", command=self.export).pack(side=tkinter.constants.LEFT, padx=2)
+        Entry(exportframe, textvariable=self.exportfilenamevar).pack(side=tkinter.constants.LEFT, padx=2)
+        Separator(exportframe, orient=tkinter.constants.VERTICAL).pack(side=tkinter.constants.LEFT, padx=5)
+        IpetImageButton(exportframe, "Refresh-icon", "Refresh the data frame", self.update).pack(side = tkinter.constants.LEFT, padx = 2)
+        Separator(exportframe, orient=tkinter.constants.VERTICAL).pack(side=tkinter.constants.LEFT, padx=5)
         IpetImageButton(exportframe, "arrow-left-icon", "Move selected column left", partial(self.move, where = -1))\
-        .pack(side=Tkconstants.LEFT, padx=2)
-        IpetImageButton(exportframe, "arrow-right-icon", "Move selected column to the right", partial(self.move, where = +1)).pack(side = Tkconstants.LEFT, padx = 2)
+        .pack(side=tkinter.constants.LEFT, padx=2)
+        IpetImageButton(exportframe, "arrow-right-icon", "Move selected column to the right", partial(self.move, where = +1)).pack(side = tkinter.constants.LEFT, padx = 2)
 
-        IpetImageButton(exportframe, "sort-ascending-icon", "Sort selected column in ascending order", self.update).pack(side = Tkconstants.LEFT, padx = 2)
-        IpetImageButton(exportframe, "sort-descending-icon", "Sort selected column in descending order", self.update).pack(side = Tkconstants.LEFT, padx = 2)
+        IpetImageButton(exportframe, "sort-ascending-icon", "Sort selected column in ascending order", self.update).pack(side = tkinter.constants.LEFT, padx = 2)
+        IpetImageButton(exportframe, "sort-descending-icon", "Sort selected column in descending order", self.update).pack(side = tkinter.constants.LEFT, padx = 2)
 
         self.optionsbutton = Button(exportframe, text="Show Options", command=self.showOptions)
-        self.optionsbutton.pack(side=Tkconstants.RIGHT)
-        exportframe.pack(side=Tkconstants.TOP, fill=Tkconstants.X)
-        paned.pack(side=Tkconstants.TOP, fill=Tkconstants.BOTH, expand=Tkconstants.TRUE)
-        scrollbar.pack(side=Tkconstants.TOP, fill=Tkconstants.X, expand=Tkconstants.TRUE)
+        self.optionsbutton.pack(side=tkinter.constants.RIGHT)
+        exportframe.pack(side=tkinter.constants.TOP, fill=tkinter.constants.X)
+        paned.pack(side=tkinter.constants.TOP, fill=tkinter.constants.BOTH, expand=tkinter.constants.TRUE)
+        scrollbar.pack(side=tkinter.constants.TOP, fill=tkinter.constants.X, expand=tkinter.constants.TRUE)
 
         # use a manager to manage the parameters
         params = [getattr(IpetTableWidget, name) for name in dir(IpetTableWidget) if name.startswith('param_')]
@@ -144,7 +144,7 @@ class IpetTableWidget(IpetWidget):
     def updateAggregation(self):
         aggregations = self.gui.comparator.getManager('aggregation').getManageables(onlyactive=True)
         self.df_aggr = pd.DataFrame(columns=self.df_selection.columns, index=[aggregation.getName() for aggregation in aggregations])
-        print self.df_selection.columns
+        print(self.df_selection.columns)
         for aggregation in aggregations:
             for col in self.df_selection.columns:
                 try:
@@ -183,7 +183,7 @@ class IpetTableWidget(IpetWidget):
             self.tl = Toplevel(self)
             for idx, param in enumerate(self.params.getManageables()):
                 IPETTypeWidget(self.tl, param.getName(), param, self.params, attribute=param.getValue()).grid(row=idx)
-            print "Opening options for Ipet Table Widget"
+            print("Opening options for Ipet Table Widget")
             self.optionsbutton.config(text='Hide Options')
             width = self.tl.winfo_width()
             height = self.tl.winfo_height()
@@ -227,7 +227,7 @@ class IpetTableWidget(IpetWidget):
             f = open(filename, 'w')
             f.close()
         except IOError:
-            print "Error: File %s could not be opened for writing - check path and writing permissions" % (filename)
+            print("Error: File %s could not be opened for writing - check path and writing permissions" % (filename))
             return
 
         # infer the correct output method from the file extension
@@ -237,12 +237,12 @@ class IpetTableWidget(IpetWidget):
         try:
             exportmethod = getattr(thedf, methodname)
             exportmethod(filename)
-            print "Saved Table to file %s" % os.path.abspath(filename)
+            print("Saved Table to file %s" % os.path.abspath(filename))
         except AttributeError:
-            print "unknown file extension %s: using to string exportmethod" % (methodname)
+            print("unknown file extension %s: using to string exportmethod" % (methodname))
             with open(filename, 'w') as f:
                 f.write(thedf.to_string())
-                print "Saved Table to file %s" % os.path.abspath(filename)
+                print("Saved Table to file %s" % os.path.abspath(filename))
 
 
     def openTableCreationFrame(self):
@@ -261,8 +261,8 @@ class TableCreationFrame(Toplevel):
       h = self.winfo_screenheight()
       self.geometry("%dx%d+%d+%d" % (w / 2, h / 4 * 3, tablewidget.winfo_rootx() + w / 10, tablewidget.winfo_rooty() + h / 10))
       self.tablewidget = tablewidget
-      panedwindow = PanedWindow(self, orient=Tkconstants.VERTICAL)
-      panedwindow.pack(expand=True, fill=Tkconstants.BOTH);
+      panedwindow = PanedWindow(self, orient=tkinter.constants.VERTICAL)
+      panedwindow.pack(expand=True, fill=tkinter.constants.BOTH);
       dataselectionframe = LabelFrame(panedwindow, text='Select Data')
       self.createDataSelectionPanel(gui, dataselectionframe)
       panedwindow.add(dataselectionframe)
@@ -272,14 +272,14 @@ class TableCreationFrame(Toplevel):
         #panedwindow.add(selectionviewpanel)
 
    def createDataSelectionPanel(self, gui, master):
-      panedwindowdsf = PanedWindow(master, orient=Tkconstants.HORIZONTAL)
-      panedwindowdsf.pack(expand=True, fill=Tkconstants.BOTH)
+      panedwindowdsf = PanedWindow(master, orient=tkinter.constants.HORIZONTAL)
+      panedwindowdsf.pack(expand=True, fill=tkinter.constants.BOTH)
       buttonframedfs = Frame(master)
-      buttonframedfs.pack(side=Tkconstants.TOP)
-      Button(buttonframedfs, text='Add current selection', command=self.selectionAdd).pack(side=Tkconstants.LEFT)
-      Button(buttonframedfs, text='Remove current selection', command=self.selectionRemove).pack(side=Tkconstants.LEFT)
-      Button(buttonframedfs, text='Reset', command=self.selectionReset).pack(side=Tkconstants.LEFT)
-      Separator(master).pack(side=Tkconstants.TOP)
+      buttonframedfs.pack(side=tkinter.constants.TOP)
+      Button(buttonframedfs, text='Add current selection', command=self.selectionAdd).pack(side=tkinter.constants.LEFT)
+      Button(buttonframedfs, text='Remove current selection', command=self.selectionRemove).pack(side=tkinter.constants.LEFT)
+      Button(buttonframedfs, text='Reset', command=self.selectionReset).pack(side=tkinter.constants.LEFT)
+      Separator(master).pack(side=tkinter.constants.TOP)
 
       self.treeviewkeys = Treeview(panedwindowdsf)
       panedwindowdsf.add(self.treeviewkeys)
@@ -291,11 +291,11 @@ class TableCreationFrame(Toplevel):
          self.treeviewtestruns.insert('', 'end', testrunname, text=testrunname)
 
    def createSelectionViewPanel(self, gui, master):
-      panedwindowsv = PanedWindow(master, orient=Tkconstants.HORIZONTAL)
-      panedwindowsv.pack(expand=True, fill=Tkconstants.BOTH)
+      panedwindowsv = PanedWindow(master, orient=tkinter.constants.HORIZONTAL)
+      panedwindowsv.pack(expand=True, fill=tkinter.constants.BOTH)
       buttonframedfs = Frame(master)
-      buttonframedfs.pack(side=Tkconstants.TOP)
-      Separator(master).pack(side=Tkconstants.TOP)
+      buttonframedfs.pack(side=tkinter.constants.TOP)
+      Separator(master).pack(side=tkinter.constants.TOP)
 
       self.treeviewcurrselection = Treeview(panedwindowsv)
       panedwindowsv.add(self.treeviewcurrselection)
@@ -303,7 +303,7 @@ class TableCreationFrame(Toplevel):
       panedwindowsv.add(optionframe)
 
    def fillTreeCurrSelection(self):
-      map(self.treeviewcurrselection.delete, self.treeviewcurrselection.get_children())
+      list(map(self.treeviewcurrselection.delete, self.treeviewcurrselection.get_children()))
       lastrun = ''
       for run, key in self.tablewidget.selection:
          if run != lastrun:

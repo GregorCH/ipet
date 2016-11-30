@@ -26,7 +26,7 @@ def quickToLatex(df, index_makros=False, **to_latex_kw):
    if index_makros:
       newdf.rename(index={idx:colformatlatex(idx) for idx in newdf.index}, inplace=True)
 
-   to_latex_kws = {key:val for key, val in itertools.chain(default_to_latex_kw.items(), to_latex_kw.items())}
+   to_latex_kws = {key:val for key, val in itertools.chain(list(default_to_latex_kw.items()), list(to_latex_kw.items()))}
    return newdf.to_latex(**to_latex_kw)
 
 def quickAggregationOnIndex(df, col, aggfunc=np.min, threshold = None):

@@ -3,7 +3,7 @@ Created on 08.03.2013
 
 @author: bzfhende
 '''
-from Tkinter import Label, Menu
+from tkinter import Label, Menu
 
 
 

@@ -3,7 +3,7 @@ from ipet.concepts import Editable
 from pandas import DataFrame, notnull
 import os
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except:
     import pickle
 
@@ -88,7 +88,7 @@ class TestRun(Editable):
         return None
     def getKeySet(self):
         if self.datadict != {}:
-            return self.datadict.keys()
+            return list(self.datadict.keys())
         else:
             return set(self.data.columns)
 
@@ -157,7 +157,7 @@ class TestRun(Editable):
         deletes all data acquired so far for probname
         '''
         if self.datadict != {}:
-            for col in self.datadict.keys():
+            for col in list(self.datadict.keys()):
                 try:
                     del self.datadict[col][probname]
                 except KeyError:
@@ -194,7 +194,7 @@ class TestRun(Editable):
             pickle.dump(self, f, protocol=2)
             f.close()
         except IOError:
-            print "Could not open %s for saving test run" % filename
+            print("Could not open %s for saving test run" % filename)
 
 
 
@@ -207,7 +207,7 @@ class TestRun(Editable):
             else:
                 f = open(filename, 'rb')
         except IOError:
-            print "Could not open %s for loading test run" % filename
+            print("Could not open %s for loading test run" % filename)
             return None
 
         testrun = pickle.load(f)
@@ -274,7 +274,7 @@ class TestRun(Editable):
         try:
             return self.problemGetData(solufileprobname, 'OptVal')
         except KeyError:
-            print self.getIdentification() + " has no solu file value for ", solufileprobname
+            print(self.getIdentification() + " has no solu file value for ", solufileprobname)
             return None
 
     def problemGetSoluFileStatus(self, solufileprobname):
@@ -285,5 +285,5 @@ class TestRun(Editable):
         try:
             return self.problemGetData(solufileprobname, 'SoluFileStatus')
         except KeyError:
-            print self.getIdentification() + " has no solu file status for ", solufileprobname
+            print(self.getIdentification() + " has no solu file status for ", solufileprobname)
             return None

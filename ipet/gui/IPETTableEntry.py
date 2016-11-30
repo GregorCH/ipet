@@ -3,9 +3,9 @@ Created on 07.03.2013
 
 @author: bzfhende
 '''
-from Tkinter import Frame, StringVar, Radiobutton, Label, Scrollbar, Menu
-from Tkconstants import LEFT, RIGHT, END, W, GROOVE, SUNKEN, VERTICAL
-from IPETSelectionLabel import SCIPguiSelectionLabel
+from tkinter import Frame, StringVar, Radiobutton, Label, Scrollbar, Menu
+from tkinter.constants import LEFT, RIGHT, END, W, GROOVE, SUNKEN, VERTICAL
+from .IPETSelectionLabel import SCIPguiSelectionLabel
 
 class TableEntry(Frame):
    '''

@@ -1,13 +1,13 @@
 from ipet.parsing.ReaderManager import ReaderManager
 # from StatisticReader import StatisticReader
-from TestRun import TestRun
+from .TestRun import TestRun
 from ipet import misc
 from ipet.concepts.Observer import Observable
 import pandas
 from ipet.parsing import SolvingTimeReader
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except:
     import pickle
 from ipet.concepts.Manager import Manager
@@ -63,7 +63,7 @@ class Experiment(Observable):
         if fileextension == TestRun.FILE_EXTENSION:
             try:
                 testrun = TestRun.loadFromFile(filename)
-            except IOError, e:
+            except IOError as e:
                 sys.stderr.write(" Loading testrun from file %s caused an exception\n%s\n" % (filename, e))
                 return
         elif testrun is None:
@@ -261,7 +261,7 @@ class Experiment(Observable):
                     try:
                         testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
                         logging.debug("Computed primal integral %.1f for problem %s, data %s"  % (testrun.problemGetData(probname, 'PrimalIntegral'), probname, repr(processplotdata)))
-                    except AssertionError, e:
+                    except AssertionError as e:
                         logging.error("Error for primal bound on problem %s, list: %s"%(probname, processplotdata))
 
                 processplotdata = getProcessPlotData(testrun, probname, **dualargs)
@@ -269,7 +269,7 @@ class Experiment(Observable):
                 if processplotdata:
                     try:
                         testrun.addData(probname, 'DualIntegral', calcIntegralValue(processplotdata, pwlinear=True))
-                    except AssertionError, e:
+                    except AssertionError as e:
                         logging.error("Error for dual bound on problem %s, list: %s "%(probname, processplotdata))
 
 
@@ -314,7 +314,7 @@ class Experiment(Observable):
         # # write solufiledata to file
         newsolufilename = 'newsolufile.solu'
         f = open(newsolufilename, 'w')
-        for prob in sorted(solufiledata.keys(), reverse=False):
+        for prob in sorted(list(solufiledata.keys()), reverse=False):
             solustatus, solupb = solufiledata.get(prob)
             f.write("%s %s" % (solustatus, prob))
             if solustatus in ['=best=', '=opt=']:
@@ -547,19 +547,19 @@ class Experiment(Observable):
            @note: works for any file extension, preferred extension is '.cmp'
         '''
 
-        print "Saving Data"
+        print("Saving Data")
         if not filename.endswith(".cmp"):
-            print "Preferred file extension for experiment instances is '.cmp'"
+            print("Preferred file extension for experiment instances is '.cmp'")
 
         try:
             f = open(filename, "wb")
         except IOError:
-            print "Could not open file named", filename
+            print("Could not open file named", filename)
             return
         pickle.dump(self, f, protocol=2)
 
         f.close()
-        print "Experiment saved to file", filename
+        print("Experiment saved to file", filename)
 
     @staticmethod
     def loadFromFile(filename):
@@ -572,7 +572,7 @@ class Experiment(Observable):
         try:
             f = open(filename, "rb")
         except IOError:
-            print "Could not open file named", filename
+            print("Could not open file named", filename)
             return
 #      try:
         comp = pickle.load(f)
@@ -582,7 +582,7 @@ class Experiment(Observable):
         f.close()
 
         if not isinstance(comp, Experiment):
-            print "the loaded data is not a experiment instance!"
+            print("the loaded data is not a experiment instance!")
             return None
         else:
             return comp

@@ -214,10 +214,10 @@ class DateTimeReader(StatisticReader):
     datetimekw = {datetimestartdatakey:datetimestartexp, datetimeendkey:datetimeendexp}
 
     def extractStatistic(self, line):
-        for key, exp in self.datetimekw.items():
+        for key, exp in list(self.datetimekw.items()):
             matched = exp.match(line)
             if matched:
-                timestamp = long(matched.groups()[0])
+                timestamp = int(matched.groups()[0])
                 time = datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
                 self.addData(key, time)
                 break
@@ -569,7 +569,7 @@ class ListReader(StatisticReader):
 
     def getRequiredOptionsByAttribute(self, attr):
         if attr == "context":
-            return self.contextname2contexts.keys()
+            return list(self.contextname2contexts.keys())
         return None
 
     def getLineData(self, line):

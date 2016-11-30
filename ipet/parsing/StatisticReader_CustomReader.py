@@ -1,6 +1,6 @@
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 import re
-import __builtin__
+import builtins
 import logging
 
 class CustomReader(StatisticReader):
@@ -31,7 +31,7 @@ class CustomReader(StatisticReader):
 
     requiredoptions = {
             "datatype" : ["float", "int"],
-            "method" : str2method.keys()
+            "method" : list(str2method.keys())
         }
 
     def __init__(self, name = None, regpattern = None, datakey = None, index = 0, datatype = "float", method = "last"):

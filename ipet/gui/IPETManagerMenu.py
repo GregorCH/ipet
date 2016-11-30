@@ -3,11 +3,11 @@ Created on 28.12.2013
 
 @author: bzfhende
 '''
-from Tkinter import Menu, Toplevel
+from tkinter import Menu, Toplevel
 from ipet.gui import IPETBrowser
-from Tkconstants import BOTH
+from tkinter.constants import BOTH
 from ipet import misc
-import tkFileDialog
+import tkinter.filedialog
 
 class IPETManagerMenu(Menu):
     '''
@@ -42,7 +42,7 @@ class IPETManagerMenu(Menu):
         '''
         load manageables
         '''
-        filename = tkFileDialog.askopenfilename()
+        filename = tkinter.filedialog.askopenfilename()
         if filename:
             rm = self.manager.__class__.fromXMLFile(filename)
             for reader in rm.getManageables(False):
@@ -55,6 +55,6 @@ class IPETManagerMenu(Menu):
         '''
         save custom readers and list readers to a specified destination
         '''
-        filename = tkFileDialog.asksaveasfilename()
+        filename = tkinter.filedialog.asksaveasfilename()
         if filename:
             misc.saveAsXML(self.manager, filename)

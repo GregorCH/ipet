@@ -3,12 +3,12 @@ Created on 30.04.2013
 
 @author: bzfhende
 '''
-from IPETWidget import IpetWidget
-from Tkconstants import TOP
-import Tkconstants
-from IPETScrolledOutputWidget import ScrolledOutputWidget
-from ttk import Frame, OptionMenu, Label
-from Tkinter import StringVar
+from .IPETWidget import IpetWidget
+from tkinter.constants import TOP
+import tkinter.constants
+from .IPETScrolledOutputWidget import ScrolledOutputWidget
+from tkinter.ttk import Frame, OptionMenu, Label
+from tkinter import StringVar
 
 class IpetOutputWidget(IpetWidget):
     '''
@@ -27,9 +27,9 @@ class IpetOutputWidget(IpetWidget):
         self.trvar = StringVar(value=str(None))
         self.probvar = StringVar(value=str(None))
 
-        self.navpanel.pack(side=TOP, fill=Tkconstants.X)
+        self.navpanel.pack(side=TOP, fill=tkinter.constants.X)
         self.textoutputframe = ScrolledOutputWidget(self, self.gui, bd=5, bg="white", width=self.winfo_screenwidth(), height=self.winfo_screenheight())
-        self.textoutputframe.pack(side=TOP, expand=1, fill=Tkconstants.BOTH)
+        self.textoutputframe.pack(side=TOP, expand=1, fill=tkinter.constants.BOTH)
         self.trvar.trace_variable("w", self.reactOnSelection)
         self.probvar.trace_variable("w", self.reactOnSelection)
 
@@ -53,7 +53,7 @@ class IpetOutputWidget(IpetWidget):
         self.ompr.grid(row=0, column=3)
 
     def reactOnSelection(self, *args):
-        print "reacting on selection %s %s" % (self.probvar.get(), self.trvar.get())
+        print("reacting on selection %s %s" % (self.probvar.get(), self.trvar.get()))
         self.textoutputframe.setProblem(self.probvar.get())
         self.textoutputframe.setTestrun(self.gui.getTestrun(self.trvar.get()))
         self.textoutputframe.update()

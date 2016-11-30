@@ -3,7 +3,7 @@ Created on 21.09.2016
 
 @author: bzfhende
 '''
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 from ipet.misc import FLOAT_INFINITY
 import logging
 class TraceFileReader(StatisticReader):
@@ -42,7 +42,7 @@ class TraceFileReader(StatisticReader):
         elif self.active and not line.startswith("*"):
             splitline = line.split(",")
             probname = splitline[0]
-            datavalues = map(self.prepareData, splitline[1:])
+            datavalues = list(map(self.prepareData, splitline[1:]))
 
             logging.debug("Trace File Reader adds data for problem %s", probname)
             self.testrun.addData(probname, self.datakeys, datavalues)

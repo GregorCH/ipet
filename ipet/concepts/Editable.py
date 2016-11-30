@@ -3,6 +3,7 @@ Created on 26.12.2013
 
 @author: bzfhende
 '''
+import collections
 class Editable:
     '''
     an editable object defines a set of attributes to be editable after construction
@@ -12,7 +13,7 @@ class Editable:
         '''
         return a list of attributes which may be edited
         '''
-        return [elem for elem in dir(self) if not elem.startswith('__') and not callable(getattr(self,elem)) \
+        return [elem for elem in dir(self) if not elem.startswith('__') and not isinstance(getattr(self,elem), collections.Callable) \
                 and type(getattr(self, elem)) in self.editabletypes]
 
     def editAttribute(self, attributename, newvalue):

@@ -3,12 +3,12 @@ Created on 27.03.2013
 
 @author: Gregor Hendel
 '''
-from Tkinter import Toplevel, Label, Entry, StringVar, Button, Frame
-from Tkconstants import LEFT, RIGHT, TOP
+from tkinter import Toplevel, Label, Entry, StringVar, Button, Frame
+from tkinter.constants import LEFT, RIGHT, TOP
 from ipet.parsing import CustomReader
-import Tkconstants
+import tkinter.constants
 from ipet.parsing import StatisticReader
-from IPETToolTip import createToolTip
+from .IPETToolTip import createToolTip
 class IpetReaderWizard(Toplevel):
     '''
     form to create a new Reader through the user interface
@@ -17,7 +17,7 @@ class IpetReaderWizard(Toplevel):
 
         self.allnumbersinline = StatisticReader.numericExpression.findall(line)
         self.numbersbeforelinestartidx = StatisticReader.numericExpression.findall(line[:linestartidx])
-        print self.numbersbeforelinestartidx
+        print(self.numbersbeforelinestartidx)
 
         startindexsuggestion = len(self.numbersbeforelinestartidx)
         Toplevel.__init__(self)
@@ -70,7 +70,7 @@ class IpetReaderWizard(Toplevel):
         namelabel = Label(self, text=title)
         createToolTip(namelabel, tooltip)
         nameentry = Entry(self, textvariable=stringvar, bg='white', width=75)
-        namelabel.grid(row=row, column=0, sticky=Tkconstants.W, pady=3)
+        namelabel.grid(row=row, column=0, sticky=tkinter.constants.W, pady=3)
         nameentry.grid(row=row, column=1, pady=3)
 
     def finish(self):

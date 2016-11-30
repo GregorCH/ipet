@@ -4,6 +4,7 @@ Created on 08.08.2014
 @author: Customer
 '''
 import sys
+import collections
 
 class Message:
     '''
@@ -28,7 +29,7 @@ class Message:
     def __str__(self):
         return self.stringmessage
     def __unicode__(self):
-        return unicode(self.stringmessage)
+        return str(self.stringmessage)
     def __repr__(self):
         return self.stringmessage
 
@@ -94,7 +95,7 @@ def disableDebugMessages():
     setStream(Message.MESSAGETYPE_DEBUG, None)
 
 def setStream(messagetype, stream):
-    if stream is not None and (not hasattr(stream, 'write') or not callable(getattr(stream, 'write'))):
+    if stream is not None and (not hasattr(stream, 'write') or not isinstance(getattr(stream, 'write'), collections.Callable)):
         raise ValueError(ErrorMessage("stream object has no 'write'-method"))
     streams[messagetype] = stream
 
@@ -104,8 +105,8 @@ if __name__ == '__main__':
     message1 = Message("Hello Info\n", Message.MESSAGETYPE_INFO)
     message2 = ErrorMessage("Hello Error\n")
     message3 = DebugMessage("DebugMessage\n")
-    map(processMessage, [message1, message2])
-    processMessage(message3)
+    for m in (message1, message2, message3):
+        processMessage(m)
     setStream(Message.MESSAGETYPE_ERROR, sys.stdout)
     setStream(Message.MESSAGETYPE_INFO, sys.stderr)
 
@@ -113,7 +114,8 @@ if __name__ == '__main__':
     disableDebugMessages()
     processMessage(message3)
 
-    map(processMessage, [message1, message2])
+    for m in (message1, message2, message3):
+        processMessage(m)
 
-    print message2
+    print(message2)
 

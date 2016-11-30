@@ -1,4 +1,4 @@
-from StatisticReader import StatisticReader
+from .StatisticReader import StatisticReader
 import re
 
 class PrimalBoundHistoryReader(StatisticReader):
@@ -141,12 +141,12 @@ class PrimalBoundHistoryReader(StatisticReader):
                     nodeinlineidx = 7
                     while line[nodeinlineidx] != " " and line[nodeinlineidx] != "+":
                         nodeinlineidx += 1
-                    print line
+                    print(line)
                     nnodes = int(line[:nodeinlineidx].split()[-1].strip('*+')) + 1
                     if line.startswith("*") or line.startswith("+"):
-                        print line
+                        print(line)
                         primalbound = float(line.split()[-4])
-                        print primalbound, nnodes
+                        print(primalbound, nnodes)
                         self.cpxprimals.append((nnodes, primalbound))
                     self.lastnnodes = nnodes
                 elif "Elapsed time = " in line:

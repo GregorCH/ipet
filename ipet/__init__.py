@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from Experiment import Experiment
-from TestRun import TestRun
+from .Experiment import Experiment
+from .TestRun import TestRun
 __all__ = [ "concepts",
             "evaluation",
             "gui",

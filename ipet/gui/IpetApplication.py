@@ -3,24 +3,24 @@ Created on 06.03.2013
 
 @author: bzfhende
 '''
-from Tkinter import Tk, Listbox, Menu
+from tkinter import Tk, Listbox, Menu
 from ipet import Experiment
 # from IpetScatterWidget import IpetScatterWidget
-from Tkconstants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END, BOTTOM
+from tkinter.constants import BOTH, TOP, LEFT, RIGHT, VERTICAL, END, BOTTOM
 # from IPETBoundHistoryWidget import IPETBoundHistoryWidget
-from IPETTableWidget import IpetTableWidget
+from .IPETTableWidget import IpetTableWidget
 from ipet import TestRun
-import ttk
-from IPETOutputWidget import IpetOutputWidget
-import tkFileDialog
-from IPETManagerMenu import IPETManagerMenu
-from ttk import Frame, Label, Button, Scrollbar, Separator
-import Tkconstants
-from IPETBoundHistoryWidget import IPETBoundHistoryWidget
-from IpetMessageWidget import IpetMessageWidget
-from IPETScatterWidget import IpetScatterWidget
-from IPETProgressStatus import IpetProgressStatus
-from IPETImageButton import IpetImageButton
+import tkinter.ttk
+from .IPETOutputWidget import IpetOutputWidget
+import tkinter.filedialog
+from .IPETManagerMenu import IPETManagerMenu
+from tkinter.ttk import Frame, Label, Button, Scrollbar, Separator
+import tkinter.constants
+from .IPETBoundHistoryWidget import IPETBoundHistoryWidget
+from .IpetMessageWidget import IpetMessageWidget
+from .IPETScatterWidget import IpetScatterWidget
+from .IPETProgressStatus import IpetProgressStatus
+from .IPETImageButton import IpetImageButton
 
 class IpetApplication(Tk):
     DEFAULT_BORDERWIDTH = 15
@@ -79,14 +79,14 @@ class IpetApplication(Tk):
 
         # make the remaining window show a tabbed panel with the different widgets
         widgets = [IpetTableWidget, IpetOutputWidget, IpetMessageWidget, IpetScatterWidget, IPETBoundHistoryWidget]
-        tabbedFrame = ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
+        tabbedFrame = tkinter.ttk.Notebook(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight())
 
         for widget in widgets:
             tabbedFrame.add(widget(tabbedFrame, self), text=widget.name)
         navbar = self.createNavBar()
-        navbar.pack(side=TOP, fill=Tkconstants.X)
+        navbar.pack(side=TOP, fill=tkinter.constants.X)
         self.progressstatus = IpetProgressStatus(self, width=screenwidth * 9 / 10, height=self.winfo_screenheight() / 12)
-        self.progressstatus.pack(side=BOTTOM, fill=Tkconstants.X)
+        self.progressstatus.pack(side=BOTTOM, fill=tkinter.constants.X)
         tabbedFrame.pack(side=BOTTOM, fill=BOTH, expand=1)
         self.setExperiment(_experiment)
 
@@ -114,7 +114,7 @@ class IpetApplication(Tk):
                 imagefilename, tooltip, command = button
                 IpetImageButton(navbar, imagefilename, tooltip, command).pack(side=LEFT)
             else:
-                Separator(navbar, orient=Tkconstants.VERTICAL).pack(side=LEFT, fill=Tkconstants.Y, padx=5)
+                Separator(navbar, orient=tkinter.constants.VERTICAL).pack(side=LEFT, fill=tkinter.constants.Y, padx=5)
         return navbar
 
     def listmakeBoxWithScrollbar(self, master, alist, guiupdatefunction, theheight=5):
@@ -122,7 +122,7 @@ class IpetApplication(Tk):
         scrollbar = Scrollbar(frame, orient=VERTICAL)
         listbox = Listbox(frame, bg='white', yscrollcommand=scrollbar.set)
         scrollbar.config(command=listbox.yview)
-        scrollbar.pack(side=RIGHT, fill=Tkconstants.Y)
+        scrollbar.pack(side=RIGHT, fill=tkinter.constants.Y)
         listbox.guiupdatefunction = guiupdatefunction
         self.updatelistbox(listbox, alist)
         listbox.pack(side=LEFT, fill=BOTH, expand=1)
@@ -182,7 +182,7 @@ class IpetApplication(Tk):
         try:
             return [e for e in self.getTestrunList() if TestRun.getIdentification(e) == identification][0]
         except IndexError:
-            print "Error : No such testrun exists: ", identification
+            print("Error : No such testrun exists: ", identification)
             return None
 
     def requestUpdate(self, widget):
@@ -202,7 +202,7 @@ class IpetApplication(Tk):
             return []
 
     def getTestrunnames(self):
-        return map(TestRun.getIdentification, self.getTestrunList())
+        return list(map(TestRun.getIdentification, self.getTestrunList()))
 
     def getProblemList(self, onlyfiltered=False):
         '''
@@ -293,7 +293,7 @@ class IpetApplication(Tk):
         compMenu.add_command(label=" Recollect Data", command=self.reCollectData)
 
         if self.experiment is not None:
-            for managername, manager in self.experiment.getManagers().iteritems():
+            for managername, manager in self.experiment.getManagers().items():
                 managermenu = IPETManagerMenu(self.menu, manager)
                 self.menu.add_cascade(menu=managermenu, label=managername.capitalize())
 
@@ -306,7 +306,7 @@ class IpetApplication(Tk):
         load method to ask for _experiment instance to be loaded
         '''
         self.file_opt['defaultextension'] = r'.cmp'
-        filename = tkFileDialog.askopenfilename(**self.file_opt)
+        filename = tkinter.filedialog.askopenfilename(**self.file_opt)
         if filename:
             compy = self.experiment.loadFromFile(filename)
             if not compy is None:
@@ -317,7 +317,7 @@ class IpetApplication(Tk):
         saves the _experiment instance to a file
         '''
         self.file_opt['defaultextension'] = r'.cmp'
-        filename = tkFileDialog.asksaveasfilename(**self.file_opt)
+        filename = tkinter.filedialog.asksaveasfilename(**self.file_opt)
         if filename:
             self.experiment.saveToFile(filename)
 
@@ -343,8 +343,8 @@ class IpetApplication(Tk):
         except:
             self.selected_testrun = None
             self.selected_problem = None
-        print "Problem list", self.getProblemList()
-        print "Testruns;", self.getTestrunnames()
+        print("Problem list", self.getProblemList())
+        print("Testruns;", self.getTestrunnames())
         if hasattr(self, 'menu'):
             del self.menu
         self.setupMenu()
@@ -355,8 +355,8 @@ class IpetApplication(Tk):
         opens a file dialog and adds log files by creating new test runs to the current _experiment
         '''
         self.file_opt['defaultextension'] = r".out"
-        filenames = tkFileDialog.askopenfilenames(**self.file_opt)
-        print filenames
+        filenames = tkinter.filedialog.askopenfilenames(**self.file_opt)
+        print(filenames)
         if type(filenames) not in [list, tuple]:
             filenames = [filenames]
         for filename in filenames:
@@ -370,8 +370,8 @@ class IpetApplication(Tk):
         adds a solu file for reading in (in-)feasibility status and optimal or best known solution values
         '''
         self.file_opt['defaultextension'] = r".solu"
-        filenames = tkFileDialog.askopenfilenames(**self.file_opt)
-        print filenames
+        filenames = tkinter.filedialog.askopenfilenames(**self.file_opt)
+        print(filenames)
         if type(filenames) not in [list, tuple]:
             filenames = [filenames]
         for filename in filenames:

@@ -6,7 +6,7 @@ Created on 22.09.2016
 from PyQt4.Qt import QWidget, QAction, QIcon, SIGNAL
 
 import os.path as osp
-from IpetMainWindow import IpetMainWindow
+from .IpetMainWindow import IpetMainWindow
 class IPETApplicationTab(QWidget):
     '''
     base class for all widgets displayed in the single tabs of the IPET application

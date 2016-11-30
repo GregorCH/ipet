@@ -207,6 +207,19 @@ class ReaderManager(Manager, IpetNode, Editable):
                 namewithextension = os.path.splitext(namewithextension)[0]
 
         return namewithextension
+    
+    def finishProblemParsing(self, line, filecontext, readers):
+        if filecontext in [StatisticReader.CONTEXT_ERRFILE, StatisticReader.CONTEXT_LOGFILE] and StatisticReader.getProblemName() is not None:
+            self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
+            for reader in readers:
+                reader.execEndOfProb()
+                
+            if filecontext == StatisticReader.CONTEXT_LOGFILE and not self.endOfInstanceReached(line[1]):
+                logging.warn("Malformatted log output for instance %s, probably a missing expression %s" % \
+                             (StatisticReader.getProblemName(), self.problemendexpression))
+                
+            StatisticReader.setProblemName(None)
+        
 
     def updateProblemName(self, line, currentcontext, readers):
         '''
@@ -215,9 +228,7 @@ class ReaderManager(Manager, IpetNode, Editable):
 
         if line[1].startswith(self.problemexpression):
             
-            if currentcontext == StatisticReader.CONTEXT_ERRFILE and StatisticReader.getProblemName() is not None:
-                for reader in readers:
-                    reader.execEndOfProb()
+            self.finishProblemParsing(line, currentcontext, readers)
                     
             problemname = self.getProblemName(line[1])
             StatisticReader.setProblemName(problemname)
@@ -292,20 +303,13 @@ class ReaderManager(Manager, IpetNode, Editable):
                 self.updateProblemName(line, filecontext, readers)
 
                 if self.endOfInstanceReached(line[1]):
-                    self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
-                    if StatisticReader.getProblemName() is not None:
-                        for reader in readers:
-                            reader.execEndOfProb()
-
-                    self.notify(Message("%s" % StatisticReader.problemname, Message.MESSAGETYPE_INFO))
+                    self.finishProblemParsing(line, filecontext, readers)
                 else:
                     for reader in readers:
                         reader.operateOnLine(line[1])
 
             else:
-                if filecontext == StatisticReader.CONTEXT_ERRFILE and StatisticReader.getProblemName() is not None:
-                    for reader in readers:
-                        reader.execEndOfProb()
+                self.finishProblemParsing(line, filecontext, readers)
 
 
 

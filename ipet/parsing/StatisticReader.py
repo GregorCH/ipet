@@ -350,13 +350,17 @@ class LimitReachedReader(StatisticReader):
     '''
     name = 'LimitReachedReader'
 
-    regular_exp = re.compile(r'\[(.*) (reached|interrupt)\]')
-    lineexpression = re.compile(r'^SCIP Status        :')
+    regular_exp = {StatisticReader.SOLVERTYPE_SCIP: re.compile(r'\[(.*) (reached|interrupt)\]'),
+                   StatisticReader.SOLVERTYPE_GUROBI: re.compile(r'^(Time limit) reached')}
+    lineexpression = {StatisticReader.SOLVERTYPE_GUROBI: re.compile(r'^Time limit reached'),
+                      StatisticReader.SOLVERTYPE_SCIP: re.compile(r'^SCIP Status        :')}
     datakey = 'LimitReached'
 
     def extractStatistic(self, line):
-        if self.lineexpression.match(line):
-            match = self.regular_exp.search(line)
+        if self.lineexpression.get(StatisticReader.solvertype) is None:
+            return
+        if self.lineexpression[StatisticReader.solvertype].match(line):
+            match = self.regular_exp[StatisticReader.solvertype].search(line)
             if match is not None:
                 stringexpression = match.groups()[0]
                 limit = "".join((part.capitalize() for part in stringexpression.split()))

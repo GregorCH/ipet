@@ -21,7 +21,7 @@ class GeneralInformationReader(StatisticReader):
 
     versionlineindices = {StatisticReader.SOLVERTYPE_SCIP : 2,
                           StatisticReader.SOLVERTYPE_CPLEX :-1,
-                          StatisticReader.SOLVERTYPE_GUROBI :-1,
+                          StatisticReader.SOLVERTYPE_GUROBI :3,
                           StatisticReader.SOLVERTYPE_CBC :-1,
                           StatisticReader.SOLVERTYPE_XPRESS: 4,
                           StatisticReader.SOLVERTYPE_COUENNE:-1}

@@ -38,7 +38,7 @@ class ReaderManager(Manager, IpetNode, Editable):
     """recognition patterns to distinguish between solver types"""
 
     othersolvers = [solver for solver in list(solvertype_recognition.keys()) if solver != StatisticReader.solvertype]
-    
+
 
     fileextension2context = {
                              ".err" : StatisticReader.CONTEXT_ERRFILE,
@@ -207,19 +207,19 @@ class ReaderManager(Manager, IpetNode, Editable):
                 namewithextension = os.path.splitext(namewithextension)[0]
 
         return namewithextension
-    
+
     def finishProblemParsing(self, line, filecontext, readers):
         if filecontext in [StatisticReader.CONTEXT_ERRFILE, StatisticReader.CONTEXT_LOGFILE] and StatisticReader.getProblemName() is not None:
             self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
             for reader in readers:
                 reader.execEndOfProb()
-                
+
             if filecontext == StatisticReader.CONTEXT_LOGFILE and not self.endOfInstanceReached(line[1]):
-                logging.warn("Malformatted log output for instance %s, probably a missing expression %s" % \
-                             (StatisticReader.getProblemName(), self.problemendexpression))
-                
+                logging.warning("Malformatted log output for instance %s, probably a missing expression %s" % \
+                               (StatisticReader.getProblemName(), self.problemendexpression))
+
             StatisticReader.setProblemName(None)
-        
+
 
     def updateProblemName(self, line, currentcontext, readers):
         '''
@@ -227,9 +227,9 @@ class ReaderManager(Manager, IpetNode, Editable):
         '''
 
         if line[1].startswith(self.problemexpression):
-            
+
             self.finishProblemParsing(line, currentcontext, readers)
-                    
+
             problemname = self.getProblemName(line[1])
             StatisticReader.setProblemName(problemname)
 

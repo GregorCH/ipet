@@ -1,16 +1,39 @@
-from distutils.core import setup
+#!/usr/bin/env python
+from setuptools import setup
 
-setup(
-    name='Ipet--Interactive Python Evaluation Tools',
-    version='0.1dev',
-    packages = ['ipet', 'ipet.concepts', 'ipet.evaluation', 'ipet.gui', 'ipet.misc', 'ipet.parsing', 'qipet'],
-    package_data=dict(ipet=["../images/*.png"]),
-    license='Creative Commons Attribution-Noncommercial-Share Alike license',
-    long_description="""
-        Ipet contains python modules for collecting and evaluating
-        MIP benchmark data in raw format. It comes with a graphical
-        user interface to collect, view, and transform benchmark
-        data. It can also be used as a library for interactive use
-        from a command-line interpreter aka python or ipython.
-        """
-)
+with open("ipet/version.py") as f:
+    exec(f.read())
+
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README').read()
+
+with open('requirements.txt') as requirements:
+    required = requirements.read().splitlines()
+
+kwargs = {
+    "name": "ipet",
+    "version": str(__version__),
+    "packages": ['ipet', 'ipet.concepts', 'ipet.evaluation', 'ipet.gui', 'ipet.misc', 'ipet.parsing', 'qipet'],
+    "package_data": dict(ipet=["../images/*.png"]),
+    "description": "Interactive Python Evaluation Tools Reader",
+    "long_description": long_description,
+    "author": "Zuse Institute Berlin",
+    "maintainer": "Zuse Institute Berlin",
+    "author_email": "lpip-developers@zib.de",
+    "maintainer_email": "lpip-developers@zib.de",
+    "install_requires": required,
+    "url": "https://git.zib.de/integer/ipet",
+    "download_url": "https://git.zib.de/integer/ipet/repository/archive.tar.gz?ref={}".format(__version__),
+    "keywords": "solver log benchmark parser",
+    "classifiers": [
+        "Programming Language :: Python",
+        "Topic :: Software Development",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+    ]
+}
+
+setup(**kwargs)

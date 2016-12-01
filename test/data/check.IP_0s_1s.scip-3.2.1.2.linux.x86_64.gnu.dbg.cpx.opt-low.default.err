@@ -1,0 +1,1645 @@
+
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/2matching/berlin52.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/2matching/bier127.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:59 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/2matching/ch130.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 13:00:00 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/2matching/eil101.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 13:00:00 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/2matching/eil76.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/2matching/gr137.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 13:00:00 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Clique/Instances/MANN_a9.clq.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Clique/Instances/hamming6-2.clq.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:56 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Clique/Instances/hamming8-2.clq.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:56 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Clique/Instances/johnson8-2-4.clq.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:56 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Coloring/Infeasible/1-FullIns_3_inf.col.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Coloring/Infeasible/queen5_5_inf.col.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Coloring/Instances/myciel3.col.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/DEV/dev.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/DEV/dev2.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/DEV/dev3.lp.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.10.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.11.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.12.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.13.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.14.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.15.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.16.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.17.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.18.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.19.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-04-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.2.mps.gz ===========
+Mon Oct 31 12:59:54 CET 2016
+Mon Oct 31 12:59:57 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.20.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.21.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.22.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.23.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.24.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.25.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.26.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.27.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.28.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.29.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.3.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.30.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.31.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.32.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.4.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.5.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.6.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.7.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.8.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/GUB/p7/p7_cpa_ilpi_mip.9.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa25332.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa25342.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa36243.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa56243.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa66234.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa67233.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa68233.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa76234.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/Margot/OA/oa77233.lp.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/airland/airland1_R1.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:01 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/airland/airland1_R2.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:58 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/airland/airland1_R3.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/airland/airland3_R1.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:01 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/airland/airland6_R1.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/airland/airland6_R3.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:00 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/airland/airland7_R2.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp41.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp410.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp42.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp43.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp44.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp45.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp46.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp47.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp48.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:59 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp49.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:08 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp51.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:07 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp510.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp52.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:04 CET 2016
+Linux optc-04-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp53.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-04-15 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp54.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp55.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp56.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp57.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:59 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp59.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:57 CET 2016
+Linux optc-04-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scp64.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:10 CET 2016
+Linux optc-04-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scpe1.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:03 CET 2016
+Linux optc-04-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scpe2.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:10 CET 2016
+Linux optc-04-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/setcover/scpe4.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:01:08 CET 2016
+Linux optc-04-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap101.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap102.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap103.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-04-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap104.mps.gz ===========
+Mon Oct 31 13:00:54 CET 2016
+Mon Oct 31 13:00:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap111.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:01 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap121.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:58 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap41.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap42.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:59 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap43.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:00 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap44.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:59 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap51.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:00 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap61.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap62.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap63.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:59 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap64.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:57 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap71.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap72.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap73.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap74.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap81.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:59 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap82.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:00 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap83.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:57 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap84.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:01 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap91.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ORLib/warehouse/cap92.mps.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:00 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/PSI/opt1_157_0.lp.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:57 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/SOS/testAggregationSOS1.lp.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/SOS/testAggregationSOS2.lp.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:01:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-10.lp.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:09 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-11.lp.gz ===========
+Mon Oct 31 13:01:54 CET 2016
+Mon Oct 31 13:02:03 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-12.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-13.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-14.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-15.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-16.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-18.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-19.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-05-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-20.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-21.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-22.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-23.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-24.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/STP/stp-s-25.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/1-FullIns_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:55 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/1-FullIns_4.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/1-FullIns_5.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-05-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/1-Insertions_4.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/1-Insertions_5.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/2-FullIns_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/2-FullIns_4.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/2-Insertions_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/2-Insertions_4.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/3-FullIns_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/3-Insertions_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/4-FullIns_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/4-Insertions_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-05-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/4-Insertions_4.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/5-FullIns_3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/anna.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/david.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/homer.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/huck.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/jean.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/miles250.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/mug100_1.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/mug100_25.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/mug88_1.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/mug88_25.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/myciel3.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/myciel4.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/myciel5.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/myciel6.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/myciel7.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/queen5_5.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/queen6_6.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/queen7_7.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/queen8_12.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/StableSet/Instances/queen8_8.stab.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw08.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw10.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw12.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw15.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw20.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw21.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw22.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw23.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw25.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw26.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw28.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw29.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw32.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw34.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw37.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw39.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw40.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/air/nw41.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-07-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/cls/cls.T90.C2.F1000.S2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.250-10-50.5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:06 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.250-5-100.2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:10 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.250-5-100.4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:05 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.250-5-50.1.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.250-5-50.2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.250-5-50.4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.250-5-50.5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:05 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/bounded/mik.500-5-50.5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.250-1-50.1.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.250-1-50.2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:05 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.250-1-50.3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.250-1-50.4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.250-1-50.5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.500-1-50.2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.500-1-50.3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:05 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/mik/unbounded/mik.500-1-50.5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/nexp/nexp.50.20.1.1.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/nexp/nexp.50.20.1.2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/nexp/nexp.50.20.1.3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/nexp/nexp.50.20.1.4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/nexp/nexp.50.20.2.2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/atamtuerk/nexp/nexp.50.20.2.5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/bs-2005-07-01-13-39-56.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-11 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/santiago-vmax=17-freq=12-int=-maxz=0-maxs=inf-sumx=inf-sumy=inf-obj=sumxy.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/santiago-vmax=17-freq=12-int=int-maxz=9-maxs=170-limx=510-limy=238-obj=sumw.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/v0415pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/v0418pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/v0420.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/v0420pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/v0421.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/borndoerfer/v0421pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu4_2.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu4_3.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-07-12 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu4_4.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu4_5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu4_6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu5_2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu5_3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu5_4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu5_5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu5_6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu6_2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu6_3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-07-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu6_4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu6_5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu6_6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu7_2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu7_3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu7_4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu7_5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu7_6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu8_2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu8_3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu8_4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu8_5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/chipverification/alu8_6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/coral/haprp.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/coral/neos-530627.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/coral/roy.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/course-ass/ss97-4.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/course-ass/ss97-6.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/course-ass/ws97-5.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/enlight/enlight4.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/enlight/enlight5.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/enlight/enlight6.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/fctp/bal8x12.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/fctp/bk4x3.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/fctp/gr4x6.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/fctp/ran10x10a.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/fctp/ran10x10b.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/fctp/ran10x12.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/a05100.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/a05200.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/a10100.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/a10200.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/a20100.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/a20200.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/b10100.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:08 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/gap/c05100.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p1.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p10.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p11.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p12.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p13.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p14.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-13 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p15.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p16.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p17.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p18.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p19.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:06 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p20.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p21.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p22.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p23.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p24.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p43.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-14 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p44.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p45.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p47.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p48.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p49.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p52.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p53.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p54.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p7.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p8.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/holmberg_SSCFLP/holmberg_p9.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/ipcount/onespin/no_request.pre.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/lutomirski/scip_bug.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/markshare/markshare_3_0.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/markshare/markshare_3_1.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/markshare/markshare_3_2.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:04 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/markshare/markshare_3_3.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/markshare/markshare_3_4.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/markshare/markshare_3_5.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/bell5.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:08 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/bell5.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:09 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/bell5.pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:09 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/blend2.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:10 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/egout.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/egout.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/egout.pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/enigma.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/enigma.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/enigma.pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/fiber.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:11 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/flugpl.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/flugpl.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/flugpl.pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/gen.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/gen.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/gen.pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/gt2.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/gt2.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-08-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/gt2.pre.mps.gz ===========
+Mon Oct 31 13:02:55 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/khb05250.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/khb05250.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/khb05250.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/lseu.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/lseu.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:05 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/lseu.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:05 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/misc06.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-04-04 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/misc06.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/misc06.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/mod008.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:13 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/mod008.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:08 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/mod008.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:08 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/modglob.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/modglob.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0033.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0033.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-02 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0033.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0282.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0282.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:02 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0282.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:03 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0548.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0548.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/p0548.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/rgn.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/set1ch.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-04-03 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/set1ch.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/vpm1.mps.cuts.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/vpm1.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib/vpm1.pre.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/air01.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/bm23.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/cracpb1.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/diamond.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-16 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/fixnet3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/gt1.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/lp4l.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/misc01.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:59 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/misc02.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/mod013.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/mod014.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/mod015.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/p0040.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-05 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/p0291.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/pipex.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/sample2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/sentoy.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/set1al.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/set1cl.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/stein15.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2/stein9.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2003/fiber.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:09 CET 2016
+Linux optc-04-06 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2003/modglob.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/miplib2003/set1ch.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:00 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/MANN_a27.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/MANN_a45.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/MANN_a9.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/hamming6-2.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/hamming6-4.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/hamming8-2.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/johnson16-2-4.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-07 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/johnson8-2-4.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/san200_0.9_3.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/multiset/testgraph.pr.10.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/radar/10:10:4.5:0.5:100.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/radar/10:10:4.5:0.95:100.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/radar/10:10:4.5:0.95:98.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/bf2670-001.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/bmc-ibm-2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/bmc-ibm-7.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-08 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/ssa0432-003.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/ssa6288-047.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/ssa7552-038.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/ssa7552-158.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/ssa7552-159.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/sat/ssa7552-160.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:58 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_ma1.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_ma2.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_rol6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-09 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_rol7.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_rol8.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_rol9.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_ros3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_ros4.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_ros5.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_ros6.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:56 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/ilp_st3.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:02:57 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/siemens2/MIP/seq8_190.mps.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016
+Linux optc-04-10 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+@01 /nfs/OPTI/jenkins/workspace/SCIP_COMP=gnu_OPT=dbg_LPS=cpx_IPOPT=true_nightly/check/IP/steinflow/b01.lp.gz ===========
+Mon Oct 31 13:02:54 CET 2016
+Mon Oct 31 13:03:01 CET 2016

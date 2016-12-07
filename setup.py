@@ -16,7 +16,7 @@ with open('requirements.txt') as requirements:
 kwargs = {
     "name": "ipet",
     "version": str(__version__),
-    "packages": ['ipet', 'ipet.concepts', 'ipet.evaluation', 'ipet.gui', 'ipet.misc', 'ipet.parsing', 'qipet'],
+    "packages": ['ipet', 'ipet.concepts', 'ipet.evaluation', 'ipet.misc', 'ipet.parsing', 'qipet'],
     "package_data": dict(ipet=["../images/*.png"]),
     "description": "Interactive Performance Evaluation Tools",
     "long_description": long_description,

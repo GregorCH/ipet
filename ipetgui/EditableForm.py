@@ -7,7 +7,7 @@ from PyQt4.QtGui import QDialog, QFormLayout, QLabel, QLineEdit, QApplication,\
     QComboBox, QCompleter, QWidget, QMainWindow
 import sys
 from ipet.evaluation.IPETEvalTable import IPETEvaluationColumn, IPETEvaluation
-from PyQt4.QtCore import QStringList, SIGNAL
+from PyQt4.QtCore import SIGNAL
 from ipet.evaluation.IPETFilter import IPETFilterGroup
 from ipet.evaluation.IPETFilter import IPETFilter
 
@@ -22,7 +22,7 @@ class EditableForm(QWidget):
     
     @staticmethod
     def extendAvailableOptions(key, moreoptions):
-        currentoptionsforkey = EditableForm.availableOptions.get(key, [None, ])
+        currentoptionsforkey = EditableForm.availableOptions.get(key, [EditableForm.NOSELECTIONTEXT, ])
         EditableForm.availableOptions[key] = sorted(currentoptionsforkey + moreoptions)
         
     def __init__(self, editable, parent=None):
@@ -60,10 +60,7 @@ class EditableForm(QWidget):
         self.emit(SIGNAL(EditableForm.USERINPUT_SIGNAL))
 
     def convertToText(self, value):
-        if value is None:
-            return ""
-        else:
-            return str(value)
+        return str(value)
         
     def convertTextToValue(self, text):
         if text == "" or text == self.NOSELECTIONTEXT:

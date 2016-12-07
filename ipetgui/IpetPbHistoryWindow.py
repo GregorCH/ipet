@@ -20,12 +20,12 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 from matplotlib.figure import Figure
-from PyQt4.Qt import QListWidget, QString, QAbstractItemView, QFileDialog, QApplication, QKeySequence, \
+from PyQt4.Qt import QListWidget, QAbstractItemView, QFileDialog, QApplication, QKeySequence, \
     QFrame, QListWidgetItem
 from PyQt4.QtCore import SIGNAL
 from ipet.TestRun import TestRun
 from ipet.misc.integrals import getProcessPlotData, getMeanIntegral
-from qipet.IpetMainWindow import IpetMainWindow
+from .IpetMainWindow import IpetMainWindow
 from ipet.parsing.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from ipet.parsing.StatisticReader import DualBoundReader
 from matplotlib.pyplot import cm
@@ -134,7 +134,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         self.trListWidget = QListWidget()
 #         for item in list("ABC"):
-#             self.trListWidget.addItem(QString(item))
+#             self.trListWidget.addItem((item))
         self.trListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         h.addWidget(self.trListWidget)
         self.connect(self.trListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
@@ -143,7 +143,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         self.probListWidget = QListWidget()
 #         for item in list("12345"):
-#             self.probListWidget.addItem(QString(item))
+#             self.probListWidget.addItem((item))
         self.probListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         h.addWidget(self.probListWidget)
         self.connect(self.probListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
@@ -214,7 +214,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         try:
             del self.testrunnames[testrun.getName()]
             item = self.trListWidget.item(self.testruns.index(testrun))
-            item.setText(QString(self.getTestrunName(testrun)))
+            item.setText((self.getTestrunName(testrun)))
         except KeyError:
             pass
     
@@ -236,14 +236,14 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         problems = []
         for testrun in self.testruns:
-            item = QListWidgetItem(QString(self.getTestrunName(testrun)))
+            item = QListWidgetItem((self.getTestrunName(testrun)))
             self.trListWidget.addItem(item)
             item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
             
             problems += testrun.getProblems()
 
         for prob in sorted(list(set(problems))):
-            self.probListWidget.addItem(QString(prob))
+            self.probListWidget.addItem((prob))
 
         self.trListWidget.selectAll()
 
@@ -258,7 +258,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
     def loadTestruns(self):
         thedir = str(".")
-        filenames = QFileDialog.getOpenFileNames(self, caption=QString("%s - Load testruns"%QApplication.applicationName()),
+        filenames = QFileDialog.getOpenFileNames(self, caption=("%s - Load testruns"%QApplication.applicationName()),
                                                directory=thedir, filter=str("Testrun files (*.trn)"))
         if filenames:
             loadedtrs = 0

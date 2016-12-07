@@ -11,16 +11,16 @@ Created on 26.03.2015
 from PyQt4.QtGui import QFrame, QWidget, QLabel, \
     QApplication, QKeySequence, QFileDialog, \
     QVBoxLayout, QHBoxLayout
-from qipet.IPetTreeView import IpetTreeView
-from qipet.EditableForm import EditableForm
-from PyQt4.QtCore import QString, Qt, SIGNAL
+from .IPetTreeView import IpetTreeView
+from .EditableForm import EditableForm
+from PyQt4.QtCore import Qt, SIGNAL
 from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
 from ipet.misc import misc
 from ipet.evaluation.Aggregation import Aggregation
 from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
 from ipet.evaluation.IPETFilter import IPETFilter
-from qipet.IpetMainWindow import IpetMainWindow
+from .IpetMainWindow import IpetMainWindow
 
 class EditableBrowser(QWidget):
     '''
@@ -113,10 +113,10 @@ class EditableBrowser(QWidget):
         if self.treewidget.getSelectedEditable() is not None:
             editable = self.treewidget.getSelectedEditable()
             editframecontent = EditableForm(editable, self.editframe)
-            textlabel = QLabel(QString("<b>Edit attributes for %s</b>" % (editable.getName())))
+            textlabel = QLabel(("<b>Edit attributes for %s</b>" % (editable.getName())))
         else:
-            editframecontent = QLabel(QString("Select an element first to modify its properties"))
-            textlabel = QLabel(QString("<b>No element selected</b>"))
+            editframecontent = QLabel(("Select an element first to modify its properties"))
+            textlabel = QLabel(("<b>No element selected</b>"))
 
         self.clearLayout(self.editframelayout)
         textlabel.setMaximumHeight(20)

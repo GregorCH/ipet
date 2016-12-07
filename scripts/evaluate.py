@@ -166,7 +166,7 @@ if __name__ == '__main__':
         exit(0)
 
     if arguments.showapp:
-        from qipet import IpetEvaluationEditorApp, ExperimentManagement
+        from ipetgui import IpetEvaluationEditorApp, ExperimentManagement
         application = QApplication(sys.argv)
         application.setApplicationName("Evaluation editor")
         mainwindow = IpetEvaluationEditorApp()

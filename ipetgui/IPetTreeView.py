@@ -7,8 +7,8 @@ from PyQt4.QtGui import QTreeWidget, QTreeWidgetItem, QMainWindow, QApplication,
     QWidget, QHBoxLayout, QFrame, QIcon, QLabel, QVBoxLayout, QGridLayout
 from ipet.evaluation import IPETEvaluation, IPETEvaluationColumn
 import sys
-from PyQt4.QtCore import SIGNAL, QString, Qt
-from qipet.EditableForm import EditableForm
+from PyQt4.QtCore import SIGNAL, Qt
+from .EditableForm import EditableForm
 from ipet.evaluation import Aggregation
 from ipet.evaluation import IPETFilterGroup, IPETInstance
 from ipet.evaluation import IPETFilter
@@ -19,11 +19,11 @@ class IpetTreeView(QTreeWidget):
     classdocs
     '''
     imagepath = osp.sep.join((osp.dirname(__file__), osp.pardir, "images"))
-    icons = {IPETEvaluationColumn:QString(osp.sep.join((imagepath, "Letter-C-violet-icon.png"))),
-             Aggregation:QString(osp.sep.join((imagepath, "Letter-A-dg-icon.png"))),
-             IPETFilterGroup:QString(osp.sep.join((imagepath, "Letter-G-gold-icon.png"))),
-             IPETFilter:QString(osp.sep.join((imagepath, "Letter-F-lg-icon.png"))),
-             IPETInstance:QString(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
+    icons = {IPETEvaluationColumn:(osp.sep.join((imagepath, "Letter-C-violet-icon.png"))),
+             Aggregation:(osp.sep.join((imagepath, "Letter-A-dg-icon.png"))),
+             IPETFilterGroup:(osp.sep.join((imagepath, "Letter-G-gold-icon.png"))),
+             IPETFilter:(osp.sep.join((imagepath, "Letter-F-lg-icon.png"))),
+             IPETInstance:(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
 
     def __init__(self, parent = None):
         '''
@@ -41,19 +41,30 @@ class IpetTreeView(QTreeWidget):
             return
             
         item = self.selectedItems()[0]
-        item.setText(0, self.item2editable[item].getName()) 
+        item.setText(0, self.itemGetEditable(item).getName()) 
         
     def populateTree(self, editable):
         self.clear()
         self.setColumnCount(1)
         self.setItemsExpandable(True)
-        self.item2editable = {}
+        self.item2editable = []
         self.createAndAddItem(editable)
     
     def bindItemIcon(self, item, editable):
         filename = self.icons.get(editable.__class__)
         if filename is not None:
             item.setIcon(0, QIcon(filename))
+            
+    def itemGetEditable(self, item):
+        '''
+        returns the Editable object corresponding to the given item
+        '''
+        for i,e in self.item2editable:
+            if i == item:
+                return e
+            
+        raise Exception("List does not contain the item %s, have only %s" % (item, self.item2editable))
+        
     
     def currentItemAcceptsClassAsChild(self, nodeclass):
         item = self.currentItem()
@@ -62,7 +73,7 @@ class IpetTreeView(QTreeWidget):
         return self.itemAcceptsClassAsChild(item, nodeclass)
         
     def itemAcceptsClassAsChild(self, item, nodeclass):
-        node = self.item2editable[item]
+        node = self.itemGetEditable(item)
         if node.acceptsAsChild(nodeclass):
             return True
         else:
@@ -76,12 +87,12 @@ class IpetTreeView(QTreeWidget):
         except:
             return None
         
-        return self.item2editable[item]
+        return self.itemGetEditable(item)
     
     def getParentOfSelectedEditable(self):
         try:
             selecteditem = self.selectedItems()[0]
-            return self.item2editable[selecteditem.parent()]
+            return self.itemGetEditable(selecteditem.parent())
         except:
             return None
 
@@ -103,7 +114,7 @@ class IpetTreeView(QTreeWidget):
             parent = self
         me = QTreeWidgetItem(parent, [editable.getName()])
         self.bindItemIcon(me, editable)
-        self.item2editable[me] = editable
+        self.item2editable.append((me, editable))
         try:
             if editable.getChildren() is not None:
                 for child in editable.getChildren():
@@ -142,8 +153,8 @@ if __name__ == "__main__":
         
         for i in reversed(list(range(layout2.count()))): 
             layout2.itemAt(i).widget().close()
-        editframecontent = EditableForm(treeview.item2editable[item], editframe)
-        textlabel = QLabel(QString("Edit attributes for %s"%(treeview.item2editable[item].getName())))
+        editframecontent = EditableForm(treeview.itemGetEditable(item), editframe)
+        textlabel = QLabel(("Edit attributes for %s"%(treeview.itemGetEditable(item).getName())))
         textlabel.setAlignment(Qt.AlignCenter)
         textlabel.setBuddy(editframecontent)
         layout2.addWidget(textlabel, 0,0)

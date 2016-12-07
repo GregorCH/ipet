@@ -4,7 +4,7 @@ Created on 29.10.2016
 @author: gregor
 '''
 from PyQt4.Qt import QAbstractTableModel, QDialog, QLabel, QTableView,\
-    QVBoxLayout, QVariant, SIGNAL, QString
+    QVBoxLayout, SIGNAL
 
 from PyQt4 import QtCore, QtGui
 import sys
@@ -72,7 +72,7 @@ class IpetTableDataModel(QAbstractTableModel):
             j = index.column()
             return '{0}'.format(self.dataframe.loc[self.dataframe.index[i], self.dataframe.columns[j]])
         else:
-            return QtCore.QVariant()
+            return None
         
     def getDataFrame(self):
         '''
@@ -99,13 +99,13 @@ class IpetTableDataModel(QAbstractTableModel):
         '''
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
-                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-            return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+                return str(int(Qt.AlignLeft|Qt.AlignVCenter))
+            return str(int(Qt.AlignRight|Qt.AlignVCenter))
         if role != Qt.DisplayRole:
-            return QVariant()
+            return None
         if orientation == Qt.Horizontal:
-            return QVariant(self.getString(self.dataframe.columns[section]))
-        return QVariant(QString(self.getString(self.dataframe.index[section])))
+            return self.getString(self.dataframe.columns[section])
+        return self.getString(self.dataframe.index[section])
     
     def flags(self, index):
         '''

@@ -8,7 +8,7 @@ from PyQt4.QtGui import QFrame, QWidget, QLabel,\
     QVBoxLayout, QHBoxLayout
 from .IPetTreeView import IpetTreeView
 from .EditableForm import EditableForm
-from PyQt4.QtCore import QString, Qt, SIGNAL
+from PyQt4.QtCore import Qt, SIGNAL
 from PyQt4.Qt import QLayout, QTabWidget
 from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
@@ -47,8 +47,8 @@ class EvaluationEditorWindow(IPETApplicationTab):
         tabwidget = QTabWidget(self)
         self.tableview = IPETDataTableView(None, self)
         self.aggtableview = IPETDataTableView(None, self)
-        tabwidget.addTab(self.tableview, QString("Instances"))
-        tabwidget.addTab(self.aggtableview, QString("Aggregated"))
+        tabwidget.addTab(self.tableview, ("Instances"))
+        tabwidget.addTab(self.aggtableview, ("Aggregated"))
         vlayout.addWidget(tabwidget)
         self.setLayout(vlayout)
         
@@ -145,7 +145,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
         
     def loadEvaluation(self):
         thedir = str(".")
-        filename = str(QFileDialog.getOpenFileName(self, caption=QString("%s - Load an evaluation"%QApplication.applicationName()),
+        filename = str(QFileDialog.getOpenFileName(self, caption=("%s - Load an evaluation"%QApplication.applicationName()),
                                                directory=thedir, filter=str("XML files (*.xml)")))
         if filename:
             try:
@@ -161,7 +161,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
     
     def saveEvaluation(self):
         if self.filename is None:
-            filename = str(QFileDialog.getSaveFileName(self, caption=QString("%s - Load an evaluation"%QApplication.applicationName()),
+            filename = str(QFileDialog.getSaveFileName(self, caption=("%s - Load an evaluation"%QApplication.applicationName()),
                                                            directory = str("."), filter=str("XML files (*.xml)")))
         else:
             filename = self.filename
@@ -175,7 +175,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
         
     
     def saveEvaluationAs(self):
-        filename = str(QFileDialog.getSaveFileName(self, caption=QString("%s - Load an evaluation"%QApplication.applicationName()),
+        filename = str(QFileDialog.getSaveFileName(self, caption=("%s - Load an evaluation"%QApplication.applicationName()),
                                                        directory = str("."), filter=str("XML files (*.xml)")))
         if not filename:
             return

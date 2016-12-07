@@ -23,8 +23,8 @@ class VariableReader(StatisticReader):
      
         # check if the SCIP variable expression is matched by line
         elif self.problemtype and self.varexp.match(line):
-            nvariables = list(map(int, self.numericExpression.findall(line)))
-            datakeys = ["%s_%s"%(self.problemtype,key) for key in self.datakeys]
+            nvariables = list(map(int, self.numericExpression.findall(line)[:len(self.varkeys)]))
+            datakeys = ["%s_%s"%(self.problemtype,key) for key in self.varkeys]
             self.addData(datakeys, nvariables)
 
         # check if the constraint expression is matched by line

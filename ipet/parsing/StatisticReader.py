@@ -165,7 +165,7 @@ class StatisticReader(Editable):
         self.extractStatistic(line)
 
     def addData(self, datakey, data):
-        logging.debug("Adding data; Reader %s Datakey %s, %s to prob %s" % (self.getName(), datakey, repr(data), self.problemname))
+        logging.debug("Reader %s adds data" % (self.getName()))
         self.testrun.addData(self.problemname, datakey, data)
 
     def turnIntoFloat(self, astring):

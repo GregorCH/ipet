@@ -237,6 +237,7 @@ class ReaderManager(Manager, IpetNode, Editable):
             # overwrite previous output information from a log file
             if problemname in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
                 self.testrun.deleteProblemData(problemname)
+
             self.testrun.addData(problemname, 'Settings', self.testrun.getSettings())
 
             self.updateLineNumberData(line[0], StatisticReader.getProblemName(), currentcontext, "LineNumbers_Begin")

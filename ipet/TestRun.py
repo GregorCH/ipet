@@ -2,6 +2,8 @@ import ipet.misc as misc
 from ipet.concepts import Editable
 from pandas import DataFrame, notnull
 import os
+import logging
+
 try:
     import pickle as pickle
 except:
@@ -50,6 +52,8 @@ class TestRun(Editable):
 
         # check for the right dictionary to store the data
         datadict = self.datadict if probname is not None else self.metadatadict
+        
+        logging.debug("TestRun %s receives data Datakey %s, %s to prob %s" % (self.getName(), repr(datakeys), repr(data), probname))
 
         if probname not in self.instanceset:
             self.instanceset.add(probname)

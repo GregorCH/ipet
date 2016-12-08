@@ -60,6 +60,8 @@ class EditableForm(QWidget):
         self.emit(SIGNAL(EditableForm.USERINPUT_SIGNAL))
 
     def convertToText(self, value):
+        if value is None:
+            return ""
         return str(value)
         
     def convertTextToValue(self, text):

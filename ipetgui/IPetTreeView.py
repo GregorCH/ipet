@@ -98,7 +98,7 @@ class IpetTreeView(QTreeWidget):
 
     def setSelectedEditable(self, editable):
         self.setItemSelected(self.currentItem(), False)
-        for item, editableval in list(self.item2editable.items()):
+        for item, editableval in self.item2editable:
             if editable == editableval:
                 #we need to set both the selected and the current item
                 self.setItemSelected(item, True)

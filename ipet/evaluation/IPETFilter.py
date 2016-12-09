@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ElementTree
 import numpy as np
 from ipet.concepts import IpetNode
 from ipet import Experiment
+import logging
 
 class IPETInstance(IpetNode, Editable):
     nodetag = "Instance"
@@ -63,7 +64,11 @@ class IPETComparison:
 
     def compare(self, x, y):
         method = getattr(self, "method_" + IPETComparison.comparisondict[self.operator])
-        return method(x, y)
+        try:
+            return method(x, y)
+        except TypeError as t:
+            logging.error("Got type error %s comparing elements x:%s and y:%s" % (t,x,y))
+            return 0
 
     def method_le(self, x, y):
         return x <= y

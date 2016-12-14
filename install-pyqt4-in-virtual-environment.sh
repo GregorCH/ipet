@@ -16,8 +16,17 @@
 # This script will only run under linux
 
 VIRTUALENV=venv
-ROOTDIR=`pwd`
-DOWNLOADDIR=${ROOTDIR}/${VIRTUALENV}/download
+if test -n "$1"
+then
+    VIRTUALENV=$1
+fi
+if ! test -d "$VIRTUALENV"
+then
+    echo Specified virtual environment \"${VIRTUALENV}\" does not exist. Exiting
+    exit 1
+fi
+
+DOWNLOADDIR=${VIRTUALENV}/download
 SIP=sip-4.18.1
 PYQT4_VERSION=4.11.4
 
@@ -53,7 +62,7 @@ do
 done
 
 # create a local include directory for the sip configuration
-mkdir $VENV/local/include
+mkdir -p ${VIRTUALENV}/local/include
 
 echo configure and install sip
 cd $DOWNLOADDIR/${SIP}
@@ -61,7 +70,7 @@ cd $DOWNLOADDIR/${SIP}
 # it symlinks to inclusion headers, e.g. /usr/include/python-x.x
 # make install will then break if we do not specify the directory
 # where the header 'sip.h' should go
-python configure.py -e $VENV/local/include
+python configure.py -e ${VIRTUALENV}/local/include
 make; make install
 cd -
 

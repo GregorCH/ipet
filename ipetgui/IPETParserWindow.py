@@ -5,11 +5,11 @@ Created on 21.09.2016
 '''
 from .IpetMainWindow import IpetMainWindow
 from PyQt4.QtGui import QLayout, QHBoxLayout
-from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QFileDialog, QString, QKeySequence, QTextBrowser, QComboBox,\
+from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QFileDialog, QKeySequence, QTextBrowser, QComboBox, \
     QLabel, SIGNAL, QTextCursor
 from .IPetTreeView import IpetTreeView
 import sys
-from qipet.EditableBrowser import EditableBrowser
+from .EditableBrowser import EditableBrowser
 from .IPETApplicationTab import IPETApplicationTab
 from ipet.parsing import ReaderManager
 from ipet import misc
@@ -170,7 +170,7 @@ class IPETParserWindow(IPETApplicationTab):
         
     def loadOutputFiles(self):
         thedir = str(".")
-        filenames = QFileDialog.getOpenFileNames(self, caption=QString("%s - Load Output Files"%QApplication.applicationName()),
+        filenames = QFileDialog.getOpenFileNames(self, caption = "%s - Load Output Files" % QApplication.applicationName(),
                                                directory=thedir, filter=str("All files (*.out)"))
         if filenames:
             loadedtrs = 0
@@ -205,7 +205,7 @@ class IPETParserWindow(IPETApplicationTab):
 
     def loadParser(self):
         thedir = str(".")
-        filename = str(QFileDialog.getOpenFileName(self, caption = QString("%s - Load a parser" % QApplication.applicationName()),
+        filename = str(QFileDialog.getOpenFileName(self, caption = "%s - Load a parser" % QApplication.applicationName(),
                                                directory = thedir, filter = str("XML files (*.xml)")))
         if filename:
             try:
@@ -270,7 +270,7 @@ class IPETParserWindow(IPETApplicationTab):
 
     def saveParser(self):
         if self.filename is None:
-            filename = str(QFileDialog.getSaveFileName(self, caption = QString("%s - Save a parser" % QApplication.applicationName()),
+            filename = str(QFileDialog.getSaveFileName(self, caption = "%s - Save a parser" % QApplication.applicationName(),
                                                            directory = str("."), filter = str("XML files (*.xml)")))
         else:
             filename = self.filename
@@ -285,7 +285,7 @@ class IPETParserWindow(IPETApplicationTab):
 
 
     def saveParserAs(self):
-        filename = str(QFileDialog.getSaveFileName(self, caption = QString("%s - Save a parser" % QApplication.applicationName()),
+        filename = str(QFileDialog.getSaveFileName(self, caption = "%s - Save a parser" % QApplication.applicationName(),
                                                        directory = str("."), filter = str("XML files (*.xml)")))
         if not filename:
             return

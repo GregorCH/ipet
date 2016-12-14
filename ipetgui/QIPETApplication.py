@@ -5,11 +5,8 @@ Created on 22.09.2016
 '''
 
 from .IpetMainWindow import IpetMainWindow
-from PyQt4.QtGui import QLayout, QHBoxLayout
-from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QTabWidget
-from .IPetTreeView import IpetTreeView
+from PyQt4.Qt import QApplication, QTabWidget
 import sys
-from .EditableBrowser import EditableBrowser
 from .IPETParserWindow import IPETParserWindow
 from .IpetEvaluationEditorApp import EvaluationEditorWindow
 

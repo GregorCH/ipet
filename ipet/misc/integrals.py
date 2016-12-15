@@ -1,9 +1,13 @@
 '''
-Created on 14.03.2014
+The MIT License (MIT)
 
-this module features methods that facilitate the handling of integrals for various histories.
+Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
 
-@author: bzfhende
+Permissions are granted as stated in the license file you have obtained
+with this software. If you find the library useful for your purpose,
+please refer to README.md for how to cite IPET.
+
+@author: Gregor Hendel
 '''
 import numpy as np
 from ipet.misc import misc

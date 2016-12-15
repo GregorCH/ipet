@@ -7,23 +7,17 @@ grapical interface that can later be loaded and reused on other
 data. Additional readers and evaluations are stored in
 xml-format which can be plugged into the evaluation method.
 
-Here are some usage examples
-
-
 # How to get IPET
 
+In the following installation instructions, we will assume that you clone the IPET repository by
 
-The most recent source code can be obtained by copying from the following url
+    git clone https://github.com/GregorCH/ipet.git
 
-    https://git.zib.de/integer/ipet/repository/archive.tar.gz
+or download and unzip one of the available zipped archieves into a local directory called "ipet".
 
-or by cloning the git repository itself:
-
-    git clone https://git.zib.de/integer/ipet
-    
+It is planned to make ipet available via the Python package indexer PyPi.
 
 # Installation and prerequisites
-
 
 IPET was originally written in Python2.7 and recently converted into Python3.
 It consists of two modules, *ipet* together with several submodules, and *ipetgui*.
@@ -44,8 +38,43 @@ Running the graphical user interface of IPET requires PyQt4 for python3. In orde
 your system has PyQt4, execute
 
     python3 -c "from PyQt4 import QtCore,QtGui; print(\"PyQt4 is ready\")"
-    
+
 We provide a script called "install-pyqt4-in-virtual-environment.sh" to install PyQt4-bindings inside a virtual environment.
+
+## Linux installation inside a virtual environment
+
+Using a virtual environment, you can safely install the required packages together without 
+messing with your globally installed system libraries. This is certainly the recommended way
+to install IPET. In the following, we assume you create the root directory of your virtual 
+environment directly in the IPET root directory and call it "venv". You may choose
+to use a differently named virtual environment somewhere else, of course.
+
+1. Create and activate the virtual environment (a new directory called "venv" gets created):
+
+        cd ipet
+        virtualenv --python python3 venv
+        source venv/bin/activate
+   Note that you may deactivate the virtual environment at any time by calling 
+        
+        deactivate
+    
+2. Install PyQt4 bindings inside your virtual environment by calling the provided script, 
+which assumes that you are running inside the virtual environment "venv" or the one specified by the optional path. 
+The script will ask you to carefully read and accept the license agreement for using PyQt4 bindings.
+
+        ./install-pyqt4-in-virtual-environment.sh [optional path to virtual environment root]
+
+3. Execute the command (note that it does no longer require to mention python3 because we are running inside the virtual environment)
+
+        pip install -r requirements.txt
+        python setup.py install
+
+4. As a developer, it might be useful to call the following command instead:
+
+        python setup.py develop
+   This creates symlinks to the IPET source files in the site-packages of the virtual environment library,
+   and allows for more rapid testing and development.
+
 
 
 ## Linux installation into your *global* environment
@@ -67,40 +96,6 @@ This step makes imports available systemwide such as
 The installation process will recognize if you have PyQt4 bindings available on your system, which are necessary to
 use the graphical user interface.
 
-## Linux installation inside a virtual environment
-
-Using a virtual environment, you can safely install the required packages together without 
-messing with your globally installed system libraries. This is certainly the recommended way
-to install IPET. In the following, we assume you create the root directory of your virtual 
-environment directly in the IPET root directory and call it "venv". You may choose
-to use a differently named virtual environment somewhere else, of course.
-
-1. Create and activate the virtual environment (a new directory called "venv" gets created):
-
-        cd ipet
-        virtualenv --python python3 venv
-        source venv/bin/activate
-   Note that you may deactivate the virtual environment at any time by calling 
-        
-        deactivate
-    
-2. Install PyQt4 bindings inside your virtual environment by calling the provided script, 
-which assumes that you are running inside the virtual environment "venv" or the one specified by the optional path. 
-
-        ./install-pyqt4-in-virtual-environment.sh [optional path to virtual environment root]
-
-
-3. Execute the command (not that it does no longer require to mention python3 because we are running inside the virtual environment)
-         
-        pip install -r requirements.txt
-        python setup.py install
-
-4. As a developer, it might be useful to call the following command instead:
-
-        python setup.py develop
-   This creates symlinks to the IPET source files in the site-packages of the virtual environment library,
-   and allows for more rapid testing and development.
-
 
 
 
@@ -121,6 +116,7 @@ Run the command
 IPET has a subdirectory called "scripts" with scripts to invoke log file parsing, test run evaluating, and starting 
 the graphical user interface.
 
+**under construction**
 
 
 
@@ -128,6 +124,8 @@ the graphical user interface.
 
 
 # The concept of IPET
+
+**under construction**
 
 
 

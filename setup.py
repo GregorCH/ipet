@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+'''
+The MIT License (MIT)
+
+Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+
+Permissions are granted as stated in the license file you have obtained
+with this software. If you find the library useful for your purpose,
+please refer to README.md for how to cite IPET.
+
+@author: Gregor Hendel
+'''
 from setuptools import setup
 
 with open("ipet/version.py") as f:
@@ -44,9 +55,9 @@ kwargs = {
     "author_email": "hendel@zib.de",
     "maintainer_email": "hendel@zib.de",
     "install_requires": required,
-    "url": "https://git.zib.de/integer/ipet",
-    "download_url": "https://git.zib.de/integer/ipet/repository/archive.tar.gz?ref={}".format(__version__),
-    "keywords": "solver log benchmark parser",
+    "url": "https://github.com/GregorCH/ipet",
+    "download_url": "https://github.com/GregorCH/ipet/archive/master.zip",
+    "keywords": "Mathematical Optimization solver log benchmark parser",
     "classifiers": [
         "Programming Language :: Python",
         "Topic :: Software Development",

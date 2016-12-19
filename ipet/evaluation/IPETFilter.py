@@ -13,7 +13,6 @@ from ipet.concepts import Editable
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 from ipet.concepts import IpetNode
-from ipet import Experiment
 import logging
 
 class IPETInstance(IpetNode, Editable):

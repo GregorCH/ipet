@@ -54,10 +54,8 @@ epilog = \
 
 
 # possible arguments in the form name,default,short,description #
-clarguments = [('--experimentfile', None, '-x', "An experiment file name (must have .ipx file extension) in cmp-format to read"),
+clarguments = [('--experimentfile', None, '-x', "An experiment file name (must have .ipx file extension) in ipx-format to read"),
                ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
-               ('--recollect', False, '-r', "Should the loaded experiment recollect data before proceeding?"),
-               ('--saveexperiment', False, '-s', "Should the experiment data be overwritten? Makes only sense if combined with '--recollect True'"),
                ('--externaldata', None,'-E', "Should external data such as additional instance information be used?"),
                ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation"),
                ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
@@ -79,6 +77,9 @@ argparser.add_argument("-n", "--nooptauto", action="store_true", default=False, 
 argparser.add_argument("-A", "--showapp", action = "store_true", default = False, help = "Display the Evaluation Editor app to modify the evaluation")
 argparser.add_argument("-l", "--long", action = "store_true", default = False, help = "use for long output (instancewise and aggregated results)")
 argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
+argparser.add_argument('-s', '--saveexperiment', action = "store_true", default = False, help = "Should the experiment data be overwritten? Makes only sense if combined with '--recollect True'")
+argparser.add_argument('-r', '--recollect', action = "store_true", default = False, help = "Should the loaded experiment recollect data before proceeding?")
+
 if __name__ == '__main__':
     try:
         arguments = argparser.parse_args()

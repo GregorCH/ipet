@@ -1,5 +1,15 @@
-#! /usr/bin/bash
-
+#!/bin/bash
+#
+# The MIT License (MIT)
+# 
+# Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+# 
+# Permissions are granted as stated in the license file you have obtained
+# with this software. If you find the library useful for your purpose,
+# please refer to README.md for how to cite IPET.
+# 
+# @author: Gregor Hendel
+#
 # this script is an attempt to automate the installation
 # of PyQt4 into a virtual environment
 # 
@@ -15,18 +25,7 @@
 # 
 # This script will only run under linux
 
-#!/bin/bash
-#
-# The MIT License (MIT)
-# 
-# Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
-# 
-# Permissions are granted as stated in the license file you have obtained
-# with this software. If you find the library useful for your purpose,
-# please refer to README.md for how to cite IPET.
-# 
-# @author: Gregor Hendel
-#
+
 VIRTUALENV=venv
 
 

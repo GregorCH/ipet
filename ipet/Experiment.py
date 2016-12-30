@@ -434,7 +434,7 @@ class Experiment(Observable):
 
         # the run failed because the primal or dual bound were better than the known optimal solution value
         if solfound and (self.isPrimalBoundBetter(testrun, probname) or self.isDualBoundBetter(testrun, probname)):
-            testrun.addData(probname, 'Status', "fail (objective value)")
+            testrun.addData(probname, 'Status', "fail_objective_value")
 
         # the run finished correctly if an objective limit was given and the solver reported infeasibility
         elif not solfound and objlimitreached:
@@ -445,7 +445,7 @@ class Experiment(Observable):
                   (objsense == ObjsenseReader.maximize and objlimit - optval >= -reltol):
                 testrun.addData(probname, 'Status', "ok")
             else:
-                testrun.addData(probname, 'Status', "fail (objective value)")
+                testrun.addData(probname, 'Status', "fail_objective_value")
         # the solver reached a limit
         elif limitreached:
             testrun.addData(probname, 'Status', limitreached.lower())
@@ -466,7 +466,7 @@ class Experiment(Observable):
 
         # we failed because dual bound is higher than the known value of a primal bound
         if self.isDualBoundBetter(testrun, probname):
-            testrun.addData(probname, 'Status', "fail (dual bound)")
+            testrun.addData(probname, 'Status', "fail_dual_bound")
 
         # solving reached a limit
         elif limitreached:
@@ -476,7 +476,7 @@ class Experiment(Observable):
 
         # primal and dual bound converged
         elif misc.getGap(pb, db) < 1e-4:
-            testrun.addData(probname, 'Status', "solved not verified")
+            testrun.addData(probname, 'Status', "solved_not_verified")
         else:
             testrun.addData(probname, 'Status', "fail")
 
@@ -494,7 +494,7 @@ class Experiment(Observable):
             if pb is not None:
                 testrun.addData(probname, 'Status', "better")
         elif misc.getGap(pb, db) < 1e-4:
-            testrun.addData(probname, 'Status', "solved not verified")
+            testrun.addData(probname, 'Status', "solved_not_verified")
         else:
             testrun.addData(probname, 'Status', "unknown")
 
@@ -514,7 +514,7 @@ class Experiment(Observable):
                 testrun.addData(probname, 'Status', "ok")
         # a solution was found, that's not good
         else:
-            testrun.addData(probname, 'Status', "fail (solution on infeasible instance)")
+            testrun.addData(probname, 'Status', "fail_solution_on_infeasible_instance")
 
 
     def checkProblemStatus(self):
@@ -531,11 +531,11 @@ class Experiment(Observable):
 
                 # an error code means that the instance aborted
                 if errcode is not None or testrun.problemGetData(probname, SolvingTimeReader.datakey) is None:
-                    testrun.addData(probname, 'Status', "fail (abort)")
+                    testrun.addData(probname, 'Status', "fail_abort")
 
                 # if the best solution was not feasible in the original problem, it's a fail
                 elif testrun.problemGetData(probname, BestSolInfeasibleReader.datakey) == True:
-                    testrun.addData(probname, 'Status', "fail (solution infeasible)")
+                    testrun.addData(probname, 'Status', "fail_solution_infeasible")
 
                 # go through the possible solution statuses and determine the Status of the run accordingly
                 elif solustatus == 'opt':

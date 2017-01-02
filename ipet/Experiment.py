@@ -12,7 +12,6 @@ please refer to README.md for how to cite IPET.
 from ipet.parsing.ReaderManager import ReaderManager
 from .TestRun import TestRun
 from ipet import misc
-from ipet.concepts.Observer import Observable
 import pandas
 from ipet.parsing import SolvingTimeReader
 
@@ -35,7 +34,7 @@ import os
 import sys
 import logging
 
-class Experiment(Observable):
+class Experiment:
     '''
     manages the collection of all log (.out) and .solu file data
 

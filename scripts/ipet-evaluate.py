@@ -18,7 +18,6 @@ from ipet.evaluation import IPETEvaluation
 import re
 import textwrap
 import os
-from PyQt4.Qt import QApplication
 
 import logging
 
@@ -174,6 +173,8 @@ if __name__ == '__main__':
 
     if arguments.showapp:
         from ipetgui import IpetEvaluationEditorApp, ExperimentManagement
+        from PyQt4.Qt import QApplication
+        
         application = QApplication(sys.argv)
         application.setApplicationName("Evaluation editor")
         mainwindow = IpetEvaluationEditorApp()

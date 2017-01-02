@@ -10,7 +10,6 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 '''
 import ipet.misc as misc
-from ipet.concepts import Editable
 from pandas import DataFrame, notnull
 import os
 import logging
@@ -20,7 +19,7 @@ try:
 except:
     import pickle
 
-class TestRun(Editable):
+class TestRun:
     '''
     represents the collected data of a particular (set of) log file(s)
     '''

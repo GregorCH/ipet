@@ -103,7 +103,7 @@ use the graphical user interface.
 
 Run the command 
     
-    python test/ExperimentTest.py
+    python -m unittest test
  if the output says OK, all tests were passed.
 
 

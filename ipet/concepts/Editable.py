@@ -35,6 +35,9 @@ class Editable:
     def attributesToDict(self):
         return {elem:getattr(self, elem) for elem in self.getEditableAttributes()}
     
+    def attributesToStringDict(self):
+        return {elem:str(getattr(self, elem)) for elem in self.getEditableAttributes()}
+    
     def getRequiredOptionsByAttribute(self, attr):
         return None
     
@@ -43,6 +46,17 @@ class Editable:
             if line.strip().startswith(attr):
                 return line[line.index(":") + 1:]
         return None
+    
+    def equals(self, other):
+        '''
+        returns True if other is of the same class and has the same attributes as self
+        '''
+        if other is None:
+            return False
+        elif other.__class__ != self.__class__:
+            return False
+        
+        return self.attributesToDict() == other.attributesToDict()
         
         
         

@@ -360,7 +360,8 @@ class IPETEvaluation(Editable, IpetNode):
     
     An evaluation transfers raw, collected data from a collection of testruns
     into tables based on selected columns, filter groups, and aggregations.
-    An evaluation and its friends come with an easy-to-modify  
+    An evaluation and its friends come with an easy-to-modify XML language
+    for modification.
     By defining multiple evaluations, 
     it is therefore possible to view the same raw data through multiple angles
     
@@ -552,7 +553,7 @@ class IPETEvaluation(Editable, IpetNode):
         return df
 
     def toXMLElem(self):
-        me = ElementTree.Element(IPETEvaluation.getNodeTag(), {'groupkey':self.groupkey, 'defaultgroup':self.defaultgroup})
+        me = ElementTree.Element(IPETEvaluation.getNodeTag(), self.attributesToStringDict())
         for col in self.columns:
             me.append(col.toXMLElem())
         for fg in self.filtergroups:
@@ -574,9 +575,7 @@ class IPETEvaluation(Editable, IpetNode):
     @staticmethod
     def processXMLElem(elem):
         if elem.tag == IPETEvaluation.getNodeTag():
-            ev = IPETEvaluation()
-            ev.setGroupKey(elem.attrib.get('groupkey', IPETEvaluation.DEFAULT_GROUPKEY))
-            ev.setDefaultGroup(elem.attrib.get('defaultgroup', IPETEvaluation.DEFAULT_DEFAULTGROUP))
+            ev = IPETEvaluation(**elem.attrib)
 
         for child in elem:
             if child.tag == IPETFilterGroup.getNodeTag():
@@ -917,30 +916,4 @@ class IPETEvaluation(Editable, IpetNode):
         return pd.DataFrame(results)[columnorder]
 
 if __name__ == '__main__':
-    ev = IPETEvaluation.fromXMLFile('../test/testevaluate.xml')
-#     ev.addColumn(IPETEvaluationColumn('SolvingTime'))
-#     ev.addColumn(IPETEvaluationColumn('Nodes'))
-#     group = IPETFilterGroup('new')
-#     filter1 = IPETFilter('SolvingTime', '0.01', 'ge', True)
-#     filter2 = IPETFilter('Nodes', '10', 'le', True)
-#     group.addFilter(filter1)
-#     group.addFilter(filter2)
-    agg = Aggregation('shmean', shiftby=10)
-    #ev.columns[0].addAggregation(agg)
-    #print ElementTree.tostring(agg.toXMLElem())
-
-    from ipet.Comparator import Comparator
-    comp = Comparator.loadFromFile('../test/.testcomp.cmp')
-    comp.externaldata = None
-    rettab, retagg = ev.evaluate(comp)
-    print(rettab.to_string())
-    print(retagg.to_string())
-    xml = ev.toXMLElem()
-    from xml.dom.minidom import parseString
-    dom = parseString(ElementTree.tostring(xml))
-    with open("myfile.xml", 'w') as myfile:
-        myfile.write(dom.toprettyxml())
-#     xml = ev.toXMLElem()
-#     dom = parseString(ElementTree.tostring(xml))
-#     print dom.toprettyxml()
-#
+    pass

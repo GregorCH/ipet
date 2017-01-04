@@ -62,12 +62,21 @@ class Experiment:
 
     def addOutputFile(self, filename, testrun=None):
         """
-        adds an output file to a testrun or create a new testrun object with the specified filename
+        adds an output file for a testrun or create a new testrun object with the specified filename
 
-        the filename should be an out, error, or settings file
+        this method handles all types of feasible file types for an experiment, either preparsed
+        TestRun files or raw solver output files or .solu files with additional information.
+
+        If a file with an unrecognized file extension is passed to this method, a ValueError is raised.
+
+        For a list of allowed file extensions, see ipet.parsing.ReaderManager.
         """
         filebasename = os.path.splitext(os.path.basename(filename))[0]
         fileextension = os.path.splitext(filename)[-1]
+
+        if not fileextension in [TestRun.FILE_EXTENSION] + self.readermanager.getFileExtensions():
+            raise ValueError("Experiment cannot handle extension '%s' of file '%s'" % (fileextension, filename))
+
 
         if fileextension == TestRun.FILE_EXTENSION:
             try:

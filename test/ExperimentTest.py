@@ -122,6 +122,20 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addOutputFile(trn_file)
         self.experiment.collectData()
 
+    def test_fileExtensions(self):
+        '''
+        Test if an experiment accepts
+        '''
+
+        # all possible extensions  should be accepted
+        for extension in ReaderManager().getFileExtensions():
+            self.experiment.addOutputFile("bla" + extension)
+
+        # if called with an unknown extension, this should raise a ValueError
+        for otherextension in [".res", ".txt"]:
+            with self.assertRaises(ValueError):
+                self.experiment.addOutputFile("bla" + otherextension)
+
     def test_ListReader(self):
         lr = ListReader("([ab]c) +([^ ]*)", "testlr")
         lines = ("ac 1", "bc 2", "ab 3")

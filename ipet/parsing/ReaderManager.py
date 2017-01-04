@@ -125,6 +125,12 @@ class ReaderManager(Manager, IpetNode, Editable):
             raise ValueError("context for file extension %s already set to %d" % (extension, oldcontext))
         self.fileextension2context[extension] = context
 
+    def getFileExtensions(self):
+        '''
+        returns a list of all recognized file extensions by this Reader manager
+        '''
+        return list(self.fileextension2context.keys())
+
     def addLogFileExtension(self, extension):
         """
         adds a new log file extension to the log file contexts

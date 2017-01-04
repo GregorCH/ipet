@@ -10,7 +10,7 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 '''
 from PyQt4.QtGui import QTreeWidget, QTreeWidgetItem, QMainWindow, QApplication,\
-    QWidget, QHBoxLayout, QFrame, QIcon, QLabel, QVBoxLayout, QGridLayout
+    QWidget, QHBoxLayout, QFrame, QIcon, QLabel, QVBoxLayout, QGridLayout, QColor
 from ipet.evaluation import IPETEvaluation, IPETEvaluationColumn
 import sys
 from PyQt4.QtCore import SIGNAL, Qt
@@ -20,6 +20,32 @@ from ipet.evaluation import IPETFilterGroup, IPETInstance
 from ipet.evaluation import IPETFilter
 from PyQt4 import QtCore
 import os.path as osp
+class IpetTreeViewItem(QTreeWidgetItem):
+
+    def __init__(self, ipetnode, parent = None):
+        super(IpetTreeViewItem, self).__init__(parent, [ipetnode.getName()])
+        self.ipetnode = ipetnode
+        self.myIcon = None
+
+    def getIpetNode(self):
+        return self.ipetnode
+
+    def data(self, column, role):
+        if column == 0:
+            if role == QtCore.Qt.DisplayRole:
+                return self.ipetnode.getName()
+            elif role == QtCore.Qt.ForegroundRole:
+                if self.ipetnode.isActive():
+                    return QColor(0, 0, 0)
+                else:
+                    return QColor(128, 128, 128)
+            elif role == QtCore.Qt.DecorationRole:
+                return self.myIcon
+
+    def setMyIcon(self, icon):
+        self.myIcon = icon
+
+
 class IpetTreeView(QTreeWidget):
     '''
     classdocs
@@ -40,38 +66,32 @@ class IpetTreeView(QTreeWidget):
         self.setAlternatingRowColors(True)
         self.setEditTriggers(QTreeWidget.NoEditTriggers)
         self.setSelectionMode(QTreeWidget.SingleSelection)
-        
+        self.items = []
     
     def updateSelectedItem(self):
         if len(self.selectedItems()) == 0:
             return
             
         item = self.selectedItems()[0]
-        item.setText(0, self.itemGetEditable(item).getName()) 
+#         item.setText(0, self.itemGetEditable(item).getName())
         
     def populateTree(self, editable):
         self.clear()
         self.setColumnCount(1)
         self.setItemsExpandable(True)
-        self.item2editable = []
         self.createAndAddItem(editable)
     
     def bindItemIcon(self, item, editable):
         filename = self.icons.get(editable.__class__)
         if filename is not None:
-            item.setIcon(0, QIcon(filename))
+            item.setMyIcon(QIcon(filename))
             
     def itemGetEditable(self, item):
         '''
         returns the Editable object corresponding to the given item
         '''
-        for i,e in self.item2editable:
-            if i == item:
-                return e
-            
-        raise Exception("List does not contain the item %s, have only %s" % (item, self.item2editable))
+        return item.getIpetNode()
         
-    
     def currentItemAcceptsClassAsChild(self, nodeclass):
         item = self.currentItem()
         if not item:
@@ -104,8 +124,8 @@ class IpetTreeView(QTreeWidget):
 
     def setSelectedEditable(self, editable):
         self.setItemSelected(self.currentItem(), False)
-        for item, editableval in self.item2editable:
-            if editable == editableval:
+        for item in self.items:
+            if editable == item.getIpetNode():
                 #we need to set both the selected and the current item
                 self.setItemSelected(item, True)
                 self.setCurrentItem(item)
@@ -118,16 +138,17 @@ class IpetTreeView(QTreeWidget):
     def createAndAddItem(self, editable, parent=None):
         if parent is None:
             parent = self
-        me = QTreeWidgetItem(parent, [editable.getName()])
+        me = IpetTreeViewItem(editable, parent)
+        self.items.append(me)
         self.bindItemIcon(me, editable)
-        self.item2editable.append((me, editable))
         try:
             if editable.getChildren() is not None:
                 for child in editable.getChildren():
                     self.createAndAddItem(child, me)
                 
                 self.expandItem(me)
-        except AttributeError:
+        except AttributeError as e:
+            print(e)
             pass
 
 editframecontent = None

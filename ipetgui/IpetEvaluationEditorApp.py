@@ -201,6 +201,13 @@ class EvaluationEditorWindow(IPETApplicationTab):
     def itemChanged(self):
         self.enableOrDisableActions()
         self.passGroupToTableViews()
+
+    def setDataFrames(self, tableviewdf, aggtableviewdf):
+        '''
+        sets both data frames and formatters for the views
+        '''
+        self.tableview.setDataFrame(tableviewdf, self.evaluation.getColumnFormatters(tableviewdf))
+        self.aggtableview.setDataFrame(aggtableviewdf, self.evaluation.getColumnFormatters(aggtableviewdf))
                 
     def passGroupToTableViews(self):
         
@@ -212,23 +219,23 @@ class EvaluationEditorWindow(IPETApplicationTab):
         if self.browser.treewidget.getSelectedEditable().__class__ is IPETFilterGroup:
             selectedfiltergroup = self.browser.treewidget.getSelectedEditable()
             
+        if selectedfiltergroup is not None and selectedfiltergroup.isActive():
+            return
+
         if selectedfiltergroup != self.lastfiltergroup:
             if selectedfiltergroup is not None:
                 self.updateStatus("Display data for selected filter group \"%s\"" % selectedfiltergroup.getName())
-                self.tableview.setDataFrame(self.evaluation.getInstanceGroupData(selectedfiltergroup))
-                self.aggtableview.setDataFrame(self.evaluation.getAggregatedGroupData(selectedfiltergroup))
+                self.setDataFrames(self.evaluation.getInstanceGroupData(selectedfiltergroup), self.evaluation.getAggregatedGroupData(selectedfiltergroup))
             else:
                 self.updateStatus("Display data for all instances")
-                self.tableview.setDataFrame(self.evaluation.getInstanceData())
-                self.aggtableview.setDataFrame(self.evaluation.getAggregatedData())
+                self.setDataFrames(self.evaluation.getInstanceData(), self.evaluation.getAggregatedData())
                 
         self.lastfiltergroup = selectedfiltergroup
 
     def reevaluate(self):
         if self.evaluation is not None:
             rettab, retagg = self.evaluation.evaluate(ExperimentManagement.getExperiment())
-            self.tableview.setDataFrame(rettab)
-            self.aggtableview.setDataFrame(retagg)
+            self.setDataFrames(rettab, retagg)
 
 class IpetEvaluationEditorApp(IpetMainWindow):
     '''

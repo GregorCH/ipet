@@ -33,6 +33,7 @@ class IpetTableDataModel(QAbstractTableModel):
         self.dataframe = dataframe
         self.sorted = self.SORT_INDEX
         self.sortcolumn = None
+        self.formatters = {}
        
 
     def sortTable(self, section):
@@ -76,7 +77,13 @@ class IpetTableDataModel(QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             i = index.row()
             j = index.column()
-            return '{0}'.format(self.dataframe.loc[self.dataframe.index[i], self.dataframe.columns[j]])
+            dataval = self.dataframe.loc[self.dataframe.index[i], self.dataframe.columns[j]]
+            formatter = self.formatters.get(self.dataframe.columns[j])
+
+            if formatter is not None:
+                return '{0}'.format(formatter(dataval))
+            else:
+                return '%.1f' % (dataval) if dataval is float else '{0}'.format(dataval)
         else:
             return None
         
@@ -86,16 +93,17 @@ class IpetTableDataModel(QAbstractTableModel):
         '''
         return self.dataframe
     
-    def setDataFrame(self, dataframe):
+    def setDataFrame(self, dataframe, formatters = {}):
         self.dataframe = dataframe
+        self.formatters = formatters
         self.reset()
         
     
-    def getString(self, stringortuple):
+    def getString(self, stringortuple, join = "\n"):
         if type(stringortuple) is str:
             return stringortuple
         elif type(stringortuple) is tuple:
-            return ":".join(stringortuple)
+            return join.join(stringortuple)
         else:
             raise TypeError("Wrong type %s, expected string or tuple" % type(stringortuple))
     
@@ -111,7 +119,7 @@ class IpetTableDataModel(QAbstractTableModel):
             return None
         if orientation == Qt.Horizontal:
             return self.getString(self.dataframe.columns[section])
-        return self.getString(self.dataframe.index[section])
+        return self.getString(self.dataframe.index[section], join = ":    ")
     
     def flags(self, index):
         '''
@@ -130,15 +138,16 @@ class IPETDataTableView(QTableView):
         
         header = self.horizontalHeader()
         self.connect(header, SIGNAL("sectionClicked(int)"), self.sortTable)
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
         
     def sortTable(self, section):
         self.model.sortTable(section)
         
     def resizeColumns(self):
-        self.resizeColumnsToContents()
+        pass
         
-    def setDataFrame(self, dataframe):
-        self.model.setDataFrame(dataframe)
+    def setDataFrame(self, dataframe, formatters = {}):
+        self.model.setDataFrame(dataframe, formatters)
         self.resizeColumns()
     
         

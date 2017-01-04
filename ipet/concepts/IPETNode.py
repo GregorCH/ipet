@@ -9,11 +9,24 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 '''
+from ipet.concepts.Editable import Editable
 
-class IpetNode:
+class IpetNode(Editable):
     '''
     A Node is an interface to an XML-like ancestor-structure
     '''
+    active = True
+    _attributes2options = {"active":[True, False]}
+    
+    def __init__(self, active = True):
+        '''
+        constructs a new IpetNode
+
+        Parameters
+        ----------
+        active : True or "True" if this element should be active, False otherwise
+        '''
+        self.set_active(active)
 
     def addChild(self, child):
         '''
@@ -39,6 +52,24 @@ class IpetNode:
         '''
         pass
     
+    def isActive(self):
+        '''
+        returns True if this node is currently active, False otherwise
+        '''
+        return self.active
+    
+    def set_active(self, active):
+        self.active = True if active in [True, "True"] else False
+
+    def getEditableAttributes(self):
+        '''
+        returns all editable attributes
+        '''
+        return ["active"]
+
+    def getRequiredOptionsByAttribute(self, attr):
+        return self._attributes2options.get(attr)
+
     @staticmethod
     def getNodeTag():
         return "Node"

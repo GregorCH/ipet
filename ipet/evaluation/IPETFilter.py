@@ -9,16 +9,15 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 '''
-from ipet.concepts import Editable
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 from ipet.concepts import IpetNode
 import logging
 
-class IPETInstance(IpetNode, Editable):
+class IPETInstance(IpetNode):
     nodetag = "Instance"
     
-    def __init__(self, name=None):
+    def __init__(self, name = None, active = True):
         '''
         constructs an Ipet Instance
         
@@ -26,7 +25,9 @@ class IPETInstance(IpetNode, Editable):
         ----------
         
         name : The name of this instance
+        active : True or "True" if this element should be active, False otherwise
         '''
+        super(IPETInstance, self).__init__(active)
         self.name = name
         
     def checkAttributes(self):
@@ -34,7 +35,7 @@ class IPETInstance(IpetNode, Editable):
             raise ValueError("Error: An instance needs a name")
         
     def getEditableAttributes(self):
-        return ["name"]
+        return ["name"] + super(IPETInstance, self).getEditableAttributes()
     
     @staticmethod
     def getNodeTag():
@@ -42,6 +43,10 @@ class IPETInstance(IpetNode, Editable):
     
     def getName(self):
         return self.name
+
+    def toXMLElem(self):
+        me = ElementTree.Element(IPETInstance.getNodeTag(), self.attributesToStringDict())
+        return me
 
 class IPETComparison:
     '''
@@ -88,7 +93,7 @@ class IPETComparison:
     def method_neq(self, x, y):
         return x != y
 
-class IPETFilter(Editable, IpetNode):
+class IPETFilter(IpetNode):
     '''
     Filters are used for selecting subsets of problems to analyze.
     '''
@@ -99,7 +104,7 @@ class IPETFilter(Editable, IpetNode):
     nodetag = "Filter"
     
 
-    def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = 'all'):
+    def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = 'all', active = True):
         '''
         filter constructor
         
@@ -110,7 +115,10 @@ class IPETFilter(Editable, IpetNode):
         expression2 : integer, float, string, or column name
         operator : operator such that evaluation expression1 op expression2 yields True or False
         anytestrun : either 'one' or 'all' 
+        active : True or "True" if this filter should be active, False otherwise
         '''
+
+        super(IPETFilter, self).__init__(active)
         self.expression1 = expression1
         self.expression2 = expression2
 
@@ -131,8 +139,9 @@ class IPETFilter(Editable, IpetNode):
 
         anytestrun = attrdict.get('anytestrun')
         operator = attrdict.get('operator')
+        active = attrdict.get('active', True)
 
-        return IPETFilter(expression1, expression2, operator, anytestrun)
+        return IPETFilter(expression1, expression2, operator, anytestrun, active)
 
     def getName(self):
         prefix = self.anytestrun
@@ -153,10 +162,12 @@ class IPETFilter(Editable, IpetNode):
         if a binary operator is selected, two expressions as left and right hand side of operator must be chosen
         For instance operators, no expressions are selectable.
         '''
+        parenteditables = super(IPETFilter, self).getEditableAttributes()
+
         if self.operator in list(IPETComparison.comparisondict.keys()):
-            return ['operator', 'anytestrun', 'expression1', 'expression2']
+            return parenteditables + ['operator', 'anytestrun', 'expression1', 'expression2']
         else:
-            return ['operator']
+            return parenteditables + ['operator']
     
     @staticmethod
     def getNodeTag():
@@ -173,14 +184,17 @@ class IPETFilter(Editable, IpetNode):
         
     def removeChild(self, child):
         self.instances.remove(child)
+
+    def getActiveInstances(self):
+        return [x for x in self.instances if x.isActive()]
             
     def getRequiredOptionsByAttribute(self, attr):
-        return self.attribute2Options.get(attr)
+        return self.attribute2Options.get(attr, super(IPETFilter, self).getRequiredOptionsByAttribute(attr))
 
     def applyInstanceOperator(self, probname):
         contained = False
         # loop through instance set
-        for name in (x.getName() for x in self.instances):
+        for name in (x.getName() for x in self.getActiveInstances()):
             if probname == name:
                 contained = True
                 break
@@ -262,14 +276,12 @@ class IPETFilter(Editable, IpetNode):
         return [probname for probname in probnames if self.filterProblem(probname, testruns)]
 
     def toXMLElem(self):
-        myattributes = self.attributesToDict()
-        mystrattributes = {key:str(myattributes[key]) for key in self.getEditableAttributes()}
-        me = ElementTree.Element('Filter', mystrattributes)
+        me = ElementTree.Element(IPETFilter.getNodeTag(), self.attributesToStringDict())
         for instance in self.instances:
-            me.append(ElementTree.Element("Instance", {"name":instance.getName()}))
+            me.append(instance.toXMLElem())
         return me
 
-class IPETFilterGroup(Editable, IpetNode):
+class IPETFilterGroup(IpetNode):
     '''
     represents a list of filters, has a name attribute for quick tabular representation
 
@@ -280,7 +292,7 @@ class IPETFilterGroup(Editable, IpetNode):
     
     editableAttributes = ["name", "filtertype"]
 
-    def __init__(self, name=None, filtertype="intersection"):
+    def __init__(self, name = None, filtertype = "intersection", active = True):
         '''
         constructor for a filter group
 
@@ -288,7 +300,10 @@ class IPETFilterGroup(Editable, IpetNode):
         ----------
         name : a suitable name for the filter group
         filtertype : either 'union' or 'intersection'
+        active : True or "True" if this filter group should be active, False otherwise
         '''
+        super(IPETFilterGroup, self).__init__(active)
+
         self.name = name
         self.filters = []
         if filtertype not in ["intersection", "union"]:
@@ -297,7 +312,7 @@ class IPETFilterGroup(Editable, IpetNode):
         self.filtertype = filtertype
         
     def getEditableAttributes(self):
-        return self.editableAttributes
+        return super(IPETFilterGroup, self).getEditableAttributes() + self.editableAttributes
     
     def getChildren(self):
         return self.filters
@@ -316,7 +331,7 @@ class IPETFilterGroup(Editable, IpetNode):
         return IPETFilterGroup.nodetag
     
     def getRequiredOptionsByAttribute(self, attr):
-        return self.attribute2options.get(attr)
+        return self.attribute2options.get(attr, super(IPETFilterGroup, self).getRequiredOptionsByAttribute(attr))
 
     def addFilter(self, filter_):
         '''
@@ -331,6 +346,10 @@ class IPETFilterGroup(Editable, IpetNode):
     def getName(self):
         return self.name
 
+    def getActiveFilters(self):
+        return [f for f in self.filters if f.isActive()]
+
+
     def filterDataFrame(self, df):
         '''
         filters a data frame object as the intersection of all instances that match the criteria defined by the filters
@@ -344,11 +363,13 @@ class IPETFilterGroup(Editable, IpetNode):
         elif self.filtertype == "union":
             intersectionfunction = lambda x:len(x) >= 1
 
+        activefilters = self.getActiveFilters()
+
         # return a filtered data frame as intersection of all instances that match all filter criteria and appear in every test run
-        return groups.filter(lambda x:intersectionfunction(x) and np.all([filter_.filterDataFrame(x) for filter_ in self.filters]))
+        return groups.filter(lambda x:intersectionfunction(x) and np.all([filter_.filterDataFrame(x) for filter_ in activefilters]))
 
     def filterProblem(self, probname, testruns=[]):
-        for filter_ in self.filters:
+        for filter_ in self.getActiveFilters():
             if not filter_.filterProblem(probname, testruns):
                 return False
 
@@ -363,11 +384,7 @@ class IPETFilterGroup(Editable, IpetNode):
 
 
     def toXMLElem(self):
-        myattributes = {'name':self.name}
-        if self.filtertype != "intersection":
-            myattributes.update({'filtertype':self.filtertype})
-
-        me = ElementTree.Element('FilterGroup', myattributes)
+        me = ElementTree.Element('FilterGroup', self.attributesToStringDict())
 
         for filter_ in self.filters:
             me.append(filter_.toXMLElem())

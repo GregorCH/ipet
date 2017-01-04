@@ -14,7 +14,6 @@ from ipet.parsing.StatisticReader_CustomReader import CustomReader
 import os
 import re
 from ipet.concepts.Manager import Manager
-from ipet.concepts.IPETMessageStream import Message
 import xml.etree.ElementTree as ElementTree
 from .StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
     GapReader, SolvingTimeReader, TimeLimitReader, \
@@ -28,10 +27,10 @@ from .StatisticReader_VariableReader import VariableReader
 from .StatisticReader_SoluFileReader import SoluFileReader
 from .TraceFileReader import TraceFileReader
 import logging
-from ipet.concepts import IpetNode, Editable
+from ipet.concepts.IPETNode import IpetNode
 
 
-class ReaderManager(Manager, IpetNode, Editable):
+class ReaderManager(Manager, IpetNode):
     """
     acquires test run data. subclasses of manager, managing readers by their unique name
     """
@@ -84,6 +83,8 @@ class ReaderManager(Manager, IpetNode, Editable):
         problemendexpression : an expression that signals the end of an instance in a log file context
         '''
         Manager.__init__(self)
+        # an ipet Node is always active
+        IpetNode.__init__(self, True)
         self.problemexpression = problemexpression
         self.problemendexpression = problemendexpression
 

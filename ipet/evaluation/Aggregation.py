@@ -11,13 +11,12 @@ please refer to README.md for how to cite IPET.
 '''
 import numpy
 from ipet.misc import misc
-from ipet.concepts import Editable
 from xml.etree import ElementTree
 from _functools import partial
 from ipet.misc.quick_Pandas import getWilcoxonQuotientSignificance as qWilcox
 from ipet.concepts import IpetNode
 
-class Aggregation(Editable, IpetNode):
+class Aggregation(IpetNode):
     '''
     aggregates a list of values into a single value, as, e.g., a mean. Allows functions from numpy and
     from misc-module
@@ -40,6 +39,8 @@ class Aggregation(Editable, IpetNode):
         
         kw : eventually, other options that will be passed to the call of the aggregation function
         '''
+        # we make aggregations always active
+        super(Aggregation, self).__init__(True)
         self.name = name
         self.editableattributes = ['name', 'aggregation']
         self.set_aggregation(None)

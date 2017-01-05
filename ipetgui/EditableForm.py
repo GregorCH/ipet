@@ -77,18 +77,22 @@ class EditableForm(QWidget):
         
     def reactOnUserInput(self):
 
-        for key in self.editable.getEditableAttributes():
+        changed = False
+        for key, oldval in self.editable.attributesToDict().items():
             container = self.key2Container[key]
             val = self.convertWidgetValueToValue(container.getWidgetValue())
-            self.editable.editAttribute(key, val)
-        
-        self.emit(SIGNAL(EditableForm.USERINPUT_SIGNAL))
+            if val != oldval:
+                self.editable.editAttribute(key, val)
+                changed = True
+
+        if changed:
+            self.emit(SIGNAL(EditableForm.USERINPUT_SIGNAL))
 
     def convertToText(self, value):
         if value is None:
             return ""
         return str(value)
-        
+
     def convertWidgetValueToValue(self, val):
         if type(val) is bool:
             return val

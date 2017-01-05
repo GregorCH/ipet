@@ -123,7 +123,7 @@ class Aggregation(IpetNode):
             return Aggregation(**additional)
 
     def toXMLElem(self):
-        attributes = {att:str(self.__dict__[att]) for att in self.editableattributes}
+        attributes = self.attributesToStringDict()
         me = ElementTree.Element(Aggregation.getNodeTag(), attributes)
             
         return me

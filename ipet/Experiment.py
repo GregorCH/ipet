@@ -15,10 +15,7 @@ from ipet import misc
 import pandas
 from ipet.parsing import SolvingTimeReader
 
-try:
-    import pickle as pickle
-except:
-    import pickle
+import pickle
 from ipet.concepts.Manager import Manager
 
 from ipet.parsing import PrimalBoundReader, DualBoundReader, ErrorFileReader, \

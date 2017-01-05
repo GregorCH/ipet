@@ -11,7 +11,7 @@ please refer to README.md for how to cite IPET.
 '''
 import xml.etree.ElementTree as ElementTree
 import numpy as np
-from ipet.concepts import IpetNode
+from ipet.concepts import IpetNode, IpetNodeAttributeError
 import logging
 
 class IPETInstance(IpetNode):
@@ -32,7 +32,8 @@ class IPETInstance(IpetNode):
         
     def checkAttributes(self):
         if self.name is None:
-            raise ValueError("Error: An instance needs a name")
+            raise IpetNodeAttributeError("name", "No name specified")
+        return True
         
     def getEditableAttributes(self):
         return ["name"] + super(IPETInstance, self).getEditableAttributes()
@@ -129,7 +130,8 @@ class IPETFilter(IpetNode):
         
     def checkAttributes(self):
         if self.operator in self.instanceoperators and self.instances == []:
-            raise ValueError("Error: Trying to initialize a filter with operator 'contains' but no 'instances'")
+            raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty instance set".format(self.operator))
+        return True
         
         
     @staticmethod

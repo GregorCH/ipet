@@ -10,8 +10,8 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 '''
-from .Editable import Editable
-from .IPETNode import IpetNode
+from .Editable import Editable, EditableAttributeError
+from .IPETNode import IpetNode, IpetNodeAttributeError
 from .Manager import Manager
 from .Observer import Observable
 from .IPETMessageStream import Message

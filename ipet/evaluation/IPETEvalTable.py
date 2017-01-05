@@ -14,7 +14,7 @@ from ipet.evaluation import Aggregation
 import xml.etree.ElementTree as ElementTree
 from .IPETFilter import IPETFilterGroup
 import numpy
-from ipet.concepts.IPETNode import IpetNode
+from ipet.concepts.IPETNode import IpetNode, IpetNodeAttributeError
 from ipet.misc import misc
 import logging
 
@@ -103,13 +103,14 @@ class IPETEvaluationColumn(IpetNode):
 
     def checkAttributes(self):
         if self.origcolname is None and self.regex is None and self.transformfunc is None and self.constant is None:
-            raise AttributeError("Error constructing this column: No origcolname, regex, constant, or transformfunction specified")
+            raise IpetNodeAttributeError("origcolname", "No origcolname, regex, constant, or transformfunction specified")
         if self.transformfunc is not None:
             if self.transformfunc not in self.possibletransformations:
-                raise AttributeError("Error: Column <%s> specified unknown transformation <%s>" % (self.getName(), self.transformfunc))
+                raise IpetNodeAttributeError("transformfunc", "Unknown transformation <%s>" % (self.transformfunc))
             minval, maxval = self.possibletransformations[self.transformfunc]
             if len(self.children) < minval or maxval != -1 and len(self.children) > maxval:
-                raise AttributeError("Error: Column <%s> specifies wrong number of children for transformation <%s>" % (self.getName(), self.transformfunc))
+                raise IpetNodeAttributeError("transformfunc", "wrong number of children for transformation <%s>" % (self.transformfunc))
+        return True
 
     def addChild(self, child):
         if not self.acceptsAsChild(child):

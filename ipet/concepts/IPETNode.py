@@ -9,7 +9,7 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 '''
-from ipet.concepts.Editable import Editable
+from ipet.concepts.Editable import Editable, EditableAttributeError
 
 class IpetNode(Editable):
     '''
@@ -73,4 +73,17 @@ class IpetNode(Editable):
     @staticmethod
     def getNodeTag():
         return "Node"
+
+class IpetNodeAttributeError(EditableAttributeError):
+    '''
+    subclass to allow for richer EditableAttributeErrors
+    '''
+
+    def __init__(self, *args):
+        '''
+        constructs an IpetNodeAttributeError
+        '''
+        super(IpetNodeAttributeError, self).__init__(*args)
+
+
         

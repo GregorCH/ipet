@@ -20,6 +20,7 @@ from ipet.evaluation import IPETFilterGroup, IPETInstance
 from ipet.evaluation import IPETFilter
 from PyQt4 import QtCore
 import os.path as osp
+from ipet.concepts.IPETNode import IpetNodeAttributeError
 class IpetTreeViewItem(QTreeWidgetItem):
 
     def __init__(self, ipetnode, parent = None):
@@ -35,10 +36,15 @@ class IpetTreeViewItem(QTreeWidgetItem):
             if role == QtCore.Qt.DisplayRole:
                 return self.ipetnode.getName()
             elif role == QtCore.Qt.ForegroundRole:
-                if self.ipetnode.isActive():
-                    return QColor(0, 0, 0)
-                else:
-                    return QColor(128, 128, 128)
+                try:
+                    self.ipetnode.checkAttributes()
+                    if self.ipetnode.isActive():
+                        return QColor(0, 0, 0)
+                    else:
+                        return QColor(128, 128, 128)
+                except IpetNodeAttributeError as e:
+                    self.setStatusTip(0, e.getMessage())
+                    return QColor(255, 0, 0)
             elif role == QtCore.Qt.DecorationRole:
                 return self.myIcon
 
@@ -66,20 +72,16 @@ class IpetTreeView(QTreeWidget):
         self.setAlternatingRowColors(True)
         self.setEditTriggers(QTreeWidget.NoEditTriggers)
         self.setSelectionMode(QTreeWidget.SingleSelection)
-        self.items = []
+        self.editable2item = {}
     
     def updateSelectedItem(self):
-        if len(self.selectedItems()) == 0:
-            return
-            
-        item = self.selectedItems()[0]
-#         item.setText(0, self.itemGetEditable(item).getName())
-        
+        pass
+
     def populateTree(self, editable):
         self.clear()
         self.setColumnCount(1)
         self.setItemsExpandable(True)
-        self.createAndAddItem(editable)
+        self.createAndAddItem(editable, parent = self)
     
     def bindItemIcon(self, item, editable):
         filename = self.icons.get(editable.__class__)
@@ -124,22 +126,22 @@ class IpetTreeView(QTreeWidget):
 
     def setSelectedEditable(self, editable):
         self.setItemSelected(self.currentItem(), False)
-        for item in self.items:
-            if editable == item.getIpetNode():
-                #we need to set both the selected and the current item
-                self.setItemSelected(item, True)
-                self.setCurrentItem(item)
-                assert self.currentItem() == item
-                self.emit(SIGNAL("itemSelectionChanged()"))
-                self.updateSelectedItem()
-                return
+        item = self.editable2item[editable]
+        if editable.equals(item.getIpetNode()):
+            # we need to set both the selected and the current item
+            self.setItemSelected(item, True)
+            self.setCurrentItem(item)
+            assert self.currentItem() == item
+            self.emit(SIGNAL("itemSelectionChanged()"))
+            self.updateSelectedItem()
+            return
         
         
     def createAndAddItem(self, editable, parent=None):
         if parent is None:
             parent = self
         me = IpetTreeViewItem(editable, parent)
-        self.items.append(me)
+        self.editable2item[editable] = me
         self.bindItemIcon(me, editable)
         try:
             if editable.getChildren() is not None:

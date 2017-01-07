@@ -14,6 +14,7 @@ import os
 import json
 import re
 import numpy
+import shutil
 from pandas.util.testing import assert_frame_equal
 
 from ipet.Experiment import Experiment
@@ -23,6 +24,7 @@ from ipet.parsing import ReaderManager
 
 
 DATADIR = os.path.join(os.path.dirname(__file__), "data")
+TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")
 
 
 class ExperimentTest(unittest.TestCase):
@@ -37,8 +39,12 @@ class ExperimentTest(unittest.TestCase):
     ]
 
     def setUp(self):
+        os.mkdir(TMPDIR)
         self.experiment = Experiment()
 
+    def tearDown(self):
+        shutil.rmtree(TMPDIR)
+        
     def test_datacollection(self):
         fname = "check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"
         out_file = os.path.join(DATADIR, fname)
@@ -47,7 +53,7 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
 
-        df = self.experiment.testrunmanager.getManageables()[0].data
+        df = self.experiment.getTestRuns()[0].getData()
         for index, column, value in self.datasamples:
             entry = df.loc[index, column]
             msg = "Wrong value parsed for instance %s in column %s: should be %s, have %s" % \
@@ -62,9 +68,10 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
 
-        data = json.loads(self.experiment.testrunmanager.getManageables()[0].data.to_json())
+        
+        data = self.experiment.getTestRuns()[0].getData()
         # ensure that the correct number of instances are properly parsed
-        self.assertEqual(len(data["Nodes"].keys()), 408)
+        self.assertEqual(len(data), 408)
 
     def test_saveAndLoad(self):
         fname = "check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"
@@ -73,20 +80,18 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addOutputFile(out_file)
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
-        save_file = os.path.join(DATADIR, ".testcomp.cmp")
+        save_file = os.path.join(TMPDIR, ".testcomp.cmp")
         self.experiment.saveToFile(save_file)
         Experiment.loadFromFile(save_file)
 
-        tr = self.experiment.testrunmanager.getManageables()[0]
+        tr = self.experiment.getTestRuns()[0]
         trn_file = os.path.join(DATADIR, ".testrun.trn")
         tr.saveToFile(trn_file)
         tr2 = TestRun.loadFromFile(trn_file)
-        msg = "Columns are not equal"
-        self.assertTrue(numpy.all(tr.data.columns.sort_values() == tr2.data.columns.sort_values()),
-                        msg)
+
         columns = ['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
         msg = "Testruns do not have exactly same column data:"
-        self.assertIsNone(assert_frame_equal(tr.data[columns], tr2.data[columns]), msg)
+        self.assertIsNone(assert_frame_equal(tr.getData()[columns], tr2.getData()[columns]), msg)
 
     def test_problemNameRecognition(self):
         rm = ReaderManager()

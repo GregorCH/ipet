@@ -548,7 +548,7 @@ class IPETEvaluation(IpetNode):
         df['_time_'] = (df.Status.isin(('better', 'timelimit')))
         df['_limit_'] = ((df['_time_']) | df.Status.isin(['nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
         df['_fail_'] = (df.Status.apply(lambda x: True if x.startswith("fail") else False))
-        df['_abort_'] = (df.Status == 'fail (abort)')
+        df['_abort_'] = (df.Status == 'fail_abort')
 
         df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_'])
 

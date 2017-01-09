@@ -40,7 +40,10 @@ class ExperimentTest(unittest.TestCase):
     ]
 
     def setUp(self):
-        os.mkdir(TMPDIR)
+        try:
+            os.mkdir(TMPDIR)
+        except FileExistsError:
+            pass
         self.experiment = Experiment()
 
     def tearDown(self):

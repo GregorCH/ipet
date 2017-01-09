@@ -33,10 +33,19 @@ import logging
 
 class Experiment:
     '''
-    manages the collection of all log (.out) and .solu file data
-
+    an Experiment represents a collection of TestRun objects and the routines for parsing
     '''
-
+    
+    Status_Ok = 'ok'
+    Status_Fail = "fail"
+    Status_FailAbort = "fail_abort"
+    Status_FailSolInfeasible = "fail_solution_infeasible"
+    Status_FailDualBound = "fail_dual_bound"
+    Status_FailObjectiveValue = "fail_objective_value"
+    Status_FailSolOnInfeasibleInstance = "fail_solution_on_infeasible_instance"
+    Status_Unknown = "unknown"
+    Status_Better = "better"
+    Status_SolvedNotVerified = "solved_not_verified"
     datakey_gap = 'SoluFileGap'
 
     def __init__(self, files=[], listofreaders=[]):
@@ -46,9 +55,6 @@ class Experiment:
 
         self.readermanager = ReaderManager()
         self.readermanager.registerDefaultReaders()
-        #self.filtermanager = Manager()
-        #self.installSomeFilters()
-        self.installAggregations()
         self.solufiles = []
         self.externaldata = None
         self.basename2testrun = {}
@@ -361,27 +367,6 @@ class Experiment:
                     faildict.setdefault(testrun.getIdentification(), []).append(probname)
         return faildict
 
-    def installSomeFilters(self):
-        filter1 = IPETFilter('Nodes', '1', 'ge')
-        filter2 = IPETFilter('Status', 'ok', 'eq')
-        filter3 = IPETFilter('SolvingTime', '0.0', 'ge')
-        for filters in [filter1, filter2, filter3]:
-            self.filtermanager.addAndActivate(filters)
-
-    def installAggregations(self):
-        '''
-        populate the aggregation manager of this Experiment instance
-
-        Aggregations map numeric vectors to single numbers.
-        '''
-        self.aggregationmanager = Manager()
-        for aggstring in ['min', 'max', 'mean', 'size']:
-            self.aggregationmanager.addAndActivate(Aggregation(aggstring))
-        for shift in [10.0, 100.0, 1000.0]:
-            agg = Aggregation('shmean', shiftby=shift)
-            agg.set_name("shifted geom. (%d)"%shift)
-            self.aggregationmanager.addAndActivate(agg)
-
     def isPrimalBoundBetter(self, testrun, probname):
         """
         returns True if the primal bound for the given problem exceeds the best known solution value
@@ -439,7 +424,7 @@ class Experiment:
 
         # the run failed because the primal or dual bound were better than the known optimal solution value
         if solfound and (self.isPrimalBoundBetter(testrun, probname) or self.isDualBoundBetter(testrun, probname)):
-            testrun.addData(probname, 'Status', "fail_objective_value")
+            testrun.addData(probname, 'Status', self.Status_FailObjectiveValue)
 
         # the run finished correctly if an objective limit was given and the solver reported infeasibility
         elif not solfound and objlimitreached:
@@ -448,18 +433,18 @@ class Experiment:
 
             if (objsense == ObjsenseReader.minimize and optval - objlimit >= -reltol) or \
                   (objsense == ObjsenseReader.maximize and objlimit - optval >= -reltol):
-                testrun.addData(probname, 'Status', "ok")
+                testrun.addData(probname, 'Status', self.Status_Ok)
             else:
-                testrun.addData(probname, 'Status', "fail_objective_value")
+                testrun.addData(probname, 'Status', self.Status_FailObjectiveValue)
         # the solver reached a limit
         elif limitreached:
             testrun.addData(probname, 'Status', limitreached.lower())
 
         # the solver reached
         elif (db is None or misc.getGap(pb, db) < 1e-4) and not self.isPrimalBoundBetter(testrun, probname):
-            testrun.addData(probname, 'Status', "ok")
+            testrun.addData(probname, 'Status', self.Status_Ok)
         else:
-            testrun.addData(probname, 'Status', "fail")
+            testrun.addData(probname, 'Status', self.Status_Fail)
 
     def determineStatusForBestProblem(self, testrun, probname):
         """
@@ -471,19 +456,19 @@ class Experiment:
 
         # we failed because dual bound is higher than the known value of a primal bound
         if self.isDualBoundBetter(testrun, probname):
-            testrun.addData(probname, 'Status', "fail_dual_bound")
+            testrun.addData(probname, 'Status', self.Status_FailDualBound)
 
         # solving reached a limit
         elif limitreached:
             testrun.addData(probname, 'Status', limitreached.lower())
             if self.isPrimalBoundBetter(testrun, probname):
-                testrun.addData(probname, 'Status', "better")
+                testrun.addData(probname, 'Status', self.Status_Better)
 
         # primal and dual bound converged
         elif misc.getGap(pb, db) < 1e-4:
-            testrun.addData(probname, 'Status', "solved_not_verified")
+            testrun.addData(probname, 'Status', self.Status_SolvedNotVerified)
         else:
-            testrun.addData(probname, 'Status', "fail")
+            testrun.addData(probname, 'Status', self.Status_Fail)
 
     def determineStatusForUnknProblem(self, testrun, probname):
         """
@@ -497,11 +482,11 @@ class Experiment:
             testrun.addData(probname, 'Status', limitreached.lower())
 
             if pb is not None:
-                testrun.addData(probname, 'Status', "better")
+                testrun.addData(probname, 'Status', self.Status_Better)
         elif misc.getGap(pb, db) < 1e-4:
-            testrun.addData(probname, 'Status', "solved_not_verified")
+            testrun.addData(probname, 'Status', self.Status_SolvedNotVerified)
         else:
-            testrun.addData(probname, 'Status', "unknown")
+            testrun.addData(probname, 'Status', self.Status_Unknown)
 
     def determineStatusForInfProblem(self, testrun, probname):
         """
@@ -516,10 +501,10 @@ class Experiment:
             if limitreached in ['TimeLimit', 'MemoryLimit', 'NodeLimit']:
                 testrun.addData(probname, 'Status', limitreached.lower())
             else:
-                testrun.addData(probname, 'Status', "ok")
+                testrun.addData(probname, 'Status', self.Status_Ok)
         # a solution was found, that's not good
         else:
-            testrun.addData(probname, 'Status', "fail_solution_on_infeasible_instance")
+            testrun.addData(probname, 'Status', self.Status_FailSolOnInfeasibleInstance)
 
 
     def checkProblemStatus(self):
@@ -536,11 +521,11 @@ class Experiment:
 
                 # an error code means that the instance aborted
                 if errcode is not None or testrun.problemGetData(probname, SolvingTimeReader.datakey) is None:
-                    testrun.addData(probname, 'Status', "fail_abort")
+                    testrun.addData(probname, 'Status', self.Status_FailAbort)
 
                 # if the best solution was not feasible in the original problem, it's a fail
                 elif testrun.problemGetData(probname, BestSolInfeasibleReader.datakey) == True:
-                    testrun.addData(probname, 'Status', "fail_solution_infeasible")
+                    testrun.addData(probname, 'Status', self.Status_FailSolInfeasible)
 
                 # go through the possible solution statuses and determine the Status of the run accordingly
                 elif solustatus == 'opt':

@@ -574,7 +574,6 @@ class Experiment:
         pickle.dump(self, f, protocol=2)
 
         f.close()
-        print("Experiment saved to file", filename)
 
     @staticmethod
     def loadFromFile(filename):

@@ -13,7 +13,6 @@ please refer to README.md for how to cite IPET.
 import re
 from ipet.concepts.Editable import Editable
 from ipet.misc import misc
-import datetime
 from ipet.concepts.IPETMessageStream import Message, processMessage
 import logging
 
@@ -229,7 +228,7 @@ class DateTimeReader(StatisticReader):
             matched = exp.match(line)
             if matched:
                 timestamp = int(matched.groups()[0])
-                time = datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                time = misc.convertTimeStamp(timestamp)
                 self.addData(key, time)
                 break
 

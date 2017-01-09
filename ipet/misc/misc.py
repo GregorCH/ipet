@@ -13,6 +13,8 @@ from math import *
 from xml.dom.minidom import parseString
 import xml.etree.ElementTree as ElementTree
 import numpy as np
+import datetime
+
 '''
    Various methods for evaluation such as gap calculation, geometric means etc. and some printing methods
 '''
@@ -163,4 +165,8 @@ def saveAsXML(nodeobject, filename):
     with open(filename, 'w') as thefile:
         thefile.write(dom.toprettyxml())
 
-
+def convertTimeStamp(timestamp):
+    '''
+    converts a time stamp (int or float) into a readable string format
+    '''
+    datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")

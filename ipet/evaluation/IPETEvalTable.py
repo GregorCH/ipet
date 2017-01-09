@@ -234,7 +234,7 @@ class IPETEvaluationColumn(IpetNode):
             return 1
 
     def attributesToStringDict(self):
-        return {k:str(v) for k, v in self.attributesToDict() if v is not None}
+        return {k:str(v) for k, v in self.attributesToDict().items() if v is not None}
 
     def toXMLElem(self):
         '''

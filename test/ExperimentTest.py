@@ -21,6 +21,7 @@ from ipet.Experiment import Experiment
 from ipet.TestRun import TestRun
 from ipet.parsing import ListReader
 from ipet.parsing import ReaderManager
+from ipet.misc import convertTimeStamp
 
 
 DATADIR = os.path.join(os.path.dirname(__file__), "data")
@@ -29,9 +30,9 @@ TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")
 
 class ExperimentTest(unittest.TestCase):
     datasamples = [
-        ("meanvarx", 'Datetime_Start', "2014-08-01 16:57:10"),
+        ("meanvarx", 'Datetime_Start', convertTimeStamp(1406905030)),
         ("lseu", 'Settings', 'testmode'),
-        ("misc03", "Datetime_End", "2014-08-01 16:56:37"),
+        ("misc03", "Datetime_End", convertTimeStamp(1406904997)),
         ("findRoot", "Nodes", 8),
         ("linking", "LineNumbers_BeginLogFile", 4),
         ("j301_2", "LineNumbers_BeginLogFile", 276),

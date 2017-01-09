@@ -28,7 +28,10 @@ class EvaluationTest(unittest.TestCase):
 
 
     def setUp(self):
-        os.mkdir(TMPDIR)
+        try:
+            os.mkdir(TMPDIR)
+        except FileExistsError:
+            pass
 
     def tearDown(self):
         shutil.rmtree(TMPDIR)

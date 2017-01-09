@@ -22,8 +22,6 @@ from ipet.parsing import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
     BestSolInfeasibleReader, LimitReachedReader, ObjlimitReader, \
     ObjsenseReader
 
-from ipet.evaluation import IPETFilter
-from ipet.evaluation.Aggregation import Aggregation
 from ipet.misc.integrals import calcIntegralValue, getProcessPlotData
 from pandas import Panel
 import pandas as pd
@@ -37,16 +35,44 @@ class Experiment:
     '''
     
     Status_Ok = 'ok'
-    Status_Fail = "fail"
-    Status_FailAbort = "fail_abort"
-    Status_FailSolInfeasible = "fail_solution_infeasible"
+    Status_SolvedNotVerified = "solved_not_verified"
+    Status_Better = "better"
+    Status_Unknown = "unknown"
     Status_FailDualBound = "fail_dual_bound"
     Status_FailObjectiveValue = "fail_objective_value"
+    Status_FailSolInfeasible = "fail_solution_infeasible"
     Status_FailSolOnInfeasibleInstance = "fail_solution_on_infeasible_instance"
-    Status_Unknown = "unknown"
-    Status_Better = "better"
-    Status_SolvedNotVerified = "solved_not_verified"
+    Status_Fail = "fail"
+    Status_FailAbort = "fail_abort"
     datakey_gap = 'SoluFileGap'
+    
+    
+    _status2Priority = {Status_Ok : 1000,
+                        Status_SolvedNotVerified : 500,
+                        Status_Better : 250,
+                        Status_Unknown : 100,
+                        Status_FailDualBound : -250,
+                        Status_FailObjectiveValue : -500,
+                        Status_FailSolInfeasible : -1000,
+                        Status_FailSolOnInfeasibleInstance : -2000,
+                        Status_Fail : -3000,
+                        Status_FailAbort : -10000}
+    
+    
+    @staticmethod
+    def getBestStatus(*args):
+        '''
+        returns the best status among a list of status codes given as args
+        '''
+        return max(*args, key = lambda x : Experiment._status2Priority.get(x, 0))
+    
+    @staticmethod
+    def getWorstStatus(*args):
+        '''
+        return the worst status among a list of status codes
+        '''
+        return min(*args, key = lambda x : Experiment._status2Priority.get(x, 0)) 
+                        
 
     def __init__(self, files=[], listofreaders=[]):
         self.testrunmanager = Manager()

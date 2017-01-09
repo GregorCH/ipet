@@ -186,6 +186,19 @@ class ExperimentTest(unittest.TestCase):
                   (repr(values[key]), key, repr(val))
             self.assertEqual(val, values[key], msg)
 
+    def testStatusComparisons(self):
+        goodStatusList = [Experiment.Status_Ok, Experiment.Status_Better, Experiment.Status_SolvedNotVerified]
+        badStatusList = [Experiment.Status_FailAbort, Experiment.Status_FailObjectiveValue, Experiment.Status_Fail]
+        
+        msg = "Returned status {0} is not the expected {1}"
+        for status, expected in [(Experiment.getBestStatus(goodStatusList + badStatusList), Experiment.Status_Ok),
+                     (Experiment.getBestStatus(*(goodStatusList + badStatusList)), Experiment.Status_Ok),
+                     (Experiment.getWorstStatus(goodStatusList + badStatusList), Experiment.Status_FailAbort),
+                     (Experiment.getBestStatus(badStatusList + ["dummy"]), "dummy"),
+                     (Experiment.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
+            self.assertEqual(status, expected, msg.format(status, expected)) 
+            
+        
 
 def collect_settings(path):
     '''

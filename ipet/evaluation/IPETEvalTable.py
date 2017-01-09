@@ -17,6 +17,7 @@ import numpy
 from ipet.concepts.IPETNode import IpetNode, IpetNodeAttributeError
 from ipet.misc import misc
 import logging
+from ipet import Experiment
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -40,7 +41,10 @@ class IPETEvaluationColumn(IpetNode):
                                "median":(1, -1),
                                "std":(1, -1),
                                "min":(1, -1),
-                               "max":(1, -1)}
+                               "max":(1, -1),
+                               "getBestStatus" : (1, -1),
+                               "getWorstStatus" : (1, -1)}
+    
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 
     requiredOptions = {"comp":possiblecomparisons,
@@ -262,6 +266,17 @@ class IPETEvaluationColumn(IpetNode):
                 elif child.tag == IPETEvaluationColumn.getNodeTag():
                     column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column
+        
+    def getTransformationFunction(self):
+        '''
+        tries to find the transformation function from the numpy, misc, or Experiment modules
+        '''
+        for module in [numpy, misc, Experiment]:
+            try:
+                return getattr(module, self.transformfunc)
+            except AttributeError:
+                pass
+        raise IpetNodeAttributeError(self.transformfunc, "Unknown transformation function %s" % self.transformfunc)
 
     def getColumnData(self, df):
         '''
@@ -290,10 +305,7 @@ class IPETEvaluationColumn(IpetNode):
         else:
             # try to apply an element-wise transformation function to the children of this column
             # gettattr is equivalent to numpy.__dict__[self.transformfunc]
-            try:
-                transformfunc = getattr(numpy, self.transformfunc)
-            except AttributeError:
-                transformfunc = getattr(misc, self.transformfunc)
+            transformfunc = self.getTransformationFunction()
 
             # concatenate the children data into a new data frame object
             argdf = pd.concat([child.getColumnData(df) for child in self.children], axis = 1)

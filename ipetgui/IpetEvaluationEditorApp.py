@@ -40,7 +40,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
         Constructor
         '''
         super(EvaluationEditorWindow, self).__init__(parent)
-        
+
         self.browser = EditableBrowser(self)
         self.evaluation = None
         self.filename = None
@@ -57,46 +57,46 @@ class EvaluationEditorWindow(IPETApplicationTab):
         tabwidget.addTab(self.aggtableview, ("Aggregated"))
         vlayout.addWidget(tabwidget)
         self.setLayout(vlayout)
-        
+
 
         self.defineActions()
         self.initConnections()
         self.passGroupToTableViews()
-        
+
     def initConnections(self):
         self.connect(self.browser, SIGNAL(EditableBrowser.ITEMEVENT), self.itemChanged)
 
     def setEvaluation(self, evaluation):
         self.browser.setRootElement(evaluation)
         self.evaluation = evaluation
-        
+
     def defineActions(self):
-        
+
         self.loadaction = self.createAction("&Load", self.loadEvaluation, QKeySequence.Open, icon = "Load-icon",
                                        tip="Load evaluation from XML file (current evaluation gets discarded)")
         self.saveaction = self.createAction("&Save", self.saveEvaluation, QKeySequence.Save, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
         self.saveasaction = self.createAction("&Save as", self.saveEvaluationAs, QKeySequence.SaveAs, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
-        self.addcolaction = self.createAction("Add &Column", self.addColumn, "Alt+C", icon="Letter-C-violet-icon", 
+        self.addcolaction = self.createAction("Add &Column", self.addColumn, "Alt+C", icon="Letter-C-violet-icon",
                                          tip="Add new column as a child of the currently selected element")
-        self.addfiltergroupaction = self.createAction("Add Filter &Group", self.addFilterGroup, "Alt+G", icon="Letter-G-gold-icon", 
+        self.addfiltergroupaction = self.createAction("Add Filter &Group", self.addFilterGroup, "Alt+G", icon="Letter-G-gold-icon",
                                          tip="Add new filter group as a child of the current evaluation")
-        self.addfilteraction = self.createAction("Add &Filter", self.addFilter, "Alt+H", icon="Letter-F-lg-icon", 
+        self.addfilteraction = self.createAction("Add &Filter", self.addFilter, "Alt+H", icon="Letter-F-lg-icon",
                                             tip="Add filter as a child of the current filter group")
-        self.addaggregationaction = self.createAction("Add &Aggregation", self.addAggregation, "Alt+A", icon="Letter-A-dg-icon", 
+        self.addaggregationaction = self.createAction("Add &Aggregation", self.addAggregation, "Alt+A", icon="Letter-A-dg-icon",
                                             tip="Add aggregation as a child for the current top level column")
-        self.addinstancenaction = self.createAction("Add &Instance", self.addInstance, "Alt+I", icon="Letter-I-blue-icon", 
+        self.addinstancenaction = self.createAction("Add &Instance", self.addInstance, "Alt+I", icon="Letter-I-blue-icon",
                                             tip="Add instance as child of the current filter")
-        
+
         self.deletelementaction = self.createAction("&Delete Element", self.browser.deleteElement, QKeySequence.Delete, "delete-icon",
                                                tip="Delete currently selected element")
-        self.reevaluateaction = self.createAction("Reevaluate", self.reevaluate, "F5", icon="reevaluate-icon", 
+        self.reevaluateaction = self.createAction("Reevaluate", self.reevaluate, "F5", icon="reevaluate-icon",
                                         tip="Reevaluate the current evaluation on the _experiment")
 
     def getMenuActions(self):
         return (("&File", [self.loadaction, self.saveaction, self.saveasaction]),("&Data", [self.reevaluateaction]))
-    
+
     def getToolBarActions(self):
         return (("File", [self.saveaction, self.loadaction]),
                 ("Evaluation", [self.addcolaction,
@@ -112,10 +112,10 @@ class EvaluationEditorWindow(IPETApplicationTab):
     def addColumn(self):
         self.updateStatus("Add column")
         self.addedcolumns += 1
-        newcolname = "New Column %d"%self.addedcolumns 
+        newcolname = "New Column %d"%self.addedcolumns
         newcol = IPETEvaluationColumn(name=newcolname)
         self.browser.addNewElementAsChildOfSelectedElement(newcol)
-        
+
     def addFilterGroup(self):
         self.updateStatus("Add filter group")
         self.addedfiltergroups += 1
@@ -123,8 +123,8 @@ class EvaluationEditorWindow(IPETApplicationTab):
         newfiltergroup = IPETFilterGroup(newfiltergroupname)
 
         self.browser.addNewElementAsChildOfSelectedElement(newfiltergroup)
-        
-    
+
+
     def addFilter(self):
         self.updateStatus("Add filter")
         self.addedfilters += 1
@@ -146,9 +146,9 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.addedinstances += 1
         newinstancename = "new Instance %d"%self.addedinstances
         newinstance = IPETInstance(newinstancename)
-        
+
         self.browser.addNewElementAsChildOfSelectedElement(newinstance)
-        
+
     def loadEvaluation(self):
         thedir = str(".")
         filename = str(QFileDialog.getOpenFileName(self, caption=("%s - Load an evaluation"%QApplication.applicationName()),
@@ -160,36 +160,36 @@ class EvaluationEditorWindow(IPETApplicationTab):
                 self.setEvaluation(ev)
             except Exception:
                 message = "Error: Could not load evaluation from file %s"%filename
-                
+
             self.updateStatus(message)
-        
+
         pass
-    
+
     def saveEvaluation(self):
         if self.filename is None:
-            filename = str(QFileDialog.getSaveFileName(self, caption=("%s - Load an evaluation"%QApplication.applicationName()),
+            filename = str(QFileDialog.getSaveFileName(self, caption=("%s - Save current evaluation"%QApplication.applicationName()),
                                                            directory = str("."), filter=str("XML files (*.xml)")))
         else:
             filename = self.filename
-        
+
         if not filename:
             return
-        
+
         misc.saveAsXML(self.evaluation, filename)
         self.filename = filename
         self.updateStatus("Saved evaluation to file %s"%filename)
-        
-    
+
+
     def saveEvaluationAs(self):
-        filename = str(QFileDialog.getSaveFileName(self, caption=("%s - Load an evaluation"%QApplication.applicationName()),
+        filename = str(QFileDialog.getSaveFileName(self, caption=("%s - Save current evaluation"%QApplication.applicationName()),
                                                        directory = str("."), filter=str("XML files (*.xml)")))
         if not filename:
             return
-        
+
         misc.saveAsXML(self.evaluation, filename)
         self.filename = filename
         self.updateStatus("Saved evaluation to file %s"%filename)
-        
+
     def enableOrDisableActions(self):
         for action, addclass in zip([self.addcolaction, self.addfiltergroupaction, self.addfilteraction, self.addaggregationaction, self.addinstancenaction],
                                     [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETInstance()]):
@@ -197,7 +197,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
                 action.setEnabled(True)
             else:
                 action.setEnabled(False)
-    
+
     def itemChanged(self):
         self.enableOrDisableActions()
         self.passGroupToTableViews()
@@ -208,17 +208,17 @@ class EvaluationEditorWindow(IPETApplicationTab):
         '''
         self.tableview.setDataFrame(tableviewdf, self.evaluation.getColumnFormatters(tableviewdf))
         self.aggtableview.setDataFrame(aggtableviewdf, self.evaluation.getColumnFormatters(aggtableviewdf))
-                
+
     def passGroupToTableViews(self):
-        
+
         if self.evaluation is None or not self.evaluation.isEvaluated():
             self.updateStatus("Refresh evaluation first to update results")
             return
-        
+
         selectedfiltergroup = None
         if self.browser.treewidget.getSelectedEditable().__class__ is IPETFilterGroup:
             selectedfiltergroup = self.browser.treewidget.getSelectedEditable()
-            
+
         if selectedfiltergroup is not None and selectedfiltergroup.isActive():
             return
 
@@ -229,7 +229,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
             else:
                 self.updateStatus("Display data for all instances")
                 self.setDataFrames(self.evaluation.getInstanceData(), self.evaluation.getAggregatedData())
-                
+
         self.lastfiltergroup = selectedfiltergroup
 
     def reevaluate(self):
@@ -251,13 +251,13 @@ class IpetEvaluationEditorApp(IpetMainWindow):
 
     def setEvaluation(self, evaluation):
         self.evaluationeditorwindow.setEvaluation(evaluation)
-        
+
     def setExperiment(self, _experiment):
         EditableForm.extendAvailableOptions("datakey", _experiment.getDatakeys())
 
-    
+
 if __name__ == "__main__":
-    
+
     app = QApplication(sys.argv)
     app.setApplicationName("Evaluation editor")
     mainwindow = IpetEvaluationEditorApp()
@@ -270,7 +270,7 @@ if __name__ == "__main__":
     mainwindow.evaluationeditorwindow.reevaluate()
     IpetMainWindow.getStatusBar().showMessage("I am a working status bar", 5000)
     mainwindow.show()
-    
+
     sys.exit(app.exec_())
-        
-    
+
+

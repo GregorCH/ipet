@@ -11,6 +11,7 @@ please refer to README.md for how to cite IPET.
 '''
 from .StatisticReader import StatisticReader
 import re
+import logging
 
 class PrimalBoundHistoryReader(StatisticReader):
     name = 'PrimalBoundHistoryReader'
@@ -72,8 +73,11 @@ class PrimalBoundHistoryReader(StatisticReader):
 
                 # in the case of ugscip, we reacted on a disp char, so no problem at all.
                 if PrimalBound != self.lastPrimalBound:
-                    self.lastPrimalBound = PrimalBound
-                    self.listOfPoints.append((float(pointInTime), float(PrimalBound)))
+                    try:
+                        self.listOfPoints.append((float(pointInTime), float(PrimalBound)))
+                        self.lastPrimalBound = PrimalBound
+                    except ValueError:
+                        pass
 
             elif not self.inTable and self.firstsolexp.match(line):
                 matches = self.numericExpression.findall(line)
@@ -97,7 +101,7 @@ class PrimalBoundHistoryReader(StatisticReader):
                 self.listOfPoints.append((float(pointInTime), float(self.gurobiextralist[-1])))
                 self.gurobiextralist = []
             elif self.inTable and line.startswith("H") or line.startswith("*"):
-                self.readBoundAndTime(line, -5, -1, timestripchars="s")
+                self.readBoundAndTime(line, -5, -1, timestripchars = "s")
 
             elif "Cutting planes:" in line and self.inTable:
                 self.inTable = False
@@ -111,16 +115,18 @@ class PrimalBoundHistoryReader(StatisticReader):
 
         elif StatisticReader.solvertype == StatisticReader.SOLVERTYPE_CBC or StatisticReader.solvertype == StatisticReader.SOLVERTYPE_COUENNE:
             if "Integer solution of " in line:
-                self.readBoundAndTime(line, 4, -2, timestripchars="(")
+                self.readBoundAndTime(line, 4, -2, timestripchars = "(")
 
             return None
 
         elif StatisticReader.solvertype == StatisticReader.SOLVERTYPE_XPRESS:
             if "BestSoln" in line:
                 self.xpresscutidx = line.index("BestSoln") + len("BestSoln")
-            elif line.startswith("+") or line.startswith("*"):
-                self.readBoundAndTime(line, -1, -1, cutidx=self.xpresscutidx)
+            elif re.search("^[a-zA-Z*](\d| )", line):
+                print(line)
+                self.readBoundAndTime(line, -1, -1, cutidx = self.xpresscutidx)
             elif line.startswith(" *** Heuristic solution found: "):
+                logging.debug(line)
                 self.readBoundAndTime(line, -4, -2)
 
         elif StatisticReader.solvertype == StatisticReader.SOLVERTYPE_CPLEX:
@@ -152,11 +158,13 @@ class PrimalBoundHistoryReader(StatisticReader):
                     nodeinlineidx = 7
                     while line[nodeinlineidx] != " " and line[nodeinlineidx] != "+":
                         nodeinlineidx += 1
-                    print(line)
                     nnodes = int(line[:nodeinlineidx].split()[-1].strip('*+')) + 1
-                    if line.startswith("*") or line.startswith("+"):
+                    if line.startswith("*"):
                         print(line)
-                        primalbound = float(line.split()[-4])
+                        if '+' in line:
+                            primalbound = float(line.split()[-3])
+                        else:
+                            primalbound = float(line.split()[-4])
                         print(primalbound, nnodes)
                         self.cpxprimals.append((nnodes, primalbound))
                     self.lastnnodes = nnodes
@@ -173,7 +181,7 @@ class PrimalBoundHistoryReader(StatisticReader):
 
         return None
 
-    def readBoundAndTime(self, line, boundidx, timeidx, timestripchars="", cutidx= -1):
+    def readBoundAndTime(self, line, boundidx, timeidx, timestripchars = "", cutidx = -1):
         splitline = line.split()
 
         primalbound = line[:cutidx].split()[boundidx]
@@ -185,6 +193,7 @@ class PrimalBoundHistoryReader(StatisticReader):
 
 
         self.lastPrimalBound = primalbound
+        logging.debug("{0} {1}".format(*(float(pointInTime), float(primalbound))))
         self.listOfPoints.append((float(pointInTime), float(primalbound)))
 
     def processCpxprimals(self, currenttime):
@@ -199,7 +208,7 @@ class PrimalBoundHistoryReader(StatisticReader):
                 if len(self.listOfPoints) > 0:
                     othertime, _ = self.listOfPoints[-1]
                     assert othertime <= estimatedtime
-                    self.listOfPoints.append((float(estimatedtime), float(bound)))
+                self.listOfPoints.append((float(estimatedtime), float(bound)))
 
         self.cpxprimals = []
 
@@ -211,5 +220,5 @@ class PrimalBoundHistoryReader(StatisticReader):
         self.lastPrimalBound = '--'
         PrimalBoundHistoryReader.totalnumberofsols += len(theList)
         # print " solutions added:", PrimalBoundHistoryReader.totalnumberofsols
-        #print self.problemname, theList
+        # print self.problemname, theList
         self.addData(self.datakey, theList)

@@ -14,29 +14,29 @@ from ipet.misc import misc
 import numpy
 
 DEFAULT_HISTORYTOUSE = 'PrimalBoundHistory'
-DEFAULT_XAFTERSOLVEKEY = 'TotalTime_solving'
+DEFAULT_XAFTERSOLVEKEY = 'SolvingTime'
 DEFAULT_XLIMITKEY = 'TimeLimit'
 DEFAULT_CUTOFFGAP = 100
 DEFAULT_BOUNDKEY = 'PrimalBound'
 
-def calcIntegralValue(thedatalist, pwlinear=False):
+def calcIntegralValue(thedatalist, pwlinear = False):
     '''
        calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
-    
+
        Keyword arguments:
        thedatalist -- a list of tuples (x_i,f(x_i)) (sorted by x_i-1 <= x_i)
                       interpreted as step-wise constant function f between the x_i, and 0 outside the range of the x_i
        pwlinear -- optional : should the method treat the function as piece-wise linear (True) or piece-wise constant
                               step-function.
-    
+
     '''
     assert len(thedatalist) >= 2
-    
+
     # unzip the datalist
     times, gaps = list(zip(*thedatalist))
     times = np.array(times)
     gaps = np.array(gaps)
-    
+
     # for piece-wise linear functions, use trapez triangulation
     # note that only n - 1 gaps are used
     if pwlinear:

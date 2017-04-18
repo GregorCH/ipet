@@ -56,7 +56,7 @@ class StatisticReader(Editable):
     sleepAfterReturn = True
     sleep = False
 
-    multipliers = dict(k=1000, M=1e6, G=1e9)
+    multipliers = dict(k = 1000, M = 1e6, G = 1e9)
 
     # the reader might behave differently depending on the solver type, due to the different output
     SOLVERTYPE_SCIP = "SCIP"
@@ -98,7 +98,7 @@ class StatisticReader(Editable):
         else:
             return context in self.context
 
-    def getSplitLineWithRegexp(self, regular_exp, line, index= -1, startofline=False):
+    def getSplitLineWithRegexp(self, regular_exp, line, index = -1, startofline = False):
         if startofline == True and not re.match(regular_exp, line):
             return None
         if startofline == False and not re.search(regular_exp, line):
@@ -157,7 +157,7 @@ class StatisticReader(Editable):
                     data = None
                 except TypeError:
 #                  print self.name, " failed data conversion"
-                    raise TypeError("Type error during data conversion in line <%s>"%line)
+                    raise TypeError("Type error during data conversion in line <%s>" % line)
                 self.addData(self.datakey, data)
         except AttributeError:
 #          print self.name, " has no such attribute"
@@ -250,11 +250,13 @@ class DualBoundReader(StatisticReader):
     dualboundpatterns = {StatisticReader.SOLVERTYPE_SCIP : "^Dual Bound         :",
                          StatisticReader.SOLVERTYPE_GUROBI : '^Best objective',
                          StatisticReader.SOLVERTYPE_CPLEX : '(^Current MIP best bound =|^MIP - Integer optimal)',
-                         StatisticReader.SOLVERTYPE_COUENNE : '^Lower Bound:'}
+                         StatisticReader.SOLVERTYPE_COUENNE : '^Lower Bound:',
+                         StatisticReader.SOLVERTYPE_XPRESS : "Best bound is"}
     dualboundlineindices = {StatisticReader.SOLVERTYPE_SCIP :-1,
                             StatisticReader.SOLVERTYPE_CPLEX : 5,
                             StatisticReader.SOLVERTYPE_GUROBI : 5,
-                            StatisticReader.SOLVERTYPE_COUENNE : 2}
+                            StatisticReader.SOLVERTYPE_COUENNE : 2,
+                            StatisticReader.SOLVERTYPE_XPRESS :-1}
     datakey = 'DualBound'
 
     def extractStatistic(self, line):
@@ -430,11 +432,13 @@ class PrimalBoundReader(StatisticReader):
     primalboundpatterns = {StatisticReader.SOLVERTYPE_SCIP: '^Primal Bound       :',
                            StatisticReader.SOLVERTYPE_CPLEX : '^MIP -.*Objective = ',
                            StatisticReader.SOLVERTYPE_GUROBI : '^Best objective ',
-                           StatisticReader.SOLVERTYPE_COUENNE : "^Upper bound:"}
+                           StatisticReader.SOLVERTYPE_COUENNE : "^Upper bound:",
+                           StatisticReader.SOLVERTYPE_XPRESS : "Best integer solution found is"}
     primalboundlineindices = {StatisticReader.SOLVERTYPE_SCIP: 3,
                               StatisticReader.SOLVERTYPE_CPLEX :-1,
                               StatisticReader.SOLVERTYPE_GUROBI : 2,
-                              StatisticReader.SOLVERTYPE_COUENNE : 2}
+                              StatisticReader.SOLVERTYPE_COUENNE : 2,
+                              StatisticReader.SOLVERTYPE_XPRESS :-1}
     datakey = 'PrimalBound'
 
     def extractStatistic(self, line):
@@ -469,7 +473,7 @@ class SolvingTimeReader(StatisticReader):
        StatisticReader.SOLVERTYPE_CPLEX : "Solution time =",
        StatisticReader.SOLVERTYPE_GUROBI : "Explored ",
        StatisticReader.SOLVERTYPE_CBC : "Coin:Total time \(CPU seconds\):",
-       StatisticReader.SOLVERTYPE_XPRESS : " *** Search ",
+       StatisticReader.SOLVERTYPE_XPRESS : " \*\*\* Search ",
        StatisticReader.SOLVERTYPE_COUENNE : "^Total time:"
     }
 
@@ -478,7 +482,7 @@ class SolvingTimeReader(StatisticReader):
        StatisticReader.SOLVERTYPE_CPLEX : 3,
        StatisticReader.SOLVERTYPE_GUROBI :-2,
        StatisticReader.SOLVERTYPE_CBC : 4,
-       StatisticReader.SOLVERTYPE_XPRESS : 5,
+       StatisticReader.SOLVERTYPE_XPRESS :5,
        StatisticReader.SOLVERTYPE_COUENNE : 2
     }
 
@@ -486,7 +490,8 @@ class SolvingTimeReader(StatisticReader):
 #       print self.solvingtimereadkeys[StatisticReader.solvertype]
         if re.search(self.solvingtimereadkeys[StatisticReader.solvertype], line):
             solvingtime = self.getWordAtIndex(line, self.solvingtimelineindex[StatisticReader.solvertype])
-            solvingtime = solvingtime[:solvingtime.find('s')]
+            solvingtime = solvingtime.rstrip('s')
+            logging.debug(line)
             self.addData(self.datakey, float(solvingtime))
 
 class TimeLimitReader(StatisticReader):
@@ -495,11 +500,11 @@ class TimeLimitReader(StatisticReader):
     '''
     name = 'TimeLimitReader'
     timelimitreadkeys = {
-                   StatisticReader.SOLVERTYPE_SCIP : '(SCIP> limits/time =|SCIP> set limits time)',
-                   StatisticReader.SOLVERTYPE_CPLEX : 'CPLEX> New value for time limit in seconds',
-                   StatisticReader.SOLVERTYPE_GUROBI : "Changed value of parameter TimeLimit to",
-                   StatisticReader.SOLVERTYPE_CBC : "Coin:seconds has value",
-                   StatisticReader.SOLVERTYPE_XPRESS : " @05",
+                   StatisticReader.SOLVERTYPE_SCIP : '@05',
+                   StatisticReader.SOLVERTYPE_CPLEX : '@05',
+                   StatisticReader.SOLVERTYPE_GUROBI : "@05",
+                   StatisticReader.SOLVERTYPE_CBC : "@05",
+                   StatisticReader.SOLVERTYPE_XPRESS : "@05",
                    StatisticReader.SOLVERTYPE_COUENNE : "^@05"}
 
     datakey = 'TimeLimit'
@@ -564,7 +569,7 @@ class ListReader(StatisticReader):
         name : a name for this reader
         '''
         if regpattern is None:
-            raise ValueError("Error: No 'regpattern' specified for reader %s"%str(name))
+            raise ValueError("Error: No 'regpattern' specified for reader %s" % str(name))
         self.regular_exp = re.compile(regpattern)
         self.regpattern = regpattern
         if name is None:

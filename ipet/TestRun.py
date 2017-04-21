@@ -13,6 +13,8 @@ import ipet.misc as misc
 from pandas import DataFrame, notnull
 import os
 import logging
+import json, numpy
+from pandas.core.common import indent
 
 try:
     import pickle as pickle
@@ -27,20 +29,25 @@ class TestRun:
     """ the file extension for saving and loading test runs from """
 
     def __init__(self, filenames=[]):
+        self.inputfromstdin = False
         self.filenames = []
         for filename in filenames:
             self.appendFilename(filename)
         self.data = DataFrame(dtype=object)
 
-
+        # FARI Where do we use keyset?
         self.keyset = set()
         self.datadict = {}
         self.metadatadict = {}
+        # FARI Where do we use and what are parametervalues?
         self.parametervalues = {}
         self.defaultparametervalues = {}
         self.instanceset = set()
         """ meta data represent instance-independent data """
 
+    def setInputFromStdin(self):
+        self.inputfromstdin = True
+        self.filenames = [""]
 
     def appendFilename(self, filename):
         '''
@@ -61,6 +68,7 @@ class TestRun:
         '''
 
         # check for the right dictionary to store the data
+        # FARI The following is a pointer or a copy into local variable datadict?
         datadict = self.datadict if probname is not None else self.metadatadict
         
         logging.debug("TestRun %s receives data Datakey %s, %s to prob %s" % (self.getName(), repr(datakeys), repr(data), probname))
@@ -94,12 +102,12 @@ class TestRun:
         '''
         return (self.parametervalues, self.defaultparametervalues)
 
-
     def getLogFile(self, fileextension=".out"):
         for filename in self.filenames:
             if filename.endswith(fileextension):
                 return filename
         return None
+    
     def getKeySet(self):
         if self.datadict != {}:
             return list(self.datadict.keys())
@@ -177,6 +185,7 @@ class TestRun:
                 except KeyError:
                     pass
         else:
+            # FARI Why 'else'?
             try:
                 self.data.drop(probname, inplace=True)
             except TypeError:
@@ -187,9 +196,11 @@ class TestRun:
         '''
         returns the settings associated with this test run
         '''
+        # FARI When is this set? Or is this a "fancy" way of setting it directly?
         try:
             return self.data['Settings'][0]
         except KeyError:
+            # FARI wouldn't it be nice to save these somewhere?
             return os.path.basename(self.filenames[0]).split('.')[-2]
 
     def getVersion(self):
@@ -201,17 +212,25 @@ class TestRun:
         except KeyError:
             return os.path.basename(self.filenames[0]).split('.')[3]
 
-
     def saveToFile(self, filename):
         try:
             f = open(filename, 'wb')
             pickle.dump(self, f, protocol=2)
+            # TODO remove
+            #print('CHECK DATA', self.data)
+            #print('CHECK DATADICT', self.datadict)
             f.close()
         except IOError:
             print("Could not open %s for saving test run" % filename)
 
-
-
+    def printToConsole(self):
+        print(self.data.ix[0,:])
+        
+    def toJson(self):
+        # FARI do we still need this?
+        return self.data.to_json()
+        #return json.dumps(self.data.to_dict(), sort_keys=True, indent=4)
+        
     @staticmethod
     def loadFromFile(filename):
         try:
@@ -228,7 +247,6 @@ class TestRun:
         f.close()
 
         return testrun
-
 
     def getLpSolver(self):
         '''
@@ -279,7 +297,6 @@ class TestRun:
         '''
         return misc.cutString(self.getSettings(), char, maxlength)
 
-
     def problemGetOptimalSolution(self, solufileprobname):
         '''
         returns objective of an optimal or a best known solution from solu file, or None, if
@@ -301,3 +318,4 @@ class TestRun:
         except KeyError:
             print(self.getIdentification() + " has no solu file status for ", solufileprobname)
             return None
+        

@@ -96,6 +96,7 @@ class StatisticReader(Editable):
         if type(self.context) is int:
             return self.context == context
         else:
+            # FARI What type would context be in this case? List? 
             return context in self.context
 
     def getSplitLineWithRegexp(self, regular_exp, line, index = -1, startofline = False):
@@ -126,6 +127,7 @@ class StatisticReader(Editable):
                 if idx == index:
                     return word.group()
         return None
+    
     def getNumberAtIndex(self, line, index):
         '''
         get the i'th number from the list of numbers in this line
@@ -303,8 +305,6 @@ class SettingsFileReader(StatisticReader):
     regular_exp_type = re.compile("^# \[type: (\w+),.*default: ([^\]]+)\]")
     context = StatisticReader.CONTEXT_SETFILE
 
-
-
     typemap = {
                "real" : float,
                "char" : str,
@@ -334,8 +334,6 @@ class SettingsFileReader(StatisticReader):
                     self.testrun.addParameterValue(name, value)
                     self.testrun.addDefaultParameterValue(name, self.default)
 
-
-
 class GapReader(StatisticReader):
     '''
     reads the primal dual gap at the end of the solving
@@ -354,7 +352,6 @@ class GapReader(StatisticReader):
             if gapasword != "infinite":
                 gap = self.turnIntoFloat(gapasword)
                 self.addData(self.datakey, gap)
-
 
 class LimitReachedReader(StatisticReader):
     '''
@@ -421,8 +418,6 @@ class ObjlimitReader(StatisticReader):
     datakey = "Objlimit"
     datatype = float
     lineindex = 5
-
-
 
 class PrimalBoundReader(StatisticReader):
     '''
@@ -603,9 +598,4 @@ class ListReader(StatisticReader):
         data = self.getLineData(line)
         if data is not None:
             self.addData(data[0], data[1])
-
-
-
-
-
 

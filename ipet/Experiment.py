@@ -28,6 +28,7 @@ import pandas as pd
 import os
 import sys
 import logging
+from sys import stdin
 
 class Experiment:
     '''
@@ -78,7 +79,6 @@ class Experiment:
         self.testrunmanager = Manager()
         self.datakeymanager = Manager()
 
-
         self.readermanager = ReaderManager()
         self.readermanager.registerDefaultReaders()
         self.solufiles = []
@@ -100,12 +100,12 @@ class Experiment:
 
         For a list of allowed file extensions, see ipet.parsing.ReaderManager.
         """
+
         filebasename = os.path.splitext(os.path.basename(filename))[0]
         fileextension = os.path.splitext(filename)[-1]
 
         if not fileextension in [TestRun.FILE_EXTENSION] + self.readermanager.getFileExtensions():
             raise ValueError("Experiment cannot handle extension '%s' of file '%s'" % (fileextension, filename))
-
 
         if fileextension == TestRun.FILE_EXTENSION:
             try:
@@ -113,9 +113,10 @@ class Experiment:
             except IOError as e:
                 sys.stderr.write(" Loading testrun from file %s caused an exception\n%s\n" % (filename, e))
                 return
+        # FARI This is just normal else, condition always true ?
         elif testrun is None:
             testrun = self.basename2testrun.setdefault(filebasename, TestRun())
-
+        # FARI Why cant this just be inside the above elif without extra if?
         if fileextension != TestRun.FILE_EXTENSION:
             testrun.appendFilename(filename)
 
@@ -124,6 +125,13 @@ class Experiment:
 
         self.updateDatakeys()
 
+    def addStdinput(self):
+        # FARI how to handle misbehaving input?
+        testrun = TestRun()
+        testrun.setInputFromStdin()
+        self.testrunmanager.addAndActivate(testrun)
+        self.updateDatakeys()
+        
     def addSoluFile(self, solufilename):
         '''
         associate a solu file with all testruns
@@ -217,7 +225,6 @@ class Experiment:
         except:
             raise ValueError("Error reading file name %s"%filename)
 
-
     def collectData(self):
         '''
         iterate over log files and solu file and collect data via installed readers
@@ -228,28 +235,31 @@ class Experiment:
         for testrun in testruns:
             for solufilename in self.solufiles:
                 testrun.appendFilename(solufilename)
-
+                
+        # FARI do we really need the same loop again?
         for testrun in testruns:
             self.readermanager.setTestRun(testrun)
             testrun.setupForDataCollection()
             self.readermanager.collectData()
-
+            
         self.makeProbNameList()
         self.calculateGaps()
         self.calculateIntegrals()
+        
+        # FARI What do we need for validation? primalbound, dualbound(, timelimitreached?)
         self.checkProblemStatus()
 
         for testrun in testruns:
             testrun.finalize()
 
+        # FARI do we really need the same loop again?
         for tr in testruns:
             self.testrunmanager.reinsertManageable(tr)
 
-
-        
         # post processing steps: things like primal integrals depend on several, independent data
+        # FARI Why? Aren't we ready to close the programm?
         self.updateDatakeys()
-
+        
     def getDatakeys(self):
         return self.datakeymanager.getAllRepresentations()
 
@@ -273,8 +283,6 @@ class Experiment:
                             thename = key[:-5] + "Gap"
                             testrun.addData(probname, thename, gap)
 
-
-
     def getJoinedData(self):
         '''
         concatenate the testrun data (possibly joined with external data)
@@ -289,8 +297,6 @@ class Experiment:
 
         return pd.concat(datalist)
 
-
-
     def calculateIntegrals(self):
         '''
         calculates and stores primal and dual integral values for every problem under 'PrimalIntegral' and 'DualIntegral'
@@ -303,7 +309,6 @@ class Experiment:
                 processplotdata = getProcessPlotData(testrun, probname)
 
                 #check for well defined data (may not exist sometimes)
-
                 if processplotdata:
                     try:
                         testrun.addData(probname, 'PrimalIntegral', calcIntegralValue(processplotdata))
@@ -318,7 +323,6 @@ class Experiment:
                         testrun.addData(probname, 'DualIntegral', calcIntegralValue(processplotdata, pwlinear=True))
                     except AssertionError as e:
                         logging.error("Error for dual bound on problem %s, list: %s "%(probname, processplotdata))
-
 
     def writeSolufile(self):
         '''
@@ -369,7 +373,6 @@ class Experiment:
             f.write("\n")
 
         f.close()
-
 
     def testrunGetProbGapToOpt(self, testrun, probname):
         optsol = testrun.problemGetOptimalSolution(probname)
@@ -564,7 +567,11 @@ class Experiment:
                     self.determineStatusForUnknProblem(testrun, probname)
 
                 logging.debug("Problem %s in testrun %s solustatus %s, errorcode %s -> Status %s" % (probname, testrun.getName(), repr(solustatus), repr(errcode), testrun.problemGetData(probname, "Status")))
-
+    
+    def printToConsole(self):
+        for tr in self.testrunmanager.getActiveSet():
+            tr.printToConsole()
+    
     def saveToFile(self, filename):
         '''
            save the experiment instance to a file specified by 'filename'.

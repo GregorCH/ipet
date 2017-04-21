@@ -63,7 +63,8 @@ kwargs = {
         "Topic :: Software Development",
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
-    ]
+    ],
+    "scripts": ["scripts/ipet-parse", "scripts/ipet-evaluate", "scripts/ipet-gui"]
 }
 
 setup(**kwargs)

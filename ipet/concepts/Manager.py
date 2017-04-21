@@ -74,11 +74,11 @@ class Manager(Observable):
         reinserts a manageable after its name has changed
         '''
         active = self.isActive(manageable)
+        # FARI Why ?
         self.deleteManageable(manageable)
         self.addManageable(manageable)
         if active:
             self.activate([manageable])
-
 
     def editObjectAttribute(self, manageable, attributename, newattribute):
         '''
@@ -102,7 +102,6 @@ class Manager(Observable):
                 raise KeyError("An element of name %s is already listed" % (newname))
             del self.stringrepresentations[oldname]
             self.stringrepresentations[newname] = manageable
-
 
     def getManageables(self, onlyactive=False):
         '''

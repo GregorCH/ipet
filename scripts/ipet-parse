@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 The MIT License (MIT)
 
@@ -16,18 +17,20 @@ from ipet import TestRun
 import argparse
 import sys
 import os
+import io
 import re
 import logging
 
 # possible arguments in the form name,default,short,description #
-clarguments = []
+# clarguments = []
 
 argparser = argparse.ArgumentParser(prog = "Ipet Parsing script", \
                                  description = "parses test run log files and saves parsed data")
-for name, default, short, description in clarguments:
-    argparser.add_argument(short, name, default = default, help = description)
+# FARI: brauchen wir nicht, oder?
+# for name, default, short, description in clarguments:
+#     argparser.add_argument(short, name, default = default, help = description)
 
-argparser.add_argument('-l', '--logfiles', nargs = '*', help = "list of outfiles that should be parsed")
+argparser.add_argument('-l', '--logfiles', nargs = '*', help = "list of outfiles that should be parsed", default=sys.stdin)
 argparser.add_argument('-r', '--readers', nargs = '*', default = [], help = "list of additional readers in xml format that should be used for parsing")
 argparser.add_argument('-s', '--solufiles', nargs = '*', default = [], help = "list of solu files that should be taken into account")
 argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
@@ -36,13 +39,15 @@ argparser.add_argument("-D", "--debug", action = "store_true", default = False, 
 if __name__ == '__main__':
     try:
         arguments = argparser.parse_args()
+        # FARI do we need this? only if we don't have input from stdin
+        print("arguments ",arguments)
     except:
         if not re.search(" -+h", ' '.join(sys.argv)) :
             print("Wrong Usage, use --help for more information.")
         exit()
     # if globals().get("help") is not None:
     logger = logging.getLogger()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')  
     ch = logging.StreamHandler()
     ch.setFormatter(formatter)
     logger.addHandler(ch)
@@ -50,12 +55,14 @@ if __name__ == '__main__':
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-
+    # FARI TODO
+    #if type(arguments.logfiles) != io.TextIOWrapper:
+    #    disable logging to console, in this case we just want the printstatement at the end  
+    #    logger.setLevel(-1) ?
     if arguments.logfiles is None:
         logging.info("No testruns specified, exiting")
         sys.exit(0)
-
-
+        
     # initialize an experiment
     experiment = Experiment()
 
@@ -64,6 +71,7 @@ if __name__ == '__main__':
         for _file in os.listdir('./'):
             if _file.endswith(".xml") or _file.endswith(".ipr"):
                 try:
+                    # Fari: do we use rm? why next line?
                     rm = ReaderManager.fromXMLFile(_file)
                     readers.append(_file)
                 except:
@@ -78,8 +86,10 @@ if __name__ == '__main__':
             experiment.readermanager.registerReader(reader)
             logging.info("Registered reader with name %s" % reader.getName())
 
-    for logfile in arguments.logfiles:
-        experiment.addOutputFile(logfile)
+    # FARI does this work? may these lines move to line 103?
+    #if type(arguments.logfiles) != io.TextIOWrapper:
+    #    for logfile in arguments.logfiles:
+    #        experiment.addOutputFile(logfile)
         
     # search for solu files in current directory
     if arguments.solufiles == []:
@@ -92,14 +102,23 @@ if __name__ == '__main__':
         experiment.addSoluFile(solufile)
 
     logging.info("Start parsing process")
-    experiment.collectData()
 
-    for tr in experiment.getTestRuns():
-        try:
-            filename = tr.filenames[0]
-            newfilename = "%s%s" % (os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
-            tr.saveToFile(newfilename)
-            logging.info("converted %s --> %s" % (filename, newfilename))
-        except:
-            logging.info("skipped testrun %s" % tr.getIdentification())
-
+    if type(arguments.logfiles) != io.TextIOWrapper:
+        for logfile in arguments.logfiles:
+            experiment.addOutputFile(logfile)
+    
+        experiment.collectData()
+        for tr in experiment.getTestRuns():
+            try:
+                filename = tr.filenames[0]
+                newfilename = "%s%s" % (os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
+                tr.saveToFile(newfilename)
+                logging.info("converted %s --> %s" % (filename, newfilename))
+            except:
+                logging.info("skipped testrun %s" % tr.getIdentification())
+    else: 
+        # FARI 
+        experiment.addStdinput()
+        experiment.collectData()
+        experiment.printToConsole()
+        # experiment.outputToConsole(stdin) - experiment.getTestRuns()[0].outputToConsole()

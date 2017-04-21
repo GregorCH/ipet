@@ -13,6 +13,7 @@ from .StatisticReader import StatisticReader, ListReader
 from ipet.parsing.StatisticReader_CustomReader import CustomReader
 import os
 import re
+import sys
 from ipet.concepts.Manager import Manager
 import xml.etree.ElementTree as ElementTree
 from .StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
@@ -49,7 +50,6 @@ class ReaderManager(Manager, IpetNode):
 
     othersolvers = [solver for solver in list(solvertype_recognition.keys()) if solver != StatisticReader.solvertype]
 
-
     fileextension2context = {
                              ".err" : StatisticReader.CONTEXT_ERRFILE,
                              ".out" : StatisticReader.CONTEXT_LOGFILE,
@@ -67,7 +67,6 @@ class ReaderManager(Manager, IpetNode):
                        StatisticReader.CONTEXT_TRACEFILE : 5
                        }
     """ defines a sorting order for file contexts """
-
 
     xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
 
@@ -218,12 +217,14 @@ class ReaderManager(Manager, IpetNode):
     def getProblemName(self, line):
         fullname = line.split()[1]
         namewithextension = os.path.basename(fullname)
+        # FARI Shouldn't this be something like ".gz"?
         if namewithextension.endswith("gz"):
             namewithextension = os.path.splitext(namewithextension)[0]
         for extension in self.extensions:
             if namewithextension.endswith(extension):
                 namewithextension = os.path.splitext(namewithextension)[0]
 
+        # FARI this is now filename WITHOUT extension, right?
         return namewithextension
 
     def finishProblemParsing(self, line, filecontext, readers):
@@ -251,8 +252,8 @@ class ReaderManager(Manager, IpetNode):
             problemname = self.getProblemName(line[1])
             StatisticReader.setProblemName(problemname)
 
-
             # overwrite previous output information from a log file
+            # FARI is this when we have multiple outputs of the same instance? Why the logfile condition at the end?
             if problemname in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
                 self.testrun.deleteProblemData(problemname)
 
@@ -266,6 +267,7 @@ class ReaderManager(Manager, IpetNode):
         else:
             return False
 
+    # FARI Deprecate this? compare to readSolverTypeDirectly
     def readSolverType(self, filename):
         '''
         check the solver type for a given log file
@@ -279,6 +281,18 @@ class ReaderManager(Manager, IpetNode):
                         ReaderManager.othersolvers = [solver for solver in list(ReaderManager.solvertype_recognition.keys()) \
                                                       if solver != StatisticReader.solvertype]
                         return
+
+    def readSolverTypeDirectly(self, f):
+        '''
+        check the solver type for a given log file
+        '''
+        for line in f:
+            for key in list(ReaderManager.solvertype_recognition.keys()):
+                if line.startswith(ReaderManager.solvertype_recognition[key]):
+                    StatisticReader.changeSolverType(key)
+                    ReaderManager.othersolvers = [solver for solver in list(ReaderManager.solvertype_recognition.keys()) \
+                                                  if solver != StatisticReader.solvertype]
+                    return
 
     def sortingKeyContext(self, context):
         try:
@@ -297,27 +311,38 @@ class ReaderManager(Manager, IpetNode):
         assert(self.testrun != None)
 
         # sort the files by context
-        self.filestrings = sorted(self.filestrings, key = lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
+        # FARI Why the sorting?
+        if not self.testrun.inputfromstdin:
+            self.filestrings = sorted(self.filestrings, key=lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
 
         for filename in self.filestrings:
+            
             f = None
-            try:
-                f = open(filename, 'r')
-            except IOError:
-                print('File', filename, "doesn't exist!")
-                continue
+            if not self.testrun.inputfromstdin:
+                try:
+                    f = open(filename, 'r')
+                except IOError:
+                    print('File', filename, "doesn't exist!")
+                    continue
+            else:
+                f = sys.stdin.readlines()
 
             # only enable readers that support the file context
-            filecontext = self.filenameGetContext(filename)
+            filecontext = self.fileextension2context[".out"]
+            if not self.testrun.inputfromstdin:
+                filecontext = self.filenameGetContext(filename)
             readers = [r for r in self.getManageables(True) if r.supportsContext(filecontext)]
 
             # search the file for information about the type of the solver
-            self.readSolverType(filename)
+            self.readSolverTypeDirectly(f)
 
             # reset the problem name before a new problem is read in
-            StatisticReader.setProblemName(None)
+            # FARI this works because the method setProblemName is static?
+            # FARI TODO how to fix this?
+            StatisticReader.setProblemName("None")
 
             # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
+            line = (0,'')
             for line in enumerate(f):
                 self.updateProblemName(line, filecontext, readers)
 
@@ -330,12 +355,11 @@ class ReaderManager(Manager, IpetNode):
             else:
                 self.finishProblemParsing(line, filecontext, readers)
 
-
-
-            f.close()
+            if not self.testrun.inputfromstdin:
+                f.close()
         # print("Collection of data finished")
         return 1
-
+    
     ### XML IO methods
     def toXMLElem(self):
         me = ElementTree.Element(ReaderManager.getNodeTag())
@@ -363,6 +387,7 @@ class ReaderManager(Manager, IpetNode):
 
     @staticmethod
     def processXMLElem(elem):
+        # FARI what if not? rm undefined?
         if elem.tag == ReaderManager.getNodeTag():
             rm = ReaderManager()
         for child in elem:

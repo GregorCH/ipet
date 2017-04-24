@@ -39,8 +39,6 @@ argparser.add_argument("-D", "--debug", action = "store_true", default = False, 
 if __name__ == '__main__':
     try:
         arguments = argparser.parse_args()
-        # FARI do we need this? only if we don't have input from stdin
-        print("arguments ",arguments)
     except:
         if not re.search(" -+h", ' '.join(sys.argv)) :
             print("Wrong Usage, use --help for more information.")
@@ -55,10 +53,10 @@ if __name__ == '__main__':
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-    # FARI TODO
-    #if type(arguments.logfiles) != io.TextIOWrapper:
-    #    disable logging to console, in this case we just want the printstatement at the end  
-    #    logger.setLevel(-1) ?
+    # FARI disable logging to console, in this case we just want the printstatement at the end  
+    if type(arguments.logfiles) == io.TextIOWrapper:
+        logger.setLevel(logging.ERROR)
+    
     if arguments.logfiles is None:
         logging.info("No testruns specified, exiting")
         sys.exit(0)

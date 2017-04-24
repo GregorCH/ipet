@@ -35,15 +35,18 @@ class TestRun:
             self.appendFilename(filename)
         self.data = DataFrame(dtype=object)
 
-        # FARI Where do we use keyset?
-        self.keyset = set()
         self.datadict = {}
+        self.currentinstancedataseries = {}
+        self.currentinstanceid = 0
+        # FARI1 Do we want to keep this?
+        self.instanceset = set()
+        # FARI1 Do we still need these?
         self.metadatadict = {}
-        # FARI Where do we use and what are parametervalues?
+        """ meta data represent instance-independent data """
         self.parametervalues = {}
         self.defaultparametervalues = {}
-        self.instanceset = set()
-        """ meta data represent instance-independent data """
+        # FARI1 Where and why do we use keyset?
+        self.keyset = set()
 
     def setInputFromStdin(self):
         self.inputfromstdin = True
@@ -57,7 +60,8 @@ class TestRun:
         if filename not in self.filenames:
             self.filenames.append(filename)
 
-    def addData(self, probname, datakeys, data):
+    #def addData(self, problemid, datakeys, data):
+    def addData(self, datakeys, data):
         '''
         add data to problem data under the specified key(s)
 
@@ -68,21 +72,25 @@ class TestRun:
         '''
 
         # check for the right dictionary to store the data
-        # FARI The following is a pointer or a copy into local variable datadict?
-        datadict = self.datadict if probname is not None else self.metadatadict
+        # FARI1 The following is a pointer or a copy into local variable datadict? -> pointer
+        # datadict = self.datadict if probname is not None else self.metadatadict
+        # datadict = self.datadict if problemid is not None else self.metadatadict
         
-        logging.debug("TestRun %s receives data Datakey %s, %s to prob %s" % (self.getName(), repr(datakeys), repr(data), probname))
+        # FARI2 problemid is not a very sensible info, how to change this for the better?
+        logging.debug("TestRun %s receives data Datakey %s, %s to prob" % (self.getName(), repr(datakeys), repr(data)))
 
-        if probname not in self.instanceset:
-            self.instanceset.add(probname)
+        #if problemid not in self.instanceset:
+        #    self.instanceset.add(problemid)
 
         if type(datakeys) is list and type(data) is list:
             for key, datum in zip(datakeys, data):
-                col = datadict.setdefault(key, {})
-                col[probname] = datum
+                #col = datadict.setdefault(key, {})
+                #col[problemid] = datum
+                self.currentinstancedataseries[key] = datum
         else:
-            col = datadict.setdefault(datakeys, {})
-            col[probname] = data
+            # col = datadict.setdefault(datakeys, {})
+            # col[problemid] = data
+            self.currentinstancedataseries[datakeys] = data
 
     def addParameterValue(self, paramname, paramval):
         '''
@@ -114,15 +122,18 @@ class TestRun:
         else:
             return set(self.data.columns)
 
-    def problemGetData(self, probname, datakey):
+    def problemGetData(self, problem, datakey):
         '''
         returns data for a specific datakey, or None, if no such data exists for this (probname, datakey) key pair
         '''
+        if not type(problem) is int:
+            # FARIDO convert from name to id
+            print("FARIFIXME")
         if self.datadict != {}:
-            return self.datadict.get(datakey, {}).get(probname, None)
+            return self.datadict.get(datakey, {}).get(problem, None)
         else:
             try:
-                data = self.data.loc[probname, datakey]
+                data = self.data.loc[problem, datakey]
             except KeyError:
                 data = None
             if type(data) is list or notnull(data):
@@ -145,10 +156,25 @@ class TestRun:
         """
         return DataFrame(self.metadatadict)
 
+    def initializeNextInstanceCollection(self):
+        self.currentinstanceid = self.currentinstanceid + 1
+
+    def finalizeInstanceCollection(self):
+        # FARI1 Does this possibly need to be transposed?
+        if self.currentinstancedataseries != {}:
+            for key in self.currentinstancedataseries.keys():
+                self.datadict.setdefault(key, {})[self.currentinstanceid] = self.currentinstancedataseries[key]
+            # FARI1 Do we need to clean up after ourselves?
+            self.currentinstancedataseries = {} 
+
+    def finishedReadingFile(self):
+        self.finalizeInstanceCollection()
+        
     def setupForDataCollection(self):
         self.datadict = self.data.to_dict()
         self.data = DataFrame(dtype=object)
-
+        
+    # FARI2 rename to setupAfterDataCollection?
     def finalize(self):
         self.data = DataFrame(self.datadict)
         self.datadict = {}
@@ -170,37 +196,39 @@ class TestRun:
         returns data for a list of problems
         '''
         if self.datadict != {}:
-            return [self.datadict.get(datakey, {}).get(probname, None) for probname in problemlist]
+            # FARIDO Does this still work this way?
+            return [self.datadict.get(datakey, {}).get(problemid, None) for problemid in problemlist]
         else:
+            # FARIDO Does this still work this way?
             return self.data.loc[problemlist, datakey]
 
-    def deleteProblemData(self, probname):
+    def deleteProblemData(self, problemid):
         '''
-        deletes all data acquired so far for probname
+        deletes all data acquired so far for problemid
         '''
         if self.datadict != {}:
             for col in list(self.datadict.keys()):
                 try:
-                    del self.datadict[col][probname]
+                    del self.datadict[col][problemid]
                 except KeyError:
                     pass
         else:
-            # FARI Why 'else'?
+            # FARI1 Why 'else'? -> because either data or datadict is empty?
             try:
-                self.data.drop(probname, inplace=True)
+                self.data.drop(problemid, inplace=True)
             except TypeError:
                 # needs to be caught for pandas version < 0.13
-                self.data = self.data.drop(probname)
+                self.data = self.data.drop(problemid)
 
     def getSettings(self):
         '''
         returns the settings associated with this test run
         '''
-        # FARI When is this set? Or is this a "fancy" way of setting it directly?
         try:
             return self.data['Settings'][0]
         except KeyError:
-            # FARI wouldn't it be nice to save these somewhere?
+            # FARI1 wouldn't it be nice to save these somewhere? 
+            # FARI this is a problem when we are reading from stdin
             return os.path.basename(self.filenames[0]).split('.')[-2]
 
     def getVersion(self):
@@ -210,24 +238,28 @@ class TestRun:
         try:
             return self.data['Version'][0]
         except KeyError:
+            # FARI1 wouldn't it be nice to save these somewhere?
+            # FARI this is a problem when we are reading from stdin
             return os.path.basename(self.filenames[0]).split('.')[3]
 
     def saveToFile(self, filename):
         try:
             f = open(filename, 'wb')
             pickle.dump(self, f, protocol=2)
-            # TODO remove
-            #print('CHECK DATA', self.data)
-            #print('CHECK DATADICT', self.datadict)
             f.close()
         except IOError:
             print("Could not open %s for saving test run" % filename)
 
     def printToConsole(self):
-        print(self.data.ix[0,:])
+        #print("DATA ", self.data)
+        #print("DATADICT ", self.datadict)
+        #print("CURRENTSERIES ", self.currentinstancedataseries)
+        #print("DATA INDEX", self.data.index.values)
+        #print("DATA COLUMNS", self.data.columns.values)
+        print(self.data.iloc[0,:])
         
     def toJson(self):
-        # FARI do we still need this?
+        # FARI2 do we still need this?
         return self.data.to_json()
         #return json.dumps(self.data.to_dict(), sort_keys=True, indent=4)
         
@@ -242,10 +274,8 @@ class TestRun:
         except IOError:
             print("Could not open %s for loading test run" % filename)
             return None
-
         testrun = pickle.load(f)
         f.close()
-
         return testrun
 
     def getLpSolver(self):
@@ -279,16 +309,19 @@ class TestRun:
         '''
         return self.getIdentification()
     
-    def getProbData(self, probname):
+    # FARI1 Do we want to refer to the problems by name (better by id?)
+    def getProbData(self, problemid):
         try:
-            return ",".join("%s: %s"%(key,self.problemGetData(probname, key)) for key in self.getKeySet())
+            return ",".join("%s: %s"%(key,self.problemGetData(problemid, key)) for key in self.getKeySet())
         except KeyError:
-            return "<%s> not contained in keys, have only\n%s"%(probname, ",".join((ind for ind in self.getProblems())))
+            # FARIDO more sensible output?
+            return "<%s> not contained in keys, have only\n%s"%(problemid, ",".join((ind for ind in self.getProblems())))
 
     def getIdentification(self):
         '''
         return identification string of this test run
         '''
+        # FARI1 Is this still the way to do this?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
 
     def getShortIdentification(self, char='_', maxlength= -1):

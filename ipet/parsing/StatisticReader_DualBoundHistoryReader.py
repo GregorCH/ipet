@@ -92,10 +92,8 @@ class DualBoundHistoryReader(StatisticReader):
         returns a dual bound history list
         '''
         if self.dualboundlist != []:
-            
             #only copy nonempty lists, otherwise Parascipdualboundhistoryreader and this one will overwrite each others data
             self.addData(self.datakey, self.dualboundlist[:])
-        
         self.reset()
         
 class ParascipDualBoundHistoryReader(DualBoundHistoryReader):

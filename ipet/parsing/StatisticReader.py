@@ -30,8 +30,8 @@ class StatisticReader(Editable):
     datatype = float
     lineindex = -1
     # print data#
-    problemname = None
-    problemnamelist = []
+    # problemname = None
+    # problemnamelist = []
     numericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+)")
     tablenumericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+|cutoff)")
     wordExpression = re.compile(r'[^\s]+')
@@ -73,13 +73,13 @@ class StatisticReader(Editable):
         """ parses string TRUE or FALSE and returns the boolean value of this expression """
         return True if value == "TRUE" else False
 
-    @staticmethod
-    def setProblemName(problemname):
-        StatisticReader.problemname = problemname
+    # @staticmethod
+    # def setProblemName(problemname):
+    #     StatisticReader.problemname = problemname
 
-    @staticmethod
-    def getProblemName():
-        return StatisticReader.problemname
+    # @staticmethod
+    # def getProblemName():
+    #     return StatisticReader.problemname
 
     @staticmethod
     def changeSolverType(newtype):
@@ -96,7 +96,7 @@ class StatisticReader(Editable):
         if type(self.context) is int:
             return self.context == context
         else:
-            # FARI What type would context be in this case? List? 
+            # FARI1 What type would context be in this case? List? 
             return context in self.context
 
     def getSplitLineWithRegexp(self, regular_exp, line, index = -1, startofline = False):
@@ -172,13 +172,13 @@ class StatisticReader(Editable):
         '''
         return None
 
-
     def operateOnLine(self, line):
         self.extractStatistic(line)
 
     def addData(self, datakey, data):
         logging.debug("Reader %s adds data" % (self.getName()))
-        self.testrun.addData(self.problemname, datakey, data)
+        # self.testrun.addData(self.problemname, datakey, data)
+        self.testrun.addData(datakey, data)
 
     def turnIntoFloat(self, astring):
         '''

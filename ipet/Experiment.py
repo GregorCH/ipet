@@ -113,10 +113,10 @@ class Experiment:
             except IOError as e:
                 sys.stderr.write(" Loading testrun from file %s caused an exception\n%s\n" % (filename, e))
                 return
-        # FARI This is just normal else, condition always true ?
+        # FARI2 This is just normal else, condition always true ?
         elif testrun is None:
             testrun = self.basename2testrun.setdefault(filebasename, TestRun())
-        # FARI Why cant this just be inside the above elif without extra if?
+        # FARI2 Why cant this just be inside the above elif without extra if?
         if fileextension != TestRun.FILE_EXTENSION:
             testrun.appendFilename(filename)
 
@@ -126,7 +126,7 @@ class Experiment:
         self.updateDatakeys()
 
     def addStdinput(self):
-        # FARI how to handle misbehaving input?
+        # FARIDO how to handle misbehaving input?
         testrun = TestRun()
         testrun.setInputFromStdin()
         self.testrunmanager.addAndActivate(testrun)
@@ -236,28 +236,29 @@ class Experiment:
             for solufilename in self.solufiles:
                 testrun.appendFilename(solufilename)
                 
-        # FARI do we really need the same loop again?
+        # FARI2 do we really need the same loop again?
         for testrun in testruns:
             self.readermanager.setTestRun(testrun)
             testrun.setupForDataCollection()
             self.readermanager.collectData()
             
+        # FARI1 Do we want to know this or is this merely for validation?
         self.makeProbNameList()
         self.calculateGaps()
         self.calculateIntegrals()
         
-        # FARI What do we need for validation? primalbound, dualbound(, timelimitreached?)
+        # FARI1 What do we need for validation? primalbound, dualbound(, timelimitreached?)
         self.checkProblemStatus()
 
         for testrun in testruns:
             testrun.finalize()
 
-        # FARI do we really need the same loop again?
+        # FARI2 do we really need the same loop again?
         for tr in testruns:
             self.testrunmanager.reinsertManageable(tr)
 
         # post processing steps: things like primal integrals depend on several, independent data
-        # FARI Why? Aren't we ready to close the programm?
+        # FARI1 Why? Aren't we ready to close the programm?
         self.updateDatakeys()
         
     def getDatakeys(self):

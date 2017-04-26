@@ -219,8 +219,6 @@ class IPETEvaluationColumn(IpetNode):
                 except ValueError:
                     return None
 
-
-
     def getCompareSuffix(self):
         if self.getCompareMethod() is not None:
             if self.comp == "quot":
@@ -352,10 +350,8 @@ class IPETEvaluationColumn(IpetNode):
 
         return result
 
-
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
-
 
 class FormatFunc:
 
@@ -364,8 +360,6 @@ class FormatFunc:
 
     def beautify(self, x):
         return (self.formatstr % x)
-
-
 
 class IPETEvaluation(IpetNode):
     '''
@@ -449,7 +443,6 @@ class IPETEvaluation(IpetNode):
     def getChildren(self):
         return self.columns + self.filtergroups
 
-
     def acceptsAsChild(self, child):
         return child.__class__ in (IPETEvaluationColumn, IPETFilterGroup)
 
@@ -489,7 +482,6 @@ class IPETEvaluation(IpetNode):
     def setGroupKey(self, gk):
         self.groupkey = gk
 
-
     def setDefaultGroup(self, dg):
         self.defaultgroup = dg
         self.setEvaluated(False)
@@ -506,6 +498,7 @@ class IPETEvaluation(IpetNode):
         '''
         should the evaluation calculate optimal auto settings?
         '''
+        # FARI1 need to call next fctn?
         self.set_evaluateoptauto(evaloptauto)
 
     def reduceToColumns(self, df_long):
@@ -538,11 +531,7 @@ class IPETEvaluation(IpetNode):
                     method = lambda x:compmethod(*x)
                     df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)
                     usercolumns.append(comparecolname)
-
-
-
         # concatenate level one columns into a new data frame and treat them as the altogether setting
-
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
 
         additionalfiltercolumns = []
@@ -629,7 +618,6 @@ class IPETEvaluation(IpetNode):
         expects a Multiindex column data frame df
         '''
         formatters = {}
-
         thelevel = 0
 
         # temporary hack to test which level is the maximum level
@@ -669,12 +657,9 @@ class IPETEvaluation(IpetNode):
                 # the column name is not contained in the final df
                 continue
 
-
-
             # add new formatting function to the map of formatting functions
             for thetuple in tuples:
                 formatters.update({thetuple:FormatFunc(col.getFormatString()).beautify})
-
 
         for comptuple in comptuples:
             formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
@@ -715,7 +700,6 @@ class IPETEvaluation(IpetNode):
         with open("%s.txt" % filebasename, "w") as txtfile:
             df.to_string(txtfile, formatters = formatters, index_names = False)
 
-
     def findStatus(self, statuscol):
         uniques = set(statuscol.unique())
         for status in ["ok", "timelimit", "nodelimit", "memlimit", "unknown", "fail", "abort"]:
@@ -741,7 +725,6 @@ class IPETEvaluation(IpetNode):
         useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis = 1)
         optdf = pd.concat([optdf, useroptdf], axis = 1)
 
-
         return optdf
 
     def checkMembers(self):
@@ -753,8 +736,6 @@ class IPETEvaluation(IpetNode):
                 col.checkAttributes()
             except Exception as e:
                 raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
-
-
 
     def getAggregatedGroupData(self, filtergroup):
         if not filtergroup in self.filtergroups:
@@ -819,7 +800,6 @@ class IPETEvaluation(IpetNode):
         else:
             self.rettab = ret
 
-
         self.instance_wise = ret
         self.agg = self.aggregateToPivotTable(columndata)
 
@@ -860,7 +840,6 @@ class IPETEvaluation(IpetNode):
         # if no aggregation was specified, return only the general part
         if len(colsandaggregations) is 0:
             return generalpart
-
 
         # column aggregations aggregate every column and every column aggregation
         colaggpart = pd.concat((df[[col.getName(), self.groupkey]].pivot_table(index = self.groupkey, aggfunc = agg.aggregate) for col, agg in colsandaggregations), axis = 1)
@@ -927,6 +906,7 @@ class IPETEvaluation(IpetNode):
             return stats
         else:
             return None
+        
     def aggregateTable(self, df):
         results = {}
         columnorder = []

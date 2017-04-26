@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 '''
 The MIT License (MIT)
 
@@ -51,7 +51,6 @@ epilog = \
 
 
     '''
-
 
 # possible arguments in the form name,default,short,description #
 clarguments = [('--experimentfile', None, '-x', "An experiment file name (must have .ipx file extension) in ipx-format to read"),
@@ -122,10 +121,9 @@ if __name__ == '__main__':
             logging.info("No eval-file specified, using standard evaluation %s" % evalfile)
     else: 
         evalfile = arguments.evalfile
-            
 
     if arguments.experimentfile is None and arguments.testrunfiles == []:
-        print("please provide either a experimentfile or (multiple, if needed) .trn testrun files")
+        print("please provide either an experimentfile or (multiple, if needed) .trn testrun files")
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
 
@@ -144,6 +142,9 @@ if __name__ == '__main__':
     if arguments.recollect is not False:
         logging.info("Recollecting data")
         experiment.collectData()
+        # FARIDO validation?
+        #if arguments.recheckTestrun:
+        #    experiment.checkProblemStatus()
 
     if arguments.saveexperiment is not False:
         experiment.saveToFile(arguments.experimentfile)
@@ -155,6 +156,7 @@ if __name__ == '__main__':
         theeval.setGroupKey(arguments.groupkey)
 
     if arguments.externaldata is not None:
+        # FARI1 What exactly is external data?
         experiment.addExternalDataFile(arguments.externaldata)
         logging.info("Added external data file %s" % arguments.externaldata)
     else:
@@ -192,17 +194,14 @@ if __name__ == '__main__':
 
     rettab, retagg = theeval.evaluate(experiment)
 
-
     if arguments.long:
         theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
-
 
     theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
 
     #for tr in comp.testrunmanager.getManageables():
         #for col in tr.data.columns:
             #print col
-
 
     if arguments.fileextension is not None:
         path = "."

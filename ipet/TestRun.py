@@ -11,10 +11,9 @@ please refer to README.md for how to cite IPET.
 '''
 import ipet.misc as misc
 from pandas import DataFrame, notnull
+import pandas as pd
 import os
 import logging
-import json, numpy
-from pandas.core.common import indent
 
 try:
     import pickle as pickle
@@ -38,14 +37,10 @@ class TestRun:
         self.datadict = {}
         self.currentinstancedataseries = {}
         self.currentinstanceid = 0
-        # FARI1 Do we want to keep this?
-        self.instanceset = set()
-        # FARI1 Do we still need these?
         self.metadatadict = {}
         """ meta data represent instance-independent data """
         self.parametervalues = {}
         self.defaultparametervalues = {}
-        # FARI1 Where and why do we use keyset?
         self.keyset = set()
 
     def setInputFromStdin(self):
@@ -60,37 +55,39 @@ class TestRun:
         if filename not in self.filenames:
             self.filenames.append(filename)
 
-    #def addData(self, problemid, datakeys, data):
-    def addData(self, datakeys, data):
+    def addDataByName(self, datakeys, data, problem):
+        for problemkey, name in self.datadict.setdefault('Problemname', None):
+            if name == problem: 
+                if type(datakeys) is list and type(data) is list:
+                    for key, datum in zip(datakeys, data):
+                        self.datadict.setdefault(key, {})[problemkey] = datum
+                    else:
+                        self.datadict.setdefault(datakeys, {})[problemkey] = data
+
+    def addData(self, datakeys, data, problem=None):
         '''
         add data to problem data under the specified key(s)
 
         add the current data - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
 
-        after data was added, the method problemGetData() can be used for access
+        after data was added, the method problemGetDataById() can be used for access
         '''
-
         # check for the right dictionary to store the data
-        # FARI1 The following is a pointer or a copy into local variable datadict? -> pointer
-        # datadict = self.datadict if probname is not None else self.metadatadict
-        # datadict = self.datadict if problemid is not None else self.metadatadict
-        
-        # FARI2 problemid is not a very sensible info, how to change this for the better?
         logging.debug("TestRun %s receives data Datakey %s, %s to prob" % (self.getName(), repr(datakeys), repr(data)))
 
-        #if problemid not in self.instanceset:
-        #    self.instanceset.add(problemid)
-
-        if type(datakeys) is list and type(data) is list:
-            for key, datum in zip(datakeys, data):
-                #col = datadict.setdefault(key, {})
-                #col[problemid] = datum
-                self.currentinstancedataseries[key] = datum
-        else:
-            # col = datadict.setdefault(datakeys, {})
-            # col[problemid] = data
-            self.currentinstancedataseries[datakeys] = data
+        if problem == None:
+            if type(datakeys) is list and type(data) is list:
+                for key, datum in zip(datakeys, data):
+                    self.currentinstancedataseries[key] = datum
+            else:
+                self.currentinstancedataseries[datakeys] = data
+        else: 
+            if type(datakeys) is list and type(data) is list:
+                for key, datum in zip(datakeys, data):
+                    self.datadict.setdefault(key,{})[problem] = datum
+            else:
+                self.datadict.setdefault(datakeys, {})[problem] = data
 
     def addParameterValue(self, paramname, paramval):
         '''
@@ -122,18 +119,22 @@ class TestRun:
         else:
             return set(self.data.columns)
 
-    def problemGetData(self, problem, datakey):
+    def problemGetDataByName(self, problemname, datakey):
+        for key, dat in self.datadict.get("Problemname", None):
+            if dat == problemname:
+                # FARI1 Is the name unique? What if it is not?
+                return self.problemGetDataById(key, datakey)
+        return None
+
+    def problemGetDataById(self, problemid, datakey):
         '''
         returns data for a specific datakey, or None, if no such data exists for this (probname, datakey) key pair
         '''
-        if not type(problem) is int:
-            # FARIDO convert from name to id
-            print("FARIFIXME")
         if self.datadict != {}:
-            return self.datadict.get(datakey, {}).get(problem, None)
+            return self.datadict.get(datakey, {}).get(problemid, None)
         else:
             try:
-                data = self.data.loc[problem, datakey]
+                data = self.data.loc[problemid, datakey]
             except KeyError:
                 data = None
             if type(data) is list or notnull(data):
@@ -156,17 +157,13 @@ class TestRun:
         """
         return DataFrame(self.metadatadict)
 
-    def initializeNextInstanceCollection(self):
-        self.currentinstanceid = self.currentinstanceid + 1
-
     def finalizeInstanceCollection(self):
-        # FARI1 Does this possibly need to be transposed?
         if self.currentinstancedataseries != {}:
             for key in self.currentinstancedataseries.keys():
                 self.datadict.setdefault(key, {})[self.currentinstanceid] = self.currentinstancedataseries[key]
-            # FARI1 Do we need to clean up after ourselves?
             self.currentinstancedataseries = {} 
-
+            self.currentinstanceid = self.currentinstanceid + 1
+        
     def finishedReadingFile(self):
         self.finalizeInstanceCollection()
         
@@ -174,32 +171,30 @@ class TestRun:
         self.datadict = self.data.to_dict()
         self.data = DataFrame(dtype=object)
         
-    # FARI2 rename to setupAfterDataCollection?
-    def finalize(self):
+    def setupAfterDataCollection(self):
         self.data = DataFrame(self.datadict)
         self.datadict = {}
 
-    def hasInstance(self, instancename):
-        return instancename in self.instanceset
+    def hasInstance(self, problemid):
+        return problemid in range(self.currentinstanceid)
 
     def getProblems(self):
         '''
         returns an (unsorted) list of problems
         '''
-        if self.datadict != {}:
-            return list(self.instanceset)
-        else:
-            return list(self.data.index.get_values())
+        return list(range(self.currentinstanceid))
+        #if self.datadict != {}:
+        #    return list(range(self.currentinstanceid))
+        #else:
+        #    return list(self.data.index.get_values())
 
     def problemlistGetData(self, problemlist, datakey):
         '''
         returns data for a list of problems
         '''
         if self.datadict != {}:
-            # FARIDO Does this still work this way?
             return [self.datadict.get(datakey, {}).get(problemid, None) for problemid in problemlist]
         else:
-            # FARIDO Does this still work this way?
             return self.data.loc[problemlist, datakey]
 
     def deleteProblemData(self, problemid):
@@ -213,7 +208,6 @@ class TestRun:
                 except KeyError:
                     pass
         else:
-            # FARI1 Why 'else'? -> because either data or datadict is empty?
             try:
                 self.data.drop(problemid, inplace=True)
             except TypeError:
@@ -227,8 +221,7 @@ class TestRun:
         try:
             return self.data['Settings'][0]
         except KeyError:
-            # FARI1 wouldn't it be nice to save these somewhere? 
-            # FARI this is a problem when we are reading from stdin
+            # FARI1 this is a problem when we are reading from stdin
             return os.path.basename(self.filenames[0]).split('.')[-2]
 
     def getVersion(self):
@@ -238,8 +231,7 @@ class TestRun:
         try:
             return self.data['Version'][0]
         except KeyError:
-            # FARI1 wouldn't it be nice to save these somewhere?
-            # FARI this is a problem when we are reading from stdin
+            # FARI1 this is a problem when we are reading from stdin
             return os.path.basename(self.filenames[0]).split('.')[3]
 
     def saveToFile(self, filename):
@@ -250,16 +242,24 @@ class TestRun:
         except IOError:
             print("Could not open %s for saving test run" % filename)
 
+    def instanceDataEmpty(self):
+        return self.currentinstancedataseries == {}
+
     def printToConsole(self):
+        #pd.set_option('display.max_rows', len(self.data.iloc[0,:]))
+        
         #print("DATA ", self.data)
         #print("DATADICT ", self.datadict)
         #print("CURRENTSERIES ", self.currentinstancedataseries)
         #print("DATA INDEX", self.data.index.values)
         #print("DATA COLUMNS", self.data.columns.values)
+        #print(self.data.iloc[:,:])
         print(self.data.iloc[0,:])
         
+        #pd.reset_option('display.max_rows')
+        pass
+        
     def toJson(self):
-        # FARI2 do we still need this?
         return self.data.to_json()
         #return json.dumps(self.data.to_dict(), sort_keys=True, indent=4)
         
@@ -309,19 +309,17 @@ class TestRun:
         '''
         return self.getIdentification()
     
-    # FARI1 Do we want to refer to the problems by name (better by id?)
-    def getProbData(self, problemid):
+    def problemGetData(self, problemid):
         try:
-            return ",".join("%s: %s"%(key,self.problemGetData(problemid, key)) for key in self.getKeySet())
+            return ",".join("%s: %s"%(key,self.problemGetDataById(problemid, key)) for key in self.getKeySet())
         except KeyError:
-            # FARIDO more sensible output?
             return "<%s> not contained in keys, have only\n%s"%(problemid, ",".join((ind for ind in self.getProblems())))
 
     def getIdentification(self):
         '''
         return identification string of this test run
         '''
-        # FARI1 Is this still the way to do this?
+        # FARI1 Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
 
     def getShortIdentification(self, char='_', maxlength= -1):
@@ -330,25 +328,25 @@ class TestRun:
         '''
         return misc.cutString(self.getSettings(), char, maxlength)
 
-    def problemGetOptimalSolution(self, solufileprobname):
+    def problemGetOptimalSolution(self, problemid):
         '''
         returns objective of an optimal or a best known solution from solu file, or None, if
         no such data has been acquired
         '''
         try:
-            return self.problemGetData(solufileprobname, 'OptVal')
+            return self.problemGetDataById(problemid, 'OptVal')
         except KeyError:
-            print(self.getIdentification() + " has no solu file value for ", solufileprobname)
+            print(self.getIdentification() + " has no solu file value for ", problemid)
             return None
 
-    def problemGetSoluFileStatus(self, solufileprobname):
-        '''
+    def problemGetSoluFileStatus(self, problemid):
+        '''  
         returns 'unkn', 'inf', 'best', 'opt' as solu file status, or None, if no solu file status
         exists for this instance
         '''
         try:
-            return self.problemGetData(solufileprobname, 'SoluFileStatus')
+            return self.problemGetDataById(problemid, 'SoluFileStatus')
         except KeyError:
-            print(self.getIdentification() + " has no solu file status for ", solufileprobname)
+            print(self.getIdentification() + " has no solu file status for ", problemid)
             return None
         

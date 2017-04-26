@@ -95,9 +95,6 @@ class IPETLogFileView(QWidget):
         for s in (self.testrunselection, self.instanceselection):
             self.connect(s, SIGNAL("currentIndexChanged(int)"), self.updateView)
         
-
-
-
     def updateExperimentData(self):
         self.testrunselection.clear()
         self.instanceselection.clear()
@@ -116,8 +113,8 @@ class IPETLogFileView(QWidget):
         outfile = selectedtestrun.getLogFile()
 
         with open(outfile, 'r') as in_file:
-            linesstart = selectedtestrun.problemGetData(str(selectedproblem), "LineNumbers_BeginLogFile")
-            linesend = selectedtestrun.problemGetData(str(selectedproblem), "LineNumbers_EndLogFile")
+            linesstart = selectedtestrun.problemGetDataById(str(selectedproblem), "LineNumbers_BeginLogFile")
+            linesend = selectedtestrun.problemGetDataById(str(selectedproblem), "LineNumbers_EndLogFile")
             self.text = []
             for idx, line in enumerate(in_file):
                 if idx > linesend:

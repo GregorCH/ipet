@@ -53,17 +53,17 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
     '''
     # read keys from kw dictionary
     historytouse = kw.get('historytouse', DEFAULT_HISTORYTOUSE)
-    history = testrun.problemGetData(probname, historytouse)
+    history = testrun.problemGetDataById(probname, historytouse)
     
     xaftersolvekey = kw.get('xaftersolvekey', DEFAULT_XAFTERSOLVEKEY)
-    xaftersolve = testrun.problemGetData(probname, xaftersolvekey)
+    xaftersolve = testrun.problemGetDataById(probname, xaftersolvekey)
     
     xlimitkey = kw.get('xlimitkey', DEFAULT_XLIMITKEY)
-    xlim = testrun.problemGetData(probname, xlimitkey)
+    xlim = testrun.problemGetDataById(probname, xlimitkey)
     
     cutoffgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
     
-    optimum = testrun.problemGetData(probname, 'OptVal')
+    optimum = testrun.problemGetDataById(probname, 'OptVal')
     
     if xlim is None and xaftersolve is None:
         return None
@@ -71,7 +71,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
         history = []
     
     lastboundkey = kw.get('boundkey', DEFAULT_BOUNDKEY)
-    lastbound = testrun.problemGetData(probname, lastboundkey)
+    lastbound = testrun.problemGetDataById(probname, lastboundkey)
     if lastbound is None:
         try:
             lastbound = history[-1][1]

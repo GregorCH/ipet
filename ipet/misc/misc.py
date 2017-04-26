@@ -169,4 +169,4 @@ def convertTimeStamp(timestamp):
     '''
     converts a time stamp (int or float) into a readable string format
     '''
-    datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")

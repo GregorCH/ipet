@@ -29,6 +29,7 @@ from .StatisticReader_SoluFileReader import SoluFileReader
 from .TraceFileReader import TraceFileReader
 import logging
 from ipet.concepts.IPETNode import IpetNode
+#from .Solver import SCIPSolver
 
 
 class ReaderManager(Manager, IpetNode):
@@ -86,9 +87,10 @@ class ReaderManager(Manager, IpetNode):
         IpetNode.__init__(self, True)
         self.problemexpression = problemexpression
         self.problemendexpression = problemendexpression
+        # self.solvers = [SCIPSolver(),]
         # FARIc There also exist the following class params:
         # self.testrun
-        # self.filenstrings
+        # self.filestrings
 
     def getEditableAttributes(self):
         return ["problemexpression", "problemendexpression"]
@@ -207,7 +209,6 @@ class ReaderManager(Manager, IpetNode):
              ])
 
     def updateLineNumberData(self, linenumber, currentcontext, prefix):
-        # FARI1 Is this dictionary supposed to be local?
         context2string = {StatisticReader.CONTEXT_LOGFILE:"LogFile",
                           StatisticReader.CONTEXT_ERRFILE:"ErrFile"}
         contextstring = context2string.get(currentcontext)
@@ -225,86 +226,62 @@ class ReaderManager(Manager, IpetNode):
             if namewithextension.endswith(extension):
                 namewithextension = os.path.splitext(namewithextension)[0]
 
-        # FARI1 this is now filename WITHOUT extension, right?
+        # FARI2 this is now filename WITHOUT extension, right?
         return namewithextension
 
     def finishProblemParsing(self, line, filecontext, readers):
-        # if filecontext in [StatisticReader.CONTEXT_ERRFILE, StatisticReader.CONTEXT_LOGFILE] and StatisticReader.getProblemName() is not None:
-        if filecontext in [StatisticReader.CONTEXT_ERRFILE, StatisticReader.CONTEXT_LOGFILE]:
-            # FARIDO how to make this output more sensible?
+        if filecontext in [StatisticReader.CONTEXT_ERRFILE, StatisticReader.CONTEXT_LOGFILE] and not self.testrun.instanceDataEmpty():
             self.updateLineNumberData(line[0], filecontext, "LineNumbers_End")
-            # self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
             for reader in readers:
                 reader.execEndOfProb()
 
-            if filecontext == StatisticReader.CONTEXT_LOGFILE and not self.endOfInstanceReached(line[1]):
-                # FARIDO how to make this output more sensible?
+            if filecontext == StatisticReader.CONTEXT_LOGFILE and not self.endOfProblemReached(line[1]):
                 logging.warning("Malformatted log output, probably a missing expression %s" % \
                                (self.problemendexpression))
-                #logging.warning("Malformatted log output for instance %s, probably a missing expression %s" % \
-                #               (StatisticReader.getProblemName(), self.problemendexpression))
-            # StatisticReader.setProblemName(None)
             self.testrun.finalizeInstanceCollection()
 
     def updateProblemName(self, line, currentcontext, readers):
         '''
         sets up data structures for a new problem instance if necessary
         '''
-        # FARI1 do we need the next line here?
-        # self.finishProblemParsing(line, currentcontext, readers)
-        # self.problemid = self.problemid+1
         problemname = self.getProblemName(line[1])
-        self.testrun.initializeNextInstanceCollection()
-        # StatisticReader.setProblemName(problemname)
-        # overwrite previous output information from a log file
-        # FARI1 is this when we have multiple outputs of the same instance? Why the logfile condition at the end?
-        # FARIc This should not be interesting anymore since we have unique problemids
-        # if problemname in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
-        #     self.testrun.deleteProblemData(problemname)
         self.testrun.addData('Problemname', problemname)
         # FARIDO what do we do here if we are reading from stdin?
         #self.testrun.addData('Settings', self.testrun.getSettings())
         self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
-    def endOfInstanceReached(self, line):
+    def endOfProblemReached(self, line):
         if line.startswith(self.problemendexpression):
             return True
         else:
             return False
 
-    def startOfInstanceReached(self, line):
+    def startOfProblemReached(self, line):
         if line.startswith(self.problemexpression):
             return True
         else:
             return False
 
-    # FARI1 Deprecate this?
     def readSolverType(self, filename):
         '''
         check the solver type for a given log file
         '''
         with open(filename, "r") as currentfile:
             self.readSolverTypeDirectly(currentfile)
-            return
-            #for line in currentfile:
-            #    for key in list(ReaderManager.solvertype_recognition.keys()):
-            #        if line.startswith(ReaderManager.solvertype_recognition[key]):
-            #            StatisticReader.changeSolverType(key)
-            #            ReaderManager.othersolvers = [solver for solver in list(ReaderManager.solvertype_recognition.keys()) \
-            #                                          if solver != StatisticReader.solvertype]
-            #            return
 
     def readSolverTypeDirectly(self, f):
         '''
         check the solver type for a given log file
         '''
+        lines = []
         for line in f:
+            lines.append(line)
             for key in list(ReaderManager.solvertype_recognition.keys()):
                 if line.startswith(ReaderManager.solvertype_recognition[key]):
                     StatisticReader.changeSolverType(key)
                     ReaderManager.othersolvers = [solver for solver in list(ReaderManager.solvertype_recognition.keys()) \
                                                   if solver != StatisticReader.solvertype]
-                    return
+                    return lines
 
     def sortingKeyContext(self, context):
         try:
@@ -328,16 +305,15 @@ class ReaderManager(Manager, IpetNode):
             self.filestrings = sorted(self.filestrings, key=lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
 
         for filename in self.filestrings:
-            
             f = None
-            if not self.testrun.inputfromstdin:
+            if self.testrun.inputfromstdin:
+                f = sys.stdin.readlines()
+            else:
                 try:
                     f = open(filename, 'r')
                 except IOError:
                     print('File', filename, "doesn't exist!")
                     continue
-            else:
-                f = sys.stdin.readlines()
 
             # only enable readers that support the file context
             # FARIc Default to .out for stdinput, then change if needed
@@ -346,26 +322,40 @@ class ReaderManager(Manager, IpetNode):
                 filecontext = self.filenameGetContext(filename)
             readers = [r for r in self.getManageables(True) if r.supportsContext(filecontext)]
 
-            # search the file for information about the type of the solver
-            self.readSolverTypeDirectly(f)
-
-            # reset the problem name before a new problem is read in
-            # FARI2 TODO how to fix this?
-            # StatisticReader.setProblemName("None")
-
             # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
-            for line in enumerate(f):
-                if self.startOfInstanceReached(line[1]):
+            line = (0,"")
+            startindex = 0
+            if self.testrun.inputfromstdin:
+                # search the file for information about the type of the solver
+                consumedlines = self.readSolverTypeDirectly(f)
+                for line in enumerate(consumedlines):
+                    if self.startOfProblemReached(line[1]):
+                        self.updateProblemName(line, filecontext, readers)
+                        
+                    if self.endOfProblemReached(line[1]):
+                        self.finishProblemParsing(line, filecontext, readers)
+                            
+                    else:
+                        for reader in readers:
+                            reader.operateOnLine(line[1])
+                startindex = len(consumedlines)
+                
+            else:
+                self.readSolverType(filename)
+                
+            for line in enumerate(f, startindex):
+                if self.startOfProblemReached(line[1]):
                     self.updateProblemName(line, filecontext, readers)
-                    
-                if self.endOfInstanceReached(line[1]):
+                
+                if self.endOfProblemReached(line[1]):
                     self.finishProblemParsing(line, filecontext, readers)
+                        
                 else:
                     for reader in readers:
                         reader.operateOnLine(line[1])
-            # FARI1 this 'else' does not make sense, what does it? -> can comment it out?
-            #else:
-            #    self.finishProblemParsing(line, filecontext, readers)
+            
+            self.finishProblemParsing(line, filecontext, readers)
+            
             if not self.testrun.inputfromstdin:
                 f.close()
             self.testrun.finishedReadingFile()

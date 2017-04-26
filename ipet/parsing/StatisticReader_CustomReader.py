@@ -101,7 +101,7 @@ class CustomReader(StatisticReader):
                 data = self.getNumberAtIndex(line, self.index)
                 data = self.datatypemethod(data)
 
-                previousdata = self.testrun.problemGetData(self.problemname, self.datakey)
+                previousdata = self.testrun.problemGetDataById(self.problemname, self.datakey)
 
                 if self.methodint == CustomReader.METHOD_FIRST:
                     if previousdata is None:

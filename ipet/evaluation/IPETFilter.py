@@ -261,7 +261,7 @@ class IPETFilter(IpetNode):
 
     def evaluate(self, value, probname, testrun):
         if value in testrun.getKeySet():
-            return testrun.problemGetData(probname, value)
+            return testrun.problemGetDataById(probname, value)
         else:
             for conversion in [int, float, str]:
                 try:

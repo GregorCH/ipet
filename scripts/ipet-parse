@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 '''
 The MIT License (MIT)
 
@@ -35,7 +35,6 @@ argparser.add_argument('-r', '--readers', nargs = '*', default = [], help = "lis
 argparser.add_argument('-s', '--solufiles', nargs = '*', default = [], help = "list of solu files that should be taken into account")
 argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
 
-
 if __name__ == '__main__':
     try:
         arguments = argparser.parse_args()
@@ -53,7 +52,7 @@ if __name__ == '__main__':
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-    # FARI disable logging to console, in this case we just want the printstatement at the end  
+    # disable logging to console, in this case we just want the printstatement at the end  
     if type(arguments.logfiles) == io.TextIOWrapper:
         logger.setLevel(logging.ERROR)
     
@@ -69,7 +68,7 @@ if __name__ == '__main__':
         for _file in os.listdir('./'):
             if _file.endswith(".xml") or _file.endswith(".ipr"):
                 try:
-                    # Fari: do we use rm? why next line?
+                    # FARI1 do we use rm? why next line? Where do we use rm here?
                     rm = ReaderManager.fromXMLFile(_file)
                     readers.append(_file)
                 except:
@@ -84,11 +83,6 @@ if __name__ == '__main__':
             experiment.readermanager.registerReader(reader)
             logging.info("Registered reader with name %s" % reader.getName())
 
-    # FARI does this work? may these lines move to line 103?
-    #if type(arguments.logfiles) != io.TextIOWrapper:
-    #    for logfile in arguments.logfiles:
-    #        experiment.addOutputFile(logfile)
-        
     # search for solu files in current directory
     if arguments.solufiles == []:
         solufiles = [_file for _file in os.listdir("./") if _file.endswith(".solu")]
@@ -115,8 +109,8 @@ if __name__ == '__main__':
             except:
                 logging.info("skipped testrun %s" % tr.getIdentification())
     else: 
-        # FARI 
         experiment.addStdinput()
         experiment.collectData()
         experiment.printToConsole()
-        # experiment.outputToConsole(stdin) - experiment.getTestRuns()[0].outputToConsole()
+        
+        

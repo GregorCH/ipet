@@ -88,7 +88,6 @@ class StatisticReader(Editable):
     def setTestRun(self, testrun):
         self.testrun = testrun
 
-
     def supportsContext(self, context):
         '''
         returns True if the reader supports a given context, otherwise False
@@ -96,7 +95,6 @@ class StatisticReader(Editable):
         if type(self.context) is int:
             return self.context == context
         else:
-            # FARI1 What type would context be in this case? List? 
             return context in self.context
 
     def getSplitLineWithRegexp(self, regular_exp, line, index = -1, startofline = False):
@@ -165,7 +163,6 @@ class StatisticReader(Editable):
 #          print self.name, " has no such attribute"
             pass
 
-
     def execEndOfProb(self):
         '''
         overwrite this method to implement final behaviour at the end of each problem, such as setting flags
@@ -209,7 +206,6 @@ class BestSolInfeasibleReader(StatisticReader):
     def extractStatistic(self, line):
         if self.regular_exp.search(line):
             self.addData(self.datakey, True)
-
 
 class DateTimeReader(StatisticReader):
     '''

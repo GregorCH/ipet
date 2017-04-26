@@ -1,6 +1,7 @@
 # project-specific
 .testcomp.cmp
 .testrun.trn
+*.trn
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

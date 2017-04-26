@@ -39,12 +39,9 @@ class SoluFileReader(StatisticReader):
         else:
             return None
 
-
     def storeToStatistics(self, instance, objval, status):
         if self.testrun.hasInstance(instance):
-            self.testrun.addData(instance, self.datakeys, [float(objval), status])
-
-
+            self.testrun.addDataByName(self.datakeys, [float(objval), status], instance)
 
     def newoptInstance(self, line):
         splittedline = line.split()

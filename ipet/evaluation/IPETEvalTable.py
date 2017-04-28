@@ -498,7 +498,6 @@ class IPETEvaluation(IpetNode):
         '''
         should the evaluation calculate optimal auto settings?
         '''
-        # FARI1 need to call next fctn?
         self.set_evaluateoptauto(evaloptauto)
 
     def reduceToColumns(self, df_long):

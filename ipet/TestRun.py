@@ -14,6 +14,7 @@ from pandas import DataFrame, notnull
 import pandas as pd
 import os
 import logging
+from ipet.Experiment import Experiment
 
 try:
     import pickle as pickle
@@ -122,7 +123,7 @@ class TestRun:
     def problemGetDataByName(self, problemname, datakey):
         for key, dat in self.datadict.get("Problemname", None):
             if dat == problemname:
-                # FARI1 Is the name unique? What if it is not?
+                # FARI1 Is the name unique? What if it is not? Return list?
                 return self.problemGetDataById(key, datakey)
         return None
 
@@ -147,22 +148,26 @@ class TestRun:
 
     def getData(self):
         """
-        returns a data frame object of the acquired data
+        Return a data frame object of the acquired data
         """
         return self.data
 
     def getMetaData(self):
         """
-        returns a data frame containing meta data
+        Return a data frame containing meta data
         """
         return DataFrame(self.metadatadict)
 
-    def finalizeInstanceCollection(self):
+    def finalizeInstanceCollection(self, solver):
         if self.currentinstancedataseries != {}:
+            # Add data collected by solver into currentinstancedataseries, such as primal and dual bound, 
+            self.addData(solver.getKeys(), solver.getData())
+            
             for key in self.currentinstancedataseries.keys():
                 self.datadict.setdefault(key, {})[self.currentinstanceid] = self.currentinstancedataseries[key]
             self.currentinstancedataseries = {} 
             self.currentinstanceid = self.currentinstanceid + 1
+            
         
     def finishedReadingFile(self):
         self.finalizeInstanceCollection()

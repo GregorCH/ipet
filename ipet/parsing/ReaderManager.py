@@ -16,12 +16,16 @@ import re
 import sys
 from ipet.concepts.Manager import Manager
 import xml.etree.ElementTree as ElementTree
-from .StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
-    GapReader, SolvingTimeReader, TimeLimitReader, \
-    BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
+# from .StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
+#     GapReader, SolvingTimeReader, TimeLimitReader, \
+#     BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
+#     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
+from .StatisticReader import ErrorFileReader, \
+    GapReader, TimeLimitReader, \
+    BestSolInfeasibleReader, MaxDepthReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
 from .StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader, ParascipDualBoundHistoryReader
-from .StatisticReader_GeneralInformationReader import GeneralInformationReader
+# from .StatisticReader_GeneralInformationReader import GeneralInformationReader
 from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
 from .StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
 from .StatisticReader_VariableReader import VariableReader
@@ -29,8 +33,9 @@ from .StatisticReader_SoluFileReader import SoluFileReader
 from .TraceFileReader import TraceFileReader
 import logging
 from ipet.concepts.IPETNode import IpetNode
+from ipet.parsing.Solver import SCIPSolver, CbcSolver, CouenneSolver,\
+    XpressSolver, GurobiSolver, CplexSolver
 #from .Solver import SCIPSolver
-
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -38,18 +43,6 @@ class ReaderManager(Manager, IpetNode):
     """
     extensions = [".mps", ".cip", ".fzn", ".pip", ".lp", ".gms", ".dat"]
     nodetag = "Readers"
-
-    solvertype_recognition = {
-                              StatisticReader.SOLVERTYPE_SCIP:"SCIP version ",
-                              StatisticReader.SOLVERTYPE_GUROBI:"Gurobi Optimizer version",
-                              StatisticReader.SOLVERTYPE_CPLEX:"Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer",
-                              StatisticReader.SOLVERTYPE_XPRESS:"FICO Xpress-Optimizer",
-                              StatisticReader.SOLVERTYPE_CBC:"Welcome to the CBC MILP Solver",
-                              StatisticReader.SOLVERTYPE_COUENNE:" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization"
-                              }
-    """recognition patterns to distinguish between solver types"""
-
-    othersolvers = [solver for solver in list(solvertype_recognition.keys()) if solver != StatisticReader.solvertype]
 
     fileextension2context = {
                              ".err" : StatisticReader.CONTEXT_ERRFILE,
@@ -87,13 +80,22 @@ class ReaderManager(Manager, IpetNode):
         IpetNode.__init__(self, True)
         self.problemexpression = problemexpression
         self.problemendexpression = problemendexpression
-        # self.solvers = [SCIPSolver(),]
-        # FARIc There also exist the following class params:
+        self.addSolvers()
+        self.activeSolver = self.solvers[0]
+        # There also exist the following class params:
         # self.testrun
         # self.filestrings
 
     def getEditableAttributes(self):
         return ["problemexpression", "problemendexpression"]
+    
+    def addSolvers(self):
+        self.solvers = [SCIPSolver(),
+                        CbcSolver(),
+                        CouenneSolver(),
+                        XpressSolver(),
+                        GurobiSolver(),
+                        CplexSolver()]
 
     def getName(self):
         return "ReaderManager"
@@ -184,23 +186,23 @@ class ReaderManager(Manager, IpetNode):
         self.registerListOfReaders([
              BestSolInfeasibleReader(),
              DateTimeReader(),
-             DualBoundReader(),
+#              DualBoundReader(),
              DualBoundHistoryReader(),
              ErrorFileReader(),
              ParascipDualBoundHistoryReader(),
              GapReader(),
-             GeneralInformationReader(),
+#              GeneralInformationReader(),
              MaxDepthReader(),
-             LimitReachedReader(),
+#              LimitReachedReader(),
              NodesReader(),
              ObjsenseReader(),
              PluginStatisticsReader(),
              PrimalBoundHistoryReader(),
-             PrimalBoundReader(),
+#              PrimalBoundReader(),
              VariableReader(),
              RootNodeFixingsReader(),
              SettingsFileReader(),
-             SolvingTimeReader(),
+#             SolvingTimeReader(),
              SoluFileReader(),
              TimeLimitReader(),
              TimeToFirstReader(),
@@ -219,14 +221,14 @@ class ReaderManager(Manager, IpetNode):
     def getProblemName(self, line):
         fullname = line.split()[1]
         namewithextension = os.path.basename(fullname)
-        # FARI2 Shouldn't this be something like ".gz"?
+        # FARI Shouldn't this be something like ".gz"?
         if namewithextension.endswith("gz"):
             namewithextension = os.path.splitext(namewithextension)[0]
         for extension in self.extensions:
             if namewithextension.endswith(extension):
                 namewithextension = os.path.splitext(namewithextension)[0]
 
-        # FARI2 this is now filename WITHOUT extension, right?
+        # now name without extension
         return namewithextension
 
     def finishProblemParsing(self, line, filecontext, readers):
@@ -238,7 +240,8 @@ class ReaderManager(Manager, IpetNode):
             if filecontext == StatisticReader.CONTEXT_LOGFILE and not self.endOfProblemReached(line[1]):
                 logging.warning("Malformatted log output, probably a missing expression %s" % \
                                (self.problemendexpression))
-            self.testrun.finalizeInstanceCollection()
+            self.testrun.finalizeInstanceCollection(self.activeSolver)
+            self.activeSolver.reset()
 
     def updateProblemName(self, line, currentcontext, readers):
         '''
@@ -276,11 +279,9 @@ class ReaderManager(Manager, IpetNode):
         lines = []
         for line in f:
             lines.append(line)
-            for key in list(ReaderManager.solvertype_recognition.keys()):
-                if line.startswith(ReaderManager.solvertype_recognition[key]):
-                    StatisticReader.changeSolverType(key)
-                    ReaderManager.othersolvers = [solver for solver in list(ReaderManager.solvertype_recognition.keys()) \
-                                                  if solver != StatisticReader.solvertype]
+            for solver in self.solvers:
+                if line.startswith(solver.recognition_pattern):
+                    self.activeSolver = solver
                     return lines
 
     def sortingKeyContext(self, context):
@@ -299,8 +300,7 @@ class ReaderManager(Manager, IpetNode):
         """
         assert(self.testrun != None)
 
-        # sort the files by context
-        # FARI2 Why the sorting?
+        # sort the files by context, for example: outfiles should be read before solufiles
         if not self.testrun.inputfromstdin:
             self.filestrings = sorted(self.filestrings, key=lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
 
@@ -316,7 +316,7 @@ class ReaderManager(Manager, IpetNode):
                     continue
 
             # only enable readers that support the file context
-            # FARIc Default to .out for stdinput, then change if needed
+            # Default to .out for stdinput, then change if needed
             filecontext = self.fileextension2context[".out"]
             if not self.testrun.inputfromstdin:
                 filecontext = self.filenameGetContext(filename)
@@ -325,8 +325,10 @@ class ReaderManager(Manager, IpetNode):
             # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
             line = (0,"")
             startindex = 0
+            # FARIDO How to do this better?
+            # search the file for information about the type of the solver
             if self.testrun.inputfromstdin:
-                # search the file for information about the type of the solver
+                # since we have can reach the lines from stdin only once, we have to save them
                 consumedlines = self.readSolverTypeDirectly(f)
                 for line in enumerate(consumedlines):
                     if self.startOfProblemReached(line[1]):
@@ -336,10 +338,10 @@ class ReaderManager(Manager, IpetNode):
                         self.finishProblemParsing(line, filecontext, readers)
                             
                     else:
+                        self.activeSolver.readline(line[1])
                         for reader in readers:
                             reader.operateOnLine(line[1])
                 startindex = len(consumedlines)
-                
             else:
                 self.readSolverType(filename)
                 
@@ -351,6 +353,7 @@ class ReaderManager(Manager, IpetNode):
                     self.finishProblemParsing(line, filecontext, readers)
                         
                 else:
+                    self.activeSolver.readline(line[1])
                     for reader in readers:
                         reader.operateOnLine(line[1])
             

@@ -83,6 +83,11 @@ if __name__ == '__main__':
             experiment.readermanager.registerReader(reader)
             logging.info("Registered reader with name %s" % reader.getName())
 
+    # search for solver files in user home directory
+    #solversdir = os.expanduser("~/.ipet/solvers/")
+    #for solverfile in os.listdir(solversdir):
+    #    experiment.addSolver(solverfile)
+    
     # search for solu files in current directory
     if arguments.solufiles == []:
         solufiles = [_file for _file in os.listdir("./") if _file.endswith(".solu")]

@@ -240,39 +240,6 @@ class DualLPTimeReader(StatisticReader):
     datatype = float
     lineindex = 3
 
-class DualBoundReader(StatisticReader):
-    '''
-    returns the reported dual bound at the end of the solve
-    '''
-    name = 'DualBoundReader'
-    dualboundpatterns = {StatisticReader.SOLVERTYPE_SCIP : "^Dual Bound         :",
-                         StatisticReader.SOLVERTYPE_GUROBI : '^Best objective',
-                         StatisticReader.SOLVERTYPE_CPLEX : '(^Current MIP best bound =|^MIP - Integer optimal)',
-                         StatisticReader.SOLVERTYPE_COUENNE : '^Lower Bound:',
-                         StatisticReader.SOLVERTYPE_XPRESS : "Best bound is"}
-    dualboundlineindices = {StatisticReader.SOLVERTYPE_SCIP :-1,
-                            StatisticReader.SOLVERTYPE_CPLEX : 5,
-                            StatisticReader.SOLVERTYPE_GUROBI : 5,
-                            StatisticReader.SOLVERTYPE_COUENNE : 2,
-                            StatisticReader.SOLVERTYPE_XPRESS :-1}
-    datakey = 'DualBound'
-
-    def extractStatistic(self, line):
-        if re.match(self.dualboundpatterns[StatisticReader.solvertype], line):
-            index = self.dualboundlineindices[StatisticReader.solvertype]
-            if re.search('^MIP - Integer optimal', line):
-                assert StatisticReader.solvertype == StatisticReader.SOLVERTYPE_CPLEX
-                index = -1
-            db = self.getWordAtIndex(line, index)
-            db = db.strip(',');
-            try:
-                db = float(db)
-                if abs(db) != misc.FLOAT_INFINITY:
-                    self.addData(self.datakey, db)
-            except ValueError:
-                pass
-#               print line
-
 class ErrorFileReader(StatisticReader):
     """
     reads information from error files
@@ -349,28 +316,6 @@ class GapReader(StatisticReader):
                 gap = self.turnIntoFloat(gapasword)
                 self.addData(self.datakey, gap)
 
-class LimitReachedReader(StatisticReader):
-    '''
-    reads if memory limit was hit
-    '''
-    name = 'LimitReachedReader'
-
-    regular_exp = {StatisticReader.SOLVERTYPE_SCIP: re.compile(r'\[(.*) (reached|interrupt)\]'),
-                   StatisticReader.SOLVERTYPE_GUROBI: re.compile(r'^(Time limit) reached')}
-    lineexpression = {StatisticReader.SOLVERTYPE_GUROBI: re.compile(r'^Time limit reached'),
-                      StatisticReader.SOLVERTYPE_SCIP: re.compile(r'^SCIP Status        :')}
-    datakey = 'LimitReached'
-
-    def extractStatistic(self, line):
-        if self.lineexpression.get(StatisticReader.solvertype) is None:
-            return
-        if self.lineexpression[StatisticReader.solvertype].match(line):
-            match = self.regular_exp[StatisticReader.solvertype].search(line)
-            if match is not None:
-                stringexpression = match.groups()[0]
-                limit = "".join((part.capitalize() for part in stringexpression.split()))
-                self.addData(self.datakey, limit)
-
 class MaxDepthReader(StatisticReader):
     '''
     reads the maximum depth
@@ -415,33 +360,6 @@ class ObjlimitReader(StatisticReader):
     datatype = float
     lineindex = 5
 
-class PrimalBoundReader(StatisticReader):
-    '''
-    reads the primal bound at the end of the solve
-    '''
-    name = 'PrimalBoundReader'
-    primalboundpatterns = {StatisticReader.SOLVERTYPE_SCIP: '^Primal Bound       :',
-                           StatisticReader.SOLVERTYPE_CPLEX : '^MIP -.*Objective = ',
-                           StatisticReader.SOLVERTYPE_GUROBI : '^Best objective ',
-                           StatisticReader.SOLVERTYPE_COUENNE : "^Upper bound:",
-                           StatisticReader.SOLVERTYPE_XPRESS : "Best integer solution found is"}
-    primalboundlineindices = {StatisticReader.SOLVERTYPE_SCIP: 3,
-                              StatisticReader.SOLVERTYPE_CPLEX :-1,
-                              StatisticReader.SOLVERTYPE_GUROBI : 2,
-                              StatisticReader.SOLVERTYPE_COUENNE : 2,
-                              StatisticReader.SOLVERTYPE_XPRESS :-1}
-    datakey = 'PrimalBound'
-
-    def extractStatistic(self, line):
-        if re.search(self.primalboundpatterns[StatisticReader.solvertype], line):
-            pb = self.getWordAtIndex(line, self.primalboundlineindices[StatisticReader.solvertype])
-            pb = pb.strip(',')
-            if pb != '-':
-                pb = float(pb)
-                if abs(pb) < misc.FLOAT_INFINITY:
-                    self.addData(self.datakey, pb)
-
-
 class RootNodeFixingsReader(StatisticReader):
     '''
     reads the number of variable fixings during root node
@@ -451,39 +369,6 @@ class RootNodeFixingsReader(StatisticReader):
     datakey = 'RootNodeFixs'
     datatype = int
     lineindex = 4
-
-class SolvingTimeReader(StatisticReader):
-    '''
-    reads the overall solving time
-    '''
-    name = 'SolvingTimeReader'
-    datakey = 'SolvingTime'
-
-    solvingtimereadkeys = {
-       StatisticReader.SOLVERTYPE_SCIP : "^Solving Time \(sec\) :",
-       StatisticReader.SOLVERTYPE_CPLEX : "Solution time =",
-       StatisticReader.SOLVERTYPE_GUROBI : "Explored ",
-       StatisticReader.SOLVERTYPE_CBC : "Coin:Total time \(CPU seconds\):",
-       StatisticReader.SOLVERTYPE_XPRESS : " \*\*\* Search ",
-       StatisticReader.SOLVERTYPE_COUENNE : "^Total time:"
-    }
-
-    solvingtimelineindex = {
-       StatisticReader.SOLVERTYPE_SCIP :-1,
-       StatisticReader.SOLVERTYPE_CPLEX : 3,
-       StatisticReader.SOLVERTYPE_GUROBI :-2,
-       StatisticReader.SOLVERTYPE_CBC : 4,
-       StatisticReader.SOLVERTYPE_XPRESS :5,
-       StatisticReader.SOLVERTYPE_COUENNE : 2
-    }
-
-    def extractStatistic(self, line):
-#       print self.solvingtimereadkeys[StatisticReader.solvertype]
-        if re.search(self.solvingtimereadkeys[StatisticReader.solvertype], line):
-            solvingtime = self.getWordAtIndex(line, self.solvingtimelineindex[StatisticReader.solvertype])
-            solvingtime = solvingtime.rstrip('s')
-            logging.debug(line)
-            self.addData(self.datakey, float(solvingtime))
 
 class TimeLimitReader(StatisticReader):
     '''

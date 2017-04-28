@@ -13,13 +13,16 @@ from ipet.parsing.ReaderManager import ReaderManager
 from .TestRun import TestRun
 from ipet import misc
 import pandas
-from ipet.parsing import SolvingTimeReader
+# from ipet.parsing import SolvingTimeReader
 
 import pickle
 from ipet.concepts.Manager import Manager
-
-from ipet.parsing import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
-    BestSolInfeasibleReader, LimitReachedReader, ObjlimitReader, \
+# 
+# from ipet.parsing import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
+#     BestSolInfeasibleReader, LimitReachedReader, ObjlimitReader, \
+#     ObjsenseReader
+from ipet.parsing import ErrorFileReader, \
+    BestSolInfeasibleReader, ObjlimitReader, \
     ObjsenseReader
 
 from ipet.misc.integrals import calcIntegralValue, getProcessPlotData
@@ -33,6 +36,14 @@ class Experiment:
     '''
     an Experiment represents a collection of TestRun objects and the routines for parsing
     '''
+    Key_PrimalBound = "PrimalBound"
+    Key_DualBound = "DualBound"
+    Key_SolvingTime = "SolvingTime"
+    Key_TimeLimitReached = "LimitReached"
+    Key_Solver = "Solver"
+    Key_Version = "Version"
+    Key_Settings = "Settings"
+    Key_SettingsPathAbsolute = "AbsolutePathSettings"
     
     Status_Ok = 'ok'
     Status_SolvedNotVerified = "solved_not_verified"
@@ -166,7 +177,6 @@ class Experiment:
     def getReaderManager(self):
         return self.readermanager
 
-    # FARI1 Do we still need this? Why?
     def updateDatakeys(self):
         '''
         union of all data keys over all instances
@@ -234,28 +244,26 @@ class Experiment:
             for solufilename in self.solufiles:
                 testrun.appendFilename(solufilename)
                 
-        # FARI2 do we really need the same loop again?
         for testrun in testruns:
             self.readermanager.setTestRun(testrun)
             testrun.setupForDataCollection()
             self.readermanager.collectData()
             
+        # FARI1 Is this calculated only for validation? 
         self.makeProbNameList()
         self.calculateGaps()
         self.calculateIntegrals()
         
-        # FARI1 What do we need for validation? 
+        # FARI1 validation
         self.checkProblemStatus()
 
         for testrun in testruns:
             testrun.setupAfterDataCollection()
 
-        # FARI2 do we really need the same loop again?
         for tr in testruns:
             self.testrunmanager.reinsertManageable(tr)
 
         # post processing steps: things like primal integrals depend on several, independent data
-        # FARI2 Why? Aren't we ready to close the programm?
         self.updateDatakeys()
         
     def getDatakeys(self):
@@ -330,8 +338,8 @@ class Experiment:
         solufiledata = {}
         for testrun in self.getTestRuns():
             for probname in testrun.getProblems():
-                pb = testrun.problemGetDataById(probname, PrimalBoundReader.datakey)
-                db = testrun.problemGetDataById(probname, DualBoundReader.datakey)
+                pb = testrun.problemGetDataById(probname, Experiment.Key_PrimalBound)
+                db = testrun.problemGetDataById(probname, Experiment.Key_DualBound)
                 if pb is None or db is None:
                     continue
                 status = '=unkn='
@@ -375,7 +383,7 @@ class Experiment:
     def testrunGetProbGapToOpt(self, testrun, problemid):
         optsol = testrun.problemGetOptimalSolution(problemid)
         status = testrun.problemGetSoluFileStatus(problemid)
-        pb = testrun.problemGetDataById(problemid, PrimalBoundReader.datakey)
+        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
         if status == 'opt' or status == 'best':
             return misc.getGap(float(pb), float(optsol))
         else:
@@ -398,7 +406,8 @@ class Experiment:
         """
         returns True if the primal bound for the given problem exceeds the best known solution value
         """
-        pb = testrun.problemGetDataById(problemid, PrimalBoundReader.datakey)
+        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        # FARIDO Objsense
         objsense = testrun.problemGetDataById(problemid, ObjsenseReader.datakey)
         optval = testrun.problemGetDataById(problemid, "OptVal")
 
@@ -417,8 +426,8 @@ class Experiment:
         """
         returns True if the dual bound for the given problem exceeds the best known solution value
         """
-        db = testrun.problemGetDataById(problemid, DualBoundReader.datakey)
-        pb = testrun.problemGetDataById(problemid, PrimalBoundReader.datakey)
+        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
+        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
 
         if db is None:
             return False
@@ -441,9 +450,9 @@ class Experiment:
         """
         determine status for a problem for which we know the optimal solution value
         """
-        pb = testrun.problemGetDataById(problemid, PrimalBoundReader.datakey)
-        db = testrun.problemGetDataById(problemid, DualBoundReader.datakey)
-        limitreached = testrun.problemGetDataById(problemid, LimitReachedReader.datakey)
+        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
+        limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
         objlimitreached = (limitreached == "objectiveLimit")
         optval = testrun.problemGetDataById(problemid, "OptVal")
         objsense = testrun.problemGetDataById(problemid, ObjsenseReader.datakey)
@@ -477,9 +486,9 @@ class Experiment:
         """
         determine status for a problem for which we only know a best solution value
         """
-        pb = testrun.problemGetDataById(problemid, PrimalBoundReader.datakey)
-        db = testrun.problemGetDataById(problemid, DualBoundReader.datakey)
-        limitreached = testrun.problemGetDataById(problemid, LimitReachedReader.datakey)
+        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
+        limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
 
         # we failed because dual bound is higher than the known value of a primal bound
         if self.isDualBoundBetter(testrun, problemid):
@@ -501,9 +510,9 @@ class Experiment:
         """
         determine status for a problem for which we don't know anything about the feasibility or optimality
         """
-        pb = testrun.problemGetDataById(problemid, PrimalBoundReader.datakey)
-        db = testrun.problemGetDataById(problemid, DualBoundReader.datakey)
-        limitreached = testrun.problemGetDataById(problemid, LimitReachedReader.datakey)
+        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
+        limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
 
         if limitreached:
             testrun.addData('Status', limitreached.lower(), problemid)
@@ -519,12 +528,12 @@ class Experiment:
         """
         determine status for a problem for which we know it's infeasible
         """
-        pb = testrun.problemGetDataById(problemid, PrimalBoundReader.datakey)
+        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
         solfound = True if pb is not None else False
 
         # no solution was found
         if not solfound:
-            limitreached = testrun.problemGetDataById(problemid, LimitReachedReader.datakey)
+            limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
             # calc was inconclusive
             if limitreached in ['TimeLimit', 'MemoryLimit', 'NodeLimit']:
                 testrun.addData('Status', limitreached.lower(), problemid)
@@ -542,13 +551,12 @@ class Experiment:
         '''
         logging.debug('Checking problem status')
         for testrun in self.getTestRuns():
-            # FARI tr.getProblems returns name or id?
             for problemid in testrun.getProblems():
                 solustatus = testrun.problemGetSoluFileStatus(problemid)
                 errcode = testrun.problemGetDataById(problemid, ErrorFileReader.datakey)
 
                 # an error code means that the instance aborted
-                if errcode is not None or testrun.problemGetDataById(problemid, SolvingTimeReader.datakey) is None:
+                if errcode is not None or testrun.problemGetDataById(problemid, Experiment.Key_SolvingTime) is None:
                     testrun.addData('Status', self.Status_FailAbort, problemid)
 
                 # if the best solution was not feasible in the original problem, it's a fail

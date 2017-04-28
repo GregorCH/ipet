@@ -16,7 +16,7 @@ import re
 import numpy
 import shutil
 from pandas.util.testing import assert_frame_equal
-
+import sys
 from ipet.Experiment import Experiment
 from ipet.TestRun import TestRun
 from ipet.parsing import ListReader
@@ -47,6 +47,8 @@ class ExperimentTest(unittest.TestCase):
         (1, "LineNumbers_BeginLogFile", 276),
         (1, "LineNumbers_EndLogFile", 575),
     ]
+    
+    checkColumns=['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
 
     def setUp(self):
         try:
@@ -73,6 +75,28 @@ class ExperimentTest(unittest.TestCase):
                   (index, column, repr(value), repr(entry))
             self.assertEqual(entry, value, msg)
 
+    # FARI How to fake input from stdin?
+    def test_datacollection_from_stdin(self):
+        fname = "bell3a.out"
+        out_file = os.path.join(DATADIR, fname)
+        with open(out_file, "r") as f:
+            sys.stdin = f
+             
+            self.experiment.addStdinput()
+            self.experiment.collectData()
+            sys.stdin = sys.__stdin__
+
+        experimentFromFile = Experiment()
+        experimentFromFile.addOutputFile(out_file)
+        experimentFromFile.collectData()
+        
+        trstdin = self.experiment.getTestRuns()[0]
+        trfile = experimentFromFile.getTestRuns()[0]
+        
+        columns = ["PrimalBound", "DualBound", "SolvingTime"]
+
+        self.checkTestrunsEqual(trstdin, trfile, columns)
+
     def test_instance_name_parsing(self):
         fname = "check.IP_0s_1s.scip-3.2.1.2.linux.x86_64.gnu.dbg.cpx.opt-low.default.out"
         out_file = os.path.join(DATADIR, fname)
@@ -82,8 +106,11 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.collectData()
         data = self.experiment.getTestRuns()[0].getData()
         # ensure that the correct number of instances are properly parsed
-        # FARI1 sure? must be 411 instead of 408?
         self.assertEqual(len(data), 411)
+
+    def checkTestrunsEqual(self, tr, tr2, columns=checkColumns):
+        msg = "Testruns do not have exactly same column data."
+        return self.assertIsNone(assert_frame_equal(tr.getData()[columns], tr2.getData()[columns]), msg)
 
     def test_saveAndLoad(self):
         fname = "check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"
@@ -100,10 +127,7 @@ class ExperimentTest(unittest.TestCase):
         trn_file = os.path.join(DATADIR, ".testrun.trn")
         tr.saveToFile(trn_file)
         tr2 = TestRun.loadFromFile(trn_file)
-
-        columns = ['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
-        msg = "Testruns do not have exactly same column data:"
-        self.assertIsNone(assert_frame_equal(tr.getData()[columns], tr2.getData()[columns]), msg)
+        self.checkTestrunsEqual(tr, tr2)
 
     def test_problemNameRecognition(self):
         rm = ReaderManager()
@@ -244,4 +268,4 @@ def estimate_type(var):
 if __name__ == "__main__":
     unittest.main()
     
-      
+    

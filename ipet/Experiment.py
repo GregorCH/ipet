@@ -17,14 +17,14 @@ import pandas
 
 import pickle
 from ipet.concepts.Manager import Manager
-# 
+#
 # from ipet.parsing import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
 #     BestSolInfeasibleReader, LimitReachedReader, ObjlimitReader, \
 #     ObjsenseReader
 from ipet.parsing import ErrorFileReader, \
     BestSolInfeasibleReader, ObjlimitReader, \
     ObjsenseReader
-from ipet.parsing.Key import Key
+from ipet.parsing import Key
 from ipet.misc.integrals import calcIntegralValue, getProcessPlotData
 from pandas import Panel
 import pandas as pd

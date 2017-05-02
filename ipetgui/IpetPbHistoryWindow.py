@@ -38,7 +38,6 @@ from ipet.TestRun import TestRun
 from ipet.misc.integrals import getProcessPlotData, getMeanIntegral
 from .IpetMainWindow import IpetMainWindow
 from ipet.parsing.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
-from ipet.parsing.StatisticReader import DualBoundReader
 from matplotlib.pyplot import cm
 import numpy
 

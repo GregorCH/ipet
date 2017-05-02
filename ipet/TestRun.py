@@ -10,6 +10,7 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 import ipet.misc as misc
+from ipet.parsing import Key
 from pandas import DataFrame, notnull
 import os
 import logging
@@ -61,15 +62,15 @@ class TestRun:
 
         after data was added, the method problemGetDataById() can be used for access
         """
-        for problemkey, name in self.datadict.setdefault('Problemname', None):
-            if name == problem: 
+        for problemkey, name in self.datadict.setdefault(Key.ProblemName, None):
+            if name == problem:
                 if type(datakeys) is list and type(data) is list:
                     for key, datum in zip(datakeys, data):
                         self.datadict.setdefault(key, {})[problemkey] = datum
                     else:
                         self.datadict.setdefault(datakeys, {})[problemkey] = data
 
-    def addData(self, datakeys, data, instanceid=None):
+    def addData(self, datakeys, data, instanceid = None):
         """
         add the current data or to the problem with specified id - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length

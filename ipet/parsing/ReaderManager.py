@@ -33,9 +33,10 @@ from .StatisticReader_SoluFileReader import SoluFileReader
 from .TraceFileReader import TraceFileReader
 import logging
 from ipet.concepts.IPETNode import IpetNode
-from ipet.parsing.Solver import SCIPSolver, CbcSolver, CouenneSolver,\
+from ipet.parsing.Solver import SCIPSolver, CbcSolver, CouenneSolver, \
     XpressSolver, GurobiSolver, CplexSolver
-#from .Solver import SCIPSolver
+from ipet.parsing import Key
+# from .Solver import SCIPSolver
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -248,9 +249,10 @@ class ReaderManager(Manager, IpetNode):
         sets up data structures for a new problem instance if necessary
         """
         problemname = self.getProblemName(line[1])
-        self.testrun.addData('Problemname', problemname)
+
+        self.testrun.addData(Key.ProblemName, problemname)
         # FARIDO what do we do here if we are reading from stdin?
-        #self.testrun.addData('Settings', self.testrun.getSettings())
+        # self.testrun.addData('Settings', self.testrun.getSettings())
         self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
     def endOfProblemReached(self, line):

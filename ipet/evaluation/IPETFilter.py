@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 from ipet.concepts import IpetNode, IpetNodeAttributeError
@@ -18,7 +18,7 @@ class IPETInstance(IpetNode):
     nodetag = "Instance"
     
     def __init__(self, name = None, active = True):
-        '''
+        """
         constructs an Ipet Instance
         
         Parameters
@@ -26,7 +26,7 @@ class IPETInstance(IpetNode):
         
         name : The name of this instance
         active : True or "True" if this element should be active, False otherwise
-        '''
+        """
         super(IPETInstance, self).__init__(active)
         self.name = name
         
@@ -50,10 +50,10 @@ class IPETInstance(IpetNode):
         return me
 
 class IPETComparison:
-    '''
+    """
     comparison operators for filters. All standard binary comparisons + float comparisons (with tolerance)
     + percentage based inequality
-    '''
+    """
     comparisondict = {
                       "le":"le",
                       "lt":"lt",
@@ -64,9 +64,9 @@ class IPETComparison:
                       }
 
     def __init__(self, operator):
-        '''
+        """
         constructs a comparison object by passing an appropriate operator as string
-        '''
+        """
         if str(operator) in IPETComparison.comparisondict:
             self.operator = str(operator)
         else:
@@ -95,9 +95,9 @@ class IPETComparison:
         return x != y
 
 class IPETFilter(IpetNode):
-    '''
+    """
     Filters are used for selecting subsets of problems to analyze.
-    '''
+    """
     instanceoperators = ["keep", "drop"]
     attribute2Options = {
                          "anytestrun":["one", "all"],
@@ -106,7 +106,7 @@ class IPETFilter(IpetNode):
     
 
     def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = 'all', active = True):
-        '''
+        """
         filter constructor
         
         Parameters
@@ -117,7 +117,7 @@ class IPETFilter(IpetNode):
         operator : operator such that evaluation expression1 op expression2 yields True or False
         anytestrun : either 'one' or 'all' 
         active : True or "True" if this filter should be active, False otherwise
-        '''
+        """
 
         super(IPETFilter, self).__init__(active)
         self.expression1 = expression1
@@ -158,12 +158,12 @@ class IPETFilter(IpetNode):
             self.comparison = IPETComparison(self.operator)
 
     def getEditableAttributes(self):
-        '''
+        """
         returns editable attributes depending on the selected operator
 
         if a binary operator is selected, two expressions as left and right hand side of operator must be chosen
         For instance operators, no expressions are selectable.
-        '''
+        """
         parenteditables = super(IPETFilter, self).getEditableAttributes()
 
         if self.operator in list(IPETComparison.comparisondict.keys()):
@@ -209,9 +209,9 @@ class IPETFilter(IpetNode):
         return False
 
     def filterProblem(self, probname, testruns=[]):
-        '''
+        """
         return True or False depending on the evaluation of the filter operator comparison
-        '''
+        """
 
         # apply an instance operator directly
         if self.operator in self.instanceoperators:
@@ -284,18 +284,18 @@ class IPETFilter(IpetNode):
         return me
 
 class IPETFilterGroup(IpetNode):
-    '''
+    """
     represents a list of filters, has a name attribute for quick tabular representation
 
     a filter group collects
-    '''
+    """
     nodetag = "FilterGroup"
     attribute2options = {"filtertype":["union", "intersection"]}
     
     editableAttributes = ["name", "filtertype"]
 
     def __init__(self, name = None, filtertype = "intersection", active = True):
-        '''
+        """
         constructor for a filter group
 
         Parameters:
@@ -303,7 +303,7 @@ class IPETFilterGroup(IpetNode):
         name : a suitable name for the filter group
         filtertype : either 'union' or 'intersection'
         active : True or "True" if this filter group should be active, False otherwise
-        '''
+        """
         super(IPETFilterGroup, self).__init__(active)
 
         self.name = name
@@ -336,13 +336,13 @@ class IPETFilterGroup(IpetNode):
         return self.attribute2options.get(attr, super(IPETFilterGroup, self).getRequiredOptionsByAttribute(attr))
 
     def addFilter(self, filter_):
-        '''
+        """
         add a filter to the list of filters.
 
         Parameters
         ----------
         filter_ : an instance of IPETFilter
-        '''
+        """
         self.filters.append(filter_)
 
     def getName(self):
@@ -353,9 +353,9 @@ class IPETFilterGroup(IpetNode):
 
 
     def filterDataFrame(self, df):
-        '''
+        """
         filters a data frame object as the intersection of all instances that match the criteria defined by the filters
-        '''
+        """
 
         groups = df.groupby(level=0)
         # first, get the highest number of instance occurrences. This number must be matched to keep the instance
@@ -395,9 +395,9 @@ class IPETFilterGroup(IpetNode):
 
     @staticmethod
     def processXMLElem(elem):
-        '''
+        """
         inspect and process an xml element
-        '''
+        """
         if elem.tag == IPETFilterGroup.getNodeTag():
             filtergroup = IPETFilterGroup(**elem.attrib)
             for child in elem:
@@ -415,17 +415,17 @@ class IPETFilterGroup(IpetNode):
 
     @staticmethod
     def fromXML(xmlstring):
-        '''
+        """
         parse an xml string matching the filter group XML syntax
-        '''
+        """
         tree = ElementTree.fromstring(xmlstring)
         return IPETFilterGroup.processXMLElem(tree)
 
     @staticmethod
     def fromXMLFile(xmlfilename):
-        '''
+        """
         parse a file containing an xml string matching the filter group XML representation syntax
-        '''
+        """
         tree = ElementTree.parse(xmlfilename)
         return IPETFilterGroup.processXMLElem(tree.getroot())
 

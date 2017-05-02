@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from PyQt4.QtGui import QTreeWidget, QTreeWidgetItem, QMainWindow, QApplication,\
     QWidget, QHBoxLayout, QFrame, QIcon, QLabel, QVBoxLayout, QGridLayout, QColor
 from ipet.evaluation import IPETEvaluation, IPETEvaluationColumn
@@ -53,9 +53,9 @@ class IpetTreeViewItem(QTreeWidgetItem):
 
 
 class IpetTreeView(QTreeWidget):
-    '''
+    """
     classdocs
-    '''
+    """
     imagepath = osp.sep.join((osp.dirname(__file__), osp.pardir, "images"))
     icons = {IPETEvaluationColumn:(osp.sep.join((imagepath, "Letter-C-violet-icon.png"))),
              Aggregation:(osp.sep.join((imagepath, "Letter-A-dg-icon.png"))),
@@ -64,9 +64,9 @@ class IpetTreeView(QTreeWidget):
              IPETInstance:(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
 
     def __init__(self, parent = None):
-        '''
+        """
         Constructor
-        '''
+        """
         super(IpetTreeView, self).__init__(parent)
         self.header().hide()
         self.setAlternatingRowColors(True)
@@ -89,9 +89,9 @@ class IpetTreeView(QTreeWidget):
             item.setMyIcon(QIcon(filename))
             
     def itemGetEditable(self, item):
-        '''
+        """
         returns the Editable object corresponding to the given item
-        '''
+        """
         return item.getIpetNode()
         
     def currentItemAcceptsClassAsChild(self, nodeclass):

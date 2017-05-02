@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .StatisticReader import StatisticReader, ListReader
 from ipet.parsing.StatisticReader_CustomReader import CustomReader
 import os
@@ -65,7 +65,7 @@ class ReaderManager(Manager, IpetNode):
     xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
 
     def __init__(self, problemexpression = "@01", problemendexpression = "=ready="):
-        '''
+        """
         constructs a new reader Manager
 
         Parameters:
@@ -74,7 +74,7 @@ class ReaderManager(Manager, IpetNode):
         problemexpression : an expression that accompanies the start of a new instance in a log file context
 
         problemendexpression : an expression that signals the end of an instance in a log file context
-        '''
+        """
         Manager.__init__(self)
         # an ipet Node is always active
         IpetNode.__init__(self, True)
@@ -133,9 +133,9 @@ class ReaderManager(Manager, IpetNode):
         self.fileextension2context[extension] = context
 
     def getFileExtensions(self):
-        '''
+        """
         returns a list of all recognized file extensions by this Reader manager
-        '''
+        """
         return list(self.fileextension2context.keys())
 
     def addLogFileExtension(self, extension):
@@ -244,9 +244,9 @@ class ReaderManager(Manager, IpetNode):
             self.activeSolver.reset()
 
     def updateProblemName(self, line, currentcontext, readers):
-        '''
+        """
         sets up data structures for a new problem instance if necessary
-        '''
+        """
         problemname = self.getProblemName(line[1])
         self.testrun.addData('Problemname', problemname)
         # FARIDO what do we do here if we are reading from stdin?
@@ -266,16 +266,16 @@ class ReaderManager(Manager, IpetNode):
             return False
 
     def readSolverType(self, filename):
-        '''
+        """
         check the solver type for a given log file
-        '''
+        """
         with open(filename, "r") as currentfile:
             self.readSolverTypeDirectly(currentfile)
 
     def readSolverTypeDirectly(self, f):
-        '''
+        """
         check the solver type for a given log file
-        '''
+        """
         lines = []
         for line in f:
             lines.append(line)
@@ -361,7 +361,7 @@ class ReaderManager(Manager, IpetNode):
             
             if not self.testrun.inputfromstdin:
                 f.close()
-            self.testrun.finishedReadingFile()
+            self.testrun.finishedReadingFile(self.activeSolver)
         # print("Collection of data finished")
         return 1
     

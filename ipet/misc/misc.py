@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,16 +8,16 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from math import *
 from xml.dom.minidom import parseString
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 import datetime
 
-'''
+"""
    Various methods for evaluation such as gap calculation, geometric means etc. and some printing methods
-'''
+"""
 FLOAT_INFINITY = 1e20
 FLOAT_LARGE = 1e15
 INT_INFINITY = 1e09
@@ -41,11 +41,11 @@ def getCplexGap(value, referencevalue):
     return getGap(value, referencevalue, True)
 
 def getGap(value, referencevalue, useCplexGap=False):
-    '''
+    """
     calculate the gap between value and reference value in percent. Gap is either calculated
     w.r.t the referencevalue, i.e., abs(value-referencevalue)/abs(referencevalue) * 100,
     or in 'Cplex'-fashion, that is,  abs(value-referencevalue)/max(abs(referencevalue), abs(value)) * 100
-    '''
+    """
     if value in [None, FLOAT_INFINITY] or referencevalue in [None, FLOAT_INFINITY]:
         return FLOAT_INFINITY
 
@@ -66,30 +66,30 @@ def getGap(value, referencevalue, useCplexGap=False):
 
 
 def listGetArithmeticMean(listofnumbers):
-    '''
+    """
     returns the arithmetic mean of a list of numbers
-    '''
+    """
     arithmeticmean = sum(listofnumbers)
     arithmeticmean /= max(len(listofnumbers),1)*1.0
     return arithmeticmean
 
 def shmean(listofnumbers, shiftby=10.0):
-    '''
+    """
     convenience function to have shorter access to shifted geometric mean
-    '''
+    """
     return listGetShiftedGeometricMean(listofnumbers, shiftby)
 
 def gemean(listofnumbers, mingeommean=DEFAULT_MIN_GEOM_MEAN):
-    '''
+    """
     convenience function to have shorter access to geometric mean
-    '''
+    """
     return listGetGeomMean(listofnumbers, mingeommean)
 
 def listGetGeomMean(listofnumbers, mingeommean=DEFAULT_MIN_GEOM_MEAN):
-    '''
+    """
     returns the geometric mean of a list of numbers, where each element under consideration
     has value min(element, mingeommean)
-    '''
+    """
     geommean = 1.0
     nitems = 0
     for number in listofnumbers:
@@ -99,10 +99,10 @@ def listGetGeomMean(listofnumbers, mingeommean=DEFAULT_MIN_GEOM_MEAN):
     return geommean
 
 def listGetShiftedGeometricMean(listofnumbers, shiftby=10.0):
-    '''
+    """
     returns the shifted geometric mean of a list of numbers, where the additional shift defaults to
     10.0 and can be set via shiftby
-    '''
+    """
     geommean = 1.0
     nitems = 0
     for number in listofnumbers:
@@ -152,11 +152,11 @@ def listGetMinColWidth(listofitems):
     return maxlen
 
 def saveAsXML(nodeobject, filename):
-    '''
+    """
     save object as XML file under the specified filename
 
     object must have a 'toXMLElem'-method
-    '''
+    """
 
     xml = nodeobject.toXMLElem()
 
@@ -166,7 +166,7 @@ def saveAsXML(nodeobject, filename):
         thefile.write(dom.toprettyxml())
 
 def convertTimeStamp(timestamp):
-    '''
+    """
     converts a time stamp (int or float) into a readable string format
-    '''
+    """
     return datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")

@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .IpetMainWindow import IpetMainWindow
 from PyQt4.QtGui import QLayout, QHBoxLayout
 from PyQt4.Qt import QVBoxLayout, QWidget, QFrame, QTextEdit, QApplication, QFileDialog, QKeySequence, QTextBrowser, QComboBox, \
@@ -33,9 +33,9 @@ class IPETLogFileView(QWidget):
         """
 
 
-    '''
+    """
     a view of a log file, with selection mechanisms for the desired test run and instance that should be shown
-    '''
+    """
     def __init__(self, parent = None):
         super(IPETLogFileView, self).__init__(parent)
         vlayout = QVBoxLayout(self)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -9,14 +9,14 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .StatisticReader import StatisticReader
 import re
 
 class VariableReader(StatisticReader):
-    '''
+    """
     Reader class to parse SCIP variable and constraint counts for original and transformed problem
-    '''
+    """
     name = 'VariableReader'
     varexp = re.compile(r'^  Variables        :')
     consexp= re.compile(r'^  Constraints      :')

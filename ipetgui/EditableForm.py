@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from PyQt4.QtGui import QDialog, QFormLayout, QLabel, QLineEdit, QApplication,\
     QComboBox, QCompleter, QWidget, QMainWindow, QCheckBox
 import sys
@@ -19,9 +19,9 @@ from ipet.evaluation.IPETFilter import IPETFilter
 from ipet.concepts.Editable import EditableAttributeError
 
 class EditableForm(QWidget):
-    '''
+    """
     classdocs
-    '''
+    """
     availableOptions = {}
     
     USERINPUT_SIGNAL = "userinput"
@@ -35,9 +35,9 @@ class EditableForm(QWidget):
         EditableForm.availableOptions[key] = sorted(currentoptionsforkey + moreoptions)
         
     def __init__(self, editable, parent=None):
-        '''
+        """
         Constructor
-        '''
+        """
         
         super(EditableForm, self).__init__(parent)
         layout = EditableFormLayout()
@@ -108,9 +108,9 @@ class EditableForm(QWidget):
             return str(optioninlist)
         
     def errorAdjustValWidget(self, widget):
-        '''
+        """
         adjust a widget to inform the user that it there is an error
-        '''
+        """
         p = widget.palette()
         p.setColor(widget.backgroundRole(), Qt.red)
         widget.setPalette(p)
@@ -129,9 +129,9 @@ class EditableForm(QWidget):
         return options
 
     def valToWidgetContainer(self, attr, val):
-        '''
+        """
         construct a widget container for the specified attribute
-        '''
+        """
         options = self.getRequiredOptionsListForAttribute(attr)
 
         # the default container type is the more general one
@@ -172,23 +172,23 @@ class EditableForm(QWidget):
 class EditableAttributeWidgetContainer:
 
     def __init__(self, attr, widget, valueCallable):
-        '''
+        """
         constructs a container that has both the attribute and the corresponding widget
-        '''
+        """
         self._attribute = attr
         self._valueCallable = valueCallable
         self._widget = widget
 
     def getWidget(self):
-        '''
+        """
         returns the widget of this container
-        '''
+        """
         return self._widget
 
     def getAttribute(self):
-        '''
+        """
         returns the attribute of this container
-        '''
+        """
         return self._attribute
 
     def getWidgetValue(self):

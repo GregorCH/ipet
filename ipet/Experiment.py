@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from ipet.parsing.ReaderManager import ReaderManager
 from .TestRun import TestRun
 from ipet import misc
@@ -24,7 +24,7 @@ from ipet.concepts.Manager import Manager
 from ipet.parsing import ErrorFileReader, \
     BestSolInfeasibleReader, ObjlimitReader, \
     ObjsenseReader
-
+from ipet.parsing.Key import Key
 from ipet.misc.integrals import calcIntegralValue, getProcessPlotData
 from pandas import Panel
 import pandas as pd
@@ -33,18 +33,9 @@ import sys
 import logging
 
 class Experiment:
-    '''
+    """
     an Experiment represents a collection of TestRun objects and the routines for parsing
-    '''
-    Key_PrimalBound = "PrimalBound"
-    Key_DualBound = "DualBound"
-    Key_SolvingTime = "SolvingTime"
-    Key_TimeLimitReached = "LimitReached"
-    Key_Solver = "Solver"
-    Key_Version = "Version"
-    Key_Settings = "Settings"
-    Key_SettingsPathAbsolute = "AbsolutePathSettings"
-    
+    """
     Status_Ok = 'ok'
     Status_SolvedNotVerified = "solved_not_verified"
     Status_Better = "better"
@@ -70,16 +61,16 @@ class Experiment:
     
     @staticmethod
     def getBestStatus(*args):
-        '''
+        """
         returns the best status among a list of status codes given as args
-        '''
+        """
         return max(*args, key = lambda x : Experiment._status2Priority.get(x, 0))
     
     @staticmethod
     def getWorstStatus(*args):
-        '''
+        """
         return the worst status among a list of status codes
-        '''
+        """
         return min(*args, key = lambda x : Experiment._status2Priority.get(x, 0)) 
                         
 
@@ -141,34 +132,34 @@ class Experiment:
         self.updateDatakeys()
         
     def addSoluFile(self, solufilename):
-        '''
+        """
         associate a solu file with all testruns
-        '''
+        """
         if solufilename not in self.solufiles:
             self.solufiles.append(solufilename)
 
     def removeTestrun(self, testrun):
-        '''
+        """
         remove a testrun object from the experiment
-        '''
+        """
         self.testrunmanager.deleteManageable(testrun)
 
     def addReader(self, reader):
-        '''
+        """
         add a reader to the experiments reader manager
-        '''
+        """
         self.readermanager.registerReader(reader)
 
     def hasReader(self, reader):
-        '''
+        """
         return True if reader is already present
-        '''
+        """
         return self.readermanager.hasReader(reader)
 
     def getProblems(self):
-        '''
+        """
         returns the list of problem names
-        '''
+        """
         return self.probnamelist
 
     def getTestRuns(self):
@@ -178,9 +169,9 @@ class Experiment:
         return self.readermanager
 
     def updateDatakeys(self):
-        '''
+        """
         union of all data keys over all instances
-        '''
+        """
         keyset = set()
         for testrun in self.getTestRuns():
             for key in testrun.getKeySet():
@@ -206,25 +197,25 @@ class Experiment:
         self.probnamelist = sorted(list(problemset))
 
     def getManager(self, managedclass):
-        '''
+        """
         get a specific manager of the experiment manager set. if managedclass is 'Testrun' or 'testrun',
         this will return the testrun manager object of this experiment
-        '''
+        """
         lowerclass = managedclass.lower()
         if hasattr(self, lowerclass + 'manager'):
             return getattr(self, lowerclass + 'manager')
 
     def getManagers(self):
-        '''
+        """
         returns a dictionary of all managers of this experiment object
-        '''
+        """
         managernames = [name for name in dir(self) if name.endswith('manager')]
         return {name:getattr(self, name) for name in managernames}
 
     def addExternalDataFile(self, filename):
-        '''
+        """
         add a filename pointing to an external file, eg a solu file with additional information
-        '''
+        """
         try:
             self.externaldata = pd.read_table(filename, sep = " *", engine = 'python', header = 1, skipinitialspace = True)
             self.updateDatakeys()
@@ -234,9 +225,9 @@ class Experiment:
             raise ValueError("Error reading file name %s"%filename)
 
     def collectData(self):
-        '''
+        """
         iterate over log files and solu file and collect data via installed readers
-        '''
+        """
 
         # add solu file to testrun if it's not yet done
         testruns = self.getTestRuns()
@@ -273,9 +264,9 @@ class Experiment:
         self.data = pandas.concat([tr.data for tr in self.getTestRuns()])
 
     def calculateGaps(self):
-        '''
+        """
         calculate and store primal and dual gap
-        '''
+        """
         for testrun in self.getTestRuns():
             for problemid in self.probnamelist:
 
@@ -290,10 +281,10 @@ class Experiment:
                             testrun.addData(thename, gap, problemid)
 
     def getJoinedData(self):
-        '''
+        """
         concatenate the testrun data (possibly joined with external data)
 
-        '''
+        """
         datalist = []
         for tr in self.getTestRuns():
             trdata = tr.data
@@ -304,9 +295,9 @@ class Experiment:
         return pd.concat(datalist)
 
     def calculateIntegrals(self):
-        '''
+        """
         calculates and stores primal and dual integral values for every problem under 'PrimalIntegral' and 'DualIntegral'
-        '''
+        """
         dualargs = dict(historytouse='dualboundhistory', boundkey='DualBound')
         for testrun in self.getTestRuns():
 
@@ -331,15 +322,15 @@ class Experiment:
                         logging.error("Error for dual bound on problem %s, list: %s "%(problemid, processplotdata))
 
     def writeSolufile(self):
-        '''
+        """
         write a solu file based on the parsed results
-        '''
+        """
         # ## collect data
         solufiledata = {}
         for testrun in self.getTestRuns():
             for probname in testrun.getProblems():
-                pb = testrun.problemGetDataById(probname, Experiment.Key_PrimalBound)
-                db = testrun.problemGetDataById(probname, Experiment.Key_DualBound)
+                pb = testrun.problemGetDataById(probname, Key.PrimalBound)
+                db = testrun.problemGetDataById(probname, Key.DualBound)
                 if pb is None or db is None:
                     continue
                 status = '=unkn='
@@ -383,18 +374,18 @@ class Experiment:
     def testrunGetProbGapToOpt(self, testrun, problemid):
         optsol = testrun.problemGetOptimalSolution(problemid)
         status = testrun.problemGetSoluFileStatus(problemid)
-        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        pb = testrun.problemGetDataById(problemid, Key.PrimalBound)
         if status == 'opt' or status == 'best':
             return misc.getGap(float(pb), float(optsol))
         else:
             return misc.FLOAT_INFINITY
 
     def checkForFails(self):
-        '''
+        """
         all testruns and instances go through fail check.
 
         returns a dictionary to contain all instances which failed
-        '''
+        """
         faildict = {}
         for testrun in self.getTestRuns():
             for probname in self.probnamelist:
@@ -406,7 +397,7 @@ class Experiment:
         """
         returns True if the primal bound for the given problem exceeds the best known solution value
         """
-        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        pb = testrun.problemGetDataById(problemid, Key.PrimalBound)
         # FARIDO Objsense
         objsense = testrun.problemGetDataById(problemid, ObjsenseReader.datakey)
         optval = testrun.problemGetDataById(problemid, "OptVal")
@@ -426,8 +417,8 @@ class Experiment:
         """
         returns True if the dual bound for the given problem exceeds the best known solution value
         """
-        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
-        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        db = testrun.problemGetDataById(problemid, Key.DualBound)
+        pb = testrun.problemGetDataById(problemid, Key.PrimalBound)
 
         if db is None:
             return False
@@ -450,9 +441,9 @@ class Experiment:
         """
         determine status for a problem for which we know the optimal solution value
         """
-        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
-        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
-        limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
+        pb = testrun.problemGetDataById(problemid, Key.PrimalBound)
+        db = testrun.problemGetDataById(problemid, Key.DualBound)
+        limitreached = testrun.problemGetDataById(problemid, Key.TimeLimitReached)
         objlimitreached = (limitreached == "objectiveLimit")
         optval = testrun.problemGetDataById(problemid, "OptVal")
         objsense = testrun.problemGetDataById(problemid, ObjsenseReader.datakey)
@@ -486,9 +477,9 @@ class Experiment:
         """
         determine status for a problem for which we only know a best solution value
         """
-        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
-        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
-        limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
+        pb = testrun.problemGetDataById(problemid, Key.PrimalBound)
+        db = testrun.problemGetDataById(problemid, Key.DualBound)
+        limitreached = testrun.problemGetDataById(problemid, Key.TimeLimitReached)
 
         # we failed because dual bound is higher than the known value of a primal bound
         if self.isDualBoundBetter(testrun, problemid):
@@ -510,9 +501,9 @@ class Experiment:
         """
         determine status for a problem for which we don't know anything about the feasibility or optimality
         """
-        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
-        db = testrun.problemGetDataById(problemid, Experiment.Key_DualBound)
-        limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
+        pb = testrun.problemGetDataById(problemid, Key.PrimalBound)
+        db = testrun.problemGetDataById(problemid, Key.DualBound)
+        limitreached = testrun.problemGetDataById(problemid, Key.TimeLimitReached)
 
         if limitreached:
             testrun.addData('Status', limitreached.lower(), problemid)
@@ -528,12 +519,12 @@ class Experiment:
         """
         determine status for a problem for which we know it's infeasible
         """
-        pb = testrun.problemGetDataById(problemid, Experiment.Key_PrimalBound)
+        pb = testrun.problemGetDataById(problemid, Key.PrimalBound)
         solfound = True if pb is not None else False
 
         # no solution was found
         if not solfound:
-            limitreached = testrun.problemGetDataById(problemid, Experiment.Key_TimeLimitReached)
+            limitreached = testrun.problemGetDataById(problemid, Key.TimeLimitReached)
             # calc was inconclusive
             if limitreached in ['TimeLimit', 'MemoryLimit', 'NodeLimit']:
                 testrun.addData('Status', limitreached.lower(), problemid)
@@ -544,11 +535,11 @@ class Experiment:
             testrun.addData('Status', self.Status_FailSolOnInfeasibleInstance, problemid)
 
     def checkProblemStatus(self):
-        '''
+        """
         checks a problem solving status
 
         checks whether the solver's return status matches the information about the instances
-        '''
+        """
         logging.debug('Checking problem status')
         for testrun in self.getTestRuns():
             for problemid in testrun.getProblems():
@@ -556,7 +547,7 @@ class Experiment:
                 errcode = testrun.problemGetDataById(problemid, ErrorFileReader.datakey)
 
                 # an error code means that the instance aborted
-                if errcode is not None or testrun.problemGetDataById(problemid, Experiment.Key_SolvingTime) is None:
+                if errcode is not None or testrun.problemGetDataById(problemid, Key.SolvingTime) is None:
                     testrun.addData('Status', self.Status_FailAbort, problemid)
 
                 # if the best solution was not feasible in the original problem, it's a fail
@@ -580,12 +571,12 @@ class Experiment:
             tr.printToConsole()
     
     def saveToFile(self, filename):
-        '''
+        """
            save the experiment instance to a file specified by 'filename'.
            Save comprises testruns and their collected data as well as custom built readers.
 
            @note: works for any file extension, preferred extension is '.cmp'
-        '''
+        """
 
         print("Saving Data")
         if not filename.endswith(".cmp"):
@@ -602,12 +593,12 @@ class Experiment:
 
     @staticmethod
     def loadFromFile(filename):
-        '''
+        """
         loads a experiment instance from the file specified by filename. This should work for all files
         generated by the saveToFile command.
 
         @return: a Experiment instance, or None if errors occured
-        '''
+        """
         try:
             f = open(filename, "rb")
         except IOError:

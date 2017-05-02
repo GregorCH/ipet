@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -9,7 +9,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 
 # embedding_in_qt4.py --- Simple Qt4 application embedding matplotlib canvases
 #
@@ -77,9 +77,9 @@ class MyStaticMplCanvas(MyMplCanvas):
 
 
 class IpetNavigationToolBar(NavigationToolbar2QT):
-    '''
+    """
     This class overrides some methods of the base navigation toolbar
-    '''
+    """
     def edit_parameters(self):
         theresult = NavigationToolbar2QT.edit_parameters(self)
 
@@ -211,9 +211,9 @@ class IpetPbHistoryWindow(IpetMainWindow):
             self.resetTestrunName(tr)
 
     def getTestrunName(self, testrun):
-        '''
+        """
         returns the test run name as specified by the user
-        '''
+        """
         return self.testrunnames.get(testrun.getName(), testrun.getName())
     
     def setTestrunName(self, testrun, newname):
@@ -294,9 +294,9 @@ class IpetPbHistoryWindow(IpetMainWindow):
         pass
 
     def update_Axis(self, probnames, testruns):
-        '''
+        """
         update method called every time a new instance was selected
-        '''
+        """
         #self.resetAxis()
         # make up data for plotting method
         x = {}
@@ -370,7 +370,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
     def axisPlotForTestrunData(self, dataX, dataY, bars=False, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, legend=True, labelsuffix="",
          colormapname = "spectral", plotkw = None, barkw = None, labelorder = []):
-        '''
+        """
         create a plot for your X and Y data. The data can either be specified as matrix, or as a dictionary
         specifying containing the labels as keys.
 
@@ -395,7 +395,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         -kw, other keywords for the plotting function, such as transparency, etc. can be specified for every plot
             separately, either as a dictionary with the dataX-keys, or as a kw-list with the same length as the
             dataX list
-        '''
+        """
 
         # index everything by labels, either given as dictionary keys, or integer indices ranging from 0 to len(dataX) - 1
         assert type(dataX) is type(dataY)
@@ -460,9 +460,9 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
 
     def resetAxis(self):
-        '''
+        """
         reset axis by removing all primallines and primalpatches previously drawn.
-        '''
+        """
         self.sc.axes.cla()
 
     def about(self):

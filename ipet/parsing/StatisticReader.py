@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -9,7 +9,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import re
 from ipet.concepts.Editable import Editable
 from ipet.misc import misc
@@ -17,12 +17,12 @@ from ipet.concepts.IPETMessageStream import Message, processMessage
 import logging
 
 class StatisticReader(Editable):
-    '''
+    """
     base class for all statistic readers - readers should always inherit from this base class for minimal implementation
     effort
 
     readers only need to overwrite the methods extractStatistic() and perhaps execEndOfProb()
-    '''
+    """
 
     name = 'NO_NAME_DEFINED_YET'
     regular_exp = re.compile('')
@@ -67,7 +67,6 @@ class StatisticReader(Editable):
     SOLVERTYPE_COUENNE = "Couenne"
     solvertype = SOLVERTYPE_SCIP
 
-
     @staticmethod
     def boolfunction(value):
         """ parses string TRUE or FALSE and returns the boolean value of this expression """
@@ -89,9 +88,9 @@ class StatisticReader(Editable):
         self.testrun = testrun
 
     def supportsContext(self, context):
-        '''
+        """
         returns True if the reader supports a given context, otherwise False
-        '''
+        """
         if type(self.context) is int:
             return self.context == context
         else:
@@ -109,12 +108,15 @@ class StatisticReader(Editable):
             return line.split()[index]
 
     def getName(self):
+        """
+        returns the name of the StatisticReader
+        """
         return self.name
 
     def getWordAtIndex(self, line, index):
-        '''
+        """
         get the i'th word in a space separated string of words
-        '''
+        """
         if index < 0 or StatisticReader.useStringSplit:
             try:
                 return line.split()[index]
@@ -127,9 +129,9 @@ class StatisticReader(Editable):
         return None
     
     def getNumberAtIndex(self, line, index):
-        '''
+        """
         get the i'th number from the list of numbers in this line
-        '''
+        """
         try:
             if index < 0:
                 return StatisticReader.numericExpression.findall(line)[self.index]
@@ -143,9 +145,9 @@ class StatisticReader(Editable):
             return None
 
     def extractStatistic(self, line):
-        '''
+        """
         overwrite this method for own reader subclasses
-        '''
+        """
         try:
             if self.regular_exp.search(line):
                 data = None
@@ -164,9 +166,9 @@ class StatisticReader(Editable):
             pass
 
     def execEndOfProb(self):
-        '''
+        """
         overwrite this method to implement final behaviour at the end of each problem, such as setting flags
-        '''
+        """
         return None
 
     def operateOnLine(self, line):
@@ -178,12 +180,12 @@ class StatisticReader(Editable):
         self.testrun.addData(datakey, data)
 
     def turnIntoFloat(self, astring):
-        '''
+        """
         parses strings to floats, keeps track of trailing caracters signifying magnitudes
 
         Special attention is put to strings of the form, e.g., '900k' where
         the tailing 'k'-character signifies multiplication by 1000.
-        '''
+        """
 
         lastelem = astring[-1]
         multiplier = StatisticReader.multipliers.get(lastelem, 1.0)
@@ -194,11 +196,11 @@ class StatisticReader(Editable):
 # DERIVED Classes
 
 class BestSolInfeasibleReader(StatisticReader):
-    '''
+    """
     catches the expression 'best solution is not feasible in original problem'
 
     @return: False if above expression is found in the log and the best solution is thus not feasible, otherwise True
-    '''
+    """
     name = 'BestSolInfeasibleReader'
     regular_exp = re.compile('best solution is not feasible in original problem')
     datakey = 'BestSolInfeas'
@@ -208,11 +210,11 @@ class BestSolInfeasibleReader(StatisticReader):
             self.addData(self.datakey, True)
 
 class DateTimeReader(StatisticReader):
-    '''
+    """
     reads in the start and finish time from a timestamp in given in Milliseconds
 
     If found, the corresponding data keys are Datetime_Start and Datetime_End
-    '''
+    """
     name = 'DateTimeReader'  # : the name for this reader
     datetimestartexp = re.compile(r"^@03 ([0-9]+)")  # : the expression for the date time start
     datetimeendexp = re.compile(r"^@04 ([0-9]+)")  # : the expression for the date time after termination
@@ -231,9 +233,9 @@ class DateTimeReader(StatisticReader):
                 break
 
 class DualLPTimeReader(StatisticReader):
-    '''
+    """
     reads the dual LP time
-    '''
+    """
     name = 'DualLPTimeReader'
     regular_exp = re.compile('^  dual LP')
     datakey = 'duallptime'
@@ -298,9 +300,9 @@ class SettingsFileReader(StatisticReader):
                     self.testrun.addDefaultParameterValue(name, self.default)
 
 class GapReader(StatisticReader):
-    '''
+    """
     reads the primal dual gap at the end of the solving
-    '''
+    """
     name = 'GapReader'
     regular_exp = re.compile('^Gap                :')
     datakey = 'Gap'
@@ -317,9 +319,9 @@ class GapReader(StatisticReader):
                 self.addData(self.datakey, gap)
 
 class MaxDepthReader(StatisticReader):
-    '''
+    """
     reads the maximum depth
-    '''
+    """
     name = 'MaxDepthReader'
     regular_exp = re.compile('  max depth        :')
     datakey = 'MaxDepth'
@@ -327,9 +329,9 @@ class MaxDepthReader(StatisticReader):
     lineindex = 3
 
 class NodesReader(StatisticReader):
-    '''
+    """
     reads the total number of solving nodes of the branch and bound search
-    '''
+    """
     name = 'NodesReader'
     regular_exp = re.compile("^  nodes \(total\)    :")
     datakey = 'Nodes'
@@ -361,9 +363,9 @@ class ObjlimitReader(StatisticReader):
     lineindex = 5
 
 class RootNodeFixingsReader(StatisticReader):
-    '''
+    """
     reads the number of variable fixings during root node
-    '''
+    """
     name = 'RootNodeFixingsReader'
     regular_exp = re.compile('^  root node')
     datakey = 'RootNodeFixs'
@@ -371,9 +373,9 @@ class RootNodeFixingsReader(StatisticReader):
     lineindex = 4
 
 class TimeLimitReader(StatisticReader):
-    '''
+    """
     extracts the time limit for an instance
-    '''
+    """
     name = 'TimeLimitReader'
     timelimitreadkeys = {
                    StatisticReader.SOLVERTYPE_SCIP : '@05',
@@ -420,13 +422,13 @@ class TimeToFirstReader(StatisticReader):
                 pass
 
 class ListReader(StatisticReader):
-    '''
+    """
     reads a list matching a regular expression
-    '''
+    """
     name = "ListReader"
 
     def __init__(self, regpattern = None, name = None):
-        '''
+        """
         construct a new list reader to parse key-value pairs from a given context
 
         List readers parse key-value pairs of the form
@@ -443,7 +445,7 @@ class ListReader(StatisticReader):
         regpattern : a pattern (regular expression supported) that suitable lines must match
 
         name : a name for this reader
-        '''
+        """
         if regpattern is None:
             raise ValueError("Error: No 'regpattern' specified for reader %s" % str(name))
         self.regular_exp = re.compile(regpattern)

@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,14 +8,14 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .StatisticReader import StatisticReader
 from ipet.misc import FLOAT_INFINITY
 import logging
 class TraceFileReader(StatisticReader):
-    '''
+    """
     classdocs
-    '''
+    """
     active = False
     context = StatisticReader.CONTEXT_TRACEFILE
     tracefilestartexpression = "* Trace Record Definition"

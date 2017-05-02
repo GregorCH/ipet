@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,12 +8,12 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import re
 from .StatisticReader import StatisticReader
 
 class PluginStatisticsReader(StatisticReader):
-   '''
+   """
    Reader which tries to read various data about plugin types arranged in table format -
    Format Foo: a    b
           1  : 0    5
@@ -29,7 +29,7 @@ class PluginStatisticsReader(StatisticReader):
    ...
 
    and will store the corresponding values under Foo_a, and Foo_b
-   '''
+   """
    name = 'PluginStatisticsReader'
    plugintypes = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
               'Separators', 'Branching Rules', 'Diving Statistics', 'LP', 'Branching Analysis', 'Primal Heuristics', 'Concurrent Solvers']

@@ -1,5 +1,5 @@
 # # -*- coding: utf-8 -*-
-# '''
+# """
 # The MIT License (MIT)
 # 
 # Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -9,15 +9,15 @@
 # please refer to README.md for how to cite IPET.
 # 
 # @author: Gregor Hendel
-# '''
+# """
 # from .StatisticReader import StatisticReader
 # import re
 # import os
 # class GeneralInformationReader(StatisticReader):
-#     '''
+#     """
 #        this reader extracts general information from a log file, that is, the solver version, the used LP solver
 #        in case of SCIP and the settings
-#     '''
+#     """
 #     name = 'GeneralInformationReader'
 #     regular_exp = ['loaded parameter file', 'default.set']
 #     actions = {}
@@ -64,11 +64,11 @@
 #                 self.addData('Settings', line.split('.')[-3])
 # 
 #     def __handleVersion(self, line):
-#         '''
+#         """
 #         handles more than just the version
 # 
 #         SCIP version 3.1.0.1 [precision: 8 byte] [memory: block] [mode: debug] [LP solver: SoPlex 2.0.0.1] [GitHash: 825e268-dirty]
-#         '''
+#         """
 #         version = line.split()[2]
 #         self.addData('Version', version)
 #         for keyword in ["mode", "LP solver", 'GitHash']:

@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from PyQt4.Qt import QAbstractTableModel, QDialog, QLabel, QTableView,\
     QVBoxLayout, SIGNAL
 
@@ -17,18 +17,18 @@ import sys
 from PyQt4.QtCore import Qt
 
 class IpetTableDataModel(QAbstractTableModel):
-    '''
+    """
     represents a model for pandas data frames
-    '''
+    """
     SORT_INDEX = 0
     SORT_UP = 1
     SORT_DOWN = 2
     
 
     def __init__(self, dataframe):
-        '''
+        """
        Constructor for a data table model
-        '''
+        """
         super(IpetTableDataModel, self).__init__()
         self.dataframe = dataframe
         self.sorted = self.SORT_INDEX
@@ -37,11 +37,11 @@ class IpetTableDataModel(QAbstractTableModel):
        
 
     def sortTable(self, section):
-        '''
+        """
         sort the table by the given column indexed by the section
         
         sorting is iterated for a column in the order ascending, nonascending, and by index (e.g., unsorted)
-        '''
+        """
         if self.sortcolumn != self.dataframe.columns[section]:
             self.sorted = self.SORT_UP
         else:
@@ -71,9 +71,9 @@ class IpetTableDataModel(QAbstractTableModel):
         return len(self.dataframe.columns)
     
     def data(self, index, role=QtCore.Qt.DisplayRole):
-        '''
+        """
         returns the data to be displayed
-        '''
+        """
         if role == QtCore.Qt.DisplayRole:
             i = index.row()
             j = index.column()
@@ -88,9 +88,9 @@ class IpetTableDataModel(QAbstractTableModel):
             return None
         
     def getDataFrame(self):
-        '''
+        """
         returns the data frame for this model
-        '''
+        """
         return self.dataframe
     
     def setDataFrame(self, dataframe, formatters = {}):
@@ -108,9 +108,9 @@ class IpetTableDataModel(QAbstractTableModel):
             raise TypeError("Wrong type %s, expected string or tuple" % type(stringortuple))
     
     def headerData(self, section, orientation, role=Qt.DisplayRole):
-        '''
+        """
         get header data at the given orientation
-        '''
+        """
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
                 return str(int(Qt.AlignLeft|Qt.AlignVCenter))
@@ -122,9 +122,9 @@ class IpetTableDataModel(QAbstractTableModel):
         return self.getString(self.dataframe.index[section], join = ":    ")
     
     def flags(self, index):
-        '''
+        """
         return the item flags
-        '''
+        """
         if not index.isValid():
             return Qt.ItemIsEnabled
         return Qt.ItemFlags(QAbstractTableModel.flags(self, index))

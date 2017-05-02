@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .StatisticReader import StatisticReader
 import re
 from .StatisticReader_CustomReader import CustomReader
@@ -16,12 +16,12 @@ from ipet.misc import misc
 import numpy as np
 
 class CustomHistoryReader(StatisticReader):
-   '''
+   """
    reads a history list from the table output in a SCIP log file; initialize with a list of column header strings as, e.g.,
    ['nodes', 'frac', ...]. The history reader parses each table line for tuples (a,b,...) corresponding to the
    requested column names. The history is returned as a list of tuples [(a1,b1, ...), (a2,b2, ...), ...,(an,bn, ...)]
    where each a(i) is different from a(i-1).
-   '''
+   """
 
    name = 'CustomHistoryReader'
    regular_exp =  re.compile('\|') # compile the regular expression to speed up reader
@@ -31,7 +31,7 @@ class CustomHistoryReader(StatisticReader):
 
 
    def __init__(self, listofheaders, listofindices=[], name='', collectheuristics=-1):
-      '''
+      """
       Constructor takes column header list as argument.
 
       - listofheaders: List of header names of columns to  parse common history for
@@ -39,7 +39,7 @@ class CustomHistoryReader(StatisticReader):
       -                can retrieve the required indices automatically
       - name         : (optional) a name for this history reader; if left out, the name will be parsed from the listofheaders
                        via capitalized column names + HistoryReader as suffix.
-      '''
+      """
       self.reset()
       self.listofheaders = listofheaders[:]
       if listofindices == []:
@@ -56,9 +56,9 @@ class CustomHistoryReader(StatisticReader):
       self.collectheuristics = collectheuristics
 
    def reset(self):
-      '''
+      """
       reset all attributes to default values for a new problem
-      '''
+      """
       self.valuehistory = []
 
    def extractStatistic(self, line):
@@ -100,8 +100,8 @@ class CustomHistoryReader(StatisticReader):
 
 
    def execEndOfProb(self):
-      '''
+      """
       copies the aquired list of value tuples into testrun data
-      '''
+      """
       self.addData(self.datakey, self.valuehistory[:])
       self.reset()

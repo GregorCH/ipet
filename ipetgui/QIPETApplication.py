@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .IpetMainWindow import IpetMainWindow
 from PyQt4.Qt import QApplication, QTabWidget
 import sys
@@ -16,9 +16,9 @@ from .IPETParserWindow import IPETParserWindow
 from .IpetEvaluationEditorApp import EvaluationEditorWindow
 
 class QIPETApplication(IpetMainWindow):
-    '''
+    """
     an application that presents different widgets for parsing and evaluating in tabs
-    '''
+    """
 
     def __init__(self, parent = None):
         super(QIPETApplication, self).__init__(parent)

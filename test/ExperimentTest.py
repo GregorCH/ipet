@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import unittest
 import os
 import json
@@ -164,9 +164,9 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.collectData()
 
     def test_fileExtensions(self):
-        '''
+        """
         Test if an experiment accepts
-        '''
+        """
         # all possible extensions  should be accepted
         for extension in ReaderManager().getFileExtensions():
             self.experiment.addOutputFile("bla" + extension)
@@ -229,9 +229,9 @@ class ExperimentTest(unittest.TestCase):
             self.assertEqual(status, expected, msg.format(status, expected)) 
             
 def collect_settings(path):
-    '''
+    """
     A crappy settings file parser
-    '''
+    """
     with open(path, "r") as f:
         settings_contents = f.readlines()
 
@@ -253,9 +253,9 @@ def boolify(value):
     raise ValueError("{} is not a bool".format(value))
 
 def estimate_type(var):
-    '''
+    """
     Guesses the str representation of the variables type
-    '''
+    """
     var = str(var)
 
     for caster in (boolify, int, float):

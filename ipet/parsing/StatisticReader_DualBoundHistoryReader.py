@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,17 +8,17 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .StatisticReader import StatisticReader
 import re
 from ipet.misc import misc
 
 class DualBoundHistoryReader(StatisticReader):
-    '''
+    """
     reads the dual bound history out of a SCIP log file. returns a list of tuples (t,db) where t denotes the
     time when a new dual bound was reported, and db is the dual bound value. Every t and db should occur only once
     in the final list
-    '''
+    """
 
     name = 'DualBoundHistoryReader'
     regular_exp =  re.compile('\|') # compile the regular expression to speed up reader
@@ -32,21 +32,21 @@ class DualBoundHistoryReader(StatisticReader):
 
 
     def reset(self):
-        '''
+        """
         reset all attributes to default values for a new problem
-        '''
+        """
         self.dualboundlist = []
         self.lastdb = misc.FLOAT_INFINITY
         self.lasttime = -1
 
     def extractStatistic(self, line):
-        '''
+        """
         search for lines with at least 15 vertical bars - such lines are table lines
 
         parse all numbers from the table, including '-' and '--'. If there are too few or no numbers,
          line is most certainly one of the less frequent table header lines and can be used to retrieve
          the index of the dual bound column
-        '''
+        """
         if self.isTableLine(line):
             if self.dbindex == -1:
                 # parse index of dual bound entry
@@ -88,9 +88,9 @@ class DualBoundHistoryReader(StatisticReader):
         return (line.count('|') > 10)
      
     def execEndOfProb(self):
-        '''
+        """
         returns a dual bound history list
-        '''
+        """
         if self.dualboundlist != []:
             #only copy nonempty lists, otherwise Parascipdualboundhistoryreader and this one will overwrite each others data
             self.addData(self.datakey, self.dualboundlist[:])
@@ -103,8 +103,8 @@ class ParascipDualBoundHistoryReader(DualBoundHistoryReader):
     intable = False
     
     def isTableLine(self, line):
-        ''' overwrites in table method of Dual Bound History Reader
-        '''
+        """ overwrites in table method of Dual Bound History Reader
+        """
         if not self.intable and line.startswith(self.parascipheader):
             self.intable = True
             return False

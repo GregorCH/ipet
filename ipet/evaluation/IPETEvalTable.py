@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import pandas as pd
 from ipet.evaluation import Aggregation
 import xml.etree.ElementTree as ElementTree
@@ -54,7 +54,7 @@ class IPETEvaluationColumn(IpetNode):
 
     def __init__(self, origcolname = None, name = None, formatstr = None, transformfunc = None, constant = None,
                  nanrep = None, minval = None, maxval = None, comp = None, regex = None, translevel = None, active = True):
-        '''
+        """
         constructor of a column for the IPET evaluation
 
         Parameters
@@ -84,7 +84,7 @@ class IPETEvaluationColumn(IpetNode):
                      if five permutations were tested. Columns with translevel=1 are appended at the end of the instance-wise table
 
         active : True or "True" if this column should be active, False otherwise
-        '''
+        """
 
         super(IPETEvaluationColumn, self).__init__(active)
         self.origcolname = origcolname
@@ -147,14 +147,14 @@ class IPETEvaluationColumn(IpetNode):
         return self.requiredOptions.get(attr, super(IPETEvaluationColumn, self).getRequiredOptionsByAttribute(attr))
 
     def getName(self):
-        '''
+        """
         infer the name for this column
 
         if this column was constructed with a column name, the name is used
         else if this column represents an original column of the data frame,
         the original column name is used, otherwise, we construct an
         artificial name that represents how this column is constructed
-        '''
+        """
         if self.name is not None:
             return self.name
         elif self.origcolname is not None:
@@ -167,9 +167,9 @@ class IPETEvaluationColumn(IpetNode):
             return self.transformfunc + ','.join((child.getName() for child in self.children))
 
     def parseValue(self, val, df = None):
-        '''
+        """
         parse a value into an integer (prioritized) or float
-        '''
+        """
         for conversion in [int, float]:
             try:
                 return conversion(val)
@@ -180,9 +180,9 @@ class IPETEvaluationColumn(IpetNode):
         return None
 
     def parseConstant(self):
-        '''
+        """
         parse the constant attribute, which is a string, into an integer (prioritized) or float
-        '''
+        """
         return self.parseValue(self.constant)
 
     def addAggregation(self, agg):
@@ -239,9 +239,9 @@ class IPETEvaluationColumn(IpetNode):
         return {k:str(v) for k, v in self.attributesToDict().items() if v is not None}
 
     def toXMLElem(self):
-        '''
+        """
         convert this Column into an XML node
-        '''
+        """
         me = ElementTree.Element(IPETEvaluationColumn.getNodeTag(), self.attributesToStringDict())
 
         # iterate through children and aggregations and convert them to xml nodes
@@ -266,9 +266,9 @@ class IPETEvaluationColumn(IpetNode):
             return column
         
     def getTransformationFunction(self):
-        '''
+        """
         tries to find the transformation function from the numpy, misc, or Experiment modules
-        '''
+        """
         for module in [numpy, misc, Experiment]:
             try:
                 return getattr(module, self.transformfunc)
@@ -277,9 +277,9 @@ class IPETEvaluationColumn(IpetNode):
         raise IpetNodeAttributeError(self.transformfunc, "Unknown transformation function %s" % self.transformfunc)
 
     def getColumnData(self, df):
-        '''
+        """
         Retrieve the data associated with this column
-        '''
+        """
 
         # if no children are associated with this column, it is either
         # a column represented in the data frame by an 'origcolname',
@@ -362,7 +362,7 @@ class FormatFunc:
         return (self.formatstr % x)
 
 class IPETEvaluation(IpetNode):
-    '''
+    """
     evaluates a comparator with given group keys, columns, and filter groups
 
     An evaluation transfers raw, collected data from a collection of testruns
@@ -372,7 +372,7 @@ class IPETEvaluation(IpetNode):
     By defining multiple evaluations,
     it is therefore possible to view the same raw data through multiple angles
 
-    '''
+    """
     nodetag = "Evaluation"
     # todo put tex, csv etc. here as other possible streams for filter group output
     possiblestreams = ['stdout', 'tex', 'txt', 'csv']
@@ -385,7 +385,7 @@ class IPETEvaluation(IpetNode):
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
     def __init__(self, groupkey = DEFAULT_GROUPKEY, defaultgroup = DEFAULT_DEFAULTGROUP, evaluateoptauto = True,
                  sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT):
-        '''
+        """
         constructs an Ipet-Evaluation
 
         Parameters
@@ -395,7 +395,7 @@ class IPETEvaluation(IpetNode):
         evaluateoptauto : should optimal auto settings be calculated?
         sortlevel : level on which to base column sorting, '0' for group level, '1' for column level
         comparecolformat : format string for comparison columns
-        '''
+        """
 
         # construct super class first, Evaluation is currently always active
         super(IPETEvaluation, self).__init__(True)
@@ -413,15 +413,15 @@ class IPETEvaluation(IpetNode):
         return self.nodetag
 
     def isEvaluated(self):
-        '''
+        """
         returns whether this evaluation has been evaluated since its columns or filter groups have been modified
-        '''
+        """
         return self.evaluated
 
     def setEvaluated(self, evaluated):
-        '''
+        """
         change the flag if this evaluation has been evaluated since its last modification
-        '''
+        """
         self.evaluated = evaluated
 
     def set_evaluateoptauto(self, evaluateoptauto):
@@ -495,9 +495,9 @@ class IPETEvaluation(IpetNode):
         self.setEvaluated(False)
 
     def setEvaluateOptAuto(self, evaloptauto):
-        '''
+        """
         should the evaluation calculate optimal auto settings?
-        '''
+        """
         self.set_evaluateoptauto(evaloptauto)
 
     def reduceToColumns(self, df_long):
@@ -611,11 +611,11 @@ class IPETEvaluation(IpetNode):
         return [col for col in self.columns if col.isActive()]
 
     def getColumnFormatters(self, df):
-        '''
+        """
         returns a formatter dictionary for all columns of this data frame
 
         expects a Multiindex column data frame df
-        '''
+        """
         formatters = {}
         thelevel = 0
 
@@ -675,16 +675,16 @@ class IPETEvaluation(IpetNode):
         streammethod(df, filebasename, formatters)
 
     def streamDataFrame_stdout(self, df, filebasename, formatters = {}):
-        '''
+        """
         print to console
-        '''
+        """
         print("%s:" % filebasename)
         print(df.to_string(formatters = formatters))
 
     def streamDataFrame_tex(self, df, filebasename, formatters = {}):
-        '''
+        """
         write tex output
-        '''
+        """
         with open("%s.tex" % filebasename, "w") as texfile:
             texfile.write(df.to_latex(formatters = formatters))
 
@@ -693,9 +693,9 @@ class IPETEvaluation(IpetNode):
             df.to_csv(csvfile, formatters = formatters)
 
     def streamDataFrame_txt(self, df, filebasename, formatters = {}):
-        '''
+        """
         write txt output
-        '''
+        """
         with open("%s.txt" % filebasename, "w") as txtfile:
             df.to_string(txtfile, formatters = formatters, index_names = False)
 
@@ -708,9 +708,9 @@ class IPETEvaluation(IpetNode):
             return statuscol.unique()[0]
 
     def calculateOptimalAutoSettings(self, df):
-        '''
+        """
         calculate optimal auto settings instancewise
-        '''
+        """
         grouped = df.groupby(level = 0)
 
         optstatus = grouped["Status"].apply(self.findStatus)
@@ -727,9 +727,9 @@ class IPETEvaluation(IpetNode):
         return optdf
 
     def checkMembers(self):
-        '''
+        """
         checks the evaluation members for inconsistencies
-        '''
+        """
         for col in self.columns:
             try:
                 col.checkAttributes()
@@ -758,7 +758,7 @@ class IPETEvaluation(IpetNode):
         return self.rettab
 
     def evaluate(self, exp):
-        '''
+        """
         evaluate the data of an Experiment instance exp
 
         Parameters
@@ -769,7 +769,7 @@ class IPETEvaluation(IpetNode):
         -------
         rettab : an instance-wise table of the specified columns
         retagg : aggregated results for every filter group and every entry of the specified
-        '''
+        """
         self.checkMembers()
 
         # data is concatenated along the rows and eventually extended by external data
@@ -875,9 +875,9 @@ class IPETEvaluation(IpetNode):
         return pd.concat(parts, axis = 1)
 
     def applyStatsTests(self, df):
-        '''
+        """
         apply statistical tests defined by each column
-        '''
+        """
 
         # group the data by the groupkey
         groupeddata = dict(list(df.groupby(self.groupkey)))

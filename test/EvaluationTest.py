@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 
 import unittest
 from ipet.evaluation import IPETEvaluation
@@ -37,9 +37,9 @@ class EvaluationTest(unittest.TestCase):
         shutil.rmtree(TMPDIR)
 
     def test_constructor(self):
-        '''
+        """
         test if the constructor is working without arguments
-        '''
+        """
         evaluation = IPETEvaluation()
 
     def test_testEvaluateXML(self):
@@ -70,9 +70,9 @@ class EvaluationTest(unittest.TestCase):
 
 
     def test_xml(self):
-        '''
+        """
         test construction of modified evaluations, and if they persist after constructing a twin directly from the XML representation
-        '''
+        """
 
         modificationlist = [{},
                             {"sortlevel":1},

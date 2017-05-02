@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from PyQt4.QtGui import QFrame, QWidget, QLabel,\
     QApplication, QKeySequence, QFileDialog, \
     QVBoxLayout, QHBoxLayout
@@ -36,9 +36,9 @@ class EvaluationEditorWindow(IPETApplicationTab):
     addedinstances = 0
 
     def __init__(self, parent=None):
-        '''
+        """
         Constructor
-        '''
+        """
         super(EvaluationEditorWindow, self).__init__(parent)
 
         self.browser = EditableBrowser(self)
@@ -203,9 +203,9 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.passGroupToTableViews()
 
     def setDataFrames(self, tableviewdf, aggtableviewdf):
-        '''
+        """
         sets both data frames and formatters for the views
-        '''
+        """
         self.tableview.setDataFrame(tableviewdf, self.evaluation.getColumnFormatters(tableviewdf))
         self.aggtableview.setDataFrame(aggtableviewdf, self.evaluation.getColumnFormatters(aggtableviewdf))
 
@@ -238,9 +238,9 @@ class EvaluationEditorWindow(IPETApplicationTab):
             self.setDataFrames(rettab, retagg)
 
 class IpetEvaluationEditorApp(IpetMainWindow):
-    '''
+    """
     This app represents the Editable Browser in a single, executable window
-    '''
+    """
 
     def __init__(self, parent = None):
         super(IpetEvaluationEditorApp, self).__init__(parent)

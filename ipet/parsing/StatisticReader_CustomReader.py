@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,16 +8,16 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .StatisticReader import StatisticReader
 import re
 import builtins
 import logging
 
 class CustomReader(StatisticReader):
-    '''
+    """
     Reader to be initialised interactively through IPET or from an interactive python shell
-    '''
+    """
     name = 'CustomReader'
     regexp = 'Custom'
     datakey = 'Custom'
@@ -46,7 +46,7 @@ class CustomReader(StatisticReader):
         }
 
     def __init__(self, name = None, regpattern = None, datakey = None, index = 0, datatype = "float", method = "last"):
-        '''
+        """
         constructor of a custom reader to parse additional simple solver output from log file context
 
         Parameters:
@@ -63,7 +63,7 @@ class CustomReader(StatisticReader):
         datatype : choose 'int' or 'float'
 
         method : how to treat multiple occurrences of this data within one instance; 'count' occurrences or parse 'first', 'last', 'sum', 'min' or 'max'
-        '''
+        """
 
         if regpattern is None:
             raise ValueError("Error: No 'regpattern' specified for reader with name %s" % str(name))
@@ -143,9 +143,9 @@ class CustomReader(StatisticReader):
         return None
 
     def setDataType(self, sometype):
-        '''
+        """
         recognizes data types (e.g., 'float' or 'int') and sets reader data type to this value
-        '''
+        """
         try:
             self.datatypemethod = getattr(__builtin__, sometype)
             self.datatype = sometype

@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import numpy as np
 from ipet.misc import misc
 import numpy
@@ -20,7 +20,7 @@ DEFAULT_CUTOFFGAP = 100
 DEFAULT_BOUNDKEY = 'PrimalBound'
 
 def calcIntegralValue(thedatalist, pwlinear = False):
-    '''
+    """
        calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
 
        Keyword arguments:
@@ -29,7 +29,7 @@ def calcIntegralValue(thedatalist, pwlinear = False):
        pwlinear -- optional : should the method treat the function as piece-wise linear (True) or piece-wise constant
                               step-function.
 
-    '''
+    """
     assert len(thedatalist) >= 2
 
     # unzip the datalist
@@ -46,11 +46,11 @@ def calcIntegralValue(thedatalist, pwlinear = False):
     return np.sum((times[1:] - times[:-1]) * gaps)
     
 def getProcessPlotData(testrun, probname, normalize=True, **kw):
-    '''
+    """
     get process plot data for a selected history (X_i,Y_i)
     
     returns a list of tuples, where the second value of the history (Y's) are mapped via a gap function
-    '''
+    """
     # read keys from kw dictionary
     historytouse = kw.get('historytouse', DEFAULT_HISTORYTOUSE)
     history = testrun.problemGetDataById(probname, historytouse)
@@ -107,10 +107,10 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
     return list(zip(x,y))
 
 def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
-    '''
+    """
     returns a numpy array that represents the mean integral over the selected problem list.
     
-    '''
+    """
     # initialize mean integral to be zero at all points of the chosen granularity
     meanintegral = np.zeros(meanintegralpoints)
     

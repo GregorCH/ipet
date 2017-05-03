@@ -18,7 +18,7 @@ class IpetNode(Editable):
     active = True
     _attributes2options = {"active":[True, False]}
     
-    def __init__(self, active = True):
+    def __init__(self, active=True):
         """
         constructs a new IpetNode
 

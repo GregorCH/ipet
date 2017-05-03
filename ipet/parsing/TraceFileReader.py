@@ -51,7 +51,7 @@ class TraceFileReader(StatisticReader):
             datavalues = list(map(self.prepareData, splitline[1:]))
 
             logging.debug("Trace File Reader adds data for problem %s", probname)
-            self.testrun.addData(probname, self.datakeys, datavalues)
+            self.testrun.addDataByName(self.datakeys, datavalues, probname)
 
 
 

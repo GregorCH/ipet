@@ -11,12 +11,12 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 import re
-from ipet.concepts.Editable import Editable
+from ipet.concepts import IpetNode
 from ipet.misc import misc
-from ipet.concepts.IPETMessageStream import Message, processMessage
+from ipet import Key
 import logging
 
-class StatisticReader(Editable):
+class StatisticReader(IpetNode):
     """
     base class for all statistic readers - readers should always inherit from this base class for minimal implementation
     effort
@@ -29,19 +29,12 @@ class StatisticReader(Editable):
     datakey = 'NO KEY'
     datatype = float
     lineindex = -1
-    # print data#
-    # problemname = None
-    # problemnamelist = []
-    numericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+)")
-    tablenumericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+|cutoff)")
-    wordExpression = re.compile(r'[^\s]+')
-    useStringSplit = False
 
     # constants that represent the different contexts that a reader should be active in
     CONTEXT_LOGFILE = 1  # the log file of a solver which most readers are reading from
     CONTEXT_ERRFILE = 2  # the error file of a solver
     CONTEXT_SETFILE = 3  # the settings file used for solving
-    CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every instance
+    CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every problem
     CONTEXT_TRACEFILE = 5
     context = CONTEXT_LOGFILE
     
@@ -56,7 +49,7 @@ class StatisticReader(Editable):
     sleepAfterReturn = True
     sleep = False
 
-    multipliers = dict(k = 1000, M = 1e6, G = 1e9)
+    multipliers = dict(k=1000, M=1e6, G=1e9)
 
     # the reader might behave differently depending on the solver type, due to the different output
     SOLVERTYPE_SCIP = "SCIP"
@@ -71,14 +64,6 @@ class StatisticReader(Editable):
     def boolfunction(value):
         """ parses string TRUE or FALSE and returns the boolean value of this expression """
         return True if value == "TRUE" else False
-
-    # @staticmethod
-    # def setProblemName(problemname):
-    #     StatisticReader.problemname = problemname
-
-    # @staticmethod
-    # def getProblemName():
-    #     return StatisticReader.problemname
 
     @staticmethod
     def changeSolverType(newtype):
@@ -96,7 +81,7 @@ class StatisticReader(Editable):
         else:
             return context in self.context
 
-    def getSplitLineWithRegexp(self, regular_exp, line, index = -1, startofline = False):
+    def getSplitLineWithRegexp(self, regular_exp, line, index=-1, startofline=False):
         if startofline == True and not re.match(regular_exp, line):
             return None
         if startofline == False and not re.search(regular_exp, line):
@@ -113,37 +98,6 @@ class StatisticReader(Editable):
         """
         return self.name
 
-    def getWordAtIndex(self, line, index):
-        """
-        get the i'th word in a space separated string of words
-        """
-        if index < 0 or StatisticReader.useStringSplit:
-            try:
-                return line.split()[index]
-            except:
-                return None
-        else:
-            for idx, word in enumerate(StatisticReader.wordExpression.finditer(line)):
-                if idx == index:
-                    return word.group()
-        return None
-    
-    def getNumberAtIndex(self, line, index):
-        """
-        get the i'th number from the list of numbers in this line
-        """
-        try:
-            if index < 0:
-                return StatisticReader.numericExpression.findall(line)[self.index]
-            else:
-                for idx, word in enumerate(StatisticReader.numericExpression.finditer(line)):
-                    if idx == index:
-                        return word.group()
-                else:
-                    return None
-        except IndexError:
-            return None
-
     def extractStatistic(self, line):
         """
         overwrite this method for own reader subclasses
@@ -152,7 +106,7 @@ class StatisticReader(Editable):
             if self.regular_exp.search(line):
                 data = None
                 try:
-                    data = self.datatype(self.getWordAtIndex(line, self.lineindex))
+                    data = self.datatype(misc.getWordAtIndex(line, self.lineindex))
                 except ValueError:
                     data = None
                 except IndexError:
@@ -176,7 +130,6 @@ class StatisticReader(Editable):
 
     def addData(self, datakey, data):
         logging.debug("Reader %s adds data" % (self.getName()))
-        # self.testrun.addData(self.problemname, datakey, data)
         self.testrun.addData(datakey, data)
 
     def turnIntoFloat(self, astring):
@@ -203,7 +156,7 @@ class BestSolInfeasibleReader(StatisticReader):
     """
     name = 'BestSolInfeasibleReader'
     regular_exp = re.compile('best solution is not feasible in original problem')
-    datakey = 'BestSolInfeas'
+    datakey = Key.BestSolutionInfeasible
 
     def extractStatistic(self, line):
         if self.regular_exp.search(line):
@@ -218,10 +171,10 @@ class DateTimeReader(StatisticReader):
     name = 'DateTimeReader'  # : the name for this reader
     datetimestartexp = re.compile(r"^@03 ([0-9]+)")  # : the expression for the date time start
     datetimeendexp = re.compile(r"^@04 ([0-9]+)")  # : the expression for the date time after termination
-    datetimestartdatakey = 'Datetime_Start'  # : data key for start of run
-    datetimeendkey = 'Datetime_End'  # : data key for end of run
+    datetimestartkey = Key.DatetimeStart  # : data key for start of run
+    datetimeendkey = Key.DatetimeEnd  # : data key for end of run
 
-    datetimekw = {datetimestartdatakey:datetimestartexp, datetimeendkey:datetimeendexp}
+    datetimekw = {datetimestartkey:datetimestartexp, datetimeendkey:datetimeendexp}
 
     def extractStatistic(self, line):
         for key, exp in list(self.datetimekw.items()):
@@ -238,7 +191,7 @@ class DualLPTimeReader(StatisticReader):
     """
     name = 'DualLPTimeReader'
     regular_exp = re.compile('^  dual LP')
-    datakey = 'duallptime'
+    datakey = Key.DualLpTime
     datatype = float
     lineindex = 3
 
@@ -248,7 +201,7 @@ class ErrorFileReader(StatisticReader):
     """
     name = "ErrorFileReader"
     regular_exp = re.compile("returned with error code (\d+)")
-    datakey = "ErrorCode"
+    datakey = Key.ErrorCode
     context = StatisticReader.CONTEXT_ERRFILE
 
     def extractStatistic(self, line):
@@ -305,13 +258,13 @@ class GapReader(StatisticReader):
     """
     name = 'GapReader'
     regular_exp = re.compile('^Gap                :')
-    datakey = 'Gap'
+    datakey = Key.Gap
     datatype = float
     lineindex = 2
 
     def extractStatistic(self, line):
         if self.regular_exp.match(line):
-            gapasword = self.getWordAtIndex(line, self.lineindex)
+            gapasword = misc.getWordAtIndex(line, self.lineindex)
 
             # if the gap is infinite, no data is passed to the test run
             if gapasword != "infinite":
@@ -324,7 +277,7 @@ class MaxDepthReader(StatisticReader):
     """
     name = 'MaxDepthReader'
     regular_exp = re.compile('  max depth        :')
-    datakey = 'MaxDepth'
+    datakey = Key.MaximumDepth
     datatype = int
     lineindex = 3
 
@@ -334,14 +287,14 @@ class NodesReader(StatisticReader):
     """
     name = 'NodesReader'
     regular_exp = re.compile("^  nodes \(total\)    :")
-    datakey = 'Nodes'
+    datakey = Key.Nodes
     datatype = int
     lineindex = 3
 
 class ObjsenseReader(StatisticReader):
     name = 'ObjsenseReader'
     regular_exp = re.compile("^  Objective sense  : (\w*)")
-    datakey = "Objsense"
+    datakey = Key.ObjectiveSense
     minimize = 1
     maximize = -1
 
@@ -358,7 +311,7 @@ class ObjsenseReader(StatisticReader):
 class ObjlimitReader(StatisticReader):
     name = "ObjlimitReader"
     regular_exp = re.compile("objective value limit set to")
-    datakey = "Objlimit"
+    datakey = Key.ObjectiveLimit
     datatype = float
     lineindex = 5
 
@@ -368,13 +321,13 @@ class RootNodeFixingsReader(StatisticReader):
     """
     name = 'RootNodeFixingsReader'
     regular_exp = re.compile('^  root node')
-    datakey = 'RootNodeFixs'
+    datakey = Key.RootNodeFixings
     datatype = int
     lineindex = 4
 
 class TimeLimitReader(StatisticReader):
     """
-    extracts the time limit for an instance
+    extracts the time limit for a problem
     """
     name = 'TimeLimitReader'
     timelimitreadkeys = {
@@ -385,7 +338,7 @@ class TimeLimitReader(StatisticReader):
                    StatisticReader.SOLVERTYPE_XPRESS : "@05",
                    StatisticReader.SOLVERTYPE_COUENNE : "^@05"}
 
-    datakey = 'TimeLimit'
+    datakey = Key.TimeLimit
 
     def extractStatistic(self, line):
         if re.search(self.timelimitreadkeys[StatisticReader.solvertype], line):
@@ -394,28 +347,28 @@ class TimeLimitReader(StatisticReader):
 class TimeToBestReader(StatisticReader):
     name = 'TimeToBestReader'
     regular_exp = re.compile('  Primal Bound     :')
-    datakey = 'TimeToBest'
+    datakey = Key.TimeToBestSolution
     datatype = float
     lineindex = 3
 
     def extractStatistic(self, line):
         if self.regular_exp.match(line):
             try:
-                self.addData(self.datakey, float(self.getNumberAtIndex(line, self.lineindex)))
+                self.addData(self.datakey, float(misc.getNumberAtIndex(line, self.lineindex)))
             except TypeError:
                 pass
 
 class TimeToFirstReader(StatisticReader):
     name = 'TimeToFirstReader'
     regular_exp = re.compile('  First Solution   :')
-    datakey = 'TimeToFirst'
+    datakey = Key.TimeToFirstSolution
     datatype = float
     lineindex = 3
 
     def extractStatistic(self, line):
         if self.regular_exp.match(line):
             try:
-                timetofirst = float(self.getNumberAtIndex(line, self.lineindex))
+                timetofirst = float(misc.getNumberAtIndex(line, self.lineindex))
                 self.addData(self.datakey, timetofirst)
 
             except TypeError:
@@ -427,7 +380,7 @@ class ListReader(StatisticReader):
     """
     name = "ListReader"
 
-    def __init__(self, regpattern = None, name = None):
+    def __init__(self, regpattern=None, name=None):
         """
         construct a new list reader to parse key-value pairs from a given context
 

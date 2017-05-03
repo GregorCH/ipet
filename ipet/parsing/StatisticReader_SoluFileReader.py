@@ -10,16 +10,16 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 from .StatisticReader import StatisticReader
+from ipet import Key
 import re
 import numpy as np
 
 class SoluFileReader(StatisticReader):
-    """
-    a reader for solu file context information
+    """A reader for solu file context information
     """
     name = 'SoluFileReader'
     actions = {}
-    datakeys = ['OptVal', 'SoluFileStatus']
+    datakeys = [Key.OptimalValue, Key.SolutionFileStatus]
     statistics = {}
     columnwidth = 12
     columnheaderstr = 'SoluFile'.rjust(columnwidth)
@@ -34,68 +34,68 @@ class SoluFileReader(StatisticReader):
         assert self.testrun != None
         match = re.match("^=([a-zA-Z]+)=", line)
         if match:
-            method = getattr(self, "new" + match.groups(0)[0] + "Instance")
+            method = getattr(self, "new" + match.groups(0)[0] + "Problem")
             method(line)
         else:
             return None
 
-    def storeToStatistics(self, instance, objval, status):
-        if self.testrun.hasInstance(instance):
-            self.testrun.addDataByName(self.datakeys, [float(objval), status], instance)
+    def storeToStatistics(self, problemname, objval, status):
+        if self.testrun.hasProblemName(problemname):
+            self.testrun.addDataByName(self.datakeys, [float(objval), status], problemname)
 
-    def newoptInstance(self, line):
+    def newoptProblem(self, line):
         splittedline = line.split()
         assert splittedline[0] == '=opt='
-        instance = splittedline[1]
+        problem = splittedline[1]
         objval = splittedline[2]
 
-        self.storeToStatistics(instance, objval, status = 'opt')
+        self.storeToStatistics(problem, objval, status='opt')
 
-    def newinfInstance(self, line):
+    def newinfProblem(self, line):
         splittedline = line.split()
         assert splittedline[0] == '=inf='
-        instance = splittedline[1]
+        problem = splittedline[1]
         objval = np.nan
 
-        self.storeToStatistics(instance, objval, status = 'inf')
+        self.storeToStatistics(problem, objval, status='inf')
 
-    def newunknInstance(self, line):
+    def newunknProblem(self, line):
         splittedline = line.split()
         assert splittedline[0] == '=unkn='
-        instance = splittedline[1]
+        problem = splittedline[1]
         objval = np.nan
 
-        self.storeToStatistics(instance, objval, status = 'unkn')
+        self.storeToStatistics(problem, objval, status='unkn')
 
 
-    def newbestInstance(self, line):
+    def newbestProblem(self, line):
         splittedline = line.split()
         assert splittedline[0] == '=best='
-        instance = splittedline[1]
+        problem = splittedline[1]
         objval = splittedline[2]
 
-        self.storeToStatistics(instance, objval, status = 'best')
+        self.storeToStatistics(problem, objval, status='best')
 
-    def newcutInstance(self, line):
+    def newcutProblem(self, line):
         splittedline = line.split()
         assert splittedline[0] == '=cut='
-        instance = splittedline[1]
+        problem = splittedline[1]
         objval = splittedline[2]
 
-        self.storeToStatistics(instance, objval, status = 'cut')
+        self.storeToStatistics(problem, objval, status='cut')
 
-    def newfeasInstance(self, line):
+    def newfeasProblem(self, line):
         splittedline = line.split()
         assert splittedline[0] == '=feas='
-        instance = splittedline[1]
+        problem = splittedline[1]
         objval = np.nan
 
-        self.storeToStatistics(instance, objval, status = 'feas')
+        self.storeToStatistics(problem, objval, status='feas')
 
-    def newbestdualInstance(self, line):
+    def newbestdualProblem(self, line):
         splittedline = line.split()
         assert splittedline[0] == '=bestdual='
-        instance = splittedline[1]
+        problem = splittedline[1]
         dualval = splittedline[2]
 
-        # self.storeToStatistics(instance, objval, status='bestdual')
+        self.storeToStatistics(problem, dualval, status='bestdual')

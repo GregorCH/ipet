@@ -94,7 +94,7 @@ def processMessage(message):
     if stream:
         stream.write(str(message))
 
-def enableDebugMessages(stream = sys.stdout):
+def enableDebugMessages(stream=sys.stdout):
     setStream(Message.MESSAGETYPE_DEBUG, stream)
 
 def disableDebugMessages():

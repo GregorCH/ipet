@@ -13,7 +13,7 @@ class Editable:
         """
         return a list of attributes which may be edited
         """
-        return [elem for elem in dir(self) if not elem.startswith('__') and not isinstance(getattr(self,elem), collections.Callable) \
+        return [elem for elem in dir(self) if not elem.startswith('__') and not isinstance(getattr(self, elem), collections.Callable) \
                 and type(getattr(self, elem)) in self.editabletypes]
 
     def editAttribute(self, attributename, newvalue):
@@ -69,7 +69,7 @@ class EditableAttributeError(Exception):
     class to represent an error if this editable were to be used now for an evaluation
     """
     DEFAULT_MESSAGE = "Attribute {0} is set incorrectly"
-    def __init__(self, attr, message = None):
+    def __init__(self, attr, message=None):
         """
         constructs an EditableAttributeError that should be thrown if checkAttributes() detects an inconsistency
 

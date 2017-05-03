@@ -11,20 +11,21 @@ please refer to README.md for how to cite IPET.
 """
 import xml.etree.ElementTree as ElementTree
 import numpy as np
+from ipet import Experiment
 from ipet.concepts import IpetNode, IpetNodeAttributeError
 import logging
 
 class IPETInstance(IpetNode):
     nodetag = "Instance"
     
-    def __init__(self, name = None, active = True):
+    def __init__(self, name=None, active=True):
         """
         constructs an Ipet Instance
         
         Parameters
         ----------
         
-        name : The name of this instance
+        name : The name of this problem
         active : True or "True" if this element should be active, False otherwise
         """
         super(IPETInstance, self).__init__(active)
@@ -78,7 +79,7 @@ class IPETComparison:
         try:
             return method(x, y)
         except TypeError as t:
-            logging.error("Got type error %s comparing elements x:%s and y:%s" % (t,x,y))
+            logging.error("Got type error %s comparing elements x:%s and y:%s" % (t, x, y))
             return 0
 
     def method_le(self, x, y):
@@ -105,7 +106,7 @@ class IPETFilter(IpetNode):
     nodetag = "Filter"
     
 
-    def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = 'all', active = True):
+    def __init__(self, expression1=None, expression2=None, operator="ge", anytestrun='all', active=True):
         """
         filter constructor
         
@@ -130,7 +131,7 @@ class IPETFilter(IpetNode):
         
     def checkAttributes(self):
         if self.operator in self.instanceoperators and self.instances == []:
-            raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty instance set".format(self.operator))
+            raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty problem set".format(self.operator))
         return True
         
         
@@ -148,7 +149,7 @@ class IPETFilter(IpetNode):
     def getName(self):
         prefix = self.anytestrun
         if self.operator in self.instanceoperators:
-            return self.operator + " instance filter"
+            return self.operator + " problem filter"
         else:
             return " ".join((prefix, self.expression1, self.operator, self.expression2))
 
@@ -162,7 +163,7 @@ class IPETFilter(IpetNode):
         returns editable attributes depending on the selected operator
 
         if a binary operator is selected, two expressions as left and right hand side of operator must be chosen
-        For instance operators, no expressions are selectable.
+        For problem operators, no expressions are selectable.
         """
         parenteditables = super(IPETFilter, self).getEditableAttributes()
 
@@ -195,7 +196,7 @@ class IPETFilter(IpetNode):
 
     def applyInstanceOperator(self, probname):
         contained = False
-        # loop through instance set
+        # loop through problem set
         for name in (x.getName() for x in self.getActiveInstances()):
             if probname == name:
                 contained = True
@@ -213,7 +214,7 @@ class IPETFilter(IpetNode):
         return True or False depending on the evaluation of the filter operator comparison
         """
 
-        # apply an instance operator directly
+        # apply an problem operator directly
         if self.operator in self.instanceoperators:
             return self.applyInstanceOperator(probname)
 
@@ -261,7 +262,7 @@ class IPETFilter(IpetNode):
 
     def evaluate(self, value, probname, testrun):
         if value in testrun.getKeySet():
-            return testrun.problemGetDataById(probname, value)
+            return testrun.getProblemDataById(probname, value)
         else:
             for conversion in [int, float, str]:
                 try:
@@ -279,8 +280,8 @@ class IPETFilter(IpetNode):
 
     def toXMLElem(self):
         me = ElementTree.Element(IPETFilter.getNodeTag(), self.attributesToStringDict())
-        for instance in self.instances:
-            me.append(instance.toXMLElem())
+        for problem in self.instances:
+            me.append(problem.toXMLElem())
         return me
 
 class IPETFilterGroup(IpetNode):
@@ -294,7 +295,7 @@ class IPETFilterGroup(IpetNode):
     
     editableAttributes = ["name", "filtertype"]
 
-    def __init__(self, name = None, filtertype = "intersection", active = True):
+    def __init__(self, name=None, filtertype="intersection", active=True):
         """
         constructor for a filter group
 
@@ -309,7 +310,7 @@ class IPETFilterGroup(IpetNode):
         self.name = name
         self.filters = []
         if filtertype not in ["intersection", "union"]:
-            raise ValueError("Error: filtertype <%s> must be either 'intersection' or 'union'"%filtertype)
+            raise ValueError("Error: filtertype <%s> must be either 'intersection' or 'union'" % filtertype)
 
         self.filtertype = filtertype
         
@@ -341,7 +342,7 @@ class IPETFilterGroup(IpetNode):
 
         Parameters
         ----------
-        filter_ : an instance of IPETFilter
+        filter_ : an problem of IPETFilter
         """
         self.filters.append(filter_)
 
@@ -358,7 +359,7 @@ class IPETFilterGroup(IpetNode):
         """
 
         groups = df.groupby(level=0)
-        # first, get the highest number of instance occurrences. This number must be matched to keep the instance
+        # first, get the highest number of problem occurrences. This number must be matched to keep the problem
         if self.filtertype == "intersection":
             instancecount = groups.apply(len).max()
             intersectionfunction = lambda x:len(x) == instancecount
@@ -431,18 +432,18 @@ class IPETFilterGroup(IpetNode):
 
 
 if __name__ == '__main__':
-    comp = Experiment(files = ['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
+    comp = Experiment(files=['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
     comp.addSoluFile('../test/short.solu')
     comp.collectData()
     operator = 'ge'
     expression1 = 'Nodes'
     expression2 = '2'
-    filter1 = IPETFilter(expression1, expression2, operator, anytestrun = "all")
-    filter2 = IPETFilter(expression1, expression2, operator, anytestrun = "one")
+    filter1 = IPETFilter(expression1, expression2, operator, anytestrun="all")
+    filter2 = IPETFilter(expression1, expression2, operator, anytestrun="one")
     print(filter1.getName())
-    print(len(comp.getProblems()))
-    print(len(filter1.getFilteredList(comp.getProblems(), comp.getManager('testrun').getManageables())))
-    print(len(filter2.getFilteredList(comp.getProblems(), comp.getManager('testrun').getManageables())))
+    print(len(comp.getProblemIds()))
+    print(len(filter1.getFilteredList(comp.getProblemIds(), comp.getManager('testrun').getManageables())))
+    print(len(filter2.getFilteredList(comp.getProblemIds(), comp.getManager('testrun').getManageables())))
 
 
     group = IPETFilterGroup('new')

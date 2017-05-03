@@ -52,8 +52,8 @@ class IPETEvaluationColumn(IpetNode):
                        "translevel":[0, 1],
                        "transformfunc":list(possibletransformations.keys())}
 
-    def __init__(self, origcolname = None, name = None, formatstr = None, transformfunc = None, constant = None,
-                 nanrep = None, minval = None, maxval = None, comp = None, regex = None, translevel = None, active = True):
+    def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
+                 nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None, active=True):
         """
         constructor of a column for the IPET evaluation
 
@@ -166,7 +166,7 @@ class IPETEvaluationColumn(IpetNode):
         else:
             return self.transformfunc + ','.join((child.getName() for child in self.children))
 
-    def parseValue(self, val, df = None):
+    def parseValue(self, val, df=None):
         """
         parse a value into an integer (prioritized) or float
         """
@@ -292,11 +292,11 @@ class IPETEvaluationColumn(IpetNode):
                     # print an error message and make a series with NaN's
                     print(e)
                     print("Could not retrieve data %s" % self.origcolname)
-                    result = pd.Series(numpy.nan, index = df.index)
+                    result = pd.Series(numpy.nan, index=df.index)
 
 
             elif self.regex is not None:
-                result = df.filter(regex = self.regex)
+                result = df.filter(regex=self.regex)
             elif self.constant is not None:
                 df[self.getName()] = self.parseConstant()
                 result = df[self.getName()]
@@ -306,18 +306,18 @@ class IPETEvaluationColumn(IpetNode):
             transformfunc = self.getTransformationFunction()
 
             # concatenate the children data into a new data frame object
-            argdf = pd.concat([child.getColumnData(df) for child in self.children], axis = 1)
+            argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)
 
             if self.getTransLevel() == 1:
 
                 # group the whole table per instance #
 
-                argdf = argdf.groupby(level = 0)
+                argdf = argdf.groupby(level=0)
 
                 # determine the axis along which to apply the transformation later on
                 applydict = {}
             else:
-                applydict = dict(axis = 1)
+                applydict = dict(axis=1)
 
             try:
                 # try to directly apply the transformation function, this might fail for
@@ -383,8 +383,8 @@ class IPETEvaluation(IpetNode):
 
     editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
-    def __init__(self, groupkey = DEFAULT_GROUPKEY, defaultgroup = DEFAULT_DEFAULTGROUP, evaluateoptauto = True,
-                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT):
+    def __init__(self, groupkey=DEFAULT_GROUPKEY, defaultgroup=DEFAULT_DEFAULTGROUP, evaluateoptauto=True,
+                 sortlevel=0, comparecolformat=DEFAULT_COMPARECOLFORMAT):
         """
         constructs an Ipet-Evaluation
 
@@ -505,7 +505,7 @@ class IPETEvaluation(IpetNode):
 
         lvlonecols = [col for col in self.getActiveColumns() if col.getTransLevel() == 1]
         if len(lvlonecols) > 0:
-            self.levelonedf = pd.concat([col.getColumnData(df_long) for col in lvlonecols], axis = 1)
+            self.levelonedf = pd.concat([col.getColumnData(df_long) for col in lvlonecols], axis=1)
             self.levelonedf.columns = [col.getName() for col in lvlonecols]
         else:
             self.levelonedf = None
@@ -528,7 +528,7 @@ class IPETEvaluation(IpetNode):
                     # apply the correct comparison method to the original and the temporary column
                     compmethod = col.getCompareMethod()
                     method = lambda x:compmethod(*x)
-                    df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)
+                    df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis=1)
                     usercolumns.append(comparecolname)
         # concatenate level one columns into a new data frame and treat them as the altogether setting
         neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
@@ -594,8 +594,8 @@ class IPETEvaluation(IpetNode):
         return ev
 
     def convertToHorizontalFormat(self, df):
-        horidf = df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis = 1)
-        horidf.sortlevel(axis = 1, level = self.sortlevel)
+        horidf = df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
+        horidf.sortlevel(axis=1, level=self.sortlevel)
         return horidf
 
     def checkStreamType(self, streamtype):
@@ -634,7 +634,7 @@ class IPETEvaluation(IpetNode):
             if col.getCompareMethod() is not None:
                 try:
                     if thelevel == 1:
-                        comptuples += df.xs(col.getName() + col.getCompareSuffix(), axis = 1, level = thelevel, drop_level = False).columns.values.tolist()
+                        comptuples += df.xs(col.getName() + col.getCompareSuffix(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
                     else:
                         comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and dfcol.endswith("Q")]
                 except:
@@ -648,7 +648,7 @@ class IPETEvaluation(IpetNode):
             # settings 'default' and 'heuroff', the result should be [('default', 'Time'),('heuroff', 'Time')]
             try:
                 if thelevel == 1:
-                    tuples = df.xs(col.getName(), axis = 1, level = thelevel, drop_level = False).columns.values.tolist()
+                    tuples = df.xs(col.getName(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
 
                 else:
                     tuples = [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and not dfcol.endswith("Q") and not dfcol.endswith("p")]
@@ -674,30 +674,30 @@ class IPETEvaluation(IpetNode):
 
         streammethod(df, filebasename, formatters)
 
-    def streamDataFrame_stdout(self, df, filebasename, formatters = {}):
+    def streamDataFrame_stdout(self, df, filebasename, formatters={}):
         """
         print to console
         """
         print("%s:" % filebasename)
-        print(df.to_string(formatters = formatters))
+        print(df.to_string(formatters=formatters))
 
-    def streamDataFrame_tex(self, df, filebasename, formatters = {}):
+    def streamDataFrame_tex(self, df, filebasename, formatters={}):
         """
         write tex output
         """
         with open("%s.tex" % filebasename, "w") as texfile:
-            texfile.write(df.to_latex(formatters = formatters))
+            texfile.write(df.to_latex(formatters=formatters))
 
-    def streamDataFrame_csv(self, df, filebasename, formatters = {}):
+    def streamDataFrame_csv(self, df, filebasename, formatters={}):
         with open("%s.csv" % filebasename, "w") as csvfile:
-            df.to_csv(csvfile, formatters = formatters)
+            df.to_csv(csvfile, formatters=formatters)
 
-    def streamDataFrame_txt(self, df, filebasename, formatters = {}):
+    def streamDataFrame_txt(self, df, filebasename, formatters={}):
         """
         write txt output
         """
         with open("%s.txt" % filebasename, "w") as txtfile:
-            df.to_string(txtfile, formatters = formatters, index_names = False)
+            df.to_string(txtfile, formatters=formatters, index_names=False)
 
     def findStatus(self, statuscol):
         uniques = set(statuscol.unique())
@@ -711,18 +711,18 @@ class IPETEvaluation(IpetNode):
         """
         calculate optimal auto settings instancewise
         """
-        grouped = df.groupby(level = 0)
+        grouped = df.groupby(level=0)
 
         optstatus = grouped["Status"].apply(self.findStatus)
         opttime = grouped["SolvingTime"].apply(numpy.min)
         opttimelim = grouped["TimeLimit"].apply(numpy.mean)
 
-        optdf = pd.concat([optstatus, opttime, opttimelim], axis = 1)
+        optdf = pd.concat([optstatus, opttime, opttimelim], axis=1)
         optdf[self.groupkey] = "OPT. AUTO"
 
         aggfuncs = {'_solved_':numpy.max}
-        useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis = 1)
-        optdf = pd.concat([optdf, useroptdf], axis = 1)
+        useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis=1)
+        optdf = pd.concat([optdf, useroptdf], axis=1)
 
         return optdf
 
@@ -795,7 +795,7 @@ class IPETEvaluation(IpetNode):
         ret = self.convertToHorizontalFormat(columndata)
         if self.levelonedf is not None:
             self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
-            self.rettab = pd.concat([ret, self.levelonedf], axis = 1)
+            self.rettab = pd.concat([ret, self.levelonedf], axis=1)
         else:
             self.rettab = ret
 
@@ -816,7 +816,7 @@ class IPETEvaluation(IpetNode):
             nonemptyfiltergroups = [fg for fg in activefiltergroups if not self.filtered_agg[fg.name].empty]
             dfs = [self.filtered_agg[fg.name] for fg in nonemptyfiltergroups]
             names = [fg.name for fg in nonemptyfiltergroups]
-            self.retagg = pd.concat(dfs, keys = names, names = ['Group'])
+            self.retagg = pd.concat(dfs, keys=names, names=['Group'])
         else:
             self.retagg = pd.DataFrame()
 
@@ -828,7 +828,7 @@ class IPETEvaluation(IpetNode):
 
     def aggregateToPivotTable(self, df):
         # the general part sums up the number of instances falling into different categories
-        generalpart = df[['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index = self.groupkey, aggfunc = sum)
+        generalpart = df[['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
 
         # test if there is any aggregation to be calculated
         hasaggregation = False
@@ -841,7 +841,7 @@ class IPETEvaluation(IpetNode):
             return generalpart
 
         # column aggregations aggregate every column and every column aggregation
-        colaggpart = pd.concat((df[[col.getName(), self.groupkey]].pivot_table(index = self.groupkey, aggfunc = agg.aggregate) for col, agg in colsandaggregations), axis = 1)
+        colaggpart = pd.concat((df[[col.getName(), self.groupkey]].pivot_table(index=self.groupkey, aggfunc=agg.aggregate) for col, agg in colsandaggregations), axis=1)
 
         # print df[["DualInt", "Settings"]].pivot_table(index = "Settings", aggfunc = numpy.min)
         # rename the column aggregations
@@ -872,7 +872,7 @@ class IPETEvaluation(IpetNode):
         if statspart is not None:
             parts.append(statspart)
 
-        return pd.concat(parts, axis = 1)
+        return pd.concat(parts, axis=1)
 
     def applyStatsTests(self, df):
         """
@@ -895,11 +895,11 @@ class IPETEvaluation(IpetNode):
 
             # iterate through the stats tests associated with each column
             for statstest in col.getStatsTests():
-                stats.append(df[[self.groupkey, col.getName()]].pivot_table(index = self.groupkey, aggfunc = lambda x:statstest(x, defaultvalues)))
+                stats.append(df[[self.groupkey, col.getName()]].pivot_table(index=self.groupkey, aggfunc=lambda x:statstest(x, defaultvalues)))
                 names.append('_'.join((col.getName(), statstest.__name__)))
 
         if len(stats) > 0:
-            stats = pd.concat(stats, axis = 1)
+            stats = pd.concat(stats, axis=1)
             stats.columns = names
 
             return stats
@@ -911,7 +911,7 @@ class IPETEvaluation(IpetNode):
         columnorder = []
         for col in self.getActiveColumns():
             origcolname = col.getName()
-            partialdf = df.xs(origcolname, level = 1, axis = 1, drop_level = False)
+            partialdf = df.xs(origcolname, level=1, axis=1, drop_level=False)
 
             for partialcol in partialdf.columns:
                 columnorder.append(partialcol)

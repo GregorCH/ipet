@@ -9,9 +9,10 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 """
-from .StatisticReader import StatisticReader
 import re
 import logging
+from .StatisticReader import StatisticReader
+from ipet import misc
 
 class PrimalBoundHistoryReader(StatisticReader):
     name = 'PrimalBoundHistoryReader'
@@ -61,9 +62,9 @@ class PrimalBoundHistoryReader(StatisticReader):
                     return
 
                 if not self.ugmode:
-                    allmatches = self.numericExpression.findall(line[:line.rindex("|")])
+                    allmatches = misc.numericExpression.findall(line[:line.rindex("|")])
                 else:
-                    allmatches = self.numericExpression.findall(line)[:5]
+                    allmatches = misc.numericExpression.findall(line)[:5]
 
                 if len(allmatches) == 0:
                     return
@@ -101,7 +102,7 @@ class PrimalBoundHistoryReader(StatisticReader):
                 self.listOfPoints.append((float(pointInTime), float(self.gurobiextralist[-1])))
                 self.gurobiextralist = []
             elif self.inTable and line.startswith("H") or line.startswith("*"):
-                self.readBoundAndTime(line, -5, -1, timestripchars = "s")
+                self.readBoundAndTime(line, -5, -1, timestripchars="s")
 
             elif "Cutting planes:" in line and self.inTable:
                 self.inTable = False
@@ -115,7 +116,7 @@ class PrimalBoundHistoryReader(StatisticReader):
 
         elif StatisticReader.solvertype == StatisticReader.SOLVERTYPE_CBC or StatisticReader.solvertype == StatisticReader.SOLVERTYPE_COUENNE:
             if "Integer solution of " in line:
-                self.readBoundAndTime(line, 4, -2, timestripchars = "(")
+                self.readBoundAndTime(line, 4, -2, timestripchars="(")
 
             return None
 
@@ -124,7 +125,7 @@ class PrimalBoundHistoryReader(StatisticReader):
                 self.xpresscutidx = line.index("BestSoln") + len("BestSoln")
             elif re.search("^[a-zA-Z*](\d| )", line):
                 print(line)
-                self.readBoundAndTime(line, -1, -1, cutidx = self.xpresscutidx)
+                self.readBoundAndTime(line, -1, -1, cutidx=self.xpresscutidx)
             elif line.startswith(" *** Heuristic solution found: "):
                 logging.debug(line)
                 self.readBoundAndTime(line, -4, -2)
@@ -181,7 +182,7 @@ class PrimalBoundHistoryReader(StatisticReader):
 
         return None
 
-    def readBoundAndTime(self, line, boundidx, timeidx, timestripchars = "", cutidx = -1):
+    def readBoundAndTime(self, line, boundidx, timeidx, timestripchars="", cutidx=-1):
         splitline = line.split()
 
         primalbound = line[:cutidx].split()[boundidx]

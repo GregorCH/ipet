@@ -34,7 +34,7 @@ class IPETLogFileView(QWidget):
 
 
     """
-    a view of a log file, with selection mechanisms for the desired test run and instance that should be shown
+    a view of a log file, with selection mechanisms for the desired test run and problem that should be shown
     """
     def __init__(self, parent = None):
         super(IPETLogFileView, self).__init__(parent)
@@ -42,16 +42,16 @@ class IPETLogFileView(QWidget):
         self.textbrowser = QTextEdit(self)
         self.textbrowser.setReadOnly(True)
         self.testrunselection = OptionsComboBox(self)
-        self.instanceselection = OptionsComboBox(self)
+        self.problemselection = OptionsComboBox(self)
         vlayout.addWidget(self.textbrowser)
         self.setStyleSheet(self.StyleSheet)
         hlayout = QHBoxLayout()
         testrunselectionlabel = QLabel("Select a test run", self)
-        instanceselectionlabel = QLabel("Select an instance", self)
+        problemselectionlabel = QLabel("Select an instance", self)
         testrunselectionlabel.setBuddy(self.testrunselection)
-        instanceselectionlabel.setBuddy(self.instanceselection)
+        problemselectionlabel.setBuddy(self.problemselection)
         for l,s in [(testrunselectionlabel, self.testrunselection),
-                    (instanceselectionlabel, self.instanceselection)]:
+                    (problemselectionlabel, self.problemselection)]:
             v = QVBoxLayout(self)
             v.addWidget(l)
             v.addWidget(s)
@@ -62,7 +62,7 @@ class IPETLogFileView(QWidget):
         self.initConnections()
 
     def getProblem(self):
-        problem = self.instanceselection.currentText()
+        problem = self.problemselection.currentText()
         return problem
     
     def getSelectedText(self):
@@ -92,18 +92,18 @@ class IPETLogFileView(QWidget):
         return None
         
     def initConnections(self):
-        for s in (self.testrunselection, self.instanceselection):
+        for s in (self.testrunselection, self.problemselection):
             self.connect(s, SIGNAL("currentIndexChanged(int)"), self.updateView)
         
     def updateExperimentData(self):
         self.testrunselection.clear()
-        self.instanceselection.clear()
+        self.problemselection.clear()
         
         testruns = ExperimentManagement.getExperiment().getTestRuns()
-        problems = ExperimentManagement.getExperiment().getProblems()
+        problems = ExperimentManagement.getExperiment().getProblemIds()
 
         self.testrunselection.addItems([t.getName() for t in testruns])
-        self.instanceselection.addItems([p for p in problems])
+        self.problemselection.addItems([p for p in problems])
 
     def updateView(self):
         selectedtestrun = self.getTestRun()
@@ -113,8 +113,8 @@ class IPETLogFileView(QWidget):
         outfile = selectedtestrun.getLogFile()
 
         with open(outfile, 'r') as in_file:
-            linesstart = selectedtestrun.problemGetDataById(str(selectedproblem), "LineNumbers_BeginLogFile")
-            linesend = selectedtestrun.problemGetDataById(str(selectedproblem), "LineNumbers_EndLogFile")
+            linesstart = selectedtestrun.getProblemDataById(str(selectedproblem), "LineNumbers_BeginLogFile")
+            linesend = selectedtestrun.getProblemDataById(str(selectedproblem), "LineNumbers_EndLogFile")
             self.text = []
             for idx, line in enumerate(in_file):
                 if idx > linesend:

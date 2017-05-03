@@ -21,7 +21,7 @@ class DualBoundHistoryReader(StatisticReader):
     """
 
     name = 'DualBoundHistoryReader'
-    regular_exp =  re.compile('\|') # compile the regular expression to speed up reader
+    regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
     datakey = 'dualboundhistory'
     dbindex = -1
     timeindex = 0
@@ -54,7 +54,8 @@ class DualBoundHistoryReader(StatisticReader):
                 self.dbindex = splittedlinenowhitespace.index('dualbound')
 
             try:
-                listofnumbersintable = self.tablenumericExpression.findall(line)
+                # FARI This works, why is eclipse complaining?
+                listofnumbersintable = misc.tablenumericExpression.findall(line)
                 # parse time and dual bound from the table
                 time = float(listofnumbersintable[self.timeindex])
                 dualbound = float(listofnumbersintable[self.dbindex])
@@ -92,12 +93,12 @@ class DualBoundHistoryReader(StatisticReader):
         returns a dual bound history list
         """
         if self.dualboundlist != []:
-            #only copy nonempty lists, otherwise Parascipdualboundhistoryreader and this one will overwrite each others data
+            # only copy nonempty lists, otherwise Parascipdualboundhistoryreader and this one will overwrite each others data
             self.addData(self.datakey, self.dualboundlist[:])
         self.reset()
         
 class ParascipDualBoundHistoryReader(DualBoundHistoryReader):
-    name="ParascipDualBoundHistoryReader"
+    name = "ParascipDualBoundHistoryReader"
     parascipheader = "     Time          Nodes        Left   Solvers     Best Integer        Best Node"
     dbindex = 5
     intable = False

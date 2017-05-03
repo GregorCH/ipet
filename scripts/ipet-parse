@@ -105,6 +105,8 @@ if __name__ == '__main__':
             experiment.addOutputFile(logfile)
     
         experiment.collectData()
+        
+        # Write output
         for tr in experiment.getTestRuns():
             try:
                 filename = tr.filenames[0]

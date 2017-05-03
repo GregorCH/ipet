@@ -250,7 +250,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
             self.trListWidget.addItem(item)
             item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
             
-            problems += testrun.getProblems()
+            problems += testrun.getProblemIds()
 
         for prob in sorted(list(set(problems))):
             self.probListWidget.addItem((prob))

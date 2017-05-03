@@ -19,7 +19,7 @@ DEFAULT_XLIMITKEY = 'TimeLimit'
 DEFAULT_CUTOFFGAP = 100
 DEFAULT_BOUNDKEY = 'PrimalBound'
 
-def calcIntegralValue(thedatalist, pwlinear = False):
+def calcIntegralValue(thedatalist, pwlinear=False):
     """
        calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
 
@@ -53,17 +53,17 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
     """
     # read keys from kw dictionary
     historytouse = kw.get('historytouse', DEFAULT_HISTORYTOUSE)
-    history = testrun.problemGetDataById(probname, historytouse)
+    history = testrun.getProblemDataById(probname, historytouse)
     
     xaftersolvekey = kw.get('xaftersolvekey', DEFAULT_XAFTERSOLVEKEY)
-    xaftersolve = testrun.problemGetDataById(probname, xaftersolvekey)
+    xaftersolve = testrun.getProblemDataById(probname, xaftersolvekey)
     
     xlimitkey = kw.get('xlimitkey', DEFAULT_XLIMITKEY)
-    xlim = testrun.problemGetDataById(probname, xlimitkey)
+    xlim = testrun.getProblemDataById(probname, xlimitkey)
     
     cutoffgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
     
-    optimum = testrun.problemGetDataById(probname, 'OptVal')
+    optimum = testrun.getProblemDataById(probname, 'OptVal')
     
     if xlim is None and xaftersolve is None:
         return None
@@ -71,7 +71,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
         history = []
     
     lastboundkey = kw.get('boundkey', DEFAULT_BOUNDKEY)
-    lastbound = testrun.problemGetDataById(probname, lastboundkey)
+    lastbound = testrun.getProblemDataById(probname, lastboundkey)
     if lastbound is None:
         try:
             lastbound = history[-1][1]
@@ -104,7 +104,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
     y = numpy.array(list(map(normfunction, y)))
         
     
-    return list(zip(x,y))
+    return list(zip(x, y))
 
 def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
     """
@@ -115,7 +115,7 @@ def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
     meanintegral = np.zeros(meanintegralpoints)
     
     # get the x axis limit, usually the
-    THE_XLIMIT = max(testrun.problemlistGetData(problemlist, kw.get('xlimitkey', DEFAULT_XLIMITKEY)))
+    THE_XLIMIT = max(testrun.getProblemsDataById(problemlist, kw.get('xlimitkey', DEFAULT_XLIMITKEY)))
     scale = THE_XLIMIT / float(meanintegralpoints)
     
     # go through problem list and add up integrals for every problem
@@ -129,7 +129,7 @@ def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
         lastX = -1.0
         lastgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
         for xi, itgap in it:
-            startindex = int(lastX + 1)/scale
+            startindex = int(lastX + 1) / scale
             lastindex = int(xi + 1) / scale
             meanintegral[startindex:lastindex] += lastgap
             lastX = xi

@@ -13,16 +13,15 @@ import unittest
 import os
 import json
 import re
-import numpy
 import shutil
-from pandas.util.testing import assert_frame_equal
 import sys
+import numpy as np
+from pandas.util.testing import assert_frame_equal
 from ipet.Experiment import Experiment
 from ipet.TestRun import TestRun
 from ipet.parsing import ListReader
 from ipet.parsing import ReaderManager
-from ipet.misc import convertTimeStamp
-
+from ipet import Key
 
 DATADIR = os.path.join(os.path.dirname(__file__), "data")
 TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")
@@ -71,7 +70,7 @@ class ExperimentTest(unittest.TestCase):
         df = self.experiment.getTestRuns()[0].getData()
         for index, column, value in self.datasamples:
             entry = df.loc[index, column]
-            msg = "Wrong value parsed for instance %s in column %s: should be %s, have %s" % \
+            msg = "Wrong value parsed for problem %s in column %s: should be %s, have %s" % \
                   (index, column, repr(value), repr(entry))
             self.assertEqual(entry, value, msg)
 
@@ -97,7 +96,7 @@ class ExperimentTest(unittest.TestCase):
 
         self.checkTestrunsEqual(trstdin, trfile, columns)
 
-    def test_instance_name_parsing(self):
+    def test_problem_name_parsing(self):
         fname = "check.IP_0s_1s.scip-3.2.1.2.linux.x86_64.gnu.dbg.cpx.opt-low.default.out"
         out_file = os.path.join(DATADIR, fname)
         solu_file = os.path.join(DATADIR, "IP_0s_1s.solu")
@@ -105,7 +104,7 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
         data = self.experiment.getTestRuns()[0].getData()
-        # ensure that the correct number of instances are properly parsed
+        # ensure that the correct number of problems are properly parsed
         self.assertEqual(len(data), 411)
 
     def checkTestrunsEqual(self, tr, tr2, columns=checkColumns):
@@ -149,14 +148,13 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addOutputFile(out_file)
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
-        manageables = self.experiment.getTestRuns()[0]
-        data = json.loads(manageables.data.to_json())
+        data = self.experiment.getTestRuns()[0].data
+        
+        for v in data["LineNumbers_BeginLogFile"]:
+            self.assertTrue(isinstance(v, np.int64))
 
-        for k, v in data["LineNumbers_BeginLogFile"].items():
-            self.assertTrue(isinstance(v, int))
-
-        for k, v in data["LineNumbers_EndLogFile"].items():
-            self.assertTrue(isinstance(v, int))
+        for v in data["LineNumbers_EndLogFile"]:
+            self.assertTrue(isinstance(v, np.int64))
 
     def test_trnfileextension(self):
         trn_file = os.path.join(DATADIR, ".testrun.trn")
@@ -217,15 +215,15 @@ class ExperimentTest(unittest.TestCase):
             self.assertEqual(val, values[key], msg)
 
     def testStatusComparisons(self):
-        goodStatusList = [Experiment.Status_Ok, Experiment.Status_Better, Experiment.Status_SolvedNotVerified]
-        badStatusList = [Experiment.Status_FailAbort, Experiment.Status_FailObjectiveValue, Experiment.Status_Fail]
+        goodStatusList = [Key.ProblemStatus.Ok, Key.ProblemStatus.Better, Key.ProblemStatus.SolvedNotVerified]
+        badStatusList = [Key.ProblemStatus.FailAbort, Key.ProblemStatus.FailObjectiveValue, Key.ProblemStatus.Fail]
         
         msg = "Returned status {0} is not the expected {1}"
-        for status, expected in [(Experiment.getBestStatus(goodStatusList + badStatusList), Experiment.Status_Ok),
-                     (Experiment.getBestStatus(*(goodStatusList + badStatusList)), Experiment.Status_Ok),
-                     (Experiment.getWorstStatus(goodStatusList + badStatusList), Experiment.Status_FailAbort),
-                     (Experiment.getBestStatus(badStatusList + ["dummy"]), "dummy"),
-                     (Experiment.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
+        for status, expected in [(Key.ProblemStatus.getBestStatus(goodStatusList + badStatusList), Key.ProblemStatus.Ok),
+                     (Key.ProblemStatus.getBestStatus(*(goodStatusList + badStatusList)), Key.ProblemStatus.Ok),
+                     (Key.ProblemStatus.getWorstStatus(goodStatusList + badStatusList), Key.ProblemStatus.FailAbort),
+                     (Key.ProblemStatus.getBestStatus(badStatusList + ["dummy"]), "dummy"),
+                     (Key.ProblemStatus.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
             self.assertEqual(status, expected, msg.format(status, expected)) 
             
 def collect_settings(path):

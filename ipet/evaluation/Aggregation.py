@@ -64,8 +64,8 @@ class Aggregation(IpetNode):
         else:
             name = self.aggregation
             
-        if( len(self.getEditableAttributes()) > 2 ):
-            name += '(%s)'% ','.join((str(self.__dict__[key]) for key in self.editableattributes[2:]))
+        if(len(self.getEditableAttributes()) > 2):
+            name += '(%s)' % ','.join((str(self.__dict__[key]) for key in self.editableattributes[2:]))
         return name
 
     @staticmethod
@@ -141,6 +141,6 @@ if __name__ == '__main__':
     agg2 = Aggregation('max')
     print(agg.aggregate(arr), agg2.aggregate(arr))
     agg.set_aggregation('mean')
-    agg2 = Aggregation('shmean', shiftby = 30.0)
-    agg3 = Aggregation('shmean', shiftby = 300.0)
+    agg2 = Aggregation('shmean', shiftby=30.0)
+    agg3 = Aggregation('shmean', shiftby=300.0)
     print(agg3.aggregate(arr), agg2.aggregate(arr))

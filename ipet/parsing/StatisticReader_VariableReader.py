@@ -11,6 +11,7 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 from .StatisticReader import StatisticReader
+from ipet import misc
 import re
 
 class VariableReader(StatisticReader):
@@ -19,7 +20,7 @@ class VariableReader(StatisticReader):
     """
     name = 'VariableReader'
     varexp = re.compile(r'^  Variables        :')
-    consexp= re.compile(r'^  Constraints      :')
+    consexp = re.compile(r'^  Constraints      :')
     varkeys = ['Vars', 'BinVars', 'IntVars', 'ImplVars', 'ContVars']
     conskeys = ["InitialNCons", "MaxNCons"]
     problemtype = None
@@ -34,18 +35,18 @@ class VariableReader(StatisticReader):
      
         # check if the SCIP variable expression is matched by line
         elif self.problemtype and self.varexp.match(line):
-            nvariables = list(map(int, self.numericExpression.findall(line)[:len(self.varkeys)]))
-            datakeys = ["%s_%s"%(self.problemtype,key) for key in self.varkeys]
+            nvariables = list(map(int, misc.numericExpression.findall(line)[:len(self.varkeys)]))
+            datakeys = ["%s_%s" % (self.problemtype, key) for key in self.varkeys]
             self.addData(datakeys, nvariables)
 
         # check if the constraint expression is matched by line
         elif self.problemtype and self.consexp.match(line):
-            nconns = list(map(int, self.numericExpression.findall(line)[:len(self.conskeys)]))
+            nconns = list(map(int, misc.numericExpression.findall(line)[:len(self.conskeys)]))
 
-            datakeys = ["%s_%s"%(self.problemtype,key) for key in self.conskeys]
+            datakeys = ["%s_%s" % (self.problemtype, key) for key in self.conskeys]
             self.addData(datakeys, nconns)
             
-            #reset the problem type
+            # reset the problem type
             self.problemtype = None
             
         return None

@@ -45,7 +45,7 @@ class CustomReader(StatisticReader):
             "method" : list(str2method.keys())
         }
 
-    def __init__(self, name = None, regpattern = None, datakey = None, index = 0, datatype = "float", method = "last"):
+    def __init__(self, name=None, regpattern=None, datakey=None, index=0, datatype="float", method="last"):
         """
         constructor of a custom reader to parse additional simple solver output from log file context
 
@@ -56,13 +56,13 @@ class CustomReader(StatisticReader):
 
         regpattern : A string or regular expression pattern to detect lines from which output should be read
 
-        datakey : The data key under which the parsed datum gets stored for every instance
+        datakey : The data key under which the parsed datum gets stored for every problem
 
         index : The zero-based index of the number in the specified line (only numbers count)
 
         datatype : choose 'int' or 'float'
 
-        method : how to treat multiple occurrences of this data within one instance; 'count' occurrences or parse 'first', 'last', 'sum', 'min' or 'max'
+        method : how to treat multiple occurrences of this data within one problem; 'count' occurrences or parse 'first', 'last', 'sum', 'min' or 'max'
         """
 
         if regpattern is None:
@@ -101,7 +101,7 @@ class CustomReader(StatisticReader):
                 data = self.getNumberAtIndex(line, self.index)
                 data = self.datatypemethod(data)
 
-                previousdata = self.testrun.problemGetDataById(self.problemname, self.datakey)
+                previousdata = self.testrun.getProblemDataById(self.problemname, self.datakey)
 
                 if self.methodint == CustomReader.METHOD_FIRST:
                     if previousdata is None:
@@ -147,7 +147,8 @@ class CustomReader(StatisticReader):
         recognizes data types (e.g., 'float' or 'int') and sets reader data type to this value
         """
         try:
-            self.datatypemethod = getattr(__builtin__, sometype)
+            # FARI how to resolve this error?
+            # self.datatypemethod = getattr(__builtin__, sometype)
             self.datatype = sometype
         except:
             logging.debug("Error: Could not recognize data type %s, using float" % sometype)

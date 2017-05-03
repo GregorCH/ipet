@@ -1,11 +1,11 @@
 
 import re
 import os
+from ipet import Key
 from ipet.misc import misc
-from ipet.parsing import Key
-from .StatisticReader import StatisticReader
+from ipet.parsing.StatisticReader import StatisticReader
 
-class Solver(StatisticReader):
+class Solver():
 
     DEFAULT = None
     DEFAULT_SOLVERID = "defaultSolver"
@@ -21,8 +21,8 @@ class Solver(StatisticReader):
                  solvingtime_lineindices = None,
                  version_pattern = None,
                  version_lineindices = None,
-                 timelimitreached_pattern = None,
-                 timelimitreached_expression = None):
+                 limitreached_pattern = None,
+                 limitreached_expression = None):
         self.solverId = solverID
         self.recognition_pattern = recognition_pattern
         self.primalbound_pattern = primalbound_pattern
@@ -33,29 +33,22 @@ class Solver(StatisticReader):
         self.solvingtime_lineindices = solvingtime_lineindices
         self.version_pattern = version_pattern
         self.version_lininedices = version_lineindices
-        if not timelimitreached_pattern is None and not timelimitreached_expression is None:
-            self.timelimitreached_pattern = re.compile(timelimitreached_pattern)
-            self.timelimitreached_expression = re.compile(timelimitreached_expression)
+        if not limitreached_pattern is None and not limitreached_expression is None:
+            self.timelimitreached_pattern = re.compile(limitreached_pattern)
+            self.timelimitreached_expression = re.compile(limitreached_expression)
 
         self.data = {}
         self.reset()
-
-    def extractStatistic(self):
-        pass
-    def execEndOfProb(self):
-        pass
-
+        
     def extractVersion(self, line : str):
-        """
-        extracts the version of the solver-software
+        """Extract the version of the solver-software
         """
 
         if re.search(self.version_pattern, line):
             self.addData(Key.Version, line.split()[self.version_lininedices])
 
     def extractTimeLimitReached(self, line):
-        """
-        reads if memory limit was hit
+        """Read if time limit was hit
         """
         if not self.timelimitreached_pattern is None and self.timelimitreached_pattern.match(line):
             match = self.timelimitreached_expression.search(line)
@@ -65,25 +58,22 @@ class Solver(StatisticReader):
                 self.addData(Key.TimeLimitReached, limit)
 
     def extractSolvingTime(self, line):
-        """
-        reads the overall solving time
+        """Read the overall solving time
         """
         if re.search(self.solvingtimer_pattern, line):
-            # FARIn Is inheritage the way to do this? Do we keep the statistic readers? Better put these methods in Key class?
-            solvingtime = self.getWordAtIndex(line, self.solvingtime_lineindices)
+            solvingtime = misc.getWordAtIndex(line, self.solvingtime_lineindices)
             solvingtime = solvingtime.rstrip('s')
             self.addData(Key.SolvingTime, float(solvingtime))
 
     def extractDualbound(self, line):
-        """
-        returns the reported dual bound (at the end of the solver-output)
+        """Return the reported dual bound (at the end of the solver-output)
         """
         if re.match(self.dualbound_pattern, line):
             index = self.dualbound_lineindices
             # FARI does this if belong here or in cplexsolver?
             if self == CplexSolver and re.search('^MIP - Integer optimal', line):
                 index = -1
-            db = self.getWordAtIndex(line, index)
+            db = misc.getWordAtIndex(line, index)
             db = db.strip(',');
             try:
                 db = float(db)
@@ -93,11 +83,10 @@ class Solver(StatisticReader):
                 pass
 
     def extractPrimalbound(self, line):
-        """
-        reads the primal bound (at the end of the solver-output)
+        """Read the primal bound (at the end of the solver-output)
         """
         if re.search(self.primalbound_pattern, line):
-            pb = self.getWordAtIndex(line, self.primalbound_lineindices)
+            pb = misc.getWordAtIndex(line, self.primalbound_lineindices)
             pb = pb.strip(',')
             if pb != '-':
                 pb = float(pb)
@@ -105,40 +94,33 @@ class Solver(StatisticReader):
                     self.addData(Key.PrimalBound, pb)
 
     def addData(self, key, data):
-        """
-        adds data to local data-dictionary
+        """Add data to local data-dictionary
         """
         # FARIDO is it okay to overwrite data?
         self.data[key] = data
-
-    def readline(self, line):
-        """
-        reads solver-specific data from that line
+    
+    def readLine(self, line):
+        """Read solver-specific data from that line
         """
         self.extractElementaryInformation(line)
         self.extractOptionalInformation(line)
         self.extractGeneralInformation(line)
 
-    # should be overwritten
+    # This method should be overwritten by subclasses
     def extractOptionalInformation(self, line):
-        """
-        reads optional data
+        """Read optional data
         """
         pass
 
     def extractGeneralInformation(self, line):
-        """
-        reads general data
+        """Read general data
         """
         self.extractVersion(line)
 
     def extractElementaryInformation(self, line):
-        """
-        reads Data that is needed for validation
+        """Read Data that is needed for validation
         """
 #     # BestSolInfeasibleReader,
-#     # DualBoundReader,
-#     # PrimalBoundReader
 #     # SolvingTimeReader,
 #     # LimitReachedReader,
 #     # ErrorFileReader
@@ -150,20 +132,26 @@ class Solver(StatisticReader):
         self.extractSolvingTime(line)
         self.extractVersion(line)
         self.extractTimeLimitReached(line)
-
+    
+    def recognizeOutput(self,line):
+        return line.startswith(self.recognition_pattern)
+    
     def getData(self):
-        """
-        returns collected data as a tuple of two generators
+        """Return collected data as a tuple of two generators
         """
         return map(list, zip(*self.data.items()))
 
     def reset(self):
-        """
-        resets all Data except the solverId
+        """Reset all Data except the solverId
         """
         self.data = {}
         self.addData(Key.Solver, self.solverId)
-#
+        
+    def getName(self):
+        return self.solverId
+    
+    def canRead(self, filecontext):
+        return filecontext is StatisticReader.CONTEXT_ERRFILE or filecontext is StatisticReader.CONTEXT_LOGFILE
 
 ###############################################################
 ##################### DERIVED Classes #########################
@@ -182,18 +170,16 @@ class SCIPSolver(Solver):
                                      solvingtime_lineindices = -1,
                                      version_pattern = 'SCIP version',
                                      version_lineindices = 2,
-                                     timelimitreached_pattern = re.compile(r'\[(.*) (reached|interrupt)\]'),
-                                     timelimitreached_expression = re.compile(r'^SCIP Status        :'))
+                                     limitreached_pattern = re.compile(r'\[(.*) (reached|interrupt)\]'),
+                                     limitreached_expression = re.compile(r'^SCIP Status        :'))
 
     def extractOptionalInformation(self, line):
-        """
-        extracts the path info
+        """Extract the path info
         """
         self.extractPath(line)
 
     def extractVersion(self, line):
-        """
-        handles more than just the version
+        """Handle more than just the version
         """
         # SCIP version 3.1.0.1 [precision: 8 byte] [memory: block] [mode: debug] [LP solver: SoPlex 2.0.0.1] [GitHash: 825e268-dirty]
         if re.search(self.version_pattern, line):
@@ -205,8 +191,7 @@ class SCIPSolver(Solver):
                     self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
 
     def extractPath(self, line):
-        """
-        extracts the path info
+        """Extract the path info
         """
         if line.startswith('loaded parameter file'):
                 absolutesettingspath = line[len('loaded parameter file '):].strip('<>')
@@ -227,8 +212,8 @@ class GurobiSolver(Solver):
                                      solvingtime_lineindices = -2,
                                      version_pattern = "Gurobi Optimizer version",
                                      version_lineindices = 3,
-                                     timelimitreached_pattern = re.compile(r'^(Time limit) reached'),
-                                     timelimitreached_expression = re.compile(r'^Time limit reached'))
+                                     limitreached_pattern = re.compile(r'^(Time limit) reached'),
+                                     limitreached_expression = re.compile(r'^Time limit reached'))
 
 class CplexSolver(Solver):
 
@@ -245,14 +230,12 @@ class CplexSolver(Solver):
                                      version_lineindices = -1)
 
     def extractOptionalInformation(self, line):
-        """
-        extracts the settings
+        """Extract the settings
         """
         self.extractSettings(line)
 
     def extractSettings(self, line):
-        """
-        extracts the settings
+        """Extract the settings
         """
         if "CPLEX> Non-default parameters written to file" in line:
                 self.addData(Key.Settings, line.split('.')[-3])

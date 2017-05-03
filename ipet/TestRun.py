@@ -10,10 +10,11 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 import ipet.misc as misc
-from ipet.parsing import Key
+from ipet import Key
 from pandas import DataFrame, notnull
 import os
 import logging
+import pandas as pd
 
 try:
     import pickle as pickle
@@ -35,10 +36,10 @@ class TestRun:
         self.data = DataFrame(dtype = object)
 
         self.datadict = {}
-        self.currentinstancedataseries = {}
-        self.currentinstanceid = 0
+        self.currentproblemdata = {}
+        self.currentproblemid = 0
         self.metadatadict = {}
-        """ meta data represent instance-independent data """
+        """ meta data represent problem-independent data """
         self.parametervalues = {}
         self.defaultparametervalues = {}
         self.keyset = set()
@@ -46,7 +47,10 @@ class TestRun:
     def setInputFromStdin(self):
         self.inputfromstdin = True
         self.filenames = [""]
-
+        
+    def readsFromStdin(self):
+        return self.inputfromstdin
+        
     def appendFilename(self, filename):
         """
         appends a file name to the list of filenames of this test run
@@ -60,7 +64,7 @@ class TestRun:
         add the current data under the specified dataname - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
 
-        after data was added, the method problemGetDataById() can be used for access
+        after data was added, the method getProblemDataById() can be used for access
         """
         for problemkey, name in self.datadict.setdefault(Key.ProblemName, None):
             if name == problem:
@@ -70,50 +74,54 @@ class TestRun:
                     else:
                         self.datadict.setdefault(datakeys, {})[problemkey] = data
 
-    def addData(self, datakeys, data, instanceid = None):
+    def addData(self, datakey, data):
+        """Add data to current problem
+        
+        readers can use this method to add data, either as a single datakey, or as list,
+        where in the latter case it is required that datakeys and data are both lists of the same length
         """
-        add the current data or to the problem with specified id - readers can use this method to add data, either as a single datakey, or as list,
+        logging.debug("TestRun %s receives data Datakey %s, %s" % (self.getName(), repr(datakey), repr(data)))
+
+        if type(datakey) is list and type(data) is list:
+            for key, datum in zip(datakey, data):
+                self.currentproblemdata[key] = datum
+        else:
+            self.currentproblemdata[datakey] = data
+
+    def addDataById(self, datakeys, data, problemid):
+        """Add the data or to the specified problem 
+
+        readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
 
-        after data was added, the method problemGetDataById() can be used for access if a instanceid was given
+        after data was added, the method getProblemDataById() can be used for access if a problemid was given
         """
         # check for the right dictionary to store the data
-        logging.debug("TestRun %s receives data Datakey %s, %s to prob" % (self.getName(), repr(datakeys), repr(data)))
+        logging.debug("TestRun %s receives data Datakey %s, %s to problem %s" % (self.getName(), repr(datakeys), repr(data), problemid))
 
-        if instanceid == None:
-            if type(datakeys) is list and type(data) is list:
-                for key, datum in zip(datakeys, data):
-                    self.currentinstancedataseries[key] = datum
-            else:
-                self.currentinstancedataseries[datakeys] = data
+        if type(datakeys) is list and type(data) is list:
+            for key, datum in zip(datakeys, data):
+                self.datadict.setdefault(key, {})[problemid] = datum
         else:
-            if type(datakeys) is list and type(data) is list:
-                for key, datum in zip(datakeys, data):
-                    self.datadict.setdefault(key, {})[instanceid] = datum
-            else:
-                self.datadict.setdefault(datakeys, {})[instanceid] = data
+            self.datadict.setdefault(datakeys, {})[problemid] = data
 
     def addParameterValue(self, paramname, paramval):
-        """
-        stores the value for a parameter of a given name for this test run
+        """Store the value for a parameter of a given name for this test run
         """
         self.parametervalues[paramname] = paramval
 
     def addDefaultParameterValue(self, paramname, defaultval):
-        """
-        stores the value for a parameter of a given name for this test run
+        """Store the value for a parameter of a given name for this test run
         """
         self.defaultparametervalues[paramname] = defaultval
 
     def getParameterData(self):
-        """
-        returns two dictionaries that map parameter names to  their value and default value
+        """Return two dictionaries that map parameter names to  their value and default value
         """
         return (self.parametervalues, self.defaultparametervalues)
 
     def getLogFile(self, fileextension = ".out"):
-        """
-        Returns the name of the logfile
+        """Returns the name of the logfile
         """
         for filename in self.filenames:
             if filename.endswith(fileextension):
@@ -121,132 +129,145 @@ class TestRun:
         return None
 
     def getKeySet(self):
-        """
-        Returns a list or set of keys (which are the columns headers of the data)
+        """Return a list or set of keys (which are the columns headers of the data)
         """
         if self.datadict != {}:
             return list(self.datadict.keys())
         else:
             return set(self.data.columns)
 
-    def problemGetDataByName(self, problemname, datakey):
-        """
-        Returns the data collected for problems with given name
-        """
-        for key, dat in self.datadict.get("Problemname", None):
-            if dat == problemname:
-                # FARI1 Is the name unique? What if it is not? Return list?
-                return self.problemGetDataById(key, datakey)
-        return None
-
-    def problemGetDataById(self, instanceid, datakey):
-        """
-        returns data for a specific datakey, or None, if no such data exists for this (probname, datakey) key pair
-        """
-        if self.datadict != {}:
-            return self.datadict.get(datakey, {}).get(instanceid, None)
-        else:
-            try:
-                data = self.data.loc[instanceid, datakey]
-            except KeyError:
-                data = None
-            if type(data) is list or notnull(data):
-                return data
-            else:
-                return None
-
     def emptyData(self):
+        """Empty all data of current testrun 
         """
-        Empties data
-        """
-        self.data = DataFrame(dtype = object)
+        self.data = DataFrame(dtype=object)
 
     def getData(self):
-        """
-        Return a data frame object of the acquired data
+        """Return a data frame object of the acquired data
         """
         return self.data
 
     def getMetaData(self):
-        """
-        Return a data frame containing meta data
+        """Return a data frame containing meta data
         """
         return DataFrame(self.metadatadict)
 
-    def finalizeInstanceCollection(self, solver):
-        """ If any data has been found then it is saved into a new instanceset in datadict
+    def finalizeCurrentCollection(self, solver):
+        """ Any data of the current problem is saved as a new row in datadict
         """
-        if self.currentinstancedataseries != {}:
-            # Add data collected by solver into currentinstancedataseries, such as primal and dual bound,
-            self.addData(*solver.getData())
+        if self.currentproblemdata != {}:
+            # Add data collected by solver into currentproblemdata, such as primal and dual bound, 
+            self.addData(*solver.getData()) 
             
-            for key in self.currentinstancedataseries.keys():
-                self.datadict.setdefault(key, {})[self.currentinstanceid] = self.currentinstancedataseries[key]
-            self.currentinstancedataseries = {}
-            self.currentinstanceid = self.currentinstanceid + 1
-
-
+            for key in self.currentproblemdata.keys():
+                self.datadict.setdefault(key, {})[self.currentproblemid] = self.currentproblemdata[key]
+            self.currentproblemdata = {} 
+            self.currentproblemid = self.currentproblemid + 1
+            
+        
     def finishedReadingFile(self, solver):
-        """ in case that the last instancedata has not been saved yet, do it now
+        """ Save data of current problem
         """
-        self.finalizeInstanceCollection(solver)
-
+        self.finalizeCurrentCollection(solver)
+        
     def setupForDataCollection(self):
-        """ save data in a python dictionary for easier data collection
+        """ Save data in a python dictionary for easier data collection
         """
         self.datadict = self.data.to_dict()
-        self.data = DataFrame(dtype = object)
-
+        self.data = DataFrame(dtype=object)
+        
     def setupAfterDataCollection(self):
-        """ save data in a pandas dataframe for futher use (i.e. reading and finding data)
+        """ Save data in a pandas dataframe for futher use (i.e. reading and finding data)
         """
         self.data = DataFrame(self.datadict)
         self.datadict = {}
 
-    def hasInstance(self, instanceid):
+    def hasProblemName(self, problemname):
+        """ Return if already collected data for a problem with given name
+        """
+        if self.datadict != {}:
+            for name in self.datadict.get(Key.ProblemName, {}):
+                if problemname is name:
+                    return True
+            return False
+        else:
+            for name in self.data[Key.ProblemName]:
+                if problemname is name:
+                    return True
+
+    def hasProblemId(self, problemid):
         """ Returns if there is already data collected for a problem with given id
         """
-        return instanceid in range(self.currentinstanceid)
+        return problemid in range(self.currentproblemid)
 
-    def getProblems(self):
+    def getProblemIds(self):
+        """ Return a list of problemids
         """
-        returns an (unsorted) list of problems
-        """
-        return list(range(self.currentinstanceid))
-        # if self.datadict != {}:
-        #    return list(range(self.currentinstanceid))
-        # else:
-        #    return list(self.data.index.get_values())
-
-    def problemlistGetData(self, instancelist, datakey):
-        """
-        returns data for a list of problems
+        return list(range(self.currentproblemid))
+    
+    def getProblemNames(self):
+        """ Return an (unsorted) list of problemnames
         """
         if self.datadict != {}:
-            return [self.datadict.get(datakey, {}).get(instanceid, None) for instanceid in instancelist]
+            return list(self.datadict.get(Key.ProblemName, []))
         else:
-            return self.data.loc[instancelist, datakey]
-
-    def deleteProblemData(self, instanceid):
+            return list(self.data[Key.ProblemName])
+    
+    def getProblemDataByName(self, problemname, datakey):
+        """Return the data collected for problems with given name
         """
-        deletes all data acquired so far for instanceid
+        collecteddata = []
+        for key, dat in self.datadict.get("Problemname", None):
+            if dat == problemname:
+                collecteddata.append(self.getProblemDataById(key, datakey))
+        return collecteddata
+
+    def getProblemDataById(self, problemid, datakey = None):
+        """Return data for a specific datakey, or None, if no such data exists for this (probname, datakey) key pair
+        """
+        if datakey is None:
+            try:
+                return ",".join("%s: %s" % (key, self.getProblemDataById(problemid, key)) for key in self.getKeySet())
+            except KeyError:
+                return "<%s> not contained in keys, have only\n%s" % (problemid, ",".join((ind for ind in self.getProblemIds())))
+        else:
+            if self.datadict != {}:
+                return self.datadict.get(datakey, {}).get(problemid, None)
+            else:
+                try:
+                    data = self.data.loc[problemid, datakey]
+                except KeyError:
+                    data = None
+                if type(data) is list or notnull(data):
+                    return data
+                else:
+                    return None
+    
+    def getProblemsDataById(self, problemids, datakey):
+        """ Return data for a list of problems
         """
         if self.datadict != {}:
-            for col in list(self.datadict.keys()):
+            return [self.datadict.get(datakey, {}).get(id, None) for id in problemids]
+        else:
+            return self.data.loc[problemids, datakey]
+
+    def deleteProblemDataById(self, problemid):
+        """ Delete all data acquired so far for problemid
+        """
+        if self.datadict != {}:
+            for key in list(self.datadict.keys()):
                 try:
-                    del self.datadict[col][instanceid]
+                    del self.datadict[key][problemid]
                 except KeyError:
                     pass
         else:
             try:
-                self.data.drop(instanceid, inplace = True)
+                self.data.drop(problemid, inplace=True)
             except TypeError:
                 # needs to be caught for pandas version < 0.13
-                self.data = self.data.drop(instanceid)
+                self.data = self.data.drop(problemid)
 
     def getSettings(self):
-        """
-        returns the settings associated with this test run
+        """ Return the settings associated with this test run
         """
         try:
             return self.data['Settings'][0]
@@ -255,8 +276,7 @@ class TestRun:
             return os.path.basename(self.filenames[0]).split('.')[-2]
 
     def getVersion(self):
-        """
-        returns the version associated with this test run
+        """ Return the version associated with this test run
         """
         try:
             return self.data['Version'][0]
@@ -265,6 +285,8 @@ class TestRun:
             return os.path.basename(self.filenames[0]).split('.')[3]
 
     def saveToFile(self, filename):
+        """ Dump the pickled instance of itself into a .trn-file
+        """
         try:
             f = open(filename, 'wb')
             pickle.dump(self, f, protocol = 2)
@@ -272,29 +294,27 @@ class TestRun:
         except IOError:
             print("Could not open %s for saving test run" % filename)
 
-    def instanceDataEmpty(self):
-        return self.currentinstancedataseries == {}
+    def emptyCurrentProblemData(self):
+        """ Empty data of currently read problem
+        """
+        return self.currentproblemdata == {}
 
     def printToConsole(self):
-        # pd.set_option('display.max_rows', len(self.data.iloc[0,:]))
-
-        # print("DATA ", self.data)
-        # print("DATADICT ", self.datadict)
-        # print("CURRENTSERIES ", self.currentinstancedataseries)
-        # print("DATA INDEX", self.data.index.values)
-        # print("DATA COLUMNS", self.data.columns.values)
-        # print(self.data.iloc[:,:])
+        """ Print data to console
+        """
+        pd.set_option('display.max_rows', len(self.data.iloc[0,:]))
         print(self.data.iloc[0, :])
-
-        # pd.reset_option('display.max_rows')
-        pass
-
+        pd.reset_option('display.max_rows')
+        
     def toJson(self):
+        """ Return the data-object in json
+        """
         return self.data.to_json()
-        # return json.dumps(self.data.to_dict(), sort_keys=True, indent=4)
 
     @staticmethod
     def loadFromFile(filename):
+        """ Loads a .trn-File containing a particular instance of TestRun
+        """
         try:
             if filename.endswith(".gz"):
                 import gzip
@@ -309,8 +329,7 @@ class TestRun:
         return testrun
 
     def getLpSolver(self):
-        """
-        returns the LP solver used for this test run
+        """ Return the LP solver used for this test run
         """
         try:
             return self.data['LPSolver'][0]
@@ -318,8 +337,7 @@ class TestRun:
             return os.path.basename(self.filenames[0]).split('.')[-4]
 
     def getSolver(self):
-        """
-        returns the LP solver used for this test run
+        """ Return the LP solver used for this test run
         """
         try:
             return self.data['Solver'][0] + self.data['GitHash'][0]
@@ -327,56 +345,49 @@ class TestRun:
             return os.path.basename(self.filenames[0]).split('.')[2]
 
     def getMode(self):
-        "get mode (optimized or debug)"
+        """ Get mode (optimized or debug)
+        """
         try:
             return self.data['mode'][0]
         except:
             return os.path.basename(self.filenames[0]).split('.')[-5]
 
     def getName(self):
-        """
-        convenience method to make test run a manageable object
+        """ Convenience method to make test run a manageable object
         """
         return self.getIdentification()
 
-    def problemGetData(self, instanceid):
-        try:
-            return ",".join("%s: %s" % (key, self.problemGetDataById(instanceid, key)) for key in self.getKeySet())
-        except KeyError:
-            return "<%s> not contained in keys, have only\n%s" % (instanceid, ",".join((ind for ind in self.getProblems())))
-
     def getIdentification(self):
-        """
-        return identification string of this test run
+        """ Return identification string of this test run
         """
         # FARI1 Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
 
     def getShortIdentification(self, char = '_', maxlength = -1):
-        """
-        returns a short identification which only includes the settings of this test run
+        """ Return a short identification which only includes the settings of this test run
         """
         return misc.cutString(self.getSettings(), char, maxlength)
 
-    def problemGetOptimalSolution(self, instanceid):
-        """
-        returns objective of an optimal or a best known solution from solu file, or None, if
-        no such data has been acquired
+    def problemGetOptimalSolution(self, problemid):
+        """ Return objective of an optimal or a best known solution
+        
+        ... from solu file, or None, if no such data has been acquired
         """
         try:
-            return self.problemGetDataById(instanceid, 'OptVal')
+            return self.getProblemDataById(problemid, 'OptVal')
         except KeyError:
-            print(self.getIdentification() + " has no solu file value for ", instanceid)
+            print(self.getIdentification() + " has no solu file value for ", problemid)
             return None
 
-    def problemGetSoluFileStatus(self, instanceid):
-        """
-        returns 'unkn', 'inf', 'best', 'opt' as solu file status, or None, if no solu file status
-        exists for this instance
+    def problemGetSoluFileStatus(self, problemid):
+        """ Return 'unkn', 'inf', 'best', 'opt'
+         
+        ... as solu file status, or None, if no solu file status
+        exists for this problem
         """
         try:
-            return self.problemGetDataById(instanceid, 'SoluFileStatus')
+            return self.getProblemDataById(problemid, 'SoluFileStatus')
         except KeyError:
-            print(self.getIdentification() + " has no solu file status for ", instanceid)
+            print(self.getIdentification() + " has no solu file status for ", problemid)
             return None
 

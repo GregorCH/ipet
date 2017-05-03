@@ -27,12 +27,12 @@ class TestRun:
     FILE_EXTENSION = ".trn"
     """ the file extension for saving and loading test runs from """
 
-    def __init__(self, filenames=[]):
+    def __init__(self, filenames = []):
         self.inputfromstdin = False
         self.filenames = []
         for filename in filenames:
             self.appendFilename(filename)
-        self.data = DataFrame(dtype=object)
+        self.data = DataFrame(dtype = object)
 
         self.datadict = {}
         self.currentinstancedataseries = {}
@@ -86,10 +86,10 @@ class TestRun:
                     self.currentinstancedataseries[key] = datum
             else:
                 self.currentinstancedataseries[datakeys] = data
-        else: 
+        else:
             if type(datakeys) is list and type(data) is list:
                 for key, datum in zip(datakeys, data):
-                    self.datadict.setdefault(key,{})[instanceid] = datum
+                    self.datadict.setdefault(key, {})[instanceid] = datum
             else:
                 self.datadict.setdefault(datakeys, {})[instanceid] = data
 
@@ -111,7 +111,7 @@ class TestRun:
         """
         return (self.parametervalues, self.defaultparametervalues)
 
-    def getLogFile(self, fileextension=".out"):
+    def getLogFile(self, fileextension = ".out"):
         """
         Returns the name of the logfile
         """
@@ -119,10 +119,10 @@ class TestRun:
             if filename.endswith(fileextension):
                 return filename
         return None
-    
+
     def getKeySet(self):
         """
-        Returns a list or set of keys (which are the columns headers of the data) 
+        Returns a list or set of keys (which are the columns headers of the data)
         """
         if self.datadict != {}:
             return list(self.datadict.keys())
@@ -157,9 +157,9 @@ class TestRun:
 
     def emptyData(self):
         """
-        Empties data  
+        Empties data
         """
-        self.data = DataFrame(dtype=object)
+        self.data = DataFrame(dtype = object)
 
     def getData(self):
         """
@@ -177,26 +177,26 @@ class TestRun:
         """ If any data has been found then it is saved into a new instanceset in datadict
         """
         if self.currentinstancedataseries != {}:
-            # Add data collected by solver into currentinstancedataseries, such as primal and dual bound, 
-            self.addData(solver.getKeys(), solver.getData())
+            # Add data collected by solver into currentinstancedataseries, such as primal and dual bound,
+            self.addData(*solver.getData())
             
             for key in self.currentinstancedataseries.keys():
                 self.datadict.setdefault(key, {})[self.currentinstanceid] = self.currentinstancedataseries[key]
-            self.currentinstancedataseries = {} 
+            self.currentinstancedataseries = {}
             self.currentinstanceid = self.currentinstanceid + 1
-            
-        
+
+
     def finishedReadingFile(self, solver):
         """ in case that the last instancedata has not been saved yet, do it now
         """
         self.finalizeInstanceCollection(solver)
-        
+
     def setupForDataCollection(self):
         """ save data in a python dictionary for easier data collection
         """
         self.datadict = self.data.to_dict()
-        self.data = DataFrame(dtype=object)
-        
+        self.data = DataFrame(dtype = object)
+
     def setupAfterDataCollection(self):
         """ save data in a pandas dataframe for futher use (i.e. reading and finding data)
         """
@@ -213,9 +213,9 @@ class TestRun:
         returns an (unsorted) list of problems
         """
         return list(range(self.currentinstanceid))
-        #if self.datadict != {}:
+        # if self.datadict != {}:
         #    return list(range(self.currentinstanceid))
-        #else:
+        # else:
         #    return list(self.data.index.get_values())
 
     def problemlistGetData(self, instancelist, datakey):
@@ -239,7 +239,7 @@ class TestRun:
                     pass
         else:
             try:
-                self.data.drop(instanceid, inplace=True)
+                self.data.drop(instanceid, inplace = True)
             except TypeError:
                 # needs to be caught for pandas version < 0.13
                 self.data = self.data.drop(instanceid)
@@ -267,7 +267,7 @@ class TestRun:
     def saveToFile(self, filename):
         try:
             f = open(filename, 'wb')
-            pickle.dump(self, f, protocol=2)
+            pickle.dump(self, f, protocol = 2)
             f.close()
         except IOError:
             print("Could not open %s for saving test run" % filename)
@@ -276,23 +276,23 @@ class TestRun:
         return self.currentinstancedataseries == {}
 
     def printToConsole(self):
-        #pd.set_option('display.max_rows', len(self.data.iloc[0,:]))
-        
-        #print("DATA ", self.data)
-        #print("DATADICT ", self.datadict)
-        #print("CURRENTSERIES ", self.currentinstancedataseries)
-        #print("DATA INDEX", self.data.index.values)
-        #print("DATA COLUMNS", self.data.columns.values)
-        #print(self.data.iloc[:,:])
-        print(self.data.iloc[0,:])
-        
-        #pd.reset_option('display.max_rows')
+        # pd.set_option('display.max_rows', len(self.data.iloc[0,:]))
+
+        # print("DATA ", self.data)
+        # print("DATADICT ", self.datadict)
+        # print("CURRENTSERIES ", self.currentinstancedataseries)
+        # print("DATA INDEX", self.data.index.values)
+        # print("DATA COLUMNS", self.data.columns.values)
+        # print(self.data.iloc[:,:])
+        print(self.data.iloc[0, :])
+
+        # pd.reset_option('display.max_rows')
         pass
-        
+
     def toJson(self):
         return self.data.to_json()
-        #return json.dumps(self.data.to_dict(), sort_keys=True, indent=4)
-        
+        # return json.dumps(self.data.to_dict(), sort_keys=True, indent=4)
+
     @staticmethod
     def loadFromFile(filename):
         try:
@@ -338,12 +338,12 @@ class TestRun:
         convenience method to make test run a manageable object
         """
         return self.getIdentification()
-    
+
     def problemGetData(self, instanceid):
         try:
-            return ",".join("%s: %s"%(key,self.problemGetDataById(instanceid, key)) for key in self.getKeySet())
+            return ",".join("%s: %s" % (key, self.problemGetDataById(instanceid, key)) for key in self.getKeySet())
         except KeyError:
-            return "<%s> not contained in keys, have only\n%s"%(instanceid, ",".join((ind for ind in self.getProblems())))
+            return "<%s> not contained in keys, have only\n%s" % (instanceid, ",".join((ind for ind in self.getProblems())))
 
     def getIdentification(self):
         """
@@ -352,7 +352,7 @@ class TestRun:
         # FARI1 Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
 
-    def getShortIdentification(self, char='_', maxlength= -1):
+    def getShortIdentification(self, char = '_', maxlength = -1):
         """
         returns a short identification which only includes the settings of this test run
         """
@@ -370,7 +370,7 @@ class TestRun:
             return None
 
     def problemGetSoluFileStatus(self, instanceid):
-        """  
+        """
         returns 'unkn', 'inf', 'best', 'opt' as solu file status, or None, if no solu file status
         exists for this instance
         """
@@ -379,4 +379,4 @@ class TestRun:
         except KeyError:
             print(self.getIdentification() + " has no solu file status for ", instanceid)
             return None
-        
+

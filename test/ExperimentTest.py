@@ -215,15 +215,15 @@ class ExperimentTest(unittest.TestCase):
             self.assertEqual(val, values[key], msg)
 
     def testStatusComparisons(self):
-        goodStatusList = [Key.ProblemStatus.Ok, Key.ProblemStatus.Better, Key.ProblemStatus.SolvedNotVerified]
-        badStatusList = [Key.ProblemStatus.FailAbort, Key.ProblemStatus.FailObjectiveValue, Key.ProblemStatus.Fail]
+        goodStatusList = [Key.ProblemStatusCodes.Ok, Key.ProblemStatusCodes.Better, Key.ProblemStatusCodes.SolvedNotVerified]
+        badStatusList = [Key.ProblemStatusCodes.FailAbort, Key.ProblemStatusCodes.FailObjectiveValue, Key.ProblemStatusCodes.Fail]
         
         msg = "Returned status {0} is not the expected {1}"
-        for status, expected in [(Key.ProblemStatus.getBestStatus(goodStatusList + badStatusList), Key.ProblemStatus.Ok),
-                     (Key.ProblemStatus.getBestStatus(*(goodStatusList + badStatusList)), Key.ProblemStatus.Ok),
-                     (Key.ProblemStatus.getWorstStatus(goodStatusList + badStatusList), Key.ProblemStatus.FailAbort),
-                     (Key.ProblemStatus.getBestStatus(badStatusList + ["dummy"]), "dummy"),
-                     (Key.ProblemStatus.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
+        for status, expected in [(Key.ProblemStatusCodes.getBestStatus(goodStatusList + badStatusList), Key.ProblemStatusCodes.Ok),
+                     (Key.ProblemStatusCodes.getBestStatus(*(goodStatusList + badStatusList)), Key.ProblemStatusCodes.Ok),
+                     (Key.ProblemStatusCodes.getWorstStatus(goodStatusList + badStatusList), Key.ProblemStatusCodes.FailAbort),
+                     (Key.ProblemStatusCodes.getBestStatus(badStatusList + ["dummy"]), "dummy"),
+                     (Key.ProblemStatusCodes.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
             self.assertEqual(status, expected, msg.format(status, expected)) 
             
 def collect_settings(path):

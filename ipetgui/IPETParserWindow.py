@@ -100,7 +100,7 @@ class IPETLogFileView(QWidget):
         self.problemselection.clear()
         
         testruns = ExperimentManagement.getExperiment().getTestRuns()
-        problems = ExperimentManagement.getExperiment().getProblemIds()
+        problems = ExperimentManagement.getExperiment().getProblemNames()
 
         self.testrunselection.addItems([t.getName() for t in testruns])
         self.problemselection.addItems([p for p in problems])

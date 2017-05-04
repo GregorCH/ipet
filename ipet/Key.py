@@ -1,7 +1,8 @@
 
+""" This module acts as collection for the datakeys and its datatypes and several status codes 
 """
-This module acts as collection for the datakeys and its datatypes
-"""
+
+# FARI didn't we want to save the datatypes of the fields?
 
 BestSolutionInfeasible = "BestSolInfeas"
 DatetimeEnd = "Datetime_End"
@@ -11,7 +12,6 @@ DualIntegral = "DualIntegral"
 DualLpTime = "DualLpTime"
 ErrorCode = "ErrorCode"
 Gap = "Gap"
-LimitReached = "LimitReached"
 MaximumDepth = "MaxDepth"
 Nodes = "Nodes"
 ObjectiveLimit = "Objlimit"
@@ -31,10 +31,35 @@ SolutionFileStatus = "SoluFileStatus"
 TimeToBestSolution = "TimeToBest"
 TimeToFirstSolution = "TimeToFirst"
 TimeLimit = "TimeLimit"
-TimeLimitReached = "TimeLimitReached"
 Version = "Version"
 
-class ProblemStatuses:
+class SolverStatusCodes:
+    """ The reason why a solver stopped its calculation. 
+    
+    There are several reasons for a solver to terminate its calculations:
+    It could have 
+        - found the optimal solution
+        - found, that the problem was infeasible
+        - hit a limit of memory, time or nodes,
+    or it could have simply been cancelled by the user
+    or worse, could have crashed.
+    """
+    Crashed = -1
+    Optimal = 0
+    Infeasible = 1
+    TimeLimit = 2
+    MemoryLimit = 3
+    NodeLimit = 4
+    # FARI what would this be?
+    # Limit = 5
+    
+class ProblemStatusCodes:
+    """ Keeping track of how good the solution of a solver actually was.
+    
+    After comparing the calculated result of a problem with the actual result, 
+    the status of the computation is graded and saved as one of the following:
+    ... 
+    """
     Ok = 'ok'
     SolvedNotVerified = "solved_not_verified"
     Better = "better"
@@ -59,23 +84,14 @@ class ProblemStatuses:
 
     @staticmethod
     def getBestStatus(*args):
-        """
-        returns the best status among a list of status codes given as args
+        """ Return the best status among a list of status codes given as args
         """
         return max(*args, key=lambda x : ProblemStatus.statusToPriority.get(x, 0))
     
     @staticmethod
     def getWorstStatus(*args):
-        """
-        return the worst status among a list of status codes
+        """ Return the worst status among a list of status codes
         """
         return min(*args, key=lambda x : ProblemStatus.statusToPriority.get(x, 0)) 
 
-class SolverStatuses:
-    Crashed = -1
-    Optimal = 0
-    Infeasible = 1
-    TimeLimit = 2
-    MemoryLimit = 3
-    Limit = 4
-    NodeLimit = 5
+

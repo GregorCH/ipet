@@ -179,7 +179,6 @@ class TestRun:
         """ Save data in a pandas dataframe for futher use (i.e. reading and finding data)
         """
         self.data = DataFrame(self.datadict)
-        print(self.data)
         self.datadict = {}
 
     def hasProblemName(self, problemname):
@@ -229,7 +228,8 @@ class TestRun:
             try:
                 return ",".join("%s: %s" % (key, self.getProblemDataById(problemid, key)) for key in self.getKeySet())
             except KeyError:
-                return "<%s> not contained in keys, have only\n%s" % (problemid, ",".join((ind for ind in self.getProblemIds())))
+                return "<%s> not contained in keys, have only\n%s" %  \
+                    (problemid, ",".join((ind for ind in self.getProblemIds())))
         else:
             if self.datadict != {}:
                 return self.datadict.get(datakey, {}).get(problemid, None)

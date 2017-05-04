@@ -131,7 +131,7 @@ class Solver():
         """
         self.data = {}
         self.addData(Key.Solver, self.solverId)
-        self.addData(Key.SolverStatus, Key.SolverStatuses.Crashed)
+        self.addData(Key.SolverStatus, Key.SolverStatusCodes.Crashed)
         
     def recognizeOutput(self, line : str):
         return self.recognition_expr.search(line)!=None

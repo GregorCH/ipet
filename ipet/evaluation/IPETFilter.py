@@ -441,9 +441,9 @@ if __name__ == '__main__':
     filter1 = IPETFilter(expression1, expression2, operator, anytestrun="all")
     filter2 = IPETFilter(expression1, expression2, operator, anytestrun="one")
     print(filter1.getName())
-    print(len(comp.getProblemIds()))
-    print(len(filter1.getFilteredList(comp.getProblemIds(), comp.getManager('testrun').getManageables())))
-    print(len(filter2.getFilteredList(comp.getProblemIds(), comp.getManager('testrun').getManageables())))
+    print(len(comp.getProblemNames()))
+    print(len(filter1.getFilteredList(comp.getProblemNames(), comp.getManager('testrun').getManageables())))
+    print(len(filter2.getFilteredList(comp.getProblemNames(), comp.getManager('testrun').getManageables())))
 
 
     group = IPETFilterGroup('new')

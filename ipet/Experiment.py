@@ -108,8 +108,8 @@ class Experiment:
         """
         return self.readermanager.hasReader(reader)
 
-    def getProblemIds(self):
-        """ Return the list of problem names
+    def getProblemNames(self):
+        """ Return the list of problem Names
         """
         return self.probnamelist
 
@@ -218,12 +218,15 @@ class Experiment:
     def calculateGaps(self):
         """ Calculate and store primal and dual gap
         """
+        # FARI Die nächsten zwei Zeilen, machen die Sinn?
         for testrun in self.getTestRuns():
-            for problemid in self.probnamelist:
+            # FARIDO im Moment sollten in der Problemnamelist nur Namen stehen, keine IDs...
+            for problemid in testrun.getProblemIds():
+            # for problemid in self.probnamelist:
 
                 optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
                 if optval is not None:
-                    for key in ["PrimalBound", "DualBound"]:
+                    for key in [Key.PrimalBound, Key.DualBound]:
                         val = testrun.getProblemDataById(problemid, key)
                         if val is not None:
                             gap = misc.getGap(val, optval, True)
@@ -252,7 +255,9 @@ class Experiment:
         for testrun in self.getTestRuns():
 
             # go through problems and calculate both primal and dual integrals
-            for problemid in self.probnamelist:
+            # FARI siehe oben
+            for problemid in testrun.getProblemIds():
+            # for problemid in self.probnamelist:
                 processplotdata = getProcessPlotData(testrun, problemid)
 
                 # check for well defined data (may not exist sometimes)
@@ -390,15 +395,16 @@ class Experiment:
         """
         pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
         db = testrun.getProblemDataById(problemid, Key.DualBound)
-        limitreached = testrun.getProblemDataById(problemid, Key.LimitReached)
-        objlimitreached = (limitreached == "objectiveLimit")
+        solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
+        # FARI What is this "objectiveLimit", where is it set and what does it imply
+        objlimitreached = (solverstatus == "objectiveLimit")
         optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
         objsense = testrun.getProblemDataById(problemid, Key.ObjectiveSense)
         solfound = True if pb is not None else False
 
         # the run failed because the primal or dual bound were better than the known optimal solution value
         if solfound and (self.isPrimalBoundBetter(testrun, problemid) or self.isDualBoundBetter(testrun, problemid)):
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.FailObjectiveValue, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.FailObjectiveValue, problemid)
 
         # the run finished correctly if an objective limit was given and the solver reported infeasibility
         elif not solfound and objlimitreached:
@@ -407,58 +413,64 @@ class Experiment:
 
             if (objsense == ObjsenseReader.minimize and optval - objlimit >= -reltol) or \
                   (objsense == ObjsenseReader.maximize and objlimit - optval >= -reltol):
-                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Ok, problemid)
+                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Ok, problemid)
             else:
-                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.FailObjectiveValue, problemid)
+                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.FailObjectiveValue, problemid)
         # the solver reached a limit
-        elif limitreached:
-            testrun.addDataById(Key.ProblemStatus, limitreached.lower(), problemid)
-
+        elif solverstatus in [Key.SolverStatusCodes.MemoryLimit, Key.SolverStatusCodes.TimeLimit, Key.SolverStatusCodes.NodeLimit]:
+            # FARIDO siehe oben
+            # testrun.addDataById(Key.ProblemStatus, solverstatus.lower(), problemid)
+            testrun.addDataById(Key.ProblemStatus, solverstatus, problemid)
+            
         # the solver reached
         elif (db is None or misc.getGap(pb, db) < 1e-4) and not self.isPrimalBoundBetter(testrun, problemid):
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Ok, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Ok, problemid)
         else:
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Fail, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Fail, problemid)
 
     def determineStatusForBestProblem(self, testrun, problemid):
         """ Determine status for a problem for which we only know a best solution value
         """
         pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
         db = testrun.getProblemDataById(problemid, Key.DualBound)
-        limitreached = testrun.getProblemDataById(problemid, Key.TimeLimitReached)
+        solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
 
         # we failed because dual bound is higher than the known value of a primal bound
         if self.isDualBoundBetter(testrun, problemid):
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.FailDualBound, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.FailDualBound, problemid)
 
         # solving reached a limit
-        elif limitreached:
-            testrun.addDataById(Key.ProblemStatus, limitreached.lower(), problemid)
+        elif solverstatus in [Key.SolverStatusCodes.MemoryLimit, Key.SolverStatusCodes.TimeLimit, Key.SolverStatusCodes.NodeLimit]:
+            # FARIDO what is the right thing to do here
+            # testrun.addDataById(Key.ProblemStatus, solverstatus.lower(), problemid)
+            testrun.addDataById(Key.ProblemStatus, solverstatus, problemid)
             if self.isPrimalBoundBetter(testrun, problemid):
-                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Better, problemid)
+                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Better, problemid)
 
         # primal and dual bound converged
         elif misc.getGap(pb, db) < 1e-4:
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.SolvedNotVerified, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.SolvedNotVerified, problemid)
         else:
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Fail, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Fail, problemid)
 
     def determineStatusForUnknProblem(self, testrun, problemid):
         """ Determine status for a problem for which we don't know anything about the feasibility or optimality
         """
         pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
         db = testrun.getProblemDataById(problemid, Key.DualBound)
-        limitreached = testrun.getProblemDataById(problemid, Key.LimitReached)
+        solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
 
-        if limitreached:
-            testrun.addDataById(Key.ProblemStatus, limitreached.lower(), problemid)
+        if solverstatus:
+            # FARIDO What is the right thing to do here?
+            # testrun.addDataById(Key.ProblemStatus, limitreached.lower(), problemid)
+            testrun.addDataById(Key.ProblemStatus, solverstatus, problemid)
 
             if pb is not None:
-                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Better, problemid)
+                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Better, problemid)
         elif misc.getGap(pb, db) < 1e-4:
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.SolvedNotVerified, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.SolvedNotVerified, problemid)
         else:
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Unknown, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Unknown, problemid)
 
     def determineStatusForInfProblem(self, testrun, problemid):
         """ Determine status for a problem for which we know it's infeasible
@@ -468,15 +480,17 @@ class Experiment:
 
         # no solution was found
         if not solfound:
-            limitreached = testrun.getProblemDataById(problemid, Key.LimitReached)
+            solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
             # calc was inconclusive
-            if limitreached in [Key.SolverStatuses.TimeLimit, Key.SolverStatuses.MemoryLimit, Key.SolverStatuses.NodeLimit]:
-                testrun.addDataById(Key.ProblemStatus, limitreached.lower(), problemid)
+            if solverstatus in [Key.SolverStatusCodes.TimeLimit, Key.SolverStatusCodes.MemoryLimit, Key.SolverStatusCodes.NodeLimit]:
+                # FARIDO what is the right problemstatus to write here?
+                # testrun.addDataById(Key.ProblemStatus, solverstatus.lower(), problemid)
+                testrun.addDataById(Key.ProblemStatus, solverstatus, problemid)
             else:
-                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.Ok, problemid)
+                testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Ok, problemid)
         # a solution was found, that's not good
         else:
-            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.FailSolOnInfeasibleInstance, problemid)
+            testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.FailSolOnInfeasibleInstance, problemid)
 
     def checkProblemStatus(self):
         """ Check a problem solving status
@@ -491,11 +505,11 @@ class Experiment:
 
                 # an error code means that the instance aborted
                 if errcode is not None or testrun.getProblemDataById(problemid, Key.SolvingTime) is None:
-                    testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.FailAbort, problemid)
+                    testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.FailAbort, problemid)
 
                 # if the best solution was not feasible in the original problem, it's a fail
                 elif testrun.getProblemDataById(problemid, BestSolInfeasibleReader.datakey) == True:
-                    testrun.addDataById(Key.ProblemStatus, Key.ProblemStatuses.FailSolInfeasible, problemid)
+                    testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.FailSolInfeasible, problemid)
 
                 # go through the possible solution statuses and determine the Status of the run accordingly
                 elif solustatus == 'opt':

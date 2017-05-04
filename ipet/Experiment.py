@@ -27,8 +27,8 @@ class Experiment:
     """
     an Experiment represents a collection of TestRun objects and the routines for parsing
     """
-    
-    def __init__(self, files=[], listofreaders=[]):
+
+    def __init__(self, files = [], listofreaders = []):
         self.testrunmanager = Manager()
         self.datakeymanager = Manager()
 
@@ -37,14 +37,14 @@ class Experiment:
         self.solufiles = []
         self.externaldata = None
         self.basename2testrun = {}
-        # FARI Sollen hier die Namen der probleme oder die ids stehen? 
+        # FARI Sollen hier die Namen der probleme oder die ids stehen?
         # haben wir überhaupt mehrere Testruns? wenn ja, wird die id fortlaufend gezählt?
         self.probnamelist = []
 
         for filename in files:
             self.addOutputFile(filename)
 
-    def addOutputFile(self, filename, testrun=None):
+    def addOutputFile(self, filename, testrun = None):
         """ Add an output file for a testrun or create a new testrun object with the specified filename
 
         this method handles all types of feasible file types for an experiment, either preparsed
@@ -86,7 +86,7 @@ class Experiment:
         testrun.setInputFromStdin()
         self.testrunmanager.addAndActivate(testrun)
         self.updateDatakeys()
-        
+
     def addSoluFile(self, solufilename):
         """ Associate a solu file with all testruns
         """
@@ -117,7 +117,7 @@ class Experiment:
         """ Returns all TestRuns
         """
         return self.testrunmanager.getManageables()
-    
+
     def getReaderManager(self):
         """ Return the Readermanager
         """
@@ -169,7 +169,7 @@ class Experiment:
         """ Add a filename pointing to an external file, eg a solu file with additional information
         """
         try:
-            self.externaldata = pd.read_table(filename, sep=" *", engine='python', header=1, skipinitialspace=True)
+            self.externaldata = pd.read_table(filename, sep = " *", engine = 'python', header = 1, skipinitialspace = True)
             self.updateDatakeys()
             logging.debug("Experiment read external data file %s" % filename)
             logging.debug("%s" % self.externaldata.head(5))
@@ -184,17 +184,17 @@ class Experiment:
         for testrun in testruns:
             for solufilename in self.solufiles:
                 testrun.appendFilename(solufilename)
-                
+
         for testrun in testruns:
             self.readermanager.setTestRun(testrun)
             testrun.setupForDataCollection()
             self.readermanager.collectData()
-            
-        # FARI1 Is this calculated only for validation? 
+
+        # FARI1 Is this calculated only for validation?
         self.makeProbNameList()
         self.calculateGaps()
         self.calculateIntegrals()
-        
+
         # FARI1 validation
         self.checkProblemStatus()
 
@@ -206,7 +206,7 @@ class Experiment:
 
         # post processing steps: things like primal integrals depend on several, independent data
         self.updateDatakeys()
-        
+
     def getDatakeys(self):
         return self.datakeymanager.getAllRepresentations()
 
@@ -241,17 +241,17 @@ class Experiment:
         for tr in self.getTestRuns():
             trdata = tr.data
             if self.externaldata is not None:
-                trdata = trdata.merge(self.externaldata, left_index=True, right_index=True, how="left", suffixes=("", "_ext"))
+                trdata = trdata.merge(self.externaldata, left_index = True, right_index = True, how = "left", suffixes = ("", "_ext"))
             datalist.append(trdata)
 
         return pd.concat(datalist)
 
     def calculateIntegrals(self):
-        """ Calculate and store primal and dual integral values 
-        
+        """ Calculate and store primal and dual integral values
+
         ... for every problem under 'PrimalIntegral' and 'DualIntegral'
         """
-        dualargs = dict(historytouse='dualboundhistory', boundkey='DualBound')
+        dualargs = dict(historytouse = 'dualboundhistory', boundkey = 'DualBound')
         for testrun in self.getTestRuns():
 
             # go through problems and calculate both primal and dual integrals
@@ -272,7 +272,7 @@ class Experiment:
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     try:
-                        testrun.addDataById(Key.DualIntegral, calcIntegralValue(processplotdata, pwlinear=True), problemid)
+                        testrun.addDataById(Key.DualIntegral, calcIntegralValue(processplotdata, pwlinear = True), problemid)
                     except AssertionError as e:
                         logging.error("Error for dual bound on problem %s, list: %s " % (problemid, processplotdata))
 
@@ -316,7 +316,7 @@ class Experiment:
         # # write solufiledata to file
         newsolufilename = 'newsolufile.solu'
         f = open(newsolufilename, 'w')
-        for prob in sorted(list(solufiledata.keys()), reverse=False):
+        for prob in sorted(list(solufiledata.keys()), reverse = False):
             solustatus, solupb = solufiledata.get(prob)
             f.write("%s %s" % (solustatus, prob))
             if solustatus in ['=best=', '=opt=']:
@@ -421,7 +421,7 @@ class Experiment:
             # FARIDO siehe oben
             # testrun.addDataById(Key.ProblemStatus, solverstatus.lower(), problemid)
             testrun.addDataById(Key.ProblemStatus, solverstatus, problemid)
-            
+
         # the solver reached
         elif (db is None or misc.getGap(pb, db) < 1e-4) and not self.isPrimalBoundBetter(testrun, problemid):
             testrun.addDataById(Key.ProblemStatus, Key.ProblemStatusCodes.Ok, problemid)
@@ -522,18 +522,17 @@ class Experiment:
                     self.determineStatusForUnknProblem(testrun, problemid)
 
                 logging.debug("Problem %s in testrun %s solustatus %s, errorcode %s -> Status %s" % (problemid, testrun.getName(), repr(solustatus), repr(errcode), testrun.getProblemDataById(problemid, "Status")))
-    
-    def printToConsole(self):
+
+    def printToConsole(self, formatstr = "{idx} {d}"):
         for tr in self.testrunmanager.getActiveSet():
-            tr.printToConsole()
-    
+            tr.printToConsole(formatstr)
+
     def saveToFile(self, filename):
         """ Save the experiment instance to a file specified by 'filename'.
-        
+
         Save comprises testruns and their collected data as well as custom built readers.
         @note: works for any file extension, preferred extension is '.cmp'
         """
-        print("Saving Data")
         if not filename.endswith(".cmp"):
             print("Preferred file extension for experiment instances is '.cmp'")
 
@@ -542,14 +541,14 @@ class Experiment:
         except IOError:
             print("Could not open file named", filename)
             return
-        pickle.dump(self, f, protocol=2)
+        pickle.dump(self, f, protocol = 2)
 
         f.close()
 
     @staticmethod
     def loadFromFile(filename):
-        """ Load an experiment instance from the file specified by filename. 
-        
+        """ Load an experiment instance from the file specified by filename.
+
         This should work for all files generated by the saveToFile command.
         @return: a Experiment instance, or None if errors occured
         """
@@ -567,9 +566,9 @@ class Experiment:
         else:
             return comp
 
-    def getDataPanel(self, onlyactive=False):
+    def getDataPanel(self, onlyactive = False):
         """ Return a pandas Data Panel of testrun data
-        
+
         Create a panel from testrun data, using the testrun settings as key
         Set onlyactive to True to only get active testruns as defined by the testrun manager
         """

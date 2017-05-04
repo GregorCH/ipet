@@ -1,5 +1,5 @@
 
-""" This module acts as collection for the datakeys and its datatypes and several status codes 
+""" This module acts as collection for the datakeys and its datatypes and several status codes
 """
 
 # FARI didn't we want to save the datatypes of the fields?
@@ -34,10 +34,10 @@ TimeLimit = "TimeLimit"
 Version = "Version"
 
 class SolverStatusCodes:
-    """ The reason why a solver stopped its calculation. 
-    
+    """ The reason why a solver stopped its calculation.
+
     There are several reasons for a solver to terminate its calculations:
-    It could have 
+    It could have
         - found the optimal solution
         - found, that the problem was infeasible
         - hit a limit of memory, time or nodes,
@@ -50,15 +50,14 @@ class SolverStatusCodes:
     TimeLimit = 2
     MemoryLimit = 3
     NodeLimit = 4
-    # FARI what would this be?
-    # Limit = 5
-    
+    Interrupted = 5
+
 class ProblemStatusCodes:
     """ Keeping track of how good the solution of a solver actually was.
-    
-    After comparing the calculated result of a problem with the actual result, 
+
+    After comparing the calculated result of a problem with the actual result,
     the status of the computation is graded and saved as one of the following:
-    ... 
+    ...
     """
     Ok = 'ok'
     SolvedNotVerified = "solved_not_verified"
@@ -70,7 +69,7 @@ class ProblemStatusCodes:
     FailSolOnInfeasibleInstance = "fail_solution_on_infeasible_instance"
     Fail = "fail"
     FailAbort = "fail_abort"
-    
+
     statusToPriority = {Ok : 1000,
                         SolvedNotVerified : 500,
                         Better : 250,
@@ -86,12 +85,12 @@ class ProblemStatusCodes:
     def getBestStatus(*args):
         """ Return the best status among a list of status codes given as args
         """
-        return max(*args, key=lambda x : ProblemStatus.statusToPriority.get(x, 0))
-    
+        return max(*args, key = lambda x : ProblemStatusCodes.statusToPriority.get(x, 0))
+
     @staticmethod
     def getWorstStatus(*args):
         """ Return the worst status among a list of status codes
         """
-        return min(*args, key=lambda x : ProblemStatus.statusToPriority.get(x, 0)) 
+        return min(*args, key = lambda x : ProblemStatusCodes.statusToPriority.get(x, 0))
 
 

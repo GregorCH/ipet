@@ -47,10 +47,10 @@ class TestRun:
     def setInputFromStdin(self):
         self.inputfromstdin = True
         self.filenames = [""]
-        
+
     def readsFromStdin(self):
         return self.inputfromstdin
-        
+
     def appendFilename(self, filename):
         """
         appends a file name to the list of filenames of this test run
@@ -76,7 +76,7 @@ class TestRun:
 
     def addData(self, datakey, data):
         """Add data to current problem
-        
+
         readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
         """
@@ -89,7 +89,7 @@ class TestRun:
             self.currentproblemdata[datakey] = data
 
     def addDataById(self, datakeys, data, problemid):
-        """Add the data or to the specified problem 
+        """Add the data or to the specified problem
 
         readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
@@ -137,9 +137,9 @@ class TestRun:
             return set(self.data.columns)
 
     def emptyData(self):
-        """Empty all data of current testrun 
+        """Empty all data of current testrun
         """
-        self.data = DataFrame(dtype=object)
+        self.data = DataFrame(dtype = object)
 
     def getData(self):
         """Return a data frame object of the acquired data
@@ -155,26 +155,26 @@ class TestRun:
         """ Any data of the current problem is saved as a new row in datadict
         """
         if self.currentproblemdata != {}:
-            # Add data collected by solver into currentproblemdata, such as primal and dual bound, 
-            self.addData(*solver.getData()) 
-            
+            # Add data collected by solver into currentproblemdata, such as primal and dual bound,
+            self.addData(*solver.getData())
+
             for key in self.currentproblemdata.keys():
                 self.datadict.setdefault(key, {})[self.currentproblemid] = self.currentproblemdata[key]
-            self.currentproblemdata = {} 
+            self.currentproblemdata = {}
             self.currentproblemid = self.currentproblemid + 1
-            
-        
+
+
     def finishedReadingFile(self, solver):
         """ Save data of current problem
         """
         self.finalizeCurrentCollection(solver)
-        
+
     def setupForDataCollection(self):
         """ Save data in a python dictionary for easier data collection
         """
         self.datadict = self.data.to_dict()
-        self.data = DataFrame(dtype=object)
-        
+        self.data = DataFrame(dtype = object)
+
     def setupAfterDataCollection(self):
         """ Save data in a pandas dataframe for futher use (i.e. reading and finding data)
         """
@@ -203,15 +203,18 @@ class TestRun:
         """ Return a list of problemids
         """
         return list(range(self.currentproblemid))
-    
+
     def getProblemNames(self):
         """ Return an (unsorted) list of problemnames
         """
         if self.datadict != {}:
             return list(self.datadict.get(Key.ProblemName, []))
         else:
-            return list(self.data[Key.ProblemName])
-    
+            if Key.ProblemName in self.data.columns:
+                return list(self.data[Key.ProblemName])
+            else:
+                return []
+
     def getProblemDataByName(self, problemname, datakey):
         """Return the data collected for problems with given name
         """
@@ -228,7 +231,7 @@ class TestRun:
             try:
                 return ",".join("%s: %s" % (key, self.getProblemDataById(problemid, key)) for key in self.getKeySet())
             except KeyError:
-                return "<%s> not contained in keys, have only\n%s" %  \
+                return "<%s> not contained in keys, have only\n%s" % \
                     (problemid, ",".join((ind for ind in self.getProblemIds())))
         else:
             if self.datadict != {}:
@@ -242,7 +245,7 @@ class TestRun:
                     return data
                 else:
                     return None
-    
+
     def getProblemsDataById(self, problemids, datakey):
         """ Return data for a list of problems
         """
@@ -262,7 +265,7 @@ class TestRun:
                     pass
         else:
             try:
-                self.data.drop(problemid, inplace=True)
+                self.data.drop(problemid, inplace = True)
             except TypeError:
                 # needs to be caught for pandas version < 0.13
                 self.data = self.data.drop(problemid)
@@ -300,13 +303,14 @@ class TestRun:
         """
         return self.currentproblemdata == {}
 
-    def printToConsole(self):
+    def printToConsole(self, formatstr = "{idx}: {d}"):
         """ Print data to console
         """
-        pd.set_option('display.max_rows', len(self.data.iloc[0,:]))
-        print(self.data.iloc[0, :])
-        pd.reset_option('display.max_rows')
-        
+        for idx, d in self.data.iterrows():
+            pd.set_option('display.max_rows', len(d))
+            print(formatstr.format(d = d, idx = idx))
+            pd.reset_option('display.max_rows')
+
     def toJson(self):
         """ Return the data-object in json
         """
@@ -371,7 +375,7 @@ class TestRun:
 
     def problemGetOptimalSolution(self, problemid):
         """ Return objective of an optimal or a best known solution
-        
+
         ... from solu file, or None, if no such data has been acquired
         """
         try:
@@ -382,7 +386,7 @@ class TestRun:
 
     def problemGetSoluFileStatus(self, problemid):
         """ Return 'unkn', 'inf', 'best', 'opt'
-         
+
         ... as solu file status, or None, if no solu file status
         exists for this problem
         """

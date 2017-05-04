@@ -20,12 +20,45 @@ import os
 import io
 import re
 import logging
+from IPython.utils.text import dedent
+import textwrap
+DEFAULT_FORMATSTR = "{idx} {d}"
+
+formatstrExamples = """
+Format String Examples
+----------------------
+
+With the -f option, a format string can be specified to control the parsing output. Normal Python format syntax
+with curly braces '{}' is used for this. The default value for the format string is '{idx} {d}', which will
+output the index of every instance together with its complete data series. 'd' stands for 'data'. By accessing the elements of
+'d' with the format string, only relevant information is displayed on the console.
+
+    >>> cat test/data/scip-*.out | ipet-parse -f "{idx} {d.ProblemName} {d.SolvingTime}
+
+should yield
+
+    0 enlight16 0.02
+    1 janos-us-DDM 6807.85
+    2 misc03 0.79
+    3 aflow40b 600.0
+
+To make the information more readible, the syntax has further options for formatting:
+
+    >>> cat test/data/scip-*.out | ipet-parse -f "{idx:3} {d.ProblemName:40} {d.SolvingTime:12}
+
+    0 enlight16                                        0.02
+    1 janos-us-DDM                                  6807.85
+    2 misc03                                           0.79
+    3 aflow40b                                        600.0
+"""
 
 # possible arguments in the form name,default,short,description #
 # clarguments = []
 
 argparser = argparse.ArgumentParser(prog = "Ipet Parsing script", \
-                                 description = "parses test run log files and saves parsed data")
+                                 description = "parses test run log files and saves parsed data",
+                                 epilog = textwrap.dedent(formatstrExamples),
+                                 formatter_class = argparse.RawDescriptionHelpFormatter)
 # FARI: brauchen wir nicht, oder?
 # for name, default, short, description in clarguments:
 #     argparser.add_argument(short, name, default = default, help = description)
@@ -34,6 +67,10 @@ argparser.add_argument('-l', '--logfiles', nargs = '*', help = "list of outfiles
 argparser.add_argument('-r', '--readers', nargs = '*', default = [], help = "list of additional readers in xml format that should be used for parsing")
 argparser.add_argument('-s', '--solufiles', nargs = '*', default = [], help = "list of solu files that should be taken into account")
 argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
+argparser.add_argument("-f", "--formatstr", default = DEFAULT_FORMATSTR,
+                       help = """format string for displaying output per instance to console. The internal formatter uses 'idx'
+                                   to reference the index and 'd' for the collected data for this instance. default : "%s" """ % DEFAULT_FORMATSTR
+                                   )
 
 if __name__ == '__main__':
     try:
@@ -118,6 +155,6 @@ if __name__ == '__main__':
     else: 
         experiment.addStdinput()
         experiment.collectData()
-        experiment.printToConsole()
+        experiment.printToConsole(arguments.formatstr)
         
         

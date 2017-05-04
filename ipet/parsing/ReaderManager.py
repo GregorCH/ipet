@@ -57,7 +57,7 @@ class ReaderManager(Manager, IpetNode):
 
     xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
 
-    def __init__(self, problemexpression="@01", problemendexpression="=ready="):
+    def __init__(self, problemexpression = "@01", problemendexpression = "=ready="):
         """
         constructs a new reader Manager
 
@@ -76,10 +76,10 @@ class ReaderManager(Manager, IpetNode):
         self.addSolvers()
         self.activeSolver = self.solvers[0]
         self.solverCanRead = True
-        
+
     def getEditableAttributes(self):
         return ["problemexpression", "problemendexpression"]
-    
+
     def addSolvers(self):
         self.solvers = [SCIPSolver()]
 #                         CbcSolver(),
@@ -108,7 +108,7 @@ class ReaderManager(Manager, IpetNode):
 
     def acceptsAsChild(self, child):
         """
-        only accepts certain reader as children 
+        only accepts certain reader as children
         """
         return child.__class__() in list(self.xmlfactorydict.values())
 
@@ -117,7 +117,7 @@ class ReaderManager(Manager, IpetNode):
         returns a sortet list of all readers
         """
         children = [m for m in self.getManageables(False) if m.__class__ in list(self.xmlfactorydict.values())]
-        return sorted(children, key=lambda x:x.getName())
+        return sorted(children, key = lambda x:x.getName())
 
     @staticmethod
     def getNodeTag():
@@ -233,7 +233,7 @@ class ReaderManager(Manager, IpetNode):
 
     def updateLineNumberData(self, linenumber, currentcontext, prefix):
         """
-        Saves the information about in what lines to find relevant information 
+        Saves the information about in what lines to find relevant information
         """
         context2string = {StatisticReader.CONTEXT_LOGFILE:"LogFile",
                           StatisticReader.CONTEXT_ERRFILE:"ErrFile"}
@@ -246,7 +246,7 @@ class ReaderManager(Manager, IpetNode):
         """
         tries to return name of problem, which is read via the line that is beginning with @1
         """
-        
+
         fullname = line.split()[1]
         namewithextension = os.path.basename(fullname)
         # FARI Shouldn't this be something like ".gz"?
@@ -261,7 +261,7 @@ class ReaderManager(Manager, IpetNode):
 
     def finishProblemParsing(self, line, filecontext, readers):
         """
-        only for error and logfiles: the lineinformation is written and the datacollection 
+        only for error and logfiles: the lineinformation is written and the datacollection
         is being finalized, active solver is being reset
         """
         if filecontext in [StatisticReader.CONTEXT_ERRFILE, StatisticReader.CONTEXT_LOGFILE] and not self.testrun.emptyCurrentProblemData():
@@ -316,7 +316,7 @@ class ReaderManager(Manager, IpetNode):
                 if solver.recognizeOutput(line):
                     self.activeSolver = solver
                     return lines
-        #raise ValueError("Input does not have a recognized format.")
+        # raise ValueError("Input does not have a recognized format.")
 
     def sortingKeyContext(self, context):
         """
@@ -342,7 +342,7 @@ class ReaderManager(Manager, IpetNode):
 
         # sort the files by context, for example: outfiles should be read before solufiles
         if not self.testrun.readsFromStdin():
-            self.filestrings = sorted(self.filestrings, key=lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
+            self.filestrings = sorted(self.filestrings, key = lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
 
         for filename in self.filestrings:
             f = None
@@ -362,8 +362,8 @@ class ReaderManager(Manager, IpetNode):
                 filecontext = self.filenameGetContext(filename)
                 self.solverCanRead = self.activeSolver.isSolverInstance(filecontext)
             readers = [r for r in self.getManageables(True) if r.supportsContext(filecontext)]
-            
-            
+
+
             # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
             line = (0, "")
             startindex = 0
@@ -379,10 +379,10 @@ class ReaderManager(Manager, IpetNode):
                 for line in enumerate(consumedlines):
                     if self.startOfProblemReached(line[1]):
                         self.updateProblemName(line, filecontext, readers)
-                        
+
                     if self.endOfProblemReached(line[1]):
                         self.finishProblemParsing(line, filecontext, readers)
-                            
+
                     else:
                         self.activeSolver.readLine(line[1])
                         for reader in readers:
@@ -390,27 +390,27 @@ class ReaderManager(Manager, IpetNode):
                 startindex = len(consumedlines)
             elif self.solverCanRead:
                 self.readSolverType(filename)
-                
+
             for line in enumerate(f, startindex):
                 if self.startOfProblemReached(line[1]):
                     self.updateProblemName(line, filecontext, readers)
-                
+
                 if self.endOfProblemReached(line[1]):
                     self.finishProblemParsing(line, filecontext, readers)
-                        
+
                 else:
                     if self.solverCanRead:
                         self.activeSolver.readLine(line[1])
                     for reader in readers:
                         reader.operateOnLine(line[1])
-            
+
             self.finishProblemParsing(line, filecontext, readers)
-            
+
             if not self.testrun.readsFromStdin():
                 f.close()
             self.testrun.finishedReadingFile(self.activeSolver)
         return 1
-    
+
     # ## XML IO methods
     def toXMLElem(self):
         me = ElementTree.Element(ReaderManager.getNodeTag())

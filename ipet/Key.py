@@ -34,7 +34,7 @@ TimeLimit = "TimeLimit"
 TimeLimitReached = "TimeLimitReached"
 Version = "Version"
 
-class ProblemStatus:
+class ProblemStatuses:
     Ok = 'ok'
     SolvedNotVerified = "solved_not_verified"
     Better = "better"
@@ -71,7 +71,7 @@ class ProblemStatus:
         """
         return min(*args, key=lambda x : ProblemStatus.statusToPriority.get(x, 0)) 
 
-class SolverStatus:
+class SolverStatuses:
     Crashed = -1
     Optimal = 0
     Infeasible = 1

@@ -179,6 +179,7 @@ class TestRun:
         """ Save data in a pandas dataframe for futher use (i.e. reading and finding data)
         """
         self.data = DataFrame(self.datadict)
+        print(self.data)
         self.datadict = {}
 
     def hasProblemName(self, problemname):

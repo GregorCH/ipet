@@ -9,148 +9,142 @@ class Solver():
 
     DEFAULT = None
     DEFAULT_SOLVERID = "defaultSolver"
+    recognition_expr = None
+    primalbound_expr = None
+    dualbound_expr = None
+    solvingtimer_expr = None
+    version_expr =  None
+    limitreached_expr = None
+    
+    solverstatusmap = {}
 
     def __init__(self,
                  solverID = DEFAULT_SOLVERID,
                  recognition_pattern = None,
                  primalbound_pattern = None,
-                 primalbound_lineindices = None,
                  dualbound_pattern = None,
-                 dualbound_lineindices = None,
                  solvingtimer_pattern = None,
-                 solvingtime_lineindices = None,
                  version_pattern = None,
-                 version_lineindices = None,
-                 limitreached_pattern = None,
-                 limitreached_expression = None):
+                 limitreached_pattern = None,):
+        
         self.solverId = solverID
-        self.recognition_pattern = recognition_pattern
-        self.primalbound_pattern = primalbound_pattern
-        self.primalbound_lineindices = primalbound_lineindices
-        self.dualbound_pattern = dualbound_pattern
-        self.dualbound_lineindices = dualbound_lineindices
-        self.solvingtimer_pattern = solvingtimer_pattern
-        self.solvingtime_lineindices = solvingtime_lineindices
-        self.version_pattern = version_pattern
-        self.version_lininedices = version_lineindices
-        if not limitreached_pattern is None and not limitreached_expression is None:
-            self.timelimitreached_pattern = re.compile(limitreached_pattern)
-            self.timelimitreached_expression = re.compile(limitreached_expression)
+        if not recognition_pattern is None:
+            self.recognition_expr = re.compile(recognition_pattern)
+        if not primalbound_pattern is None:
+            self.primalbound_expr = re.compile(primalbound_pattern)
+        if not dualbound_pattern is None:
+            self.dualbound_expr = re.compile(dualbound_pattern)
+        if not solvingtimer_pattern is None:
+            self.solvingtimer_expr = re.compile(solvingtimer_pattern)
+        if not version_pattern is None:
+            self.version_expr = re.compile(version_pattern)
+        if not limitreached_pattern is None:
+            self.limitreached_expr = re.compile(limitreached_pattern)
 
         self.data = {}
         self.reset()
         
+    def extractStatus(self, line : str):
+        """Check if the line matches one of the status patterns
+        """
+        for pattern, status in self.solverstatusmap.items():
+            if re.match(pattern, line):
+                self.addData(Key.SolverStatus, status)
+            
     def extractVersion(self, line : str):
         """Extract the version of the solver-software
         """
+        self.extractByExpression(line, self.version_expr, Key.Version)
 
-        if re.search(self.version_pattern, line):
-            self.addData(Key.Version, line.split()[self.version_lininedices])
-
-    def extractTimeLimitReached(self, line):
-        """Read if time limit was hit
-        """
-        if not self.timelimitreached_pattern is None and self.timelimitreached_pattern.match(line):
-            match = self.timelimitreached_expression.search(line)
-            if match is not None:
-                stringexpression = match.groups()[0]
-                limit = "".join((part.capitalize() for part in stringexpression.split()))
-                self.addData(Key.TimeLimitReached, limit)
-
-    def extractSolvingTime(self, line):
+    def extractSolvingTime(self, line : str):
         """Read the overall solving time
         """
-        if re.search(self.solvingtimer_pattern, line):
-            solvingtime = misc.getWordAtIndex(line, self.solvingtime_lineindices)
-            solvingtime = solvingtime.rstrip('s')
-            self.addData(Key.SolvingTime, float(solvingtime))
+        self.extractByExpression(line, self.solvingtimer_expr, Key.SolvingTime)
 
-    def extractDualbound(self, line):
+    def extractDualbound(self, line : str):
         """Return the reported dual bound (at the end of the solver-output)
         """
-        if re.match(self.dualbound_pattern, line):
-            index = self.dualbound_lineindices
-            # FARI does this if belong here or in cplexsolver?
-            if self == CplexSolver and re.search('^MIP - Integer optimal', line):
-                index = -1
-            db = misc.getWordAtIndex(line, index)
-            db = db.strip(',');
-            try:
-                db = float(db)
-                if abs(db) != misc.FLOAT_INFINITY:
-                    self.addData(Key.DualBound, db)
-            except ValueError:
-                pass
-
-    def extractPrimalbound(self, line):
+        self.extractByExpression(line, self.dualbound_expr, Key.DualBound)
+            
+    def extractPrimalbound(self, line : str):
         """Read the primal bound (at the end of the solver-output)
         """
-        if re.search(self.primalbound_pattern, line):
-            pb = misc.getWordAtIndex(line, self.primalbound_lineindices)
-            pb = pb.strip(',')
-            if pb != '-':
-                pb = float(pb)
-                if abs(pb) < misc.FLOAT_INFINITY:
-                    self.addData(Key.PrimalBound, pb)
+        self.extractByExpression(line, self.primalbound_expr, Key.PrimalBound)
+
+    def extractByExpression(self, line : str, expr, key : str, datatype : type = float) -> None:
+        """
+        Search for regular expression 'expr' and store a possible match under the given 'key'.
+        
+        Parameters
+        ----------
+        line
+            a line of solver output
+        expr
+            regular expression with (at least) one group
+        key
+            data key to store datum after a match
+        datatype
+            data type for the datum, default : float
+        """
+        m = expr.match(line)
+        if m is not None:
+            try:
+                d = datatype(m.groups()[0])
+                self.addData(key, d)
+            except:
+                pass
 
     def addData(self, key, data):
         """Add data to local data-dictionary
         """
-        # FARIDO is it okay to overwrite data?
         self.data[key] = data
     
-    def readLine(self, line):
+    def readLine(self, line : str):
         """Read solver-specific data from that line
         """
         self.extractElementaryInformation(line)
         self.extractOptionalInformation(line)
         self.extractGeneralInformation(line)
 
-    # This method should be overwritten by subclasses
-    def extractOptionalInformation(self, line):
-        """Read optional data
-        """
-        pass
-
-    def extractGeneralInformation(self, line):
-        """Read general data
-        """
-        self.extractVersion(line)
-
-    def extractElementaryInformation(self, line):
+    def extractElementaryInformation(self, line : str):
         """Read Data that is needed for validation
         """
-#     # BestSolInfeasibleReader,
-#     # SolvingTimeReader,
-#     # LimitReachedReader,
-#     # ErrorFileReader
-#     # primalboundhistory, dualboundhistory
-#     # ObjsenseReader,
-#     # ObjlimitReader,
         self.extractPrimalbound(line)
         self.extractDualbound(line)
         self.extractSolvingTime(line)
         self.extractVersion(line)
-        self.extractTimeLimitReached(line)
+        self.extractStatus(line)
     
-    def recognizeOutput(self,line):
-        return line.startswith(self.recognition_pattern)
-    
-    def getData(self):
-        """Return collected data as a tuple of two generators
+    # This method should be overwritten by subclasses
+    def extractOptionalInformation(self, line : str):
+        """Read optional data
         """
-        return map(list, zip(*self.data.items()))
+        pass
+
+    def extractGeneralInformation(self, line : str):
+        """Read general data
+        """
+        self.extractVersion(line)
 
     def reset(self):
         """Reset all Data except the solverId
         """
         self.data = {}
         self.addData(Key.Solver, self.solverId)
+        self.addData(Key.SolverStatus, Key.SolverStatuses.Crashed)
         
+    def recognizeOutput(self, line : str):
+        return self.recognition_expr.search(line)!=None
+    
+    def getData(self):
+        """Return collected data as a tuple of two generators
+        """
+        return map(list, zip(*self.data.items()))
+
     def getName(self):
         return self.solverId
     
-    def canRead(self, filecontext):
+    def isSolverInstance(self, filecontext):
         return filecontext is StatisticReader.CONTEXT_ERRFILE or filecontext is StatisticReader.CONTEXT_LOGFILE
 
 ###############################################################
@@ -158,124 +152,115 @@ class Solver():
 ###############################################################
 
 class SCIPSolver(Solver):
+    
+    solverID = "SCIP"
+    recognition_expr = re.compile("^SCIP version ")
+    primalbound_expr = re.compile("Primal Bound       : (\S+)")
+    dualbound_expr = re.compile("^Dual Bound         : (\S+)")
+    solvingtimer_expr = re.compile("^Solving Time \(sec\) : (\S+)")
+    version_expr =  re.compile("SCIP version (\S+)")    
+    limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
 
-    def __init__(self):
-        super(SCIPSolver, self).__init__(solverID = "SCIP",
-                                     recognition_pattern = "SCIP version ",
-                                     primalbound_pattern = '^Primal Bound       :',
-                                     primalbound_lineindices = 3,
-                                     dualbound_pattern = "^Dual Bound         :",
-                                     dualbound_lineindices = -1,
-                                     solvingtimer_pattern = "^Solving Time \(sec\) :",
-                                     solvingtime_lineindices = -1,
-                                     version_pattern = 'SCIP version',
-                                     version_lineindices = 2,
-                                     limitreached_pattern = re.compile(r'\[(.*) (reached|interrupt)\]'),
-                                     limitreached_expression = re.compile(r'^SCIP Status        :'))
+    def __init__(self, **kw):
+        super(SCIPSolver, self).__init__(**kw)
 
-    def extractOptionalInformation(self, line):
+    def extractOptionalInformation(self, line : str):
         """Extract the path info
         """
         self.extractPath(line)
+        self.extractMoreData(line)
 
-    def extractVersion(self, line):
+    def extractMoreData(self, line : str):
         """Handle more than just the version
         """
-        # SCIP version 3.1.0.1 [precision: 8 byte] [memory: block] [mode: debug] [LP solver: SoPlex 2.0.0.1] [GitHash: 825e268-dirty]
-        if re.search(self.version_pattern, line):
-            version = line.split()[2]
-            self.addData(Key.Version, version)
-            for keyword in ["mode", "LP solver", "GitHash"]:
-                data = re.search(r"\[%s: ([\w .-]+)\]" % keyword, line)
-                if data:
-                    self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
+        for keyword in ["mode", "LP solver", "GitHash"]:
+            data = re.search(r"\[%s: ([\w .-]+)\]" % keyword, line)
+            if data:
+                self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
 
-    def extractPath(self, line):
+    def extractPath(self, line : str):
         """Extract the path info
         """
         if line.startswith('loaded parameter file'):
-                absolutesettingspath = line[len('loaded parameter file '):].strip('<>')
-                self.addData(Key.SettingsPathAbsolute, absolutesettingspath)
-                settings = os.path.basename(absolutesettingspath)
-                settings = os.path.splitext(settings)[0]
-
+            absolutesettingspath = line[len('loaded parameter file '):].strip('<>')
+            self.addData(Key.SettingsPathAbsolute, absolutesettingspath)
+            settings = os.path.basename(absolutesettingspath)
+            settings = os.path.splitext(settings)[0]
+ 
 class GurobiSolver(Solver):
+ 
+    solverID = "GUROBI"
+    recognition_expr = re.compile("Gurobi Optimizer version")
+    primalbound_expr = re.compile("^Best objective (\S+)")
+    dualbound_expr = re.compile("^Best objective (?:\S+), best bound (\S+)")
+    solvingtimer_expr = re.compile("Explored \d* nodes \(.*\) in (\S*) seconds")
+    version_expr =  re.compile("Gurobi Optimizer version (\S+)")    
+    limitreached_expr = re.compile("^Time limit reached")
 
-    def __init__(self):
-        super(GurobiSolver, self).__init__(solverID = "GUROBI",
-                                     recognition_pattern = "Gurobi Optimizer version",
-                                     primalbound_pattern = '^Best objective ',
-                                     primalbound_lineindices = 2,
-                                     dualbound_pattern = '^Best objective',
-                                     dualbound_lineindices = 5,
-                                     solvingtimer_pattern = "Explored ",
-                                     solvingtime_lineindices = -2,
-                                     version_pattern = "Gurobi Optimizer version",
-                                     version_lineindices = 3,
-                                     limitreached_pattern = re.compile(r'^(Time limit) reached'),
-                                     limitreached_expression = re.compile(r'^Time limit reached'))
+    def __init__(self, **kw):
+        super(GurobiSolver, self).__init__(**kw)
 
 class CplexSolver(Solver):
+ 
+    solverID = "CPLEX"
+    recognition_expr = re.compile("Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer")
+    primalbound_expr = re.compile("^MIP -.*Objective =\s*(\S+)")
+    dualbound_expr = re.compile("^Current MIP best bound =\s*(\S+)")
+    solvingtimer_expr = re.compile("Solution time =\s*(\S+)")
+    version_expr =  re.compile("Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer (\S+)")    
+    limitreached_expr = None
 
-    def __init__(self):
-        super(CplexSolver, self).__init__(solverID = "CPLEX",
-                                     recognition_pattern = "Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer",
-                                     primalbound_pattern = '^MIP -.*Objective = ',
-                                     primalbound_lineindices = -1,
-                                     dualbound_pattern = '(^Current MIP best bound =|^MIP - Integer optimal)',
-                                     dualbound_lineindices = 5,
-                                     solvingtimer_pattern = "Solution time =",
-                                     solvingtime_lineindices = 3,
-                                     version_pattern = "Welcome to IBM(R) ILOG(R) CPLEX(R)",
-                                     version_lineindices = -1)
+    def __init__(self, **kw):
+        super(CplexSolver, self).__init__(**kw)
 
     def extractOptionalInformation(self, line):
         """Extract the settings
         """
         self.extractSettings(line)
-
+ 
     def extractSettings(self, line):
         """Extract the settings
         """
         if "CPLEX> Non-default parameters written to file" in line:
-                self.addData(Key.Settings, line.split('.')[-3])
-
+            self.addData(Key.Settings, line.split('.')[-3])
+ 
 class CbcSolver(Solver):
+ 
+    solverID = "CBC"
+    recognition_expr = re.compile("Welcome to the CBC MILP Solver")
+    primalbound_expr = re.compile("Objective value computed by solver: (\S*)")
+    dualbound_expr = re.compile("Objective value:\s*(\S*)")
+    solvingtimer_expr = re.compile("Total time \(CPU seconds\):\s*(\S*)")
+    version_expr =  re.compile("Version: (\S+)")    
+    limitreached_expr = None
 
-    def __init__(self):
-        # TODO primal and dual bound, version?
-        super(CbcSolver, self).__init__(solverID = "CBC",
-                                     recognition_pattern = "FICO Xpress-Optimizer",
-                                     solvingtimer_pattern = "Coin:Total time \(CPU seconds\):",
-                                     solvingtime_lineindices = 4,
-                                     version_pattern = "Version:",
-                                     version_lineindices = -1)
+    def __init__(self, **kw):
+        super(CbcSolver, self).__init__(**kw)
 
 class XpressSolver(Solver):
+ 
+    solverID = "XPRESS"
+    recognition_expr = re.compile("FICO Xpress-Optimizer")
+    primalbound_expr = re.compile("Best integer solution found is\s*(\S*)")
+    dualbound_expr = re.compile("Best bound is\s*(\S*)")
+    solvingtimer_expr = re.compile("\*\*\* Search completed \*\*\*\s*Time\s*(\S*)")
+    version_expr =  re.compile("FICO Xpress-Optimizer \S* (\S*)")    
+    limitreached_expr = re.compile("STOPPING = (\S*) limit reached") 
 
-    def __init__(self):
-        super(XpressSolver, self).__init__(solverID = "XPRESS",
-                                     recognition_pattern = "Welcome to the CBC MILP Solver",
-                                     primalbound_pattern = "Best integer solution found is",
-                                     primalbound_lineindices = -1,
-                                     dualbound_pattern = "Best bound is",
-                                     dualbound_lineindices = -1,
-                                     solvingtimer_pattern = " \*\*\* Search ",
-                                     solvingtime_lineindices = 5,
-                                     version_pattern = "FICO Xpress Optimizer",
-                                     version_lineindices = 4)
-
-class CouenneSolver(Solver):
-
-    def __init__(self):
-        super(CouenneSolver, self).__init__(solverID = "Couenne",
-                                     recognition_pattern = " Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization",
-                                     primalbound_pattern = "^Upper bound:",
-                                     primalbound_lineindices = 2,
-                                     dualbound_pattern = '^Lower Bound:',
-                                     dualbound_lineindices = 2,
-                                     solvingtimer_pattern = "^Total time:",
-                                     solvingtime_lineindices = 2,
-                                     version_pattern = " Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization",
-                                     version_lineindices = -1)
-
+    def __init__(self, **kw):
+        super(XpressSolver, self).__init__(**kw)
+#   
+# class CouenneSolver(Solver):
+#  
+#     solverID = "Couenne"
+#     recognition_expr = re.compile("Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization")
+#     primalbound_expr = re.compile("^Upper bound:")
+#     dualbound_expr = re.compile("^Lower Bound:")
+#     solvingtimer_expr = re.compile("^Total time:")
+#     version_expr =  re.compile(" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization \S* (\S*)")    
+#     limitreached_expr = None
+# 
+#     def __init__(self, **kw):
+#         super(CouenneSolver, self).__init__(**kw)
+#         
+#   

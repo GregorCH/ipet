@@ -25,8 +25,9 @@ from .StatisticReader_CustomReader import CustomReader
 from .TraceFileReader import TraceFileReader
 from ipet.concepts.Manager import Manager
 from ipet.concepts.IPETNode import IpetNode
-from ipet.parsing.Solver import SCIPSolver, CbcSolver, CouenneSolver, \
-    XpressSolver, GurobiSolver, CplexSolver
+from ipet.parsing.Solver import SCIPSolver
+# CbcSolver, CouenneSolver, \
+#     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
 
 class ReaderManager(Manager, IpetNode):
@@ -80,12 +81,12 @@ class ReaderManager(Manager, IpetNode):
         return ["problemexpression", "problemendexpression"]
     
     def addSolvers(self):
-        self.solvers = [SCIPSolver(),
-                        CbcSolver(),
-                        CouenneSolver(),
-                        XpressSolver(),
-                        GurobiSolver(),
-                        CplexSolver()]
+        self.solvers = [SCIPSolver()]
+#                         CbcSolver(),
+#                         CouenneSolver(),
+#                         XpressSolver(),
+#                         GurobiSolver(),
+#                         CplexSolver()]
 
     def getName(self):
         """
@@ -359,7 +360,7 @@ class ReaderManager(Manager, IpetNode):
             filecontext = self.fileextension2context[".out"]
             if not self.testrun.readsFromStdin():
                 filecontext = self.filenameGetContext(filename)
-                self.solverCanRead = self.activeSolver.canRead(filecontext)
+                self.solverCanRead = self.activeSolver.isSolverInstance(filecontext)
             readers = [r for r in self.getManageables(True) if r.supportsContext(filecontext)]
             
             

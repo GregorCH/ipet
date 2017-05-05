@@ -148,7 +148,7 @@ class Solver():
         self.addData(Key.SolverStatus, Key.SolverStatusCodes.Crashed)
 
     def recognizeOutput(self, line : str):
-        return self.recognition_expr.search(line) != None
+        return self.recognition_expr.match(line) != None
 
     def getData(self, datakey = None):
         """Return data stored under datakey or return collected data as a tuple of two generators

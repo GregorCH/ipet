@@ -42,7 +42,8 @@ class ReaderManager(Manager, IpetNode):
                              ".out" : StatisticReader.CONTEXT_LOGFILE,
                              ".set" : StatisticReader.CONTEXT_SETFILE,
                              ".solu": StatisticReader.CONTEXT_SOLUFILE,
-                             ".trc" : StatisticReader.CONTEXT_TRACEFILE
+                             ".trc" : StatisticReader.CONTEXT_TRACEFILE,
+                             "" : StatisticReader.CONTEXT_LOGFILE # workaround for input from stdin
                              }
     """map for file extensions to the file contexts to specify the relevant readers"""
 
@@ -151,30 +152,34 @@ class ReaderManager(Manager, IpetNode):
         returns a list of all recognized file extensions by this Reader manager
         """
         return list(self.fileextension2context.keys())
-
-    def addLogFileExtension(self, extension):
-        """
-        adds a new log file extension to the log file context
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_LOGFILE)
-
-    def addErrorFileExtension(self, extension):
-        """
-        adds a new error file extension to the error file context
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_ERRFILE)
-
-    def addSettingsFileExtension(self, extension):
-        """
-        adds a new settings file extension to settings file context
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_SETFILE)
-
-    def addSoluFileExtension(self, extension):
-        """
-        adds a new solu file extension to solu file context
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_SOLUFILE)
+#
+#    def addLogFileExtension(self, extension):
+#        # This is never used
+#        """
+#        adds a new log file extension to the log file context
+#        """
+#        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_LOGFILE)
+#
+#    def addErrorFileExtension(self, extension):
+#        # This is never used
+#        """
+#        adds a new error file extension to the error file context
+#        """
+#        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_ERRFILE)
+#
+#    def addSettingsFileExtension(self, extension):
+#        # This is never used
+#        """
+#        adds a new settings file extension to settings file context
+#        """
+#        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_SETFILE)
+#
+#    def addSoluFileExtension(self, extension):
+#        # This is never used
+#        """
+#        adds a new solu file extension to solu file context
+#        """
+#        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_SOLUFILE)
 
     def getNReaders(self):
         """
@@ -282,8 +287,7 @@ class ReaderManager(Manager, IpetNode):
         problemname = self.getProblemName(line[1])
 
         self.testrun.addData(Key.ProblemName, problemname)
-        # FARIDO what do we do here if we are reading from stdin?
-        # self.testrun.addData('Settings', self.testrun.getSettings())
+        self.testrun.addData(Key.LogFileName, self.testrun.getCurrentLogfilename())
         self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
     def endOfProblemReached(self, line):
@@ -341,35 +345,32 @@ class ReaderManager(Manager, IpetNode):
         assert(self.testrun != None)
 
         # sort the files by context, for example: outfiles should be read before solufiles
-        if not self.testrun.readsFromStdin():
-            self.filestrings = sorted(self.filestrings, key = lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
+#        if not self.testrun.readsFromStdin():
+        self.filestrings = sorted(self.filestrings, key = lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
 
         for filename in self.filestrings:
             f = None
-            if self.testrun.readsFromStdin():
+            # empty filename means input from stdin
+            if filename == "": 
                 f = sys.stdin.readlines()
             else:
                 try:
                     f = open(filename, 'r')
                 except IOError:
-                    print('File', filename, "doesn't exist!")
                     continue
 
             # only enable readers that support the file context
             # Default to .out for stdinput, then change if needed
-            filecontext = self.fileextension2context[".out"]
-            if not self.testrun.readsFromStdin():
-                filecontext = self.filenameGetContext(filename)
-                self.solverCanRead = self.activeSolver.isSolverInstance(filecontext)
+            filecontext = self.filenameGetContext(filename)
+            
+            self.solverCanRead = self.activeSolver.isSolverInstance(filecontext)
             readers = [r for r in self.getManageables(True) if r.supportsContext(filecontext)]
-
-
             # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
             line = (0, "")
             startindex = 0
             # FARIDO How to do this better?
             # search the file for information about the type of the solver
-            if self.testrun.readsFromStdin() and self.solverCanRead:
+            if filename == "" and self.solverCanRead:
                 # since we can read the lines from stdin only once, we have to save them
                 try:
                     consumedlines = self.readSolverTypeDirectly(f)
@@ -406,7 +407,7 @@ class ReaderManager(Manager, IpetNode):
 
             self.finishProblemParsing(line, filecontext, readers)
 
-            if not self.testrun.readsFromStdin():
+            if not filename == "":
                 f.close()
             self.testrun.finishedReadingFile(self.activeSolver)
         return 1

@@ -18,6 +18,7 @@ from ipet.concepts.IPETNode import IpetNode, IpetNodeAttributeError
 from ipet.misc import misc
 import logging
 from ipet import Experiment
+from ipet import Key
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -376,7 +377,8 @@ class IPETEvaluation(IpetNode):
     nodetag = "Evaluation"
     # todo put tex, csv etc. here as other possible streams for filter group output
     possiblestreams = ['stdout', 'tex', 'txt', 'csv']
-    DEFAULT_GROUPKEY = "Settings"
+#    DEFAULT_GROUPKEY = "Settings"
+    DEFAULT_GROUPKEY = Key.LogFileName
     DEFAULT_DEFAULTGROUP = "default"
     DEFAULT_COMPARECOLFORMAT = "%.3f"
     ALLTOGETHER = "_alltogether_"

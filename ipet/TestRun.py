@@ -38,30 +38,24 @@ class TestRun:
         self.datadict = {}
         self.currentproblemdata = {}
         self.currentproblemid = 0
-        self.metadatadict = {}
         """ meta data represent problem-independent data """
+        self.metadatadict = {}
         self.parametervalues = {}
         self.defaultparametervalues = {}
         self.keyset = set()
 
     def setInputFromStdin(self):
-        self.inputfromstdin = True
         self.filenames = [""]
 
-    def readsFromStdin(self):
-        return self.inputfromstdin
-
     def appendFilename(self, filename):
-        """
-        appends a file name to the list of filenames of this test run
+        """Append a file name to the list of filenames of this test run
         """
         filename = os.path.abspath(filename)
         if filename not in self.filenames:
             self.filenames.append(filename)
 
     def addDataByName(self, datakeys, data, problem):
-        """
-        add the current data under the specified dataname - readers can use this method to add data, either as a single datakey, or as list,
+        """Add the current data under the specified dataname - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
 
         after data was added, the method getProblemDataById() can be used for access
@@ -141,11 +135,6 @@ class TestRun:
         """
         self.data = DataFrame(dtype = object)
 
-    def getData(self):
-        """Return a data frame object of the acquired data
-        """
-        return self.data
-
     def getMetaData(self):
         """Return a data frame containing meta data
         """
@@ -162,7 +151,6 @@ class TestRun:
                 self.datadict.setdefault(key, {})[self.currentproblemid] = self.currentproblemdata[key]
             self.currentproblemdata = {}
             self.currentproblemid = self.currentproblemid + 1
-
 
     def finishedReadingFile(self, solver):
         """ Save data of current problem
@@ -270,24 +258,6 @@ class TestRun:
                 # needs to be caught for pandas version < 0.13
                 self.data = self.data.drop(problemid)
 
-    def getSettings(self):
-        """ Return the settings associated with this test run
-        """
-        try:
-            return self.data['Settings'][0]
-        except KeyError:
-            # FARI1 this is a problem when we are reading from stdin
-            return os.path.basename(self.filenames[0]).split('.')[-2]
-
-    def getVersion(self):
-        """ Return the version associated with this test run
-        """
-        try:
-            return self.data['Version'][0]
-        except KeyError:
-            # FARI1 this is a problem when we are reading from stdin
-            return os.path.basename(self.filenames[0]).split('.')[3]
-
     def saveToFile(self, filename):
         """ Dump the pickled instance of itself into a .trn-file
         """
@@ -333,6 +303,35 @@ class TestRun:
         f.close()
         return testrun
 
+    def getData(self, datakey = None):
+        """Return a data frame object of the acquired data
+        """
+        return self.data
+            
+    def getCurrentLogfilename(self):
+        """ Return the name of the current logfile 
+        """
+        return os.path.basename(self.filenames[0])
+
+    # FARIDO: We should deprecate this filename fiddeling
+    # FARI1 this is a problem when we are reading from stdin
+
+    def getSettings(self):
+        """ Return the settings associated with this test run
+        """
+        try:
+            return self.data['Settings'][0]
+        except KeyError:
+            return os.path.basename(self.filenames[0]).split('.')[-2]
+
+    def getVersion(self):
+        """ Return the version associated with this test run
+        """
+        try:
+            return self.data['Version'][0]
+        except KeyError:
+            return os.path.basename(self.filenames[0]).split('.')[3]
+
     def getLpSolver(self):
         """ Return the LP solver used for this test run
         """
@@ -367,11 +366,12 @@ class TestRun:
         """
         # FARI1 Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
-
-    def getShortIdentification(self, char = '_', maxlength = -1):
-        """ Return a short identification which only includes the settings of this test run
-        """
-        return misc.cutString(self.getSettings(), char, maxlength)
+    
+#    def getShortIdentification(self, char = '_', maxlength = -1):
+#        # This is never used
+#        """ Return a short identification which only includes the settings of this test run
+#        """
+#        return misc.cutString(self.getSettings(), char, maxlength)
 
     def problemGetOptimalSolution(self, problemid):
         """ Return objective of an optimal or a best known solution

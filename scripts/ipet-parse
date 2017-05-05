@@ -20,7 +20,7 @@ import os
 import io
 import re
 import logging
-from IPython.utils.text import dedent
+#from IPython.utils.text import dedent
 import textwrap
 DEFAULT_FORMATSTR = "{idx} {d}"
 

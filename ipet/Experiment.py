@@ -44,7 +44,8 @@ class Experiment:
         for filename in files:
             self.addOutputFile(filename)
 
-    def addOutputFile(self, filename, testrun = None):
+    #def addOutputFile(self, filename, testrun = None): # testrun parameter is unused
+    def addOutputFile(self, filename):
         """ Add an output file for a testrun or create a new testrun object with the specified filename
 
         this method handles all types of feasible file types for an experiment, either preparsed
@@ -67,7 +68,7 @@ class Experiment:
             except IOError as e:
                 sys.stderr.write(" Loading testrun from file %s caused an exception\n%s\n" % (filename, e))
                 return
-        elif testrun is None:
+        else: #if testrun is None:
             testrun = self.basename2testrun.setdefault(filebasename, TestRun())
 
         if fileextension != TestRun.FILE_EXTENSION:

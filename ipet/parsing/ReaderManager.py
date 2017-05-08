@@ -344,16 +344,27 @@ class ReaderManager(Manager, IpetNode):
         self.filestrings = sorted(self.filestrings, key = lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
 
         for filename in self.filestrings:
+            fileextension = os.path.splitext(filename)[-1]
             f = None
             # empty filename means input from stdin
             if filename == "": 
                 f = sys.stdin.readlines()
             else:
+                # try opening file
                 try:
                     f = open(filename, 'r')
                 except IOError:
                     continue
 
+                # for log- and errorfiles try reading metadata
+                if fileextension in [".out", ".err"]:
+                    try:
+                        with open(os.path.splitext(filename)[0]+".meta",'r') as meta:
+                            for line in meta:
+                                self.testrun.extractMetaData(line)
+                    except IOError:
+                        pass
+                
             # only enable readers that support the file context
             # Default to .out for stdinput, then change if needed
             filecontext = self.filenameGetContext(filename)

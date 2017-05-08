@@ -53,7 +53,20 @@ class TestRun:
         filename = os.path.abspath(filename)
         if filename not in self.filenames:
             self.filenames.append(filename)
-
+            
+    def extractMetaData(self, line : str):
+        """ Read metadata from specified line
+        
+        Parameters 
+        ----------
+        line
+            string to be read from. has to have the form 
+                @attribute datum
+        """
+        [attr, datum] = line.split('@')[1].split(' ')
+        datum = datum.split('\n')[0]
+        self.metadatadict[attr] = datum
+    
     def addDataByName(self, datakeys, data, problem):
         """Add the current data under the specified dataname - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
@@ -323,38 +336,38 @@ class TestRun:
             return self.data['Settings'][0]
         except KeyError:
             return os.path.basename(self.filenames[0]).split('.')[-2]
-
-    def getVersion(self):
-        """ Return the version associated with this test run
-        """
-        try:
-            return self.data['Version'][0]
-        except KeyError:
-            return os.path.basename(self.filenames[0]).split('.')[3]
-
-    def getLpSolver(self):
-        """ Return the LP solver used for this test run
-        """
-        try:
-            return self.data['LPSolver'][0]
-        except KeyError:
-            return os.path.basename(self.filenames[0]).split('.')[-4]
-
-    def getSolver(self):
-        """ Return the LP solver used for this test run
-        """
-        try:
-            return self.data['Solver'][0] + self.data['GitHash'][0]
-        except KeyError:
-            return os.path.basename(self.filenames[0]).split('.')[2]
-
-    def getMode(self):
-        """ Get mode (optimized or debug)
-        """
-        try:
-            return self.data['mode'][0]
-        except:
-            return os.path.basename(self.filenames[0]).split('.')[-5]
+#
+#    def getVersion(self):
+#        """ Return the version associated with this test run
+#        """
+#        try:
+#            return self.data['Version'][0]
+#        except KeyError:
+#            return os.path.basename(self.filenames[0]).split('.')[3]
+#
+#    def getLpSolver(self):
+#        """ Return the LP solver used for this test run
+#        """
+#        try:
+#            return self.data['LPSolver'][0]
+#        except KeyError:
+#            return os.path.basename(self.filenames[0]).split('.')[-4]
+#
+#    def getSolver(self):
+#        """ Return the LP solver used for this test run
+#        """
+#        try:
+#            return self.data['Solver'][0] + self.data['GitHash'][0]
+#        except KeyError:
+#            return os.path.basename(self.filenames[0]).split('.')[2]
+#
+#    def getMode(self):
+#        """ Get mode (optimized or debug)
+#        """
+#        try:
+#            return self.data['mode'][0]
+#        except:
+#            return os.path.basename(self.filenames[0]).split('.')[-5]
 
     def getName(self):
         """ Convenience method to make test run a manageable object
@@ -381,7 +394,7 @@ class TestRun:
         try:
             return self.getProblemDataById(problemid, 'OptVal')
         except KeyError:
-            print(self.getIdentification() + " has no solu file value for ", problemid)
+#            print(self.getIdentification() + " has no solu file value for ", problemid)
             return None
 
     def problemGetSoluFileStatus(self, problemid):
@@ -393,6 +406,6 @@ class TestRun:
         try:
             return self.getProblemDataById(problemid, 'SoluFileStatus')
         except KeyError:
-            print(self.getIdentification() + " has no solu file status for ", problemid)
+#            print(self.getIdentification() + " has no solu file status for ", problemid)
             return None
 

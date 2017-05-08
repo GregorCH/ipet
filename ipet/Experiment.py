@@ -242,6 +242,8 @@ class Experiment:
         for tr in self.getTestRuns():
             trdata = tr.data
             if self.externaldata is not None:
+                # Suggestion:
+                # trdata = trdata.join(self.externaldata, on=Key.ProblemName, suffixes = ("", "_ext"))
                 trdata = trdata.merge(self.externaldata, left_index = True, right_index = True, how = "left", suffixes = ("", "_ext"))
             datalist.append(trdata)
 
@@ -336,18 +338,18 @@ class Experiment:
             return misc.getGap(float(pb), float(optsol))
         else:
             return misc.FLOAT_INFINITY
-
-    def checkForFails(self):
-        """ All testruns and instances go through fail check.
-
-        returns a dictionary to contain all instances which failed
-        """
-        faildict = {}
-        for testrun in self.getTestRuns():
-            for probname in self.probnamelist:
-                if testrun.problemCheckFail(probname) > 0:
-                    faildict.setdefault(testrun.getIdentification(), []).append(probname)
-        return faildict
+#
+#    def checkForFails(self):
+#        """ All testruns and instances go through fail check.
+#
+#        returns a dictionary to contain all instances which failed
+#        """
+#        faildict = {}
+#        for testrun in self.getTestRuns():
+#            for probname in self.probnamelist:
+#                if testrun.problemCheckFail(probname) > 0:
+#                    faildict.setdefault(testrun.getIdentification(), []).append(probname)
+#        return faildict
 
     def isPrimalBoundBetter(self, testrun, problemid):
         """ Return True if the primal bound for the given problem exceeds the best known solution value

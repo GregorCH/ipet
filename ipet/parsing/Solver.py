@@ -256,7 +256,6 @@ class SCIPSolver(Solver):
             self.inTable and self.heurdispcharexpugmode.match(line) and self.ugmode:
 
             if not self.ugmode:
-                print("ACHTUNG", line, self.ugmode, self.inTable)
                 allmatches = misc.numericExpression.findall(line[:line.rindex("|")])
             else:
                 allmatches = misc.numericExpression.findall(line)[:5]
@@ -370,7 +369,6 @@ class GurobiSolver(Solver):
         if "Expl Unexpl |  Obj  Depth" in line:
             self.inTable = True
         elif self.inTable and line.endswith("s\n") and self.gurobiextralist != []:
-#              print "+++++++++++++++++++++"
             pointInTime = line.split()[-1].strip("s")
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, self.gurobiextralist[-1])
             self.gurobiextralist = []
@@ -380,7 +378,6 @@ class GurobiSolver(Solver):
         elif "Cutting planes:" in line and self.inTable:
             self.inTable = False
         elif self.gurobiextralist != [] and "Explored " in line:
-#              print "-------------------------"
             pointInTime = line.split()[-2]
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, self.gurobiextralist[-1])
             self.gurobiextralist = []

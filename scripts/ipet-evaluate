@@ -96,7 +96,7 @@ if __name__ == '__main__':
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-    # initialize a experiment
+    # initialize an experiment
     experiment = None
     if arguments.evalfile is None:
         evalfile = None
@@ -156,7 +156,6 @@ if __name__ == '__main__':
         theeval.setGroupKey(arguments.groupkey)
 
     if arguments.externaldata is not None:
-        # FARI1 What exactly is external data?
         experiment.addExternalDataFile(arguments.externaldata)
         logging.info("Added external data file %s" % arguments.externaldata)
     else:
@@ -187,11 +186,13 @@ if __name__ == '__main__':
             pass
         ExperimentManagement.setExperiment(experiment)
         mainwindow.setExperiment(ExperimentManagement.getExperiment())
+
         theeval.evaluate(ExperimentManagement.getExperiment())
         mainwindow.show()
 
         sys.exit(application.exec_())
 
+    # returntable and returnaggregation
     rettab, retagg = theeval.evaluate(experiment)
 
     if arguments.long:

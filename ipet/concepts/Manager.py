@@ -49,7 +49,6 @@ class Manager(Observable):
             except AttributeError:
                 return str(manageable)
 
-
     def getManageable(self, stringrepresentation):
         """
         returns the manageable belonging to a string representation, or None, if no such manageable is available

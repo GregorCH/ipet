@@ -16,9 +16,7 @@ import xml.etree.ElementTree as ElementTree
 from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, StatisticReader, ListReader, \
     BestSolInfeasibleReader, MaxDepthReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
-from .StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader, ParascipDualBoundHistoryReader
 from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
-from .StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
 from .StatisticReader_VariableReader import VariableReader
 from .StatisticReader_SoluFileReader import SoluFileReader
 from .StatisticReader_CustomReader import CustomReader
@@ -217,15 +215,12 @@ class ReaderManager(Manager, IpetNode):
         self.registerListOfReaders([
              BestSolInfeasibleReader(),
              DateTimeReader(),
-             DualBoundHistoryReader(),
              ErrorFileReader(),
-             ParascipDualBoundHistoryReader(),
              GapReader(),
              MaxDepthReader(),
              NodesReader(),
              ObjsenseReader(),
              PluginStatisticsReader(),
-             PrimalBoundHistoryReader(),
              VariableReader(),
              RootNodeFixingsReader(),
              SettingsFileReader(),

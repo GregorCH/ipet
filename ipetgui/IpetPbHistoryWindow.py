@@ -37,8 +37,8 @@ from PyQt4.QtCore import SIGNAL
 from ipet.TestRun import TestRun
 from ipet.misc.integrals import getProcessPlotData, getMeanIntegral
 from .IpetMainWindow import IpetMainWindow
-from ipet.parsing.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from matplotlib.pyplot import cm
+from ipet import Key
 import numpy
 
 progname = os.path.basename(sys.argv[0])
@@ -332,7 +332,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
             ymax = max(ymax, max(y[testrunname]))
             ymin = min(ymin, min(y[testrunname]))
             if showdualbound:
-                arguments = {"historytouse":DualBoundHistoryReader.datakey, "boundkey":DualBoundReader.datakey}
+                arguments = {"historytouse":Key.DualBoundHistory, "boundkey":Key.DualBound}
                 if len(probnames) == 1:
                     zx[testrunname], z[testrunname] = list(zip(*getProcessPlotData(testrun, probnames[0], usenormalization, **arguments)))
                 else:

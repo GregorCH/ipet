@@ -15,9 +15,7 @@ from .StatisticReader_CustomReader import CustomReader
 from .StatisticReader_SoluFileReader import SoluFileReader
 from .StatisticReader_VariableReader import VariableReader
 from .StatisticReader_CustomHistoryReader import CustomHistoryReader
-from .StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
 from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
-from .StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
 from .StatisticReader import StatisticReader, ErrorFileReader, GapReader, TimeLimitReader, \
     BestSolInfeasibleReader, MaxDepthReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader, DateTimeReader

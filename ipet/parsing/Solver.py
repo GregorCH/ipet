@@ -187,7 +187,7 @@ class Solver():
         return self.solverId
 
     def isSolverInstance(self, filecontext):
-        return filecontext is StatisticReader.CONTEXT_ERRFILE or filecontext is StatisticReader.CONTEXT_LOGFILE
+        return filecontext in [Key.CONTEXT_ERRFILE, Key.CONTEXT_LOGFILE]
 
     # Helper for primalboundhistory-reading
     def readBoundAndTime(self, line, boundidx, timeidx, timestripchars="", cutidx=-1):

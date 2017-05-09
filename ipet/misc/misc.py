@@ -14,7 +14,8 @@ from xml.dom.minidom import parseString
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 import datetime
-
+import os
+from ipet import Key
 """
    Various methods for evaluation such as gap calculation, geometric means etc. and some printing methods
 """
@@ -26,6 +27,22 @@ numericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\
 tablenumericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+|cutoff)")
 wordExpression = re.compile(r'[^\s]+')
 useStringSplit = False
+
+def sortingKeyContext(context):
+    """
+    returns sortkey belonging to context
+    """
+    try:
+        return Key.context2Sortkey[context]
+    except IndexError:
+        raise IndexError("Unknown context %d" % context)
+
+def filenameGetContext(filename):
+    """
+    get filecontext via fileextension
+    """
+    extension = os.path.splitext(os.path.basename(filename))[1]
+    return Key.fileextension2context[extension]
 
 def getWordAtIndex(line : str, index : int) -> str:
     """ Get the i'th word in a space separated string of words.

@@ -30,22 +30,8 @@ class StatisticReader(IpetNode):
     datatype = float
     lineindex = -1
 
-    # constants that represent the different contexts that a reader should be active in
-    CONTEXT_LOGFILE = 1  # the log file of a solver which most readers are reading from
-    CONTEXT_ERRFILE = 2  # the error file of a solver
-    CONTEXT_SETFILE = 3  # the settings file used for solving
-    CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every problem
-    CONTEXT_TRACEFILE = 5
-    context = CONTEXT_LOGFILE
+    context = Key.CONTEXT_LOGFILE
     
-    contextname2contexts = {
-            "log" : CONTEXT_LOGFILE,
-            "err" : CONTEXT_ERRFILE,
-            "set" : CONTEXT_SETFILE,
-            "solu" : CONTEXT_SOLUFILE,
-            "trace" : CONTEXT_TRACEFILE
-        }
-
     sleepAfterReturn = True
     sleep = False
 
@@ -148,6 +134,27 @@ class StatisticReader(IpetNode):
 ######################################################################################
 # DERIVED Classes
 
+class MetaDataReader(StatisticReader):
+    context = [Key.CONTEXT_METAFILE, Key.CONTEXT_LOGFILE, Key.CONTEXT_ERRFILE]
+    
+    metadataexp = re.compile("^@\S{3,}\s+\S+$")
+    name = 'MetaDataReader'
+    datakey = Key.MetaData
+    
+    def extractStatistic(self, line):
+        """ Read metadata from specified line
+        
+        Parameters 
+        ----------
+        line
+            string to be read from. has to have the form 
+                @attribute datum
+        """
+        if self.metadataexp.match(line): 
+            [attr, datum] = line.split('@')[1].split(' ')
+            datum = datum.split('\n')[0]
+            self.testrun.metadatadict[attr] = datum
+    
 class BestSolInfeasibleReader(StatisticReader):
     """
     catches the expression 'best solution is not feasible in original problem'
@@ -202,7 +209,7 @@ class ErrorFileReader(StatisticReader):
     name = "ErrorFileReader"
     regular_exp = re.compile("returned with error code (\d+)")
     datakey = Key.ErrorCode
-    context = StatisticReader.CONTEXT_ERRFILE
+    context = Key.CONTEXT_ERRFILE
 
     def extractStatistic(self, line):
         match = self.regular_exp.search(line)
@@ -221,7 +228,7 @@ class SettingsFileReader(StatisticReader):
     name = "SettingsFileReader"
     regular_exp_name = re.compile("^([\w/]+) = (.+)")
     regular_exp_type = re.compile("^# \[type: (\w+),.*default: ([^\]]+)\]")
-    context = StatisticReader.CONTEXT_SETFILE
+    context = Key.CONTEXT_SETFILE
 
     typemap = {
                "real" : float,

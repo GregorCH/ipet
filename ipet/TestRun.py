@@ -9,12 +9,15 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 """
-import ipet.misc as misc
 from ipet import Key
+from ipet import misc
 from pandas import DataFrame, notnull
-import os
+from ipet.parsing import StatisticReader
+import os, sys
 import logging
 import pandas as pd
+#from lib2to3.fixes.fix_input import context
+#from matplotlib.tests import test_lines
 
 try:
     import pickle as pickle
@@ -43,30 +46,64 @@ class TestRun:
         self.parametervalues = {}
         self.defaultparametervalues = {}
         self.keyset = set()
+        
+        self.currentfileiterator = None
+        self.currentfile = None
+        self.consumedStdinput = []
+
+    def __iter__(self):
+        if(self.currentfile != ""):
+            with open(self.currentfile, "r") as f:
+                for line in enumerate(f):
+                    yield line
+        else: 
+            for line in enumerate(self.consumedStdinput):
+                yield line
+            for line in enumerate(sys.stdin, len(self.consumedStdinput)):
+                yield line
+
+    def iterationPrepare(self):
+        filenames = sorted(self.filenames, key = lambda x:misc.sortingKeyContext(misc.filenameGetContext(x)))
+        self.currentfileiterator = iter(filenames)
+        
+    def iterationNextFile(self):
+        try:
+            self.currentfile = next(self.currentfileiterator)
+            return True
+        except StopIteration:
+            return False
+    
+    def iterationAddConsumedStdinput(self, consumedlines):
+        if self.currentfile == "":
+            for line in consumedlines:
+                self.consumedStdinput.append(line)
+    
+    def iterationCleanUp(self):
+        self.currentfileiterator = None
+        
+    def iterationGetCurrentFile(self):
+        return self.currentfile
 
     def setInputFromStdin(self):
-        self.filenames = [""]
+        self.filenames.append("")
 
     def appendFilename(self, filename):
+        # TODO test this
         """Append a file name to the list of filenames of this test run
         """
         filename = os.path.abspath(filename)
         if filename not in self.filenames:
             self.filenames.append(filename)
-            
-    def extractMetaData(self, line : str):
-        """ Read metadata from specified line
+        else:
+            return
         
-        Parameters 
-        ----------
-        line
-            string to be read from. has to have the form 
-                @attribute datum
-        """
-        [attr, datum] = line.split('@')[1].split(' ')
-        datum = datum.split('\n')[0]
-        self.metadatadict[attr] = datum
-    
+        extension = misc.filenameGetContext(filename)
+        if extension in [Key.CONTEXT_ERRFILE, Key.CONTEXT_LOGFILE]:
+            metafile = os.path.splitext(filename)[0]+".meta"
+
+            if os.path.isfile(metafile) and (metafile not in self.filenames):
+                self.filenames.append(metafile)
+        
     def addDataByName(self, datakeys, data, problem):
         """Add the current data under the specified dataname - readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
@@ -159,6 +196,7 @@ class TestRun:
         if self.currentproblemdata != {}:
             # Add data collected by solver into currentproblemdata, such as primal and dual bound,
             self.addData(*solver.getData())
+            self.addData(Key.MetaData, self.metadatadict)
 
             for key in self.currentproblemdata.keys():
                 self.datadict.setdefault(key, {})[self.currentproblemid] = self.currentproblemdata[key]
@@ -191,9 +229,12 @@ class TestRun:
                     return True
             return False
         else:
-            for name in self.data[Key.ProblemName]:
-                if problemname is name:
-                    return True
+            if Key.ProblemName in self.data.keys():
+                for name in self.data[Key.ProblemName]:
+                    if problemname is name:
+                        return True
+            else:
+                return False
 
     def hasProblemId(self, problemid):
         """ Returns if there is already data collected for a problem with given id
@@ -326,9 +367,6 @@ class TestRun:
         """
         return os.path.basename(self.filenames[0])
 
-    # FARIDO: We should deprecate this filename fiddeling
-    # FARI1 this is a problem when we are reading from stdin
-
     def getSettings(self):
         """ Return the settings associated with this test run
         """
@@ -337,38 +375,6 @@ class TestRun:
         except KeyError:
             return os.path.basename(self.filenames[0]).split('.')[-2]
 #
-#    def getVersion(self):
-#        """ Return the version associated with this test run
-#        """
-#        try:
-#            return self.data['Version'][0]
-#        except KeyError:
-#            return os.path.basename(self.filenames[0]).split('.')[3]
-#
-#    def getLpSolver(self):
-#        """ Return the LP solver used for this test run
-#        """
-#        try:
-#            return self.data['LPSolver'][0]
-#        except KeyError:
-#            return os.path.basename(self.filenames[0]).split('.')[-4]
-#
-#    def getSolver(self):
-#        """ Return the LP solver used for this test run
-#        """
-#        try:
-#            return self.data['Solver'][0] + self.data['GitHash'][0]
-#        except KeyError:
-#            return os.path.basename(self.filenames[0]).split('.')[2]
-#
-#    def getMode(self):
-#        """ Get mode (optimized or debug)
-#        """
-#        try:
-#            return self.data['mode'][0]
-#        except:
-#            return os.path.basename(self.filenames[0]).split('.')[-5]
-
     def getName(self):
         """ Convenience method to make test run a manageable object
         """
@@ -380,12 +386,6 @@ class TestRun:
         # FARI1 Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
     
-#    def getShortIdentification(self, char = '_', maxlength = -1):
-#        # This is never used
-#        """ Return a short identification which only includes the settings of this test run
-#        """
-#        return misc.cutString(self.getSettings(), char, maxlength)
-
     def problemGetOptimalSolution(self, problemid):
         """ Return objective of an optimal or a best known solution
 

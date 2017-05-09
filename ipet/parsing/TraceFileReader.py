@@ -11,13 +11,15 @@ please refer to README.md for how to cite IPET.
 """
 from .StatisticReader import StatisticReader
 from ipet.misc import FLOAT_INFINITY
+from ipet import Key
 import logging
+
 class TraceFileReader(StatisticReader):
     """
     classdocs
     """
     active = False
-    context = StatisticReader.CONTEXT_TRACEFILE
+    context = Key.CONTEXT_TRACEFILE
     tracefilestartexpression = "* Trace Record Definition"
     input = "InputFileName,ModelType,SolverName,OptionFile,Direction,NumberOfEquations,NumberOfVariables,NumberOfDiscreteVariables,NumberOfNonZeros,NumberOfNonlinearNonZeros," + \
             "ModelStatus,SolverStatus,ObjectiveValue,ObjectiveValueEstimate,SolverTime,ETSolver,NumberOfIterations,NumberOfNodes"

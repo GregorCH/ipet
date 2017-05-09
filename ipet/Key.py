@@ -2,7 +2,44 @@
 """ This module acts as collection for the datakeys and its datatypes and several status codes
 """
 
-# FARI didn't we want to save the datatypes of the fields?
+# constants that represent the different contexts that a reader should be active in
+CONTEXT_LOGFILE = 1  # the log file of a solver which most readers are reading from
+CONTEXT_ERRFILE = 2  # the error file of a solver
+CONTEXT_SETFILE = 3  # the settings file used for solving
+CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every problem
+CONTEXT_TRACEFILE = 5
+CONTEXT_METAFILE = 0  # the metadata
+
+contextname2contexts = {
+        "log" : CONTEXT_LOGFILE,
+        "err" : CONTEXT_ERRFILE,
+        "set" : CONTEXT_SETFILE,
+        "solu" : CONTEXT_SOLUFILE,
+        "trace" : CONTEXT_TRACEFILE,
+        "meta" : CONTEXT_METAFILE,
+        "" : CONTEXT_LOGFILE
+    }
+
+fileextension2context = {
+                         ".err" : CONTEXT_ERRFILE,
+                         ".out" : CONTEXT_LOGFILE,
+                         ".set" : CONTEXT_SETFILE,
+                         ".solu": CONTEXT_SOLUFILE,
+                         ".trc" : CONTEXT_TRACEFILE,
+                         ".meta" : CONTEXT_METAFILE,
+                         "" : CONTEXT_LOGFILE # workaround for input from stdin
+                         }
+"""map for file extensions to the file contexts to specify the relevant readers"""
+
+context2Sortkey = {
+                   CONTEXT_ERRFILE : 2,
+                   CONTEXT_LOGFILE : 1,
+                   CONTEXT_SETFILE : 3,
+                   CONTEXT_SOLUFILE : 4,
+                   CONTEXT_TRACEFILE : 5,
+                   CONTEXT_METAFILE : 0
+                   }
+""" defines a sorting order for file contexts """
 
 BestSolutionInfeasible = "BestSolInfeas"
 DatetimeEnd = "Datetime_End"
@@ -14,6 +51,7 @@ DualLpTime = "DualLpTime"
 ErrorCode = "ErrorCode"
 Gap = "Gap"
 LogFileName = "LogFileName"
+MetaData = "MetaData"
 MaximumDepth = "MaxDepth"
 Nodes = "Nodes"
 ObjectiveLimit = "Objlimit"

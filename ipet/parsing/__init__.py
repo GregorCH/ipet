@@ -17,6 +17,6 @@ from .StatisticReader_VariableReader import VariableReader
 from .StatisticReader_CustomHistoryReader import CustomHistoryReader
 from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
 from .StatisticReader import StatisticReader, ErrorFileReader, GapReader, TimeLimitReader, \
-    BestSolInfeasibleReader, MaxDepthReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
+    BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ListReader, ObjsenseReader, DateTimeReader
 __all__ = []

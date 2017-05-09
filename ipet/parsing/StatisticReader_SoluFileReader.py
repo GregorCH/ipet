@@ -23,7 +23,7 @@ class SoluFileReader(StatisticReader):
     statistics = {}
     columnwidth = 12
     columnheaderstr = 'SoluFile'.rjust(columnwidth)
-    context = StatisticReader.CONTEXT_SOLUFILE
+    context = Key.CONTEXT_SOLUFILE
 
     def setTestRun(self, testrun):
         self.testrun = testrun

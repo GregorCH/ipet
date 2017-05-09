@@ -254,7 +254,7 @@ class Experiment:
 
         ... for every problem under 'PrimalIntegral' and 'DualIntegral'
         """
-        dualargs = dict(historytouse = 'dualboundhistory', boundkey = 'DualBound')
+        dualargs = dict(historytouse = Key.DualBoundHistory, boundkey = Key.DualBound)
         for testrun in self.getTestRuns():
 
             # go through problems and calculate both primal and dual integrals

@@ -287,7 +287,7 @@ class ReaderManager(Manager, IpetNode):
                     self.finishProblemParsing(line, context, readers)
 
                 else:
-                    if self.solverCanRead:
+                    if self.activeSolver.isSolverInstance(context):
                         self.activeSolver.readLine(line[1])
                     for reader in readers:
                         reader.operateOnLine(line[1])

@@ -12,12 +12,13 @@ please refer to README.md for how to cite IPET.
 import numpy as np
 from ipet.misc import misc
 import numpy
+from ipet import Key
 
-DEFAULT_HISTORYTOUSE = 'PrimalBoundHistory'
-DEFAULT_XAFTERSOLVEKEY = 'SolvingTime'
-DEFAULT_XLIMITKEY = 'TimeLimit'
+DEFAULT_HISTORYTOUSE = Key.PrimalBoundHistory
+DEFAULT_XAFTERSOLVEKEY = Key.SolvingTime
+DEFAULT_XLIMITKEY = Key.TimeLimit
 DEFAULT_CUTOFFGAP = 100
-DEFAULT_BOUNDKEY = 'PrimalBound'
+DEFAULT_BOUNDKEY = Key.PrimalBound
 
 def calcIntegralValue(thedatalist, pwlinear=False):
     """
@@ -77,7 +78,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
             lastbound = history[-1][1]
         except:
             lastbound = misc.FLOAT_INFINITY
-        
+    
     if len(history) > 0:
         x, y = list(zip(*history))
         x = list(x)

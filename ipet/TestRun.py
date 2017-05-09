@@ -331,9 +331,9 @@ class TestRun:
         """ Print data to console
         """
         for idx, d in self.data.iterrows():
-            pd.set_option('display.max_rows', len(d))
+#            pd.set_option('display.max_rows', len(d))
             print(formatstr.format(d = d, idx = idx))
-            pd.reset_option('display.max_rows')
+#            pd.reset_option('display.max_rows')
 
     def toJson(self):
         """ Return the data-object in json

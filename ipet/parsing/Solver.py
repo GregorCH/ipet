@@ -126,8 +126,11 @@ class Solver():
     def addHistoryData(self, key, timestr : str, boundstr : str):
         """Add data to local data-dictionary
         """
-        time = float(timestr)
-        bound = float(boundstr)
+        try:
+            time = float(timestr)
+            bound = float(boundstr)
+        except:
+            return
         history = self.data.setdefault(key, [])
         # only append newly found bounds
         if history == [] or history[-1][1] != bound:
@@ -171,6 +174,9 @@ class Solver():
         self.data = {}
         self.addData(Key.Solver, self.solverId)
         self.addData(Key.SolverStatus, Key.SolverStatusCodes.Crashed)
+#        TODO how does the historydata work ?
+        self.data.setdefault(Key.PrimalBoundHistory, [])
+        self.data.setdefault(Key.DualBoundHistory, [])
 
     def recognizeOutput(self, line : str):
         return self.recognition_expr.match(line) != None
@@ -280,46 +286,42 @@ class SCIPSolver(Solver):
         """
         timeindex = 0
     
-        if self.isTableLine(line):
-            if self.dualboundindex == -1:
+        if not self.isTableLine(line):
+            if self.inTable:
                 # parse index of dual bound entry
                 columnheaders = list(map(str.strip, line.split('|')))
                 self.dualboundindex = columnheaders.index('dualbound')
+            return 
 
-            try:
-                # FARI This works, why is eclipse complaining?
-                lineelems = misc.tablenumericExpression.findall(line)
-                # parse time and dual bound from the table
-                time = lineelems[timeindex]
-                dualbound = lineelems[self.dualboundindex]
-                
-                # store newly found (time, dual bound) tuple if it differs from the last dual bound
-                self.addHistoryData(Key.DualBoundHistory, time, dualbound)
-                
-            except ValueError:
-                return None
-            except IndexError:
-                return None
-        return None
-        
+        try:
+            # FARI This works, why is eclipse complaining?
+            lineelems = misc.tablenumericExpression.findall(line)
+            # parse time and dual bound from the table
+            time = lineelems[timeindex]
+            dualbound = lineelems[self.dualboundindex]
+            
+            # store newly found (time, dual bound) tuple if it differs from the last dual bound
+            self.addHistoryData(Key.DualBoundHistory, time, dualbound)
+            
+        except ValueError:
+            return None
+        except IndexError:
+            return None
+     
     def isTableLine(self, line):
-        if not self.inTable:
-            if self.primalboundhistory_exp.match(line):
-                self.inTable = True
-                return False
-            elif line.startswith("     Time          Nodes        Left   Solvers     Best Integer        Best Node"):
-                self.inTable = True
-                self.ugmode = True
-                return False
-            return False
-        elif self.inTable and \
-            ((line.startswith("SCIP Status") or not self.shorttablecheckexp.search(line))):
-            self.inTable = False
+        if self.primalboundhistory_exp.match(line):
+            self.inTable = True
             self.ugmode = False
             return False
-        else:
-            return self.inTable
-     
+        elif line.startswith("     Time          Nodes        Left   Solvers     Best Integer        Best Node"):
+            self.inTable = True
+            self.ugmode = True
+            return False
+        elif self.inTable and ((line.startswith("SCIP Status") and self.ugmode) \
+                         or ((not self.ugmode) and not self.shorttablecheckexp.search(line))):
+            self.inTable = False
+        return self.inTable
+
     def extractMoreData(self, line : str):
         """Handle more than just the version
         """

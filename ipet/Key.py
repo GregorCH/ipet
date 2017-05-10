@@ -110,10 +110,18 @@ class ProblemStatusCodes:
     FailSolOnInfeasibleInstance = "fail_solution_on_infeasible_instance"
     Fail = "fail"
     FailAbort = "fail_abort"
+    TimeLimit = "timelimit"
+    MemoryLimit = "memlimit"
+    NodeLimit = "nodelimit"
+    Interrupted = "interrupt"
 
     statusToPriority = {Ok : 1000,
                         SolvedNotVerified : 500,
                         Better : 250,
+                        Interrupted : 237,
+                        NodeLimit : 225,
+                        TimeLimit : 200,
+                        MemoryLimit : 150,
                         Unknown : 100,
                         FailDualBound :-250,
                         FailObjectiveValue :-500,
@@ -134,4 +142,21 @@ class ProblemStatusCodes:
         """
         return min(*args, key = lambda x : ProblemStatusCodes.statusToPriority.get(x, 0))
 
+solver2problemStatusCode = {
+    SolverStatusCodes.Crashed : ProblemStatusCodes.FailAbort,
+    SolverStatusCodes.Infeasible : ProblemStatusCodes.Ok,
+    SolverStatusCodes.Optimal : ProblemStatusCodes.Ok,
+    SolverStatusCodes.TimeLimit : ProblemStatusCodes.TimeLimit,
+    SolverStatusCodes.MemoryLimit : ProblemStatusCodes.MemoryLimit,
+    SolverStatusCodes.NodeLimit : ProblemStatusCodes.NodeLimit,
+    SolverStatusCodes.Interrupted : ProblemStatusCodes.Interrupted}
 
+def solverToProblemStatusCode(solverstatus : int) -> str:
+    """Map the status of the solver to the corresponding problem status code
+
+    Parameters
+    ----------
+    solverstatus
+        integer status code reported by the solver
+    """
+    return solver2problemStatusCode.get(solverstatus, ProblemStatusCodes.Unknown)

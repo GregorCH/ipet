@@ -201,6 +201,11 @@ def getVariabilityScore(listofnumbers):
 
     return np.sqrt(np.sum((arrayofnumbers - arrayofnumbers.mean()) ** 2)) / arrayofnumbers.sum()
 
+def isInfinite(value : float) -> bool:
+    """Return if absolute value is larger than float infinity
+    """
+    return abs(value) >= FLOAT_INFINITY
+
 def cutString(string, char='_', maxlength=-1):
     iscuttable = True
     stringcopy = string[0:len(string)]
@@ -266,7 +271,7 @@ def convertTimeStamp(timestamp : float) -> str:
     Returns
     -------
     str
-        The humanreadable timestamp as in Y-m-d H:M:S
+        The human readable timestamp as in Y-m-d H:M:S
     """
     return datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
 

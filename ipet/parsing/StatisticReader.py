@@ -188,8 +188,8 @@ class DateTimeReader(StatisticReader):
             matched = exp.match(line)
             if matched:
                 timestamp = int(matched.groups()[0])
-                time = misc.convertTimeStamp(timestamp)
-                self.addData(key, time)
+                #time = misc.convertTimeStamp(timestamp)
+                self.addData(key, timestamp)
                 break
 
 class DualLPTimeReader(StatisticReader):

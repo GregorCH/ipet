@@ -44,7 +44,8 @@ class IPETEvaluationColumn(IpetNode):
                                "min":(1, -1),
                                "max":(1, -1),
                                "getBestStatus" : (1, -1),
-                               "getWorstStatus" : (1, -1)}
+                               "getWorstStatus" : (1, -1),
+                               "convertTimeStamp" : (1, 1)}
     
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 

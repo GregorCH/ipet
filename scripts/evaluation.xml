@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
-<Evaluation defaultgroup="default" groupkey="Settings">
-	<Column origcolname="TotalTime_solving" minval="0.5" maxval="TimeLimit" nanrep="TimeLimit" name="Time" translevel="0" comp="quot">
+<Evaluation defaultgroup="default" groupkey="LogFileName">
+	<Column origcolname="SolvingTime" minval="0.5" maxval="TimeLimit" nanrep="TimeLimit" name="Time" translevel="0" comp="quot">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>
 	<Column name="Nodes" origcolname="Nodes" comp="quot">

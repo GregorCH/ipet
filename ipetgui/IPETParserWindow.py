@@ -226,7 +226,7 @@ class IPETParserWindow(IPETApplicationTab):
         startofline = selectedline[:indices[0]]
         lineincludingselection = selectedline[:indices[1]]
         
-        ne = StatisticReader.numericExpression
+        ne = misc.numericExpression
         nhitsstartofline = len(ne.findall(startofline))
         nhitslineincludingselection = len(ne.findall(lineincludingselection))
         

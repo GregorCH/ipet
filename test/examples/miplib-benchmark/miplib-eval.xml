@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
-<Evaluation comparecolformat="%.3f" defaultgroup="benchmark.scips.out" evaluateoptauto="False" groupkey="LogFileName" sortlevel="0">
+<Evaluation comparecolformat="%.3f" defaultgroup="benchmark.gurobi.out" evaluateoptauto="True" groupkey="LogFileName" sortlevel="0">
 	<Column active="True" comp="quot" maxval="TimeLimit" minval="0.5" name="Time" nanrep="TimeLimit" origcolname="SolvingTime" translevel="0">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>
 	<Column active="True" comp="quot" name="Nodes" origcolname="Nodes">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
 	</Column>
-	<Column active="True" name="DTime" transformfunc="subtract" translevel="0">
+	<Column active="True" minval="1" name="DTime" transformfunc="subtract" translevel="0">
 		<Column active="True" origcolname="Datetime_End" translevel="0"/>
 		<Column active="True" origcolname="Datetime_Start" translevel="0"/>
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>

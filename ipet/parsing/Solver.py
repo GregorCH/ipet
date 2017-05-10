@@ -22,7 +22,7 @@ class Solver():
     solverstatusmap = {}
 
     def __init__(self,
-                 solverID = None,
+                 solverId = None,
                  recognition_pattern = None,
                  primalbound_pattern = None,
                  dualbound_pattern = None,
@@ -31,8 +31,8 @@ class Solver():
                  limitreached_pattern = None,
                  solverstatusmap = None):
 
-        if solverID is not None:
-            self.solverId = solverID
+        if solverId is not None:
+            self.solverId = solverId
 
         if not recognition_pattern is None:
             self.recognition_expr = re.compile(recognition_pattern)
@@ -348,7 +348,7 @@ class SCIPSolver(Solver):
 
 class GurobiSolver(Solver):
 
-    solverID = "GUROBI"
+    solverId = "GUROBI"
     recognition_expr = re.compile("Gurobi Optimizer version")
     primalbound_expr = re.compile("^Best objective (\S+)")
     dualbound_expr = re.compile("^Best objective (?:\S+), best bound (\S+)")
@@ -392,7 +392,7 @@ class GurobiSolver(Solver):
     
 class CplexSolver(Solver):
 
-    solverID = "CPLEX"
+    solverId = "CPLEX"
     recognition_expr = re.compile("Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer")
     primalbound_expr = re.compile("^MIP -.*Objective =\s*(\S+)")
     dualbound_expr = re.compile("^Current MIP best bound =\s*(\S+)")
@@ -477,7 +477,7 @@ class CplexSolver(Solver):
 
 class CbcSolver(Solver):
 
-    solverID = "CBC"
+    solverId = "CBC"
     recognition_expr = re.compile("Welcome to the CBC MILP Solver")
     primalbound_expr = re.compile("Objective value computed by solver: (\S*)")
     dualbound_expr = re.compile("Objective value:\s*(\S*)")
@@ -497,7 +497,7 @@ class CbcSolver(Solver):
         
 class XpressSolver(Solver):
 
-    solverID = "XPRESS"
+    solverId = "XPRESS"
     recognition_expr = re.compile("FICO Xpress-Optimizer")
     primalbound_expr = re.compile("Best integer solution found is\s*(\S*)")
     dualbound_expr = re.compile("Best bound is\s*(\S*)")

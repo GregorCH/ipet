@@ -130,6 +130,14 @@ class TestRun:
         else:
             self.currentproblemdata[datakey] = data
 
+    def getCurrentProblemData(self, datakey : str = None):
+        """Return current problem data, either entirely or for specified data key
+        """
+        if datakey is None:
+            return self.currentproblemdata
+        else:
+            return self.currentproblemdata.get(datakey)
+
     def addDataById(self, datakeys, data, problemid):
         """Add the data or to the specified problem
 

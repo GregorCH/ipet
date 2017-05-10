@@ -13,6 +13,8 @@ from .StatisticReader import StatisticReader
 import re
 import builtins
 import logging
+from ipet import misc
+from ipet.concepts.IPETNode import IpetNode
 
 class CustomReader(StatisticReader):
     """
@@ -45,7 +47,7 @@ class CustomReader(StatisticReader):
             "method" : list(str2method.keys())
         }
 
-    def __init__(self, name=None, regpattern=None, datakey=None, index=0, datatype="float", method="last"):
+    def __init__(self, name = None, regpattern = None, datakey = None, index = 0, datatype = "float", method = "last", active = True):
         """
         constructor of a custom reader to parse additional simple solver output from log file context
 
@@ -64,6 +66,8 @@ class CustomReader(StatisticReader):
 
         method : how to treat multiple occurrences of this data within one problem; 'count' occurrences or parse 'first', 'last', 'sum', 'min' or 'max'
         """
+
+        IpetNode.__init__(self, active)
 
         if regpattern is None:
             raise ValueError("Error: No 'regpattern' specified for reader with name %s" % str(name))
@@ -89,19 +93,19 @@ class CustomReader(StatisticReader):
         self.set_datatype(datatype)
 
     def getEditableAttributes(self):
-        return ['name', 'regpattern', 'datakey', 'index', 'datatype', 'method']
+        return ['name', 'regpattern', 'datakey', 'index', 'datatype', 'method'] + IpetNode.getEditableAttributes(self)
 
     def getRequiredOptionsByAttribute(self, attr):
-        return self.requiredoptions.get(attr, None)
+        return self.requiredoptions.get(attr, IpetNode.getRequiredOptionsByAttribute(self, attr))
 
     def extractStatistic(self, line):
         if self.regexp.search(line):
 
+            previousdata = self.testrun.getCurrentProblemData(self.datakey)
             try:
-                data = self.getNumberAtIndex(line, self.index)
+                data = misc.getNumberAtIndex(line, self.index)
                 data = self.datatypemethod(data)
 
-                previousdata = self.testrun.getProblemDataById(self.problemname, self.datakey)
 
                 if self.methodint == CustomReader.METHOD_FIRST:
                     if previousdata is None:
@@ -133,7 +137,7 @@ class CustomReader(StatisticReader):
                     else:
                         self.addData(self.datakey, previousdata + 1)
 
-
+                    pass
 
             except:
                 logging.debug("Reader %s could not retrieve data at index %d from matching line '%s'", self.getName(), self.index, line)
@@ -147,14 +151,12 @@ class CustomReader(StatisticReader):
         recognizes data types (e.g., 'float' or 'int') and sets reader data type to this value
         """
         try:
-            # FARI how to resolve this error?
-            # self.datatypemethod = getattr(__builtin__, sometype)
+            self.datatypemethod = getattr(builtins, sometype)
             self.datatype = sometype
         except:
             logging.debug("Error: Could not recognize data type %s, using float" % sometype)
             self.datatypemethod = float
             self.datatype = 'float'
-            
     def set_datatype(self, datatype):
         self.setDataType(datatype)
 

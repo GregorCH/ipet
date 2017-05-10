@@ -105,18 +105,16 @@ class TestRun:
                 self.filenames.append(metafile)
         
     def addDataByName(self, datakeys, data, problem):
-        """Add the current data under the specified dataname - readers can use this method to add data, either as a single datakey, or as list,
+        """Add the current data under the specified dataname
+
+        Readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
 
         after data was added, the method getProblemDataById() can be used for access
         """
-        for problemkey, name in self.datadict.setdefault(Key.ProblemName, None):
+        for problemid, name in self.datadict.setdefault(Key.ProblemName, {}).items():
             if name == problem:
-                if type(datakeys) is list and type(data) is list:
-                    for key, datum in zip(datakeys, data):
-                        self.datadict.setdefault(key, {})[problemkey] = datum
-                    else:
-                        self.datadict.setdefault(datakeys, {})[problemkey] = data
+                self.addDataById(datakeys, data, problemid)
 
     def addData(self, datakey, data):
         """Add data to current problem
@@ -224,17 +222,13 @@ class TestRun:
         """ Return if already collected data for a problem with given name
         """
         if self.datadict != {}:
-            for name in self.datadict.get(Key.ProblemName, {}):
-                if problemname is name:
-                    return True
-            return False
+            return problemname in self.datadict.get(Key.ProblemName, {}).values()
         else:
             if Key.ProblemName in self.data.keys():
                 for name in self.data[Key.ProblemName]:
-                    if problemname is name:
+                    if problemname == name:
                         return True
-            else:
-                return False
+            return False
 
     def hasProblemId(self, problemid):
         """ Returns if there is already data collected for a problem with given id

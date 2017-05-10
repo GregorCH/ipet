@@ -1,0 +1,99 @@
+@01 instances/miplib2010/app1-2.mps.gz ===========
+-----------------------------
+Tue Oct 25 15:54:10 MST 2016
+-----------------------------
+@03 1477436050
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.app1-2.mps.sol
+Set parameter TimeLimit to value 7200
+Set parameter MIPGap to value 0.0
+Set parameter Threads to value 1
+
+Gurobi Optimizer version 7.0.0 build v7.0.0rc3 (linux64)
+Copyright (c) 2016, Gurobi Optimization, Inc.
+
+Read MPS format model from file instances/miplib2010/app1-2.mps.gz
+Reading time = 0.06 seconds
+app1-2: 53467 rows, 26871 columns, 199175 nonzeros
+Optimize a model with 53467 rows, 26871 columns and 199175 nonzeros
+Variable types: 13571 continuous, 13300 integer (13300 binary)
+Coefficient statistics:
+  Matrix range     [1e-05, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e-05, 1e+00]
+Found heuristic solution: objective -41
+Presolve removed 17851 rows and 4861 columns
+Presolve time: 3.40s
+Presolved: 35616 rows, 22010 columns, 149085 nonzeros
+Variable types: 11526 continuous, 10484 integer (10484 binary)
+
+Root relaxation: objective -1.789432e+02, 5382 iterations, 0.70 seconds
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -178.94318    0  282  -41.00000 -178.94318   336%     -    4s
+     0     0 -171.91701    0  268  -41.00000 -171.91701   319%     -   15s
+     0     0 -170.97660    0  267  -41.00000 -170.97660   317%     -   15s
+     0     0 -169.27049    0  275  -41.00000 -169.27049   313%     -   15s
+     0     0 -168.87923    0  271  -41.00000 -168.87923   312%     -   15s
+     0     0 -168.77079    0  274  -41.00000 -168.77079   312%     -   16s
+     0     0 -168.37789    0  271  -41.00000 -168.37789   311%     -   16s
+     0     0 -168.13970    0  279  -41.00000 -168.13970   310%     -   16s
+     0     0 -168.02564    0  280  -41.00000 -168.02564   310%     -   16s
+     0     0 -168.02564    0  281  -41.00000 -168.02564   310%     -   16s
+     0     0 -168.02564    0  281  -41.00000 -168.02564   310%     -   16s
+     0     0 -168.02564    0  280  -41.00000 -168.02564   310%     -   16s
+     0     0 -168.02564    0  280  -41.00000 -168.02564   310%     -   16s
+     0     0 -168.02564    0  280  -41.00000 -168.02564   310%     -   17s
+     0     0 -168.02564    0  280  -41.00000 -168.02564   310%     -   17s
+     0     0 -168.02564    0  257  -41.00000 -168.02564   310%     -   17s
+     0     0 -168.02564    0  258  -41.00000 -168.02564   310%     -   18s
+     0     0 -168.02564    0  257  -41.00000 -168.02564   310%     -   18s
+     0     0 -168.02564    0  257  -41.00000 -168.02564   310%     -   18s
+     0     0 -168.02564    0  257  -41.00000 -168.02564   310%     -   18s
+     0     2 -167.97894    0  257  -41.00000 -167.97894   310%     -   21s
+    74     8 -144.93002   40  265  -41.00000 -167.97894   310%  20.5   25s
+   109     9 -133.04355   58  269  -41.00000 -167.97894   310%  21.4   30s
+   220    24  -85.16803  121  316  -41.00000 -167.97894   310%  16.9   35s
+   304    35  -47.38031  164  364  -41.00000 -167.97894   310%  19.0   40s
+   428     9 infeasible  159       -41.00000  -52.87391  29.0%  28.3   45s
+
+Cutting planes:
+  Gomory: 16
+  Implied bound: 23
+  Clique: 1
+  MIR: 22
+
+Explored 526 nodes (21191 simplex iterations) in 46.67 seconds
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: -41 
+Pool objective bound -41
+
+Optimal solution found (tolerance 0.00e+00)
+Best objective -4.100000000000e+01, best bound -4.100000000000e+01, gap 0.0000%
+
+Wrote result file '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.app1-2.mps.sol'
+
+
+@04 1477436097
+@05 7200
+
+Read MPS: 1
+MIP has 26871 vars and 53467 constraints
+Read SOL: 1
+Objective value computed by solver: -41
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 2e-17 Objective 0
+
+-----------------------------
+Tue Oct 25 15:54:58 MST 2016
+-----------------------------
+
+=ready=

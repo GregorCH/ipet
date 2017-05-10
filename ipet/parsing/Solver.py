@@ -111,6 +111,8 @@ class Solver():
             data type for the datum, default : float
         """
         m = expr.match(line)
+#        if key == Key.PrimalBound:
+#            print("ACHUTUNG EXTRACT", key, line)
         if m is not None:
             try:
                 d = datatype(m.groups()[0])
@@ -350,8 +352,8 @@ class GurobiSolver(Solver):
 
     solverId = "GUROBI"
     recognition_expr = re.compile("Gurobi Optimizer version")
-    primalbound_expr = re.compile("^Best objective (\S+)")
-    dualbound_expr = re.compile("^Best objective (?:\S+), best bound (\S+)")
+    primalbound_expr = re.compile("^Best objective (\S+), best bound (?:\S+),")
+    dualbound_expr = re.compile("^Best objective (?:\S+), best bound (\S+),")
     solvingtimer_expr = re.compile("Explored \d* nodes \(.*\) in (\S*) seconds")
     version_expr = re.compile("Gurobi Optimizer version (\S+)")
     limitreached_expr = re.compile("^Time limit reached")
@@ -393,11 +395,11 @@ class GurobiSolver(Solver):
 class CplexSolver(Solver):
 
     solverId = "CPLEX"
-    recognition_expr = re.compile("Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer")
+    recognition_expr = re.compile("^Welcome to IBM\(R\) ILOG\(R\) CPLEX\(R\) Interactive Optimizer")
     primalbound_expr = re.compile("^MIP -.*Objective =\s*(\S+)")
-    dualbound_expr = re.compile("^Current MIP best bound =\s*(\S+)")
+    dualbound_expr = re.compile("^(?:Current MIP best bound|^MIP - Integer optimal solution:  Objective) =\s*(\S+)")
     solvingtimer_expr = re.compile("Solution time =\s*(\S+)")
-    version_expr = re.compile("Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer (\S+)")
+    version_expr = re.compile("^Welcome to IBM\(R\) ILOG\(R\) CPLEX\(R\) Interactive Optimizer (\S+)")
     limitreached_expr = None
 
     # variables needed for primal bound history extraction
@@ -479,11 +481,17 @@ class CbcSolver(Solver):
 
     solverId = "CBC"
     recognition_expr = re.compile("Welcome to the CBC MILP Solver")
-    primalbound_expr = re.compile("Objective value computed by solver: (\S*)")
-    dualbound_expr = re.compile("Objective value:\s*(\S*)")
+    # TODO what exactly are we looking for?
+    primalbound_expr = re.compile("^Objective value:\s*(\S*)")
+    dualbound_expr = re.compile("^(?:Lower bound\s*|Objective value\s*):\s*(\S*)")
     solvingtimer_expr = re.compile("Total time \(CPU seconds\):\s*(\S*)")
     version_expr = re.compile("Version: (\S+)")
     limitreached_expr = None
+
+    solverstatusmap = {"Result - Optimal solution found" : Key.SolverStatusCodes.Optimal,
+                       "Result - Stopped on time limit" : Key.SolverStatusCodes.TimeLimit,
+                       "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible
+                       }
 
     def __init__(self, **kw):
         super(CbcSolver, self).__init__(**kw)
@@ -499,8 +507,8 @@ class XpressSolver(Solver):
 
     solverId = "XPRESS"
     recognition_expr = re.compile("FICO Xpress-Optimizer")
-    primalbound_expr = re.compile("Best integer solution found is\s*(\S*)")
-    dualbound_expr = re.compile("Best bound is\s*(\S*)")
+    primalbound_expr = re.compile("Objective value =\s*(\S*)")
+    dualbound_expr = re.compile("Best Bound =\s*(\S*)")
     solvingtimer_expr = re.compile("\*\*\* Search completed \*\*\*\s*Time\s*(\S*)")
     version_expr = re.compile("FICO Xpress-Optimizer \S* (\S*)")
     limitreached_expr = re.compile("STOPPING = (\S*) limit reached")

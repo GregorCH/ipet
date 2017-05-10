@@ -1,0 +1,133 @@
+@01 instances/miplib2010/bab5.mps.gz ===========
+-----------------------------
+Tue Oct 25 15:54:58 MST 2016
+-----------------------------
+@03 1477436098
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.bab5.mps.sol
+Set parameter TimeLimit to value 7200
+Set parameter MIPGap to value 0.0
+Set parameter Threads to value 1
+
+Gurobi Optimizer version 7.0.0 build v7.0.0rc3 (linux64)
+Copyright (c) 2016, Gurobi Optimization, Inc.
+
+Read MPS format model from file instances/miplib2010/bab5.mps.gz
+Reading time = 0.57 seconds
+bab5: 4964 rows, 21600 columns, 155520 nonzeros
+Optimize a model with 4964 rows, 21600 columns and 155520 nonzeros
+Variable types: 0 continuous, 21600 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [9e-02, 8e+00]
+  Objective range  [2e+01, 4e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 5e+01]
+Presolve removed 226 rows and 202 columns
+Presolve time: 0.27s
+Presolved: 4738 rows, 21398 columns, 68369 nonzeros
+Variable types: 0 continuous, 21398 integer (21398 binary)
+
+Root relaxation: objective -1.164152e+05, 16508 iterations, 0.58 seconds
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -116415.20    0   94          - -116415.20      -     -    1s
+     0     0 -114009.28    0  279          - -114009.28      -     -    1s
+     0     0 -114007.98    0  269          - -114007.98      -     -    1s
+     0     0 -113171.75    0  295          - -113171.75      -     -    1s
+     0     0 -113171.75    0  243          - -113171.75      -     -    1s
+     0     0 -112661.95    0  253          - -112661.95      -     -    1s
+     0     0 -112661.95    0  278          - -112661.95      -     -    1s
+     0     0 -112645.27    0  182          - -112645.27      -     -    1s
+     0     0 -112515.60    0  289          - -112515.60      -     -    2s
+     0     0 -112404.61    0  217          - -112404.61      -     -    2s
+     0     0 -112404.61    0  312          - -112404.61      -     -    2s
+     0     0 -112354.70    0  375          - -112354.70      -     -    2s
+     0     0 -112354.70    0  386          - -112354.70      -     -    2s
+     0     0 -112086.27    0  387          - -112086.27      -     -    2s
+     0     0 -112054.79    0  354          - -112054.79      -     -    2s
+     0     0 -111957.67    0  261          - -111957.67      -     -    2s
+     0     0 -111953.80    0  315          - -111953.80      -     -    2s
+     0     0 -111929.92    0  334          - -111929.92      -     -    2s
+     0     0 -111786.11    0  335          - -111786.11      -     -    2s
+     0     0 -111549.46    0  436          - -111549.46      -     -    2s
+     0     0 -110882.85    0  416          - -110882.85      -     -    2s
+     0     0 -110487.99    0  441          - -110487.99      -     -    2s
+     0     0 -110317.11    0  436          - -110317.11      -     -    2s
+     0     0 -109715.28    0  322          - -109715.28      -     -    2s
+     0     0 -109587.53    0  412          - -109587.53      -     -    2s
+     0     0 -109171.88    0  425          - -109171.88      -     -    2s
+     0     0 -109051.11    0  508          - -109051.11      -     -    3s
+     0     0 -108732.99    0  455          - -108732.99      -     -    3s
+     0     0 -108732.41    0  481          - -108732.41      -     -    3s
+     0     0 -108703.77    0  404          - -108703.77      -     -    3s
+     0     0 -108702.57    0  436          - -108702.57      -     -    3s
+     0     0 -108654.50    0  414          - -108654.50      -     -    3s
+     0     0 -108651.09    0  390          - -108651.09      -     -    3s
+     0     0 -108649.38    0  448          - -108649.38      -     -    3s
+     0     0 -108619.39    0  449          - -108619.39      -     -   11s
+     0     0 -108611.04    0  465          - -108611.04      -     -   14s
+     0     0 -108604.94    0  479          - -108604.94      -     -   15s
+     0     0 -108599.46    0  363          - -108599.46      -     -   15s
+     0     0 -108599.46    0  342          - -108599.46      -     -   16s
+     0     2 -108599.46    0  342          - -108599.46      -     -   16s
+    13    12 -106038.08   12  349          - -108143.04      -   169   20s
+H   16    13                    -105135.2071 -108143.04  2.86%   152   20s
+    57    39 -105720.35   53  264 -105135.21 -108143.04  2.86%  69.1   25s
+H   81    41                    -105379.3851 -108143.04  2.62%  58.3   26s
+H  108    47                    -105423.5836 -108076.13  2.52%  53.8   27s
+H  135    56                    -105864.2001 -108076.13  2.09%  54.4   29s
+   153    75 -106727.54   75  106 -105864.20 -108076.13  2.09%  55.3   30s
+H  162    77                    -105901.5551 -108076.13  2.05%  55.7   30s
+H  190    76                    -106190.6971 -108076.13  1.78%  55.4   33s
+H  202    72                    -106284.8661 -107118.25  0.78%  56.2   33s
+   220    86 -107023.72   15  177 -106284.87 -107066.66  0.74%  59.2   35s
+H  272   110                    -106358.0141 -107066.66  0.67%  57.6   36s
+   356   152 -106467.01   27  250 -106358.01 -107029.65  0.63%  53.7   40s
+H  407   188                    -106359.9571 -107024.35  0.62%  51.6   40s
+   511   252 -106874.88   12  342 -106359.96 -107021.17  0.62%  50.1   50s
+   525   262 -106826.97   35  342 -106359.96 -107021.17  0.62%   114   63s
+H  527   249                    -106361.4631 -107021.17  0.62%   114   64s
+H  533   240                    -106411.8401 -106462.79  0.05%   148   64s
+
+Cutting planes:
+  Gomory: 22
+  Cover: 57
+  Clique: 61
+  MIR: 3
+  Flow cover: 4
+  GUB cover: 4
+  Zero half: 17
+
+Explored 534 nodes (116569 simplex iterations) in 65.35 seconds
+Thread count was 1 (of 8 available processors)
+
+Solution count 10: -106412 -106361 -106360 ... -105379
+Pool objective bound -106412
+
+Optimal solution found (tolerance 0.00e+00)
+Best objective -1.064118401000e+05, best bound -1.064118401000e+05, gap 0.0000%
+
+Wrote result file '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.bab5.mps.sol'
+
+
+@04 1477436164
+@05 7200
+
+Read MPS: 1
+MIP has 21600 vars and 4964 constraints
+Read SOL: 1
+Objective value computed by solver: -106412
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 0 Objective 0
+
+-----------------------------
+Tue Oct 25 15:56:05 MST 2016
+-----------------------------
+
+=ready=

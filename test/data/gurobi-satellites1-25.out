@@ -1,0 +1,110 @@
+@01 instances/miplib2010/satellites1-25.mps.gz ===========
+-----------------------------
+Tue Oct 25 20:50:16 MST 2016
+-----------------------------
+@03 1477453816
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.satellites1-25.mps.sol
+Set parameter TimeLimit to value 7200
+Set parameter MIPGap to value 0.0
+Set parameter Threads to value 1
+
+Gurobi Optimizer version 7.0.0 build v7.0.0rc3 (linux64)
+Copyright (c) 2016, Gurobi Optimization, Inc.
+
+Read MPS format model from file instances/miplib2010/satellites1-25.mps.gz
+Reading time = 0.02 seconds
+satellites1-25: 5996 rows, 9013 columns, 59023 nonzeros
+Optimize a model with 5996 rows, 9013 columns and 59023 nonzeros
+Variable types: 504 continuous, 8509 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [4e-01, 2e+05]
+  Objective range  [1e+00, 1e+02]
+  Bounds range     [1e+00, 2e+05]
+  RHS range        [1e+00, 2e+05]
+Presolve removed 1684 rows and 1393 columns
+Presolve time: 0.13s
+Presolved: 4312 rows, 7620 columns, 46838 nonzeros
+Variable types: 33 continuous, 7587 integer (7585 binary)
+Found heuristic solution: objective 49.0000000
+
+Root relaxation: objective -2.000000e+01, 7339 iterations, 1.03 seconds
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  -20.00000    0  420   49.00000  -20.00000   141%     -    2s
+     0     0  -20.00000    0  382   49.00000  -20.00000   141%     -    4s
+     0     0  -20.00000    0  290   49.00000  -20.00000   141%     -    6s
+     0     0  -20.00000    0  513   49.00000  -20.00000   141%     -    7s
+     0     0  -20.00000    0  518   49.00000  -20.00000   141%     -    8s
+     0     0  -20.00000    0  683   49.00000  -20.00000   141%     -    8s
+     0     0  -20.00000    0  581   49.00000  -20.00000   141%     -    8s
+     0     0  -20.00000    0  344   49.00000  -20.00000   141%     -   10s
+H    0     0                      38.0000000  -20.00000   153%     -   10s
+H    0     0                      37.0000000  -20.00000   154%     -   10s
+     0     0  -20.00000    0  376   37.00000  -20.00000   154%     -   10s
+     0     0  -20.00000    0  298   37.00000  -20.00000   154%     -   12s
+     0     0  -20.00000    0  298   37.00000  -20.00000   154%     -   12s
+     0     0  -20.00000    0  244   37.00000  -20.00000   154%     -   13s
+     0     0  -20.00000    0  244   37.00000  -20.00000   154%     -   13s
+     0     0  -20.00000    0  244   37.00000  -20.00000   154%     -   14s
+     0     0  -20.00000    0  310   37.00000  -20.00000   154%     -   14s
+     0     0  -20.00000    0  278   37.00000  -20.00000   154%     -   15s
+     0     0  -20.00000    0  298   37.00000  -20.00000   154%     -   15s
+     0     0  -20.00000    0  246   37.00000  -20.00000   154%     -   17s
+     0     0  -20.00000    0  222   37.00000  -20.00000   154%     -   19s
+     0     0  -20.00000    0  222   37.00000  -20.00000   154%     -   20s
+     0     2  -20.00000    0  222   37.00000  -20.00000   154%     -   21s
+     6     8  -20.00000    4  204   37.00000  -20.00000   154%  1128   25s
+H    8     8                      29.0000000  -20.00000   169%   866   25s
+    48     7  -20.00000    5  375   29.00000  -20.00000   169%   295   30s
+    91    28  -19.75000    8  373   29.00000  -20.00000   169%   226   35s
+   173    75  -12.45697   67  420   29.00000  -20.00000   169%   163   40s
+   270   114  -18.00000   22  420   29.00000  -20.00000   169%   176   45s
+   425   183  -11.62500   77  367   29.00000  -20.00000   169%   155   50s
+H  506   228                       0.0000000  -20.00000      -   143   51s
+H  692   223                      -4.0000000  -19.99953   400%   123   54s
+H  719   230                      -5.0000000  -19.99877   300%   121   54s
+   732   225  -18.50000   33  314   -5.00000  -19.74946   295%   121   55s
+
+Cutting planes:
+  Learned: 1
+  Cover: 35
+  Implied bound: 25
+  Clique: 71
+  MIR: 23
+  Inf proof: 16
+  Zero half: 9
+
+Explored 1170 nodes (226442 simplex iterations) in 59.70 seconds
+Thread count was 1 (of 8 available processors)
+
+Solution count 7: -5 -4 0 ... 49
+Pool objective bound -5
+
+Optimal solution found (tolerance 0.00e+00)
+Best objective -5.000000000000e+00, best bound -5.000000000000e+00, gap 0.0000%
+
+Wrote result file '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.satellites1-25.mps.sol'
+
+
+@04 1477453876
+@05 7200
+
+Read MPS: 1
+MIP has 9013 vars and 5996 constraints
+Read SOL: 1
+Objective value computed by solver: -5
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 6e-11 Objective 0
+
+-----------------------------
+Tue Oct 25 20:51:16 MST 2016
+-----------------------------
+
+=ready=

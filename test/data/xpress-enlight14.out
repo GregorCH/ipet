@@ -1,0 +1,55 @@
+@01 instances/miplib2010/enlight14.mps.gz ===========
+-----------------------------
+Wed Dec  7 13:32:34 MST 2016
+-----------------------------
+@03 1481142754
+FICO Xpress-Optimizer 64-bit v30.01.03 (Hyper64 capacity)
+FICO Xpress-SLP release version 30.01.03 Dec  2 2016
+(c) Copyright Fair Isaac Corporation 1983-2017. All rights reserved
+Xpress-Nonlinear Knitro 10.0.0 extension
+Using Xpress-Optimizer [/home/beck/math/opt/xpressmp/lib/libxprs.so.30.01.03]
+Using Xpress-SLP       [/home/beck/math/opt/xpressmp/lib/libxslp.so]
+Using Knitro           [/home/beck/math/opt/xpressmp/lib/libxknitro.so]
+MAXTIME=-7200
+CPUTIME=0
+THREADS=1
+MIPRELSTOP=0
+
+Reading Problem enlight14
+Problem Statistics
+         197 (      0 spare) rows
+         392 (      0 spare) structural columns
+        1316 (      0 spare) non-zero elements
+Global Statistics
+         392 entities        0 sets        0 set members
+Minimizing MILP enlight14
+Original problem has:
+       197 rows          392 cols         1316 elements       392 globals
+Presolved problem has:
+       196 rows          392 cols         1120 elements       392 globals
+LP relaxation tightened
+Symmetric problem: generators: 1, support set: 364
+ Number of orbits: 182, largest orbit: 2
+Will try to keep branch and bound tree memory usage below 18.0Gb
+ *** Search completed ***     Time:     0 Nodes:          0
+Problem is integer infeasible
+Number of integer feasible solutions found is 0
+Best bound is  1.00000E+40
+Uncrunching matrix
+Objective value = 1e+40
+Best Bound = 1.000000000000000030378603e+40
+Nodes explored = 0
+file3
+
+@04 1481142754
+@05 7200
+
+Read MPS: 1
+MIP has 392 vars and 196 constraints
+Read SOL: 0
+
+-----------------------------
+Wed Dec  7 13:32:34 MST 2016
+-----------------------------
+
+=ready=

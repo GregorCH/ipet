@@ -3,12 +3,19 @@ import re
 import os
 from ipet import Key
 from ipet.misc import misc
-from ipet.parsing.StatisticReader import StatisticReader
-from ipet.Key import SolverStatusCodes
 from operator import itemgetter
 from pip._vendor.distlib._backport.tarfile import TUREAD
 
 class Solver():
+    """ The solver-class acts as Reader for solver-specific data.
+    
+    After being fed the out-file line by line to readLine(line) 
+    the solver can return the collected data via getData().
+    When reading multiple runs, the solver has to be reset via reset().
+    
+    This class has to be inherited by a SpecificSolver-class and 
+    should not be used as it is.
+    """
 
     DEFAULT = None
     solverId = "defaultSolver"
@@ -52,17 +59,23 @@ class Solver():
         self.reset()
 
     def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds.
+        
+        Method has to be overwritten.
         """
         pass 
     
     def extractDualboundHistory(self, line : str):
-        """ Extract the sequence of dual bounds  
+        """ Extract the sequence of dual bounds.
+        
+        Method should be overwritten.
         """
         pass 
     
     def extractStatus(self, line : str):
-        """Check if the line matches one of the status patterns
+        """ Check if the line matches one of the solverstatusmap patterns.
+        
+        If the one of the patterns matches, the data will be added data as Key.SolverStatus.
         """
         for pattern, status in self.solverstatusses:
             if line.startswith(pattern):
@@ -72,12 +85,16 @@ class Solver():
                 break
 
     def extractVersion(self, line : str):
-        """Extract the version of the solver-software
+        """ Extract the version of the solver-software.
+        
+        If the versionpattern matches, the version will be added to data as Key.Version.
         """
         self.extractByExpression(line, self.version_expr, Key.Version, str)
 
     def extractSolvingTime(self, line : str):
-        """Read the overall solving time
+        """ Read the overall solving time given by the solver.
+        
+        If the solvingpatterns matches, the version will be added to data as Key.SolvingTime.
         """
         self.extractByExpression(line, self.solvingtime_expr, Key.SolvingTime)
 

@@ -24,7 +24,7 @@ class IPETEvaluationColumn(IpetNode):
 
     nodetag = "Column"
 
-    editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "constant",
+    editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "reduction", "constant",
                  "nanrep", "minval", "maxval", "comp", "translevel", "regex"]
 
     possibletransformations = {None:(0, 0),
@@ -47,15 +47,29 @@ class IPETEvaluationColumn(IpetNode):
                                "getWorstStatus" : (1, -1),
                                "convertTimeStamp" : (1, 1)}
     
+    possiblereductions = [  None,
+                            "mean",
+                            "max",
+                            "min",
+                            "std",
+                            "gemean",
+                            "shmean",
+                            "getBestStatus",
+                            "getWorstStatus",
+                            "median",
+                            "sum"
+                            ]
+    
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 
     requiredOptions = {"comp":possiblecomparisons,
                        "origcolname":"datakey",
                        "translevel":[0, 1],
-                       "transformfunc":list(possibletransformations.keys())}
+                       "transformfunc":list(possibletransformations.keys()),
+                       "reduction" : possiblereductions}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
-                 nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None, active=True):
+                 nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None, active=True, reduction=None):
         """
         constructor of a column for the IPET evaluation
 
@@ -86,6 +100,8 @@ class IPETEvaluationColumn(IpetNode):
                      if five permutations were tested. Columns with translevel=1 are appended at the end of the instance-wise table
 
         active : True or "True" if this column should be active, False otherwise
+        
+        reduction : aggregation function that is applied to reduce multiple occurrences of index 
         """
 
         super(IPETEvaluationColumn, self).__init__(active)
@@ -102,7 +118,7 @@ class IPETEvaluationColumn(IpetNode):
         self.translevel = translevel
         self.set_comp(comp)
         self.regex = regex
-
+        self.set_reduction(reduction)
 
         self.aggregations = []
         self.children = []
@@ -116,6 +132,10 @@ class IPETEvaluationColumn(IpetNode):
             minval, maxval = self.possibletransformations[self.transformfunc]
             if len(self.children) < minval or maxval != -1 and len(self.children) > maxval:
                 raise IpetNodeAttributeError("transformfunc", "wrong number of children for transformation <%s>" % (self.transformfunc))
+            
+        if self.reduction is not None:
+            if self.reduction not in self.possiblereductions:
+                raise IpetNodeAttributeError("Attribute 'reduction' has illegal value '%s'"% self.reduction)
         return True
 
     def addChild(self, child):
@@ -205,6 +225,11 @@ class IPETEvaluationColumn(IpetNode):
                 self.comp = newvalue
             except ValueError:
                 raise ValueError("Trying to set an unknown comparison method '%s' for column '%s', should be in\n %s" % (newvalue, self.getName(), ", ".join((repr(c) for c in self.possiblecomparisons))))
+            
+    def set_reduction(self, reduction):
+        """Set the reduction function
+        """
+        self.reduction = reduction
 
     def getCompareMethod(self):
         if self.comp is None or self.comp == "":
@@ -506,6 +531,10 @@ class IPETEvaluation(IpetNode):
     def reduceToColumns(self, df_long):
         usercolumns = []
 
+        #
+        # Attention: this will be deleted soon because it is not flexible enough
+        # --> will be replaced by reduction function in IPETEvaluationColumn
+        #
         lvlonecols = [col for col in self.getActiveColumns() if col.getTransLevel() == 1]
         if len(lvlonecols) > 0:
             self.levelonedf = pd.concat([col.getColumnData(df_long) for col in lvlonecols], axis=1)
@@ -520,6 +549,9 @@ class IPETEvaluation(IpetNode):
 
                 # look if a comparison with the default group should be made
                 if col.getCompareMethod() is not None:
+                    #
+                    # ATTENTION: This assumes that the index for 'defaultgroup' is already unique.
+                    #
                     compcol = dict(list(df_long.groupby(self.groupkey)[col.getName()]))[self.defaultgroup]
 
                     # save as temporary column. This will expand the smaller compcol index to the larger data frame
@@ -597,6 +629,16 @@ class IPETEvaluation(IpetNode):
         return ev
 
     def convertToHorizontalFormat(self, df):
+        #
+        # TODO apply the reduction function to every column (maybe earlier in evaluate)
+        #
+        #
+        # use sum reduction for columns like _limit_, _solved_, etc.
+        #
+        
+        #
+        # TODO change the arguments of the pivot function to self.indexkeys, self.columnkeys (which will replace the self.groupkey) 
+        #
         horidf = df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
         horidf.sortlevel(axis=1, level=self.sortlevel)
         return horidf
@@ -716,6 +758,9 @@ class IPETEvaluation(IpetNode):
         """
         grouped = df.groupby(level=0)
 
+        #
+        # every apply operation on the group element returns a pandas series
+        #
         optstatus = grouped["Status"].apply(self.findStatus)
         opttime = grouped["SolvingTime"].apply(numpy.min)
         opttimelim = grouped["TimeLimit"].apply(numpy.mean)

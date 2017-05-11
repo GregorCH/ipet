@@ -15,9 +15,8 @@ class Solver():
     recognition_expr = None
     primalbound_expr = None
     dualbound_expr = None
-    solvingtimer_expr = None
+    solvingtime_expr = None
     version_expr = None
-    limitreached_expr = None
 
     solverstatusmap = {}
 
@@ -26,9 +25,8 @@ class Solver():
                  recognition_pattern = None,
                  primalbound_pattern = None,
                  dualbound_pattern = None,
-                 solvingtimer_pattern = None,
+                 solvingtime_pattern = None,
                  version_pattern = None,
-                 limitreached_pattern = None,
                  solverstatusmap = None):
 
         if solverId is not None:
@@ -40,12 +38,10 @@ class Solver():
             self.primalbound_expr = re.compile(primalbound_pattern)
         if not dualbound_pattern is None:
             self.dualbound_expr = re.compile(dualbound_pattern)
-        if not solvingtimer_pattern is None:
-            self.solvingtimer_expr = re.compile(solvingtimer_pattern)
+        if not solvingtime_pattern is None:
+            self.solvingtime_expr = re.compile(solvingtime_pattern)
         if not version_pattern is None:
             self.version_expr = re.compile(version_pattern)
-        if not limitreached_pattern is None:
-            self.limitreached_expr = re.compile(limitreached_pattern)
 
         if solverstatusmap is not None:
             self.solverstatusmap = solverstatusmap
@@ -78,12 +74,12 @@ class Solver():
     def extractVersion(self, line : str):
         """Extract the version of the solver-software
         """
-        self.extractByExpression(line, self.version_expr, Key.Version)
+        self.extractByExpression(line, self.version_expr, Key.Version, str)
 
     def extractSolvingTime(self, line : str):
         """Read the overall solving time
         """
-        self.extractByExpression(line, self.solvingtimer_expr, Key.SolvingTime)
+        self.extractByExpression(line, self.solvingtime_expr, Key.SolvingTime)
 
     def extractDualbound(self, line : str):
         """Return the reported dual bound (at the end of the solver-output)
@@ -111,8 +107,6 @@ class Solver():
             data type for the datum, default : float
         """
         m = expr.match(line)
-#        if key == Key.PrimalBound:
-#            print("ACHUTUNG EXTRACT", key, line)
         if m is not None:
             try:
                 d = datatype(m.groups()[0])
@@ -167,7 +161,6 @@ class Solver():
     def extractGeneralInformation(self, line : str):
         """Read general data
         """
-        self.extractVersion(line)
         self.extractDualboundHistory(line)
 
     def reset(self):
@@ -214,7 +207,7 @@ class SCIPSolver(Solver):
     recognition_expr = re.compile("^SCIP version ")
     primalbound_expr = re.compile("^Primal Bound       : (\S+)")
     dualbound_expr = re.compile("^Dual Bound         : (\S+)")
-    solvingtimer_expr = re.compile("^Solving Time \(sec\) : (\S+)")
+    solvingtime_expr = re.compile("^Solving Time \(sec\) : (\S+)")
     version_expr = re.compile("SCIP version (\S+)")
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
 
@@ -354,9 +347,16 @@ class GurobiSolver(Solver):
     recognition_expr = re.compile("Gurobi Optimizer version")
     primalbound_expr = re.compile("^Best objective (\S+), best bound (?:\S+),")
     dualbound_expr = re.compile("^Best objective (?:\S+), best bound (\S+),")
-    solvingtimer_expr = re.compile("Explored \d* nodes \(.*\) in (\S*) seconds")
+    solvingtime_expr = re.compile("Explored \d* nodes \(.*\) in (\S*) seconds")
     version_expr = re.compile("Gurobi Optimizer version (\S+)")
-    limitreached_expr = re.compile("^Time limit reached")
+ 
+    solverstatusmap = {"Optimal solution found (tolerance 0.00e+00)" : Key.SolverStatusCodes.Optimal,
+                       "Model is infeasible" : Key.SolverStatusCodes.Infeasible,
+#                       "" : Key.SolverStatusCodes.TimeLimit,
+#                       "" : Key.SolverStatusCodes.MemoryLimit,
+#                       "" : Key.SolverStatusCodes.NodeLimit,
+#                       "" : Key.SolverStatusCodes.Interrupted
+                       }
 
     # variables needed for bound history
     inTable = False
@@ -398,17 +398,24 @@ class CplexSolver(Solver):
     recognition_expr = re.compile("^Welcome to IBM\(R\) ILOG\(R\) CPLEX\(R\) Interactive Optimizer")
     primalbound_expr = re.compile("^MIP -.*Objective =\s*(\S+)")
     dualbound_expr = re.compile("^(?:Current MIP best bound|^MIP - Integer optimal solution:  Objective) =\s*(\S+)")
-    solvingtimer_expr = re.compile("Solution time =\s*(\S+)")
+    solvingtime_expr = re.compile("Solution time =\s*(\S+)")
     version_expr = re.compile("^Welcome to IBM\(R\) ILOG\(R\) CPLEX\(R\) Interactive Optimizer (\S+)")
-    limitreached_expr = None
+
+    solverstatusmap = {"CPLEX> MIP - Integer optimal" : Key.SolverStatusCodes.Optimal,
+                       "CPLEX> MIP - Integer infeasible." : Key.SolverStatusCodes.Infeasible,
+#                       "" : Key.SolverStatusCodes.TimeLimit,
+#                       "" : Key.SolverStatusCodes.MemoryLimit,
+#                       "" : Key.SolverStatusCodes.NodeLimit,
+#                       "" : Key.SolverStatusCodes.Interrupted
+                       }
 
     # variables needed for primal bound history extraction
-    easyCPLEX = True
+    easyCPLEX = False
     lastelapsedtime = 0.0
     nnodessincelastelapsedtime = 0
     lastnnodes = 0
     cpxprimals = []
-    inTable = True
+    inTable = False
     
     def __init__(self, **kw):
         super(CplexSolver, self).__init__(**kw)
@@ -424,6 +431,7 @@ class CplexSolver(Solver):
         if "CPLEX> Non-default parameters written to file" in line:
             self.addData(Key.Settings, line.split('.')[-3])
 
+    # TODO DualBoundHistory
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds  
         """
@@ -431,18 +439,24 @@ class CplexSolver(Solver):
             splitline = line.split()
             self.readBoundAndTime(line, splitline.index("Found") + 4, splitline.index("Found") + 6)
         elif not self.easyCPLEX:
+#            print("ACHTUNG",0)
             if "Welcome to IBM(R) ILOG(R) CPLEX(R)" in line:
+#                print("ACHTUNG",1)
                 self.lastelapsedtime = 0.0
                 self.nnodessincelastelapsedtime = 0
                 self.lastnnodes = 0
                 self.cpxprimals = []
             if "   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap" in line:
+#                print("ACHTUNG",2)
                 self.inTable = True
             elif self.inTable and ("cuts applied:" in line or "Root node processing" in line):
+#                print("ACHTUNG",3)
                 self.inTable = False
             elif self.inTable and "Repeating presolve." in line:
+#                print("ACHTUNG",4)
                 self.inTable = False
-            elif self.inTable and len(line) > 0 and line.startswith(" ") or line.startswith("*"):
+            elif self.inTable and len(line) > 0 and (line.startswith(" ") or line.startswith("*")):
+#                print("ACHTUNG",5,line)
                 if line == "\n":
                     return None
                 nodeinlineidx = 7
@@ -457,6 +471,7 @@ class CplexSolver(Solver):
                     self.cpxprimals.append((nnodes, primalbound))
                 self.lastnnodes = nnodes
             elif "Elapsed time = " in line:
+#                print("ACHTUNG",6)
                 thetime = float(line.split()[3])
                 self.processCpxprimals(thetime)
 
@@ -464,6 +479,7 @@ class CplexSolver(Solver):
                 self.lastelapsedtime = thetime
 
             elif "Solution time =" in line:
+#                print("ACHTUNG",7)
                 thetime = float(line.split()[3])
                 self.processCpxprimals(thetime)
     
@@ -481,16 +497,17 @@ class CbcSolver(Solver):
 
     solverId = "CBC"
     recognition_expr = re.compile("Welcome to the CBC MILP Solver")
-    # TODO what exactly are we looking for?
     primalbound_expr = re.compile("^Objective value:\s*(\S*)")
     dualbound_expr = re.compile("^(?:Lower bound\s*|Objective value\s*):\s*(\S*)")
-    solvingtimer_expr = re.compile("Total time \(CPU seconds\):\s*(\S*)")
-    version_expr = re.compile("Version: (\S+)")
-    limitreached_expr = None
+    solvingtime_expr = re.compile("Total time \(CPU seconds\):\s*(\S*)")
+    version_expr = re.compile("^Version: (\S+)")
 
     solverstatusmap = {"Result - Optimal solution found" : Key.SolverStatusCodes.Optimal,
                        "Result - Stopped on time limit" : Key.SolverStatusCodes.TimeLimit,
                        "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible
+#                       "" : Key.SolverStatusCodes.MemoryLimit,
+#                       "" : Key.SolverStatusCodes.NodeLimit,
+#                       "" : Key.SolverStatusCodes.Interrupted
                        }
 
     def __init__(self, **kw):
@@ -509,10 +526,17 @@ class XpressSolver(Solver):
     recognition_expr = re.compile("FICO Xpress-Optimizer")
     primalbound_expr = re.compile("Objective value =\s*(\S*)")
     dualbound_expr = re.compile("Best Bound =\s*(\S*)")
-    solvingtimer_expr = re.compile("\*\*\* Search completed \*\*\*\s*Time\s*(\S*)")
-    version_expr = re.compile("FICO Xpress-Optimizer \S* (\S*)")
-    limitreached_expr = re.compile("STOPPING = (\S*) limit reached")
+    solvingtime_expr = re.compile("\*\*\* Search completed \*\*\*\s*Time\s*(\S*)")
+    version_expr = re.compile("FICO Xpress-Optimizer \S* v(\S*)")
 
+    solverstatusmap = {" *** Search completed ***" : Key.SolverStatusCodes.Optimal,
+                       "Problem is integer infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "STOPPING - MAXTIME limit reached." : Key.SolverStatusCodes.TimeLimit,
+#                       "" : Key.SolverStatusCodes.MemoryLimit,
+#                       "" : Key.SolverStatusCodes.NodeLimit,
+#                       "" : Key.SolverStatusCodes.Interrupted
+                       }
+    
     # variables needed for primal bound history extraction
     xpresscutidx = -1
 
@@ -528,18 +552,24 @@ class XpressSolver(Solver):
             self.readBoundAndTime(line, -1, -1, cutidx=self.xpresscutidx)
         elif line.startswith(" *** Heuristic solution found: "):
             self.readBoundAndTime(line, -4, -2)
-
     
 #class CouenneSolver(Solver):
 #
-#    # TODO fix regexes to contain groups which can extract numbers
+#    # TODO fix regexes to contain groups which can extract numbers, test, etc
 #    solverID = "Couenne"
 #    recognition_expr = re.compile("Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization")
 #    primalbound_expr = re.compile("^Upper bound:")
 #    dualbound_expr = re.compile("^Lower Bound:")
-#    solvingtimer_expr = re.compile("^Total time:")
+#    solvingtime_expr = re.compile("^Total time:")
 #    version_expr =  re.compile(" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization \S* (\S*)")
-#    limitreached_expr = None
+#
+#    solverstatusmap = {"" : Key.SolverStatusCodes.Optimal,
+#                       "" : Key.SolverStatusCodes.Infeasible,
+#                       "" : Key.SolverStatusCodes.TimeLimit,
+#                       "" : Key.SolverStatusCodes.MemoryLimit,
+#                       "" : Key.SolverStatusCodes.NodeLimit,
+#                       "" : Key.SolverStatusCodes.Interrupted
+#                       }
 #
 #    def __init__(self, **kw):
 #        super(CouenneSolver, self).__init__(**kw)

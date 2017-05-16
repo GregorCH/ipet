@@ -237,6 +237,8 @@ class Experiment:
 
     def getJoinedData(self):
         """ Concatenate the testrun data (possibly joined with external data)
+        
+        this may result in nonunique index, the data is simply concatenated
         """
         datalist = []
         for tr in self.getTestRuns():

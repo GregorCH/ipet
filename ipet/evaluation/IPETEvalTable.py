@@ -436,6 +436,8 @@ class IPETEvaluation(IpetNode):
         self.set_evaluateoptauto(evaluateoptauto)
         self.sortlevel = int(sortlevel)
         self.evaluated = False
+        
+        self.indexkeys = [[],[]]
 
     def getName(self):
         return self.nodetag
@@ -507,8 +509,11 @@ class IPETEvaluation(IpetNode):
         self.filtergroups.remove(fg)
         self.setEvaluated(False)
 
-    def setGroupKey(self, gk):
-        self.groupkey = gk
+#    def setGroupKey(self, gk):
+#        self.groupkey = gk
+
+    def setIndex(self, keys, level):
+        self.indexkeys[level] = list(keys) 
 
     def setDefaultGroup(self, dg):
         self.defaultgroup = dg
@@ -523,12 +528,16 @@ class IPETEvaluation(IpetNode):
         self.setEvaluated(False)
 
     def setEvaluateOptAuto(self, evaloptauto):
-        """
-        should the evaluation calculate optimal auto settings?
+        """ Should the evaluation calculate optimal auto settings?
         """
         self.set_evaluateoptauto(evaloptauto)
 
     def reduceToColumns(self, df_long):
+        """ reduces the huge number of columns
+        
+        reduces df_long to the columns specified in evaluation xmlfile
+        (concatenates usercolumns, neededcolumns and additionalfiltercolumns from df_long)
+        """
         usercolumns = []
 
         #
@@ -542,9 +551,12 @@ class IPETEvaluation(IpetNode):
         else:
             self.levelonedf = None
         # treat columns differently for level=0 and level=1
+        # FARI What are active columns and where are they set?
         for col in self.getActiveColumns():
             if col.getTransLevel() == 0:
                 df_long[col.getName()] = col.getColumnData(df_long)
+                print(col.getName())
+                # FARI Isn't this a problem with columnnames that are not unique?
                 usercolumns.append(col.getName())
 
                 # look if a comparison with the default group should be made
@@ -566,7 +578,7 @@ class IPETEvaluation(IpetNode):
                     df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis=1)
                     usercolumns.append(comparecolname)
         # concatenate level one columns into a new data frame and treat them as the altogether setting
-        neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
+        neededcolumns = [col for col in [*self.indexkeys[0], *self.indexkeys[1], Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName] if col not in usercolumns]
 
         additionalfiltercolumns = []
         for fg in self.getActiveFilterGroups():
@@ -580,6 +592,8 @@ class IPETEvaluation(IpetNode):
         return result
 
     def calculateNeededData(self, df):
+        """ Calculate and concatenate needed data about status and problemname 
+        """
         df['_time_'] = (df.Status.isin(('better', 'timelimit')))
         df['_limit_'] = ((df['_time_']) | df.Status.isin(['nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
         df['_fail_'] = (df.Status.apply(lambda x: True if x.startswith("fail") else False))
@@ -589,8 +603,7 @@ class IPETEvaluation(IpetNode):
 
         df['_count_'] = 1
         df['_unkn_'] = (df.Status == 'unknown')
-        df['ProblemNames'] = df.index
-
+        df['ProblemNames'] = df[Key.ProblemName]
         return df
 
     def toXMLElem(self):
@@ -600,7 +613,6 @@ class IPETEvaluation(IpetNode):
         for fg in self.filtergroups:
             fgelem = fg.toXMLElem()
             me.append(fgelem)
-
         return me
 
     @staticmethod
@@ -827,9 +839,9 @@ class IPETEvaluation(IpetNode):
             raise KeyError(" Group key is missing in data:", self.groupkey)
         elif self.defaultgroup not in data[self.groupkey].values:
             possiblebasegroups = sorted(data[self.groupkey].unique())
-            logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
+#            logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
             self.defaultgroup = possiblebasegroups[0]
-            logging.info(" Using value <%s> as base group" % (self.defaultgroup))
+#            logging.info(" Using value <%s> as base group" % (self.defaultgroup))
 
         columndata = self.reduceToColumns(data)
 
@@ -841,15 +853,13 @@ class IPETEvaluation(IpetNode):
 
         # compile a results table containing all instances
         ret = self.convertToHorizontalFormat(columndata)
+        # FARI self.levelonedf is always None because it will be deprecated?
         if self.levelonedf is not None:
             self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
             self.rettab = pd.concat([ret, self.levelonedf], axis=1)
         else:
             self.rettab = ret
-
-        self.instance_wise = ret
-        self.agg = self.aggregateToPivotTable(columndata)
-
+            
         self.filtered_agg = {}
         self.filtered_instancewise = {}
         # filter column data and group by group key #
@@ -879,8 +889,8 @@ class IPETEvaluation(IpetNode):
         generalpart = df[['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index=self.groupkey, aggfunc=sum)
 
         # test if there is any aggregation to be calculated
-        hasaggregation = False
-        stop = False
+#        hasaggregation = False
+#        stop = False
         activecolumns = self.getActiveColumns()
         colsandaggregations = [(col, agg) for col in activecolumns for agg in col.aggregations]
 

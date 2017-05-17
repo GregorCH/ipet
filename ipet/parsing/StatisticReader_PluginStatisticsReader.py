@@ -95,7 +95,7 @@ class PluginStatisticsReader(StatisticReader):
             else:
                 # treat vectors (tables with only one data column)
                 datakeys = ['_'.join((self.plugintype, pluginname))]
-                # FARI This works, why is eclipse complaining?
+                # TODO This works, why is eclipse complaining?
                 data = [self.convertToFloat(misc.numericExpression.search(line, colonidx + 1).group(0))]
 
             # determine minimum length (necessary if more headers were recognized than actual available data)

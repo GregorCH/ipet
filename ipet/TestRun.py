@@ -385,7 +385,7 @@ class TestRun:
     def getIdentification(self):
         """ Return identification string of this test run
         """
-        # FARI1 Is this still the way to do this? What if we are reading from stdin?
+        # TODO Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
     
     def problemGetOptimalSolution(self, problemid):

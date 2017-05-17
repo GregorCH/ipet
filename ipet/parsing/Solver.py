@@ -306,7 +306,7 @@ class SCIPSolver(Solver):
             return 
 
         try:
-            # FARI This works, why is eclipse complaining?
+            # TODO This works, why is eclipse complaining?
             lineelems = misc.tablenumericExpression.findall(line)
             # parse time and dual bound from the table
             time = lineelems[timeindex]

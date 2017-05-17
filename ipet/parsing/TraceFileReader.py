@@ -44,7 +44,6 @@ class TraceFileReader(StatisticReader):
         return value
 
     def extractStatistic(self, line):
-        # FARIDO What do we do here? How does this kind of trace file look like?
         if line.startswith(self.tracefilestartexpression):
             self.active = True
         elif self.active and not line.startswith("*"):

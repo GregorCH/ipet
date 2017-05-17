@@ -412,7 +412,7 @@ class IPETEvaluation(IpetNode):
     editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
     def __init__(self, groupkey=DEFAULT_GROUPKEY, defaultgroup=DEFAULT_DEFAULTGROUP, evaluateoptauto=True,
-                 sortlevel=0, comparecolformat=DEFAULT_COMPARECOLFORMAT):
+                 sortlevel=0, comparecolformat=DEFAULT_COMPARECOLFORMAT, indexkeylvl0=[], indexkeylvl1=[]):
         """
         constructs an Ipet-Evaluation
 
@@ -437,7 +437,7 @@ class IPETEvaluation(IpetNode):
         self.sortlevel = int(sortlevel)
         self.evaluated = False
         
-        self.indexkeys = [[],[]]
+        self.indexkeys = [indexkeylvl0, indexkeylvl1]
 
     def getName(self):
         return self.nodetag
@@ -551,12 +551,12 @@ class IPETEvaluation(IpetNode):
         else:
             self.levelonedf = None
         # treat columns differently for level=0 and level=1
-        # FARI What are active columns and where are they set?
+        # We are only interested in the columns that are activated in the eval file
         for col in self.getActiveColumns():
             if col.getTransLevel() == 0:
                 df_long[col.getName()] = col.getColumnData(df_long)
-                print(col.getName())
-                # FARI Isn't this a problem with columnnames that are not unique?
+                
+                # TODO Isn't this a problem with columnnames that are not unique?
                 usercolumns.append(col.getName())
 
                 # look if a comparison with the default group should be made
@@ -578,7 +578,11 @@ class IPETEvaluation(IpetNode):
                     df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis=1)
                     usercolumns.append(comparecolname)
         # concatenate level one columns into a new data frame and treat them as the altogether setting
-        neededcolumns = [col for col in [*self.indexkeys[0], *self.indexkeys[1], Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName] if col not in usercolumns]
+        newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
+        for x in self.indexkeys[0] + self.indexkeys[1]:
+            if x not in newcols:
+                newcols.append(x)
+        neededcolumns = [col for col in newcols if col not in usercolumns]
 
         additionalfiltercolumns = []
         for fg in self.getActiveFilterGroups():
@@ -603,7 +607,6 @@ class IPETEvaluation(IpetNode):
 
         df['_count_'] = 1
         df['_unkn_'] = (df.Status == 'unknown')
-        df['ProblemNames'] = df[Key.ProblemName]
         return df
 
     def toXMLElem(self):
@@ -642,17 +645,18 @@ class IPETEvaluation(IpetNode):
 
     def convertToHorizontalFormat(self, df):
         #
+        # TODO change the arguments of the pivot function to self.indexkeys, self.columnkeys (which will replace the self.groupkey) 
+        #
+        tmpcols = list(set(self.usercolumns + self.indexkeys[0] + self.indexkeys[1]))
+        horidf = df[tmpcols].set_index(self.indexkeys[0] + self.indexkeys[1]).sort_index(level=0)
+        #
         # TODO apply the reduction function to every column (maybe earlier in evaluate)
         #
         #
         # use sum reduction for columns like _limit_, _solved_, etc.
-        #
-        
-        #
-        # TODO change the arguments of the pivot function to self.indexkeys, self.columnkeys (which will replace the self.groupkey) 
-        #
-        horidf = df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis=1)
-        horidf.sortlevel(axis=1, level=self.sortlevel)
+#        if d.index.is_unique:
+#            print("UNIQUE INDEX! :)")
+        horidf = horidf.unstack(self.indexkeys[1]).swaplevel(0,len(self.indexkeys[1]), axis=1)
         return horidf
 
     def checkStreamType(self, streamtype):
@@ -853,16 +857,20 @@ class IPETEvaluation(IpetNode):
 
         # compile a results table containing all instances
         ret = self.convertToHorizontalFormat(columndata)
-        # FARI self.levelonedf is always None because it will be deprecated?
+        # TODO self.levelonedf is always None because it will be deprecated
         if self.levelonedf is not None:
             self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
             self.rettab = pd.concat([ret, self.levelonedf], axis=1)
         else:
             self.rettab = ret
+        
+        # TODO Where do we need these following two lines?
+        self.instance_wise = ret
+        self.agg = self.aggregateToPivotTable(columndata)
             
         self.filtered_agg = {}
         self.filtered_instancewise = {}
-        # filter column data and group by group key #
+        # filter column data and group by group key
         activefiltergroups = self.getActiveFilterGroups()
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group

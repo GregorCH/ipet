@@ -74,7 +74,6 @@ class ExperimentTest(unittest.TestCase):
                   (index, column, repr(value), repr(entry))
             self.assertEqual(entry, value, msg)
 
-    # FARI How to fake input from stdin?
     def test_datacollection_from_stdin(self):
         fname = "bell3a.out"
         out_file = os.path.join(DATADIR, fname)

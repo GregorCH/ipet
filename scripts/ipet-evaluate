@@ -78,8 +78,8 @@ argparser.add_argument("-l", "--long", action = "store_true", default = False, h
 argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
 argparser.add_argument('-s', '--saveexperiment', action = "store_true", default = False, help = "Should the experiment data be overwritten? Makes only sense if combined with '--recollect True'")
 argparser.add_argument('-r', '--recollect', action = "store_true", default = False, help = "Should the loaded experiment recollect data before proceeding?")
-argparser.add_argument('-i', '--index', action = "store_true", default = None, help = "specification of (multilevel) index seperated by whitespaces")
-argparser.add_argument('-c', '--columns', action = "store_true", default = None, help = "specification of (multilevel) columns seperated by whitespaces")
+argparser.add_argument('-i', '--index', action = "append", default = None, help = "specification of (multilevel) index seperated by whitespaces")
+argparser.add_argument('-c', '--columns', action = "append", default = None, help = "specification of (multilevel) columns seperated by whitespaces")
 
 if __name__ == '__main__':
     try:
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     if arguments.recollect is not False:
         logging.info("Recollecting data")
         experiment.collectData()
-        # FARIDO validation?
+        # TODO What was it about the validation?
         #if arguments.recheckTestrun:
         #    experiment.checkProblemStatus()
 
@@ -156,9 +156,15 @@ if __name__ == '__main__':
 
     if arguments.columns is not None:
         theeval.setIndex(arguments.columns, 1)
+    else:
+        theeval.setIndex(Key.LogfileName, 1)
+        # TODO Better default handling?
 
     if arguments.index is not None:
         theeval.setIndex(arguments.index, 0)
+    else:
+        # TODO Better default handling?
+        theeval.setIndex(Key.ProblemName, 0)
 
 #    if arguments.groupkey is not None:
 #        theeval.setGroupKey(arguments.groupkey)

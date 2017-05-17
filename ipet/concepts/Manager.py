@@ -73,7 +73,6 @@ class Manager(Observable):
         reinserts a manageable after its name has changed
         """
         active = self.isActive(manageable)
-        # FARI2 Why ?
         self.deleteManageable(manageable)
         self.addManageable(manageable)
         if active:

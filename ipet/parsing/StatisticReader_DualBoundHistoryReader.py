@@ -54,7 +54,6 @@
 #                self.dbindex = splittedlinenowhitespace.index('dualbound')
 #
 #            try:
-#                # FARI This works, why is eclipse complaining?
 #                listofnumbersintable = misc.tablenumericExpression.findall(line)
 #                # parse time and dual bound from the table
 #                time = float(listofnumbersintable[self.timeindex])

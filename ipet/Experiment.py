@@ -37,8 +37,6 @@ class Experiment:
         self.solufiles = []
         self.externaldata = None
         self.basename2testrun = {}
-        # FARI Sollen hier die Namen der probleme oder die ids stehen?
-        # haben wir überhaupt mehrere Testruns? wenn ja, wird die id fortlaufend gezählt?
         self.probnamelist = []
 
         for filename in files:
@@ -82,7 +80,7 @@ class Experiment:
     def addStdinput(self):
         """ Add stdin as input (for piping from terminal)
         """
-        # FARIDO how to handle misbehaving input?
+        # TODO how to handle misbehaving input?
         testrun = TestRun()
         testrun.setInputFromStdin()
         self.testrunmanager.addAndActivate(testrun)
@@ -191,12 +189,11 @@ class Experiment:
             testrun.setupForDataCollection()
             self.readermanager.collectData()
 
-        # FARI1 Is this calculated only for validation?
+        # TODO Is this calculated only for validation?
         self.makeProbNameList()
         self.calculateGaps()
         self.calculateIntegrals()
 
-        # FARI1 validation
         self.checkProblemStatus()
 
         for testrun in testruns:
@@ -219,12 +216,9 @@ class Experiment:
     def calculateGaps(self):
         """ Calculate and store primal and dual gap
         """
-        # FARI Die nächsten zwei Zeilen, machen die Sinn?
         for testrun in self.getTestRuns():
-            # FARIDO im Moment sollten in der Problemnamelist nur Namen stehen, keine IDs...
             for problemid in testrun.getProblemIds():
-            # for problemid in self.probnamelist:
-
+            
                 optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
                 if optval is not None:
                     for key in [Key.PrimalBound, Key.DualBound]:
@@ -260,9 +254,7 @@ class Experiment:
         for testrun in self.getTestRuns():
 
             # go through problems and calculate both primal and dual integrals
-            # FARI siehe oben
             for problemid in testrun.getProblemIds():
-            # for problemid in self.probnamelist:
                 processplotdata = getProcessPlotData(testrun, problemid)
 
                 # check for well defined data (may not exist sometimes)
@@ -357,7 +349,6 @@ class Experiment:
         """ Return True if the primal bound for the given problem exceeds the best known solution value
         """
         pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-        # FARIDO Objsense
         objsense = testrun.getProblemDataById(problemid, Key.ObjectiveSense)
         optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
 
@@ -401,7 +392,7 @@ class Experiment:
         pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
         db = testrun.getProblemDataById(problemid, Key.DualBound)
         solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
-        # FARI What is this "objectiveLimit", where is it set and what does it imply
+        # TODO What is this "objectiveLimit", where is it set and what does it imply?
         objlimitreached = (solverstatus == "objectiveLimit")
         optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
         objsense = testrun.getProblemDataById(problemid, Key.ObjectiveSense)
@@ -467,8 +458,6 @@ class Experiment:
         solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
 
         if solverstatus:
-            # FARIDO What is the right thing to do here?
-            # code = limitreached.lower()
             code = Key.solverToProblemStatusCode(solverstatus)
 
             if pb is not None:
@@ -491,8 +480,6 @@ class Experiment:
             solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
             # calc was inconclusive
             if solverstatus in [Key.SolverStatusCodes.TimeLimit, Key.SolverStatusCodes.MemoryLimit, Key.SolverStatusCodes.NodeLimit]:
-                # FARIDO what is the right problemstatus to write here?
-                # code = solverstatus.lower()
                 code = Key.solverToProblemStatusCode(solverstatus)
             else:
                 code = Key.ProblemStatusCodes.Ok

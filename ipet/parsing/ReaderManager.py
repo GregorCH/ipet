@@ -202,7 +202,6 @@ class ReaderManager(Manager, IpetNode):
 
         fullname = line.split()[1]
         namewithextension = os.path.basename(fullname)
-        # FARI Shouldn't this be something like ".gz"?
         if namewithextension.endswith("gz"):
             namewithextension = os.path.splitext(namewithextension)[0]
         for extension in self.extensions:

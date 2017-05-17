@@ -12,6 +12,7 @@ please refer to README.md for how to cite IPET.
 '''
 
 from ipet import Experiment
+from ipet import Key
 import argparse
 import sys
 from ipet.evaluation import IPETEvaluation
@@ -152,19 +153,19 @@ if __name__ == '__main__':
         experiment.saveToFile(arguments.experimentfile)
 
     if arguments.defaultgroup is not None:
-        theeval.setDefaultGroup(arguments.defaultgroup)
+        #theeval.setDefaultGroup(arguments.defaultgroup)
+        #
+        # this will only work from our test directory using the following command
+        #
+        #ipet-evaluate -t results/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.gamma_*_beta_0*.trn -e eval-test.xml -l -n -d 0.01 -D
+        theeval.setDefaultGroup((0.10, 0.05))
 
     if arguments.columns is not None:
-        theeval.setIndex(arguments.columns, 1)
-    else:
-        theeval.setIndex(Key.LogfileName, 1)
+        theeval.set_index(arguments.columns, 1)
         # TODO Better default handling?
 
     if arguments.index is not None:
-        theeval.setIndex(arguments.index, 0)
-    else:
-        # TODO Better default handling?
-        theeval.setIndex(Key.ProblemName, 0)
+        theeval.set_index(arguments.index, 0)
 
 #    if arguments.groupkey is not None:
 #        theeval.setGroupKey(arguments.groupkey)

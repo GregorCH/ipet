@@ -59,7 +59,6 @@ argparser = argparse.ArgumentParser(prog = "Ipet Parsing script", \
                                  description = "parses test run log files and saves parsed data",
                                  epilog = textwrap.dedent(formatstrExamples),
                                  formatter_class = argparse.RawDescriptionHelpFormatter)
-# FARI: brauchen wir nicht, oder?
 # for name, default, short, description in clarguments:
 #     argparser.add_argument(short, name, default = default, help = description)
 
@@ -102,10 +101,10 @@ if __name__ == '__main__':
 
     if arguments.readers == []:
         readers = []
-        for _file in os.listdir('./'):
+        # TODO Test this
+        for _file in os.listdir('./') + os.listdir(os.path.expanduser('~/.ipet/readers')):
             if _file.endswith(".xml") or _file.endswith(".ipr"):
                 try:
-                    # FARI1 do we use rm? why next line? Where do we use rm here?
                     rm = ReaderManager.fromXMLFile(_file)
                     readers.append(_file)
                 except:

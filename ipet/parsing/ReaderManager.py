@@ -12,6 +12,7 @@ please refer to README.md for how to cite IPET.
 import os
 import sys
 import logging
+import inspect
 import xml.etree.ElementTree as ElementTree
 from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, StatisticReader, ListReader, \
     BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodesReader, RootNodeFixingsReader, \
@@ -23,7 +24,7 @@ from .StatisticReader_CustomReader import CustomReader
 from .TraceFileReader import TraceFileReader
 from ipet.concepts.Manager import Manager
 from ipet.concepts.IPETNode import IpetNode
-from ipet.parsing.Solver import SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, CplexSolver
+from ipet.parsing.Solver import Solver, SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, CplexSolver
 from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
@@ -67,6 +68,21 @@ class ReaderManager(Manager, IpetNode):
                         XpressSolver(),
                         GurobiSolver(),
                         CplexSolver()]
+        
+        # TODO Test this
+        # TODO Do this somewhere else (to be able to use this elsewhere)
+        sys.path.append(os.path.expanduser("~/.ipet"))
+        # Shut up eclipse! This works
+        import solvers
+        
+        additionalsolvers = []
+        for name, obj in inspect.getmembers(solvers):
+            if inspect.isclass(obj) and issubclass(obj, Solver):
+                a = getattr(solvers, obj.__name__)()
+                additionalsolvers.append(a)
+        
+        self.solvers.append(additionalsolvers)    
+        logging.debug("Loaded the following solvers {}".format(self.solvers))
 
     def getName(self):
         """

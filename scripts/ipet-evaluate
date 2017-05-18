@@ -158,11 +158,11 @@ if __name__ == '__main__':
         # this will only work from our test directory using the following command
         #
         #ipet-evaluate -t results/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.gamma_*_beta_0*.trn -e eval-test.xml -l -n -d 0.01 -D
-        theeval.setDefaultGroup((0.10, 0.05))
+#        theeval.setDefaultGroup((0.10, 0.05))
+        theeval.setDefaultGroup(arguments.defaultgroup)
 
     if arguments.columns is not None:
         theeval.set_index(arguments.columns, 1)
-        # TODO Better default handling?
 
     if arguments.index is not None:
         theeval.set_index(arguments.index, 0)

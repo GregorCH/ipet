@@ -223,7 +223,7 @@ if __name__ == '__main__':
         path = "."
         extension = arguments.fileextension
         prefixstr = arguments.prefix if arguments.prefix else ""
-        for fg in theeval.filtergroups:
+        for fg in theeval.getActiveFilterGroups():
             instancewisename = "%s/%s%s"%(path, prefixstr, fg.name)
             theeval.streamDataFrame(theeval.filtered_instancewise[fg.name], instancewisename, extension)
             logging.info("Instance-wise data written to %s.%s" % (instancewisename, extension))

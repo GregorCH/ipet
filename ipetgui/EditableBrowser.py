@@ -18,7 +18,7 @@ from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
 from ipet.misc import misc
 from ipet.evaluation.Aggregation import Aggregation
-from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
+from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETValue
 from ipet.evaluation.IPETFilter import IPETFilter
 from .IpetMainWindow import IpetMainWindow
 

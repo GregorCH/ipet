@@ -226,15 +226,15 @@ class IPETEvaluationColumn(IpetNode):
                 self.comp = newvalue
             except ValueError:
                 raise ValueError("Trying to set an unknown comparison method '%s' for column '%s', should be in\n %s" % (newvalue, self.getName(), ", ".join((repr(c) for c in self.possiblecomparisons))))
-            
+
     def set_reduction(self, reduction):
         """Set the reduction function
         """
         self.reduction = reduction
-    
+
     def getCompareColName(self):
         return self.getName() + self.getCompareSuffix()
-    
+
     def getCompareMethod(self):
         if self.comp is None or self.comp == "":
             return None
@@ -311,12 +311,16 @@ class IPETEvaluationColumn(IpetNode):
         """
         tries to find the reduction function from the numpy, misc, or Experiment modules
         """
+
+        funcname = self.reduction
+        if funcname is None:
+            funcname = "mean"
         for module in [numpy, misc, Experiment]:
             try:
-                return getattr(module, self.reduction)
+                return getattr(module, funcname)
             except AttributeError:
                 pass
-        raise IpetNodeAttributeError(self.reduction, "Unknown reduction function %s" % self.reduction)
+        raise IpetNodeAttributeError(funcname, "Unknown reduction function %s" % self.reduction)
 
     def getColumnData(self, df):
         """
@@ -394,6 +398,25 @@ class IPETEvaluationColumn(IpetNode):
 
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
+
+    def addDependency(self, dependencies, dep):
+        if dep not in dependencies[self.getName()]:
+            dependencies[self.getName()].add(dep)
+
+    def getDependencies(self):
+        """Return a list of data frame column names that this column requires
+        """
+        dependencies = {self.getName() : set()}
+        if self.origcolname is not None:
+            self.addDependency(dependencies, self.origcolname)
+        for c in [self.minval, self.nanrep, self.maxval]:
+            if c is not None and self.parseValue(c) is None:
+                self.addDependency(dependencies, c)
+        for i in self.children:
+            self.addDependency(dependencies, i.getName())
+            dependencies.update(i.getDependencies())
+
+        return dependencies
 
 class FormatFunc:
 
@@ -583,8 +606,6 @@ class IPETEvaluation(IpetNode):
         reduces df_long to the columns specified in evaluation xmlfile
         (concatenates usercolumns, neededcolumns and additionalfiltercolumns from df_long)
         """
-        usercolumns = []
-
         #
         # Attention: this will be deleted soon because it is not flexible enough
         # --> will be replaced by reduction function in IPETEvaluationColumn
@@ -597,14 +618,13 @@ class IPETEvaluation(IpetNode):
             self.levelonedf = None
         # treat columns differently for level=0 and level=1
         # We are only interested in the columns that are activated in the eval file
+        usercolumns = [c.getName() for c in self.getActiveColumns()]
         for col in self.toposortColumns(self.getActiveColumns()):
             if col.getTransLevel() == 0:
                 df_long[col.getName()] = col.getColumnData(df_long)
-                
-                # TODO Isn't this a problem with columnnames that are not unique?
-                usercolumns.append(col.getName())
-                continue
 
+                continue
+                # TODO Isn't this a problem with columnnames that are not unique?
                 # look if a comparison with the default group should be made
                 if col.getCompareMethod() is not None:
 
@@ -645,36 +665,49 @@ class IPETEvaluation(IpetNode):
         return result
     
     def toposortColumns(self, columns):
-        # TODO return and use the top ordering
-        adj = self.getAdjacencies(columns)
-        logging.debug("TOPOSORT:\nAdjacency List: {},\nTopological Ordering: {}".format(adj,list(toposort(adj))))
-        # TODO reverse the mapping from columname to columnobject
-        return columns
-    
-    def getAdjacencies(self, columns):
+        """Compute a topological ordering respecting the data dependencies of the specified column list
+        """
+        adj = self.getDependencies(columns)
+
+        toposorted = list(toposort(adj))
+        logging.debug("TOPOSORT:\nDependency List: {},\nTopological Ordering: {}".format(adj, toposorted))
+
+        def getIndex(name, toposorted):
+            for idx, topo in enumerate(toposorted):
+                if name in topo: return idx
+            return -1
+
+        indices = {col.getName() : getIndex(col.getName(), toposorted) for col in columns}
+
+        return sorted(columns, key = lambda x: indices.get(x.getName(), -1))
+
+    def getDependencies(self, columns):
         # TODO is this the right thing?
         adj = {}
         for col in columns:
-            if col.getChildren() is not None:
-                # do we want col.getName() instead of col.getCompareColName()? 
-                #-> Problem when an eval column has the same name as a data column
-                deps = [ch.getCompareColName() for ch in col.getChildren() if ch is IPETEvaluationColumn] + [col.origcolname]
-                adj[col.getCompareColName()] = set(deps)
-                adj.update(self.getAdjacencies(col.getChildren()))
+            adj.update(col.getDependencies())
         return adj
     
     def calculateNeededData(self, df):
         """ Calculate and concatenate needed data about status and problemname 
         """
-        df['_time_'] = (df.Status.isin(('better', 'timelimit')))
-        df['_limit_'] = ((df['_time_']) | df.Status.isin(['nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
-        df['_fail_'] = (df.Status.apply(lambda x: True if x.startswith("fail") else False))
-        df['_abort_'] = (df.Status == 'fail_abort')
+        df['_time_'] = (df[Key.ProblemStatus].isin((Key.ProblemStatusCodes.Better, Key.ProblemStatusCodes.TimeLimit)))
+        df['_limit_'] = ((df['_time_']) | df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.NodeLimit,
+                                                                      Key.ProblemStatusCodes.MemoryLimit,
+                                                                      Key.ProblemStatusCodes.Interrupted
+                                                                      ]))
+        df['_fail_'] = df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailDualBound,
+                                                    Key.ProblemStatusCodes.FailObjectiveValue,
+                                                    Key.ProblemStatusCodes.FailSolInfeasible,
+                                                    Key.ProblemStatusCodes.FailSolOnInfeasibleInstance,
+                                                    Key.ProblemStatusCodes.Fail
+                                        ])
+        df['_abort_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.FailAbort)
 
         df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_'])
 
         df['_count_'] = 1
-        df['_unkn_'] = (df.Status == 'unknown')
+        df['_unkn_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.Unknown)
         return df
 
     def toXMLElem(self):
@@ -714,23 +747,23 @@ class IPETEvaluation(IpetNode):
 
     def convertToHorizontalFormat(self, df):
         tmpcols = list(set(self.usercolumns + self.indexkeys[0] + self.indexkeys[1]))
-        
+
         horidf = df[tmpcols].set_index(self.indexkeys[0] + self.indexkeys[1]).sort_index(level=0)
 
         if not horidf.index.is_unique:
             grouped = horidf.groupby(level=horidf.index.names)
-            newcols = []              
-            
+            newcols = []
+
 #            #TODO use sum reduction for columns like _limit_, _solved_, etc.
 #            #TODO do we want to reduce these?  
 #            for col in ['_time_','_limit_','_fail_','_abort_','_solved_','_unkn_']:
 #                newcols.append(grouped[col].apply(numpy.count_nonzero()))
-#                
+#
 #            newcols.append(grouped['_count_'].apply(numpy.sum()))
-            
-            for col in self.getActiveColumns() :
+
+            for col in self.getActiveColumns():
                 newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
-            
+
             horidf = pd.concat(newcols, axis=1)
 
         horidf = horidf.unstack(self.indexkeys[1])
@@ -931,8 +964,10 @@ class IPETEvaluation(IpetNode):
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
 
         if self.evaluateoptauto:
-            opt = self.calculateOptimalAutoSettings(columndata)
-            columndata = pd.concat([columndata, opt])
+            logging.warn("Optimal auto settings are currently not available, use reductions instead")
+            #opt = self.calculateOptimalAutoSettings(columndata)
+            #columndata = pd.concat([columndata, opt])
+            #logging.debug("Result of calculateOptimalAutoSettings:\n{}\n".format(columndata))
 
         columndata = self.calculateNeededData(columndata)
         logging.debug("Result of calculateNeededData:\n{}\n".format(columndata))

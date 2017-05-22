@@ -16,7 +16,7 @@ from xml.dom.minidom import parseString
 import xml.etree.ElementTree as ElementTree
 import os
 from ipet.misc import saveAsXML
-from ipet.evaluation import IPETFilter, IPETFilterGroup, IPETInstance
+from ipet.evaluation import IPETFilter, IPETFilterGroup, IPETValue
 from ipet.evaluation import Aggregation
 from ipet.evaluation import IPETEvaluationColumn
 
@@ -49,7 +49,7 @@ class EvaluationTest(unittest.TestCase):
         classes = [(IPETFilter, "filter"),
                    (Aggregation, "agg"),
                    (IPETFilterGroup, "group"),
-                   (IPETInstance, "instance"),
+                   (IPETValue, "instance"),
                    (IPETEvaluationColumn, "column")]
 
         for cl, basename in classes:

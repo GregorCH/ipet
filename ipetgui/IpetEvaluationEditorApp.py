@@ -20,7 +20,7 @@ from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
 from ipet.misc import misc
 from ipet.evaluation.Aggregation import Aggregation
-from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
+from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETValue
 from ipet.evaluation.IPETFilter import IPETFilter
 from .IpetMainWindow import IpetMainWindow
 from .EditableBrowser import EditableBrowser
@@ -145,7 +145,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.updateStatus("Add instance")
         self.addedinstances += 1
         newinstancename = "new Instance %d"%self.addedinstances
-        newinstance = IPETInstance(newinstancename)
+        newinstance = IPETValue(newinstancename)
 
         self.browser.addNewElementAsChildOfSelectedElement(newinstance)
 
@@ -192,7 +192,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
 
     def enableOrDisableActions(self):
         for action, addclass in zip([self.addcolaction, self.addfiltergroupaction, self.addfilteraction, self.addaggregationaction, self.addinstancenaction],
-                                    [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETInstance()]):
+                                    [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETValue()]):
             if self.browser.treewidget.currentItemAcceptsClassAsChild(addclass):
                 action.setEnabled(True)
             else:

@@ -15,8 +15,8 @@ from ipet import Experiment
 from ipet.concepts import IpetNode, IpetNodeAttributeError
 import logging
 
-class IPETInstance(IpetNode):
-    nodetag = "Instance"
+class IPETValue(IpetNode):
+    nodetag = "Value"
     
     def __init__(self, name=None, active=True):
         """
@@ -28,7 +28,7 @@ class IPETInstance(IpetNode):
         name : The name of this problem
         active : True or "True" if this element should be active, False otherwise
         """
-        super(IPETInstance, self).__init__(active)
+        super(IPETValue, self).__init__(active)
         self.name = name
         
     def checkAttributes(self):
@@ -37,17 +37,25 @@ class IPETInstance(IpetNode):
         return True
         
     def getEditableAttributes(self):
-        return ["name"] + super(IPETInstance, self).getEditableAttributes()
+        return ["name"] + super(IPETValue, self).getEditableAttributes()
     
     @staticmethod
     def getNodeTag():
-        return IPETInstance.nodetag
+        return IPETValue.nodetag
     
     def getName(self):
         return self.name
 
+    def getValue(self):
+        for mytype in [int, float, str]:
+            try:
+                return mytype(self.name)
+            except ValueError:
+                continue
+        return None
+
     def toXMLElem(self):
-        me = ElementTree.Element(IPETInstance.getNodeTag(), self.attributesToStringDict())
+        me = ElementTree.Element(IPETValue.getNodeTag(), self.attributesToStringDict())
         return me
 
 class IPETComparison:
@@ -99,14 +107,14 @@ class IPETFilter(IpetNode):
     """
     Filters are used for selecting subsets of problems to analyze.
     """
-    instanceoperators = ["keep", "drop"]
+    valueoperators = ["keep", "drop"]
     attribute2Options = {
                          "anytestrun":["one", "all"],
-                         "operator":list(IPETComparison.comparisondict.keys()) + instanceoperators}
+                         "operator":list(IPETComparison.comparisondict.keys()) + valueoperators}
     nodetag = "Filter"
     
 
-    def __init__(self, expression1=None, expression2=None, operator="ge", anytestrun='all', active=True):
+    def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = 'all', active = True, datakey = None):
         """
         filter constructor
         
@@ -115,6 +123,7 @@ class IPETFilter(IpetNode):
         
         expression1 : integer, float, string, or column name
         expression2 : integer, float, string, or column name
+        datakey : available data key for drop and keep filters
         operator : operator such that evaluation expression1 op expression2 yields True or False
         anytestrun : either 'one' or 'all' 
         active : True or "True" if this filter should be active, False otherwise
@@ -125,12 +134,13 @@ class IPETFilter(IpetNode):
         self.expression2 = expression2
 
         self.anytestrun = anytestrun
-        self.instances = []
+        self.values = []
         
         self.set_operator(operator)
+        self.datakey = datakey
         
     def checkAttributes(self):
-        if self.operator in self.instanceoperators and self.instances == []:
+        if self.operator in self.valueoperators and self.values == []:
             raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty problem set".format(self.operator))
         return True
         
@@ -142,14 +152,15 @@ class IPETFilter(IpetNode):
 
         anytestrun = attrdict.get('anytestrun')
         operator = attrdict.get('operator')
+        datakey = attrdict.get('datakey')
         active = attrdict.get('active', True)
 
-        return IPETFilter(expression1, expression2, operator, anytestrun, active)
+        return IPETFilter(expression1, expression2, operator, anytestrun, active, datakey)
 
     def getName(self):
         prefix = self.anytestrun
-        if self.operator in self.instanceoperators:
-            return self.operator + " problem filter"
+        if self.operator in self.valueoperators:
+            return "{} value filter (key: {})".format(self.operator, self.datakey)
         else:
             return " ".join((prefix, self.expression1, self.operator, self.expression2))
 
@@ -170,37 +181,39 @@ class IPETFilter(IpetNode):
         if self.operator in list(IPETComparison.comparisondict.keys()):
             return parenteditables + ['operator', 'anytestrun', 'expression1', 'expression2']
         else:
-            return parenteditables + ['operator']
+            return parenteditables + ['operator', 'anytestrun', 'datakey']
     
     @staticmethod
     def getNodeTag():
         return IPETFilter.nodetag
     
     def getChildren(self):
-        return self.instances
+        return self.values
         
     def acceptsAsChild(self, child):
-        return child.__class__ is IPETInstance
+        return child.__class__ is IPETValue
     
     def addChild(self, child):
-        self.instances.append(child)
+        self.values.append(child)
         
     def removeChild(self, child):
-        self.instances.remove(child)
+        self.values.remove(child)
 
-    def getActiveInstances(self):
-        return [x for x in self.instances if x.isActive()]
+    def getActiveValue(self):
+        return [x for x in self.values if x.isActive()]
             
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2Options.get(attr, super(IPETFilter, self).getRequiredOptionsByAttribute(attr))
 
-    def applyInstanceOperator(self, probname):
+    def applyValueOperator(self, df):
         contained = False
         # loop through problem set
-        for name in (x.getName() for x in self.getActiveInstances()):
-            if probname == name:
-                contained = True
-                break
+        contained = df.isin([x.getValue() for x in self.getActiveValue()])
+
+        if self.anytestrun:
+            contained = contained.any().bool()
+        else:
+            contained = contained.all().bool()
 
         if contained and self.operator == "keep":
             return True
@@ -215,8 +228,8 @@ class IPETFilter(IpetNode):
         """
 
         # apply an problem operator directly
-        if self.operator in self.instanceoperators:
-            return self.applyInstanceOperator(probname)
+        if self.operator in self.valueoperators:
+            return self.applyValueOperator(probname)
 
         # evaluate the two expressions and filter according to the anytestrun attribute if one or all match the requirement
         for testrun in testruns:
@@ -233,8 +246,8 @@ class IPETFilter(IpetNode):
 
 
     def filterDataFrame(self, df):
-        if self.operator in self.instanceoperators:
-            return self.applyInstanceOperator(df.index[0])
+        if self.operator in self.valueoperators:
+            return self.applyValueOperator(df[[self.datakey]])
 
         x = self.evaluateValueDataFrame(df, self.expression1)
         y = self.evaluateValueDataFrame(df, self.expression2)
@@ -280,7 +293,7 @@ class IPETFilter(IpetNode):
 
     def toXMLElem(self):
         me = ElementTree.Element(IPETFilter.getNodeTag(), self.attributesToStringDict())
-        for problem in self.instances:
+        for problem in self.values:
             me.append(problem.toXMLElem())
         return me
 
@@ -355,7 +368,7 @@ class IPETFilterGroup(IpetNode):
 
     def filterDataFrame(self, df):
         """
-        filters a data frame object as the intersection of all instances that match the criteria defined by the filters
+        filters a data frame object as the intersection of all values that match the criteria defined by the filters
         """
 
         groups = df.groupby(level=0)
@@ -368,7 +381,7 @@ class IPETFilterGroup(IpetNode):
 
         activefilters = self.getActiveFilters()
 
-        # return a filtered data frame as intersection of all instances that match all filter criteria and appear in every test run
+        # return a filtered data frame as intersection of all values that match all filter criteria and appear in every test run
         return groups.filter(lambda x:intersectionfunction(x) and np.all([filter_.filterDataFrame(x) for filter_ in activefilters]))
 
     def filterProblem(self, probname, testruns=[]):
@@ -410,7 +423,7 @@ class IPETFilterGroup(IpetNode):
             for child in elem:
                 instancename = child.attrib.get("name")
                 if instancename:
-                    filter_.addChild(IPETInstance(instancename))
+                    filter_.addChild(IPETValue(instancename))
                 filter_.checkAttributes()
             return filter_
 

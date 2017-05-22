@@ -12,5 +12,5 @@ please refer to README.md for how to cite IPET.
 """
 from .Aggregation import Aggregation
 from .IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
-from .IPETFilter import IPETFilter, IPETFilterGroup, IPETInstance
+from .IPETFilter import IPETFilter, IPETFilterGroup, IPETValue
 __all__ = []

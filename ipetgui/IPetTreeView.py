@@ -16,7 +16,7 @@ import sys
 from PyQt4.QtCore import SIGNAL, Qt
 from .EditableForm import EditableForm
 from ipet.evaluation import Aggregation
-from ipet.evaluation import IPETFilterGroup, IPETInstance
+from ipet.evaluation import IPETFilterGroup, IPETValue
 from ipet.evaluation import IPETFilter
 from PyQt4 import QtCore
 import os.path as osp
@@ -61,7 +61,7 @@ class IpetTreeView(QTreeWidget):
              Aggregation:(osp.sep.join((imagepath, "Letter-A-dg-icon.png"))),
              IPETFilterGroup:(osp.sep.join((imagepath, "Letter-G-gold-icon.png"))),
              IPETFilter:(osp.sep.join((imagepath, "Letter-F-lg-icon.png"))),
-             IPETInstance:(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
+             IPETValue:(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
 
     def __init__(self, parent = None):
         """

@@ -293,8 +293,8 @@ class IPETFilter(IpetNode):
 
     def toXMLElem(self):
         me = ElementTree.Element(IPETFilter.getNodeTag(), self.attributesToStringDict())
-        for problem in self.values:
-            me.append(problem.toXMLElem())
+        for value in self.values:
+            me.append(value.toXMLElem())
         return me
 
 class IPETFilterGroup(IpetNode):

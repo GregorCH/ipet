@@ -7,31 +7,53 @@ Created on Apr 27, 2017
 from ipet.parsing.Solver import Solver
 import re
 from ipet import Key
+from ipet import misc
 
 class MIPCLSolver(Solver):
-	solverId = "DreamSolver"
-	recognition_expr = re.compile("MIPCLSolver")
-	primalbound_expr = re.compile("Primalbound: (\S*)")
-	dualbound_expr = re.compile("Dualbound: (\S*)")
-	solvingtime_expr = re.compile("solvingtime: (\S*)")
-	version_expr = re.compile("MIPCLSolver: (\S*)")
+	solverId = "MIPCL"
+	recognition_expr = re.compile("Reading data")
+	primalbound_expr = re.compile("Objective value: (\S*)")
+	dualbound_expr = re.compile("^(?:\s*lower-bound: |Objective value: )(\S+)")
+	solvingtime_expr = re.compile("Solution time: (\S*)")
+	version_expr = re.compile("MIPCL version (\S*)")
 
-	solverstatusmap = {"found optimal solution" : Key.SolverStatusCodes.Optimal,
-			"proved infeasibility" : Key.SolverStatusCodes.Infeasible, 
-			"timelimit reached." : Key.SolverStatusCodes.TimeLimit, }
+	solverstatusmap = {"Objective value: (\S*) - optimality proven" : Key.SolverStatusCodes.Optimal,
+			"This problem is infeasible" : Key.SolverStatusCodes.Infeasible,
+			"Time limit reached" : Key.SolverStatusCodes.TimeLimit}
 	
+	# variables needed for primal bound history
+	inTable = False
+	primalboundhistory_exp = re.compile("^      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound     Gap%")
+	endtable = re.compile('^===========================================')
+
 	def __init__(self, **kw):
 		super(MIPCLSolver, self).__init__(**kw)
 
-	def extractPrimalboundHistory(self, line : str):
+	def extracHistory(self, line : str):
 		""" Extract the sequence of primal bounds  
 		"""
-		m = re.compile("Primalbound: (\S*) at (\S*)").match(line)
-		if m is not None:
-			try:
-				t = float(m.groups()[1])
-				d = float(m.groups()[0])
-				self.addHistoryData(Key.PrimalBoundHistory, t, d)
-			except:
-				pass
+		if not self.isTableLine(line):
+			return 
+		
+		# history reader should be in a table. check if a display char indicates a new primal bound
+		if self.inTable:
+			allmatches = misc.numericExpressionOrInf.findall(line)
+			if len(allmatches) == 0:
+				return
+
+			pointInTime = allmatches[0]
+			pb = allmatches[4]
+			db = allmatches[5]
+			# in the case of ugscip, we reacted on a disp char, so no problem at all.
+			self.addHistoryData(Key.PrimalBoundHistory, pointInTime, pb)
+			self.addHistoryData(Key.DualBoundHistory, pointInTime, db)
+	
+	def isTableLine(self, line):
+		if self.primalboundhistory_exp.match(line):
+			self.inTable = True
+			return False
+		elif self.inTable and self.endtable.match(line):
+			self.inTable = False
+			return False
+		return self.inTable
 

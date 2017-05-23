@@ -5,6 +5,7 @@ from ipet import Key
 from ipet.misc import misc
 from operator import itemgetter
 from pip._vendor.distlib._backport.tarfile import TUREAD
+from IPython.utils import ulinecache
 
 class Solver():
     """ The solver-class acts as Reader for solver-specific data.
@@ -58,27 +59,13 @@ class Solver():
         self.data = {}
         self.reset()
 
-    def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds.
-        
-        Method has to be overwritten.
-        """
-        pass 
-    
-    def extractDualboundHistory(self, line : str):
-        """ Extract the sequence of dual bounds.
-        
-        Method should be overwritten.
-        """
-        pass 
-    
     def extractStatus(self, line : str):
         """ Check if the line matches one of the solverstatusmap patterns.
         
         If the one of the patterns matches, the data will be added data as Key.SolverStatus.
         """
         for pattern, status in self.solverstatusses:
-            if line.startswith(pattern):
+            if re.compile(pattern).match(line):
 
                 self.addData(Key.SolverStatus, status)
                 # break in order to prevent parsing a weaker status
@@ -167,7 +154,29 @@ class Solver():
         self.extractSolvingTime(line)
         self.extractVersion(line)
         self.extractStatus(line)
+        self.extractHistory(line)
+
+    def extractHistory(self, line):
+        """ Extract the sequence of primal and dual bounds.
+
+        Method has to be overwritten.
+        """
         self.extractPrimalboundHistory(line)
+        self.extractDualboundHistory(line)
+
+    def extractPrimalboundHistory(self, line : str):
+        """ Extract the sequence of primal bounds.
+
+        Method has to be overwritten.
+        """
+        pass
+
+    def extractDualboundHistory(self, line : str):
+        """ Extract the sequence of dual bounds.
+
+        Method should be overwritten.
+        """
+        pass
 
     # This method should be overwritten by subclasses
     def extractOptionalInformation(self, line : str):
@@ -245,11 +254,11 @@ class SCIPSolver(Solver):
     regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
     
     solverstatusmap = {
-        "SCIP Status        : problem is solved [optimal solution found]":Key.SolverStatusCodes.Optimal,
-        "SCIP Status        : problem is solved [infeasible]": Key.SolverStatusCodes.Infeasible,
-        "SCIP Status        : solving was interrupted [time limit reached]" : Key.SolverStatusCodes.TimeLimit,
-        "SCIP Status        : solving was interrupted [memory limit reached]" : Key.SolverStatusCodes.MemoryLimit,
-        "SCIP Status        : solving was interrupted [node limit reached]" : Key.SolverStatusCodes.NodeLimit,
+        "SCIP Status        : problem is solved \[optimal solution found\]":Key.SolverStatusCodes.Optimal,
+        "SCIP Status        : problem is solved \[infeasible\]": Key.SolverStatusCodes.Infeasible,
+        "SCIP Status        : solving was interrupted \[time limit reached\]" : Key.SolverStatusCodes.TimeLimit,
+        "SCIP Status        : solving was interrupted \[memory limit reached\]" : Key.SolverStatusCodes.MemoryLimit,
+        "SCIP Status        : solving was interrupted \[node limit reached\]" : Key.SolverStatusCodes.NodeLimit,
         "SCIP Status        : solving was interrupted" : Key.SolverStatusCodes.Interrupted,
         }
 
@@ -367,7 +376,7 @@ class GurobiSolver(Solver):
     solvingtime_expr = re.compile("Explored \d* nodes \(.*\) in (\S*) seconds")
     version_expr = re.compile("Gurobi Optimizer version (\S+)")
  
-    solverstatusmap = {"Optimal solution found (tolerance 0.00e+00)" : Key.SolverStatusCodes.Optimal,
+    solverstatusmap = {"Optimal solution found" : Key.SolverStatusCodes.Optimal,
                        "Model is infeasible" : Key.SolverStatusCodes.Infeasible,
 #                       "" : Key.SolverStatusCodes.TimeLimit,
 #                       "" : Key.SolverStatusCodes.MemoryLimit,
@@ -404,11 +413,6 @@ class GurobiSolver(Solver):
             self.gurobiextralist = []
         return None
     
-    def extractDualboundHistory(self, line : str):
-        """ Extract the sequence of dual bounds  
-        """
-        pass 
-    
 class CplexSolver(Solver):
 
     solverId = "CPLEX"
@@ -418,8 +422,8 @@ class CplexSolver(Solver):
     solvingtime_expr = re.compile("Solution time =\s*(\S+)")
     version_expr = re.compile("^Welcome to IBM\(R\) ILOG\(R\) CPLEX\(R\) Interactive Optimizer (\S+)")
 
-    solverstatusmap = {"CPLEX> MIP - Integer optimal" : Key.SolverStatusCodes.Optimal,
-                       "CPLEX> MIP - Integer infeasible." : Key.SolverStatusCodes.Infeasible,
+    solverstatusmap = {"MIP - Integer optimal solution" : Key.SolverStatusCodes.Optimal,
+                       "MIP - Integer infeasible." : Key.SolverStatusCodes.Infeasible,
 #                       "" : Key.SolverStatusCodes.TimeLimit,
 #                       "" : Key.SolverStatusCodes.MemoryLimit,
 #                       "" : Key.SolverStatusCodes.NodeLimit,
@@ -456,24 +460,18 @@ class CplexSolver(Solver):
             splitline = line.split()
             self.readBoundAndTime(line, splitline.index("Found") + 4, splitline.index("Found") + 6)
         elif not self.easyCPLEX:
-#            print("ACHTUNG",0)
             if "Welcome to IBM(R) ILOG(R) CPLEX(R)" in line:
-#                print("ACHTUNG",1)
                 self.lastelapsedtime = 0.0
                 self.nnodessincelastelapsedtime = 0
                 self.lastnnodes = 0
                 self.cpxprimals = []
             if "   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap" in line:
-#                print("ACHTUNG",2)
                 self.inTable = True
             elif self.inTable and ("cuts applied:" in line or "Root node processing" in line):
-#                print("ACHTUNG",3)
                 self.inTable = False
             elif self.inTable and "Repeating presolve." in line:
-#                print("ACHTUNG",4)
                 self.inTable = False
             elif self.inTable and len(line) > 0 and (line.startswith(" ") or line.startswith("*")):
-#                print("ACHTUNG",5,line)
                 if line == "\n":
                     return None
                 nodeinlineidx = 7
@@ -488,7 +486,6 @@ class CplexSolver(Solver):
                     self.cpxprimals.append((nnodes, primalbound))
                 self.lastnnodes = nnodes
             elif "Elapsed time = " in line:
-#                print("ACHTUNG",6)
                 thetime = float(line.split()[3])
                 self.processCpxprimals(thetime)
 
@@ -496,7 +493,6 @@ class CplexSolver(Solver):
                 self.lastelapsedtime = thetime
 
             elif "Solution time =" in line:
-#                print("ACHTUNG",7)
                 thetime = float(line.split()[3])
                 self.processCpxprimals(thetime)
     
@@ -541,14 +537,15 @@ class XpressSolver(Solver):
 
     solverId = "XPRESS"
     recognition_expr = re.compile("FICO Xpress-Optimizer")
-    primalbound_expr = re.compile("Objective value =\s*(\S*)")
-    dualbound_expr = re.compile("Best Bound =\s*(\S*)")
-    solvingtime_expr = re.compile("\*\*\* Search completed \*\*\*\s*Time\s*(\S*)")
+    primalbound_expr = re.compile("Best integer solution found is\s*(\S*)")
+    dualbound_expr = re.compile("Best bound is\s*(\S*)")
+    solvingtime_expr = re.compile(" \*\*\* Search.*\*\*\*\s*Time:\s*(\S*)")
     version_expr = re.compile("FICO Xpress-Optimizer \S* v(\S*)")
 
-    solverstatusmap = {" *** Search completed ***" : Key.SolverStatusCodes.Optimal,
+    # TODO does this work? Benchmarks seem to be broken
+    solverstatusmap = {r" \*\*\* Search completed \*\*\*" : Key.SolverStatusCodes.Optimal,
                        "Problem is integer infeasible" : Key.SolverStatusCodes.Infeasible,
-                       "STOPPING - MAXTIME limit reached." : Key.SolverStatusCodes.TimeLimit,
+                       "STOPPING - MAXTIME limit reached" : Key.SolverStatusCodes.TimeLimit,
 #                       "" : Key.SolverStatusCodes.MemoryLimit,
 #                       "" : Key.SolverStatusCodes.NodeLimit,
 #                       "" : Key.SolverStatusCodes.Interrupted
@@ -567,7 +564,7 @@ class XpressSolver(Solver):
             self.xpresscutidx = line.index("BestSoln") + len("BestSoln")
         elif re.search("^[a-zA-Z*](\d| )", line):
             self.readBoundAndTime(line, -1, -1, cutidx=self.xpresscutidx)
-        elif line.startswith(" *** Heuristic solution found: "):
+        elif line.startswith(" \*\*\* Heuristic solution found: "):
             self.readBoundAndTime(line, -4, -2)
     
 #class CouenneSolver(Solver):

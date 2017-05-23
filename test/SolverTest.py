@@ -7,6 +7,7 @@ import unittest
 import os
 from ipet.parsing.Solver import SCIPSolver, GurobiSolver, CplexSolver, CbcSolver, XpressSolver
 from ipet import Key
+from ipet.parsing.MIPCLSolver import MIPCLSolver
 
 DATADIR = os.path.join(os.path.dirname(__file__), "data")
 TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")
@@ -132,7 +133,7 @@ class SolverTest(unittest.TestCase):
                     Key.Version: "30.01.03",
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound: -106411.84,
-                    Key.DualBound: -106701.816} ],
+                    Key.DualBound:-106701.8161} ],
                 "xpress-dfn-gwin-UUM" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
@@ -143,7 +144,7 @@ class SolverTest(unittest.TestCase):
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
-                    Key.PrimalBound: 1e+40 ,
+                    Key.PrimalBound: None,
                     Key.DualBound: 1e+40} ],
                 "xpress-satellites1-25" : [ {
                     Key.Solver: "XPRESS",
@@ -151,6 +152,36 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound: -5 ,
                     Key.DualBound: -5} ],
+                "mipcl-app1-2" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.3.1",
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:-41,
+                    Key.DualBound:-41} ],
+                "mipcl-bab5" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.3.1",
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:-106411.84,
+                    Key.DualBound:-106411.84} ],
+                "mipcl-dfn-gwin-UUM" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.3.1",
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 38752,
+                    Key.DualBound: 38752} ],
+                "mipcl-enlight14" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.3.1",
+                    Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
+                    Key.PrimalBound: None ,
+                    Key.DualBound: None} ],
+                "mipcl-satellites1-25" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.3.1",
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:-5 ,
+                    Key.DualBound:-5} ],
                 "scip-infeasible" : [ {
                     Key.Solver: "SCIP",
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
@@ -186,6 +217,7 @@ class SolverTest(unittest.TestCase):
         self.solvers.append([CplexSolver(), "CPLEX"])
         self.solvers.append([CbcSolver(), "CBC"])
         self.solvers.append([XpressSolver(), "XPRESS"])
+        self.solvers.append([MIPCLSolver(), "MIPCL"])
         self.activeSolver = self.solvers[0][SOLVER]
 
     def tearDown(self):
@@ -199,9 +231,6 @@ class SolverTest(unittest.TestCase):
         for filename in self.fileinfo.keys():
             file = self.getFileName(filename)
             self.readFile(file)
-#            print("ACHTUNG", filename)
-#            for i in self.activeSolver.data[Key.PrimalBoundHistory]:
-#                print(i)
             for key in self.fileinfo.get(filename)[PRECISE].keys():
                 self.assertPrecise(filename, key)
             for key in self.fileinfo.get(filename)[ALMOST].keys():

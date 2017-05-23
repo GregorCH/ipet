@@ -70,6 +70,8 @@ argparser.add_argument("-f", "--formatstr", default = DEFAULT_FORMATSTR,
                        help = """format string for displaying output per instance to console. The internal formatter uses 'idx'
                                    to reference the index and 'd' for the collected data for this instance. default : "%s" """ % DEFAULT_FORMATSTR
                                    )
+argparser.add_argument("-v", "--validatedual", action = "store_true", default = Experiment.DEFAULT_VALIDATEDUAL, help = "Enable dual validation, relative to 'gaptol' parameter")
+argparser.add_argument("-g", "--gaptol", type = float, default = Experiment.DEFAULT_GAPTOL, help = "relative tolerance for primal and dual objective validation")
 
 if __name__ == '__main__':
     try:
@@ -97,7 +99,7 @@ if __name__ == '__main__':
         sys.exit(0)
         
     # initialize an experiment
-    experiment = Experiment()
+    experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
 
     if arguments.readers == []:
         readers = []

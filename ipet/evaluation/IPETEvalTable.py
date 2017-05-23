@@ -620,6 +620,7 @@ class IPETEvaluation(IpetNode):
         # We are only interested in the columns that are activated in the eval file
         usercolumns = [c.getName() for c in self.getActiveColumns()]
         for col in self.toposortColumns(self.getActiveColumns()):
+#        for col in self.getActiveColumns():
             if col.getTransLevel() == 0:
                 df_long[col.getName()] = col.getColumnData(df_long)
 
@@ -749,7 +750,6 @@ class IPETEvaluation(IpetNode):
         tmpcols = list(set(self.usercolumns + self.indexkeys[0] + self.indexkeys[1]))
 
         horidf = df[tmpcols].set_index(self.indexkeys[0] + self.indexkeys[1]).sort_index(level=0)
-
         if not horidf.index.is_unique:
             grouped = horidf.groupby(level=horidf.index.names)
             newcols = []
@@ -994,6 +994,7 @@ class IPETEvaluation(IpetNode):
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
             reduceddata = self.applyFilterGroup(columndata, fg)
+            logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 

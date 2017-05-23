@@ -24,6 +24,7 @@ FLOAT_LARGE = 1e15
 INT_INFINITY = 1e09
 DEFAULT_MIN_GEOM_MEAN = 1.0
 numericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+)")
+numericExpressionOrInf = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+|inf)")
 tablenumericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+|cutoff)")
 wordExpression = re.compile(r'[^\s]+')
 useStringSplit = False

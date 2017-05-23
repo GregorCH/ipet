@@ -81,7 +81,7 @@ class ReaderManager(Manager, IpetNode):
                 a = getattr(solvers, obj.__name__)()
                 additionalsolvers.append(a)
         
-        self.solvers.append(additionalsolvers)    
+        self.solvers = self.solvers + additionalsolvers
         logging.debug("Loaded the following solvers {}".format(self.solvers))
 
     def getName(self):

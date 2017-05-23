@@ -27,8 +27,10 @@ class Experiment:
     """
     an Experiment represents a collection of TestRun objects and the routines for parsing
     """
+    DEFAULT_GAPTOL = 1e-4
+    DEFAULT_VALIDATEDUAL = False
 
-    def __init__(self, files = [], listofreaders = []):
+    def __init__(self, files = [], listofreaders = [], gaptol = DEFAULT_GAPTOL, validatedual = DEFAULT_VALIDATEDUAL):
         self.testrunmanager = Manager()
         self.datakeymanager = Manager()
 
@@ -41,6 +43,20 @@ class Experiment:
 
         for filename in files:
             self.addOutputFile(filename)
+
+        self.gaptol = gaptol
+        self.validatedual = validatedual
+
+    def set_gaptol(self, gaptol : float):
+        """
+        Set the relative gap tolerance for the solver validation
+        """
+        self.gaptol = gaptol
+
+    def set_validatedual(self, validatedual : bool):
+        """Enable or disable validation of the primal dual gap
+        """
+        self.validatedual = validatedual
 
     #def addOutputFile(self, filename, testrun = None): # testrun parameter is unused
     def addOutputFile(self, filename):
@@ -291,7 +307,7 @@ class Experiment:
                     sense = 1
                 else: sense = -1
 
-                if not infinite and misc.getGap(pb, db, True) <= 1e-5:
+                if not infinite and misc.getGap(pb, db, True) <= self.gaptol:
                     status = '=opt='
                 elif not infinite:
                     status = '=best='
@@ -355,7 +371,7 @@ class Experiment:
         if pb is None:
             return False
 
-        reltol = 1e-5 * max(abs(pb), 1.0)
+        reltol = self.gaptol * max(abs(pb), 1.0)
 
         if objsense == ObjsenseReader.minimize and optval - pb > reltol:
             return True
@@ -376,15 +392,23 @@ class Experiment:
         optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
 
         if pb is not None:
-            reltol = 1e-5 * max(abs(pb), 1.0)
+            reltol = self.gaptol * max(abs(pb), 1.0)
         else:
-            reltol = 1e-5 * max(abs(optval), 1.0)
+            reltol = self.gaptol * max(abs(optval), 1.0)
 
         if objsense == ObjsenseReader.minimize and db - optval > reltol:
             return True
         elif objsense == ObjsenseReader.maximize and optval - db > reltol:
             return True
         return False
+
+
+    def validateDual(self, pb, db):
+        """validate the relative gap between the primal and dual bound if dual validation is enabled
+        """
+        if self.validatedual:
+            return misc.getGap(pb, db) < self.gaptol
+        return True
 
     def determineStatusForOptProblem(self, testrun, problemid):
         """ Determine status for a problem for which we know the optimal solution value
@@ -401,11 +425,10 @@ class Experiment:
         # the run failed because the primal or dual bound were better than the known optimal solution value
         if solfound and (self.isPrimalBoundBetter(testrun, problemid) or self.isDualBoundBetter(testrun, problemid)):
             code = Key.ProblemStatusCodes.FailObjectiveValue
-
         # the run finished correctly if an objective limit was given and the solver reported infeasibility
         elif not solfound and objlimitreached:
             objlimit = testrun.getProblemDataById(problemid, ObjlimitReader.datakey)
-            reltol = 1e-5 * max(abs(optval), 1.0)
+            reltol = self.gaptol * max(abs(optval), 1.0)
 
             if (objsense == ObjsenseReader.minimize and optval - objlimit >= -reltol) or \
                   (objsense == ObjsenseReader.maximize and objlimit - optval >= -reltol):
@@ -417,7 +440,7 @@ class Experiment:
             code = Key.solverToProblemStatusCode(solverstatus)
 
         # the solver reached
-        elif (db is None or misc.getGap(pb, db) < 1e-4) and not self.isPrimalBoundBetter(testrun, problemid):
+        elif (db is None or self.validateDual(pb, db)) and not self.isPrimalBoundBetter(testrun, problemid):
             code = Key.ProblemStatusCodes.Ok
         else:
             code = Key.ProblemStatusCodes.Fail
@@ -443,7 +466,7 @@ class Experiment:
                 code = Key.ProblemStatusCodes.Better
 
         # primal and dual bound converged
-        elif misc.getGap(pb, db) < 1e-4:
+        elif self.validateDual(pb, db):
             code = Key.ProblemStatusCodes.SolvedNotVerified
         else:
             code = Key.ProblemStatusCodes.Fail
@@ -462,7 +485,7 @@ class Experiment:
 
             if pb is not None:
                 code = Key.ProblemStatusCodes.Better
-        elif misc.getGap(pb, db) < 1e-4:
+        elif misc.getGap(pb, db) < self.gaptol:
             code = Key.ProblemStatusCodes.SolvedNotVerified
         else:
             code = Key.ProblemStatusCodes.Unknown

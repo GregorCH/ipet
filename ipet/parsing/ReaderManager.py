@@ -10,9 +10,7 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 import os
-import sys
 import logging
-import inspect
 import xml.etree.ElementTree as ElementTree
 from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, StatisticReader, ListReader, \
     BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodesReader, RootNodeFixingsReader, \
@@ -29,6 +27,7 @@ from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
+from scipy.linalg import _solvers
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -55,6 +54,7 @@ class ReaderManager(Manager, IpetNode):
         IpetNode.__init__(self, True)
         self.problemexpression = problemexpression
         self.problemendexpression = problemendexpression
+        self.solvers = []
         self.addSolvers()
         self.activeSolver = self.solvers[0]
         self.solverCanRead = True
@@ -63,26 +63,12 @@ class ReaderManager(Manager, IpetNode):
         return ["problemexpression", "problemendexpression"]
 
     def addSolvers(self):
-        self.solvers = [SCIPSolver(),
-                        CbcSolver(),
-                        XpressSolver(),
-                        GurobiSolver(),
-                        CplexSolver()]
-        
-        # TODO Test this
-        # TODO Do this somewhere else (to be able to use this elsewhere)
-        sys.path.append(os.path.expanduser("~/.ipet"))
-        # Shut up eclipse! This works
-        import solvers
-        
-        additionalsolvers = []
-        for name, obj in inspect.getmembers(solvers):
-            if inspect.isclass(obj) and issubclass(obj, Solver):
-                a = getattr(solvers, obj.__name__)()
-                additionalsolvers.append(a)
-        
-        self.solvers = self.solvers + additionalsolvers
-        logging.debug("Loaded the following solvers {}".format(self.solvers))
+        for s in [SCIPSolver(), CbcSolver(), XpressSolver(), GurobiSolver(), CplexSolver()]:
+            self.addSolver(s)
+
+    def addSolver(self, solver):
+        self.solvers.append(solver)
+        logging.debug("Added a solver: {}".format(solver.getName()))
 
     def getName(self):
         """
@@ -114,13 +100,6 @@ class ReaderManager(Manager, IpetNode):
         """
         children = [m for m in self.getManageables(False) if m.__class__ in list(self.xmlfactorydict.values())]
         return sorted(children, key = lambda x:x.getName())
-
-    @staticmethod
-    def getNodeTag():
-        """
-        returns the name of the Readermanager
-        """
-        return ReaderManager.nodetag
 
     def setTestRun(self, testrun):
         """
@@ -326,6 +305,13 @@ class ReaderManager(Manager, IpetNode):
                         break
                 me.append(ElementTree.Element(key, readerstrattrs))
         return me
+
+    @staticmethod
+    def getNodeTag():
+        """
+        returns the name of the Readermanager
+        """
+        return ReaderManager.nodetag
 
     @staticmethod
     def fromXML(xmlstring):

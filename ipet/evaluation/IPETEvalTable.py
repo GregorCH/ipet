@@ -20,6 +20,7 @@ from ipet.misc import misc
 import logging
 from ipet import Experiment
 from ipet import Key
+from cgi import log
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -746,30 +747,30 @@ class IPETEvaluation(IpetNode):
                 ev.addColumn(IPETEvaluationColumn.processXMLElem(child))
         return ev
 
-    def convertToHorizontalFormat(self, df):
-        tmpcols = list(set(self.usercolumns + self.indexkeys[0] + self.indexkeys[1]))
+    def reduceByIndex(self, df):
+        tmpcols = list(set(self.usercolumns + self.indexkeys[0] + self.indexkeys[1] + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
+        horidf = df[tmpcols]
+        grouped = horidf.groupby(by = self.indexkeys[0] + self.indexkeys[1])
+        newcols = []
 
-        horidf = df[tmpcols].set_index(self.indexkeys[0] + self.indexkeys[1]).sort_index(level=0)
-        if not horidf.index.is_unique:
-            grouped = horidf.groupby(level=horidf.index.names)
-            newcols = []
+        reductionMap = {'_solved_' : numpy.all, '_count_' : numpy.max}
+        for col in ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']:
+            newcols.append(grouped[col].apply(reductionMap.get(col, numpy.any)))
 
-#            #TODO use sum reduction for columns like _limit_, _solved_, etc.
-#            #TODO do we want to reduce these?  
-#            for col in ['_time_','_limit_','_fail_','_abort_','_solved_','_unkn_']:
-#                newcols.append(grouped[col].apply(numpy.count_nonzero()))
-#
-#            newcols.append(grouped['_count_'].apply(numpy.sum()))
+        for col in self.getActiveColumns():
+            newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
 
-            for col in self.getActiveColumns():
-                newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
+        horidf = pd.concat(newcols, axis = 1)
+        horidf = horidf.reset_index(self.indexkeys[0] + self.indexkeys[1])
 
-            horidf = pd.concat(newcols, axis=1)
-
-        horidf = horidf.unstack(self.indexkeys[1])
-        if len(self.indexkeys[1]) > 0 :
-            horidf = horidf.swaplevel(0, len(self.indexkeys[1]), axis = 1)
         return horidf
+
+    def convertToHorizontalFormat(self, df):
+        df = df.set_index(self.indexkeys[0] + self.indexkeys[1]).sort_index(level = 0)
+        df = df.unstack(self.indexkeys[1])
+        if len(self.indexkeys[1]) > 0 :
+            df = df.swaplevel(0, len(self.indexkeys[1]), axis = 1)
+        return df
 
     def checkStreamType(self, streamtype):
         if streamtype not in self.possiblestreams:
@@ -972,8 +973,15 @@ class IPETEvaluation(IpetNode):
         columndata = self.calculateNeededData(columndata)
         logging.debug("Result of calculateNeededData:\n{}\n".format(columndata))
 
+        columndata = self.reduceByIndex(columndata)
+
+        # show less info in long table
+        columns = columndata.columns
+        diff = lambda l1, l2: [x for x in l1 if x not in l2]
+        lcolumns = diff(columns, ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'])
+
         # compile a results table containing all instances
-        ret = self.convertToHorizontalFormat(columndata)
+        ret = self.convertToHorizontalFormat(columndata[lcolumns])
         logging.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
 
         # TODO self.levelonedf is always None because it will be deprecated
@@ -983,9 +991,10 @@ class IPETEvaluation(IpetNode):
         else:
             self.rettab = ret
         
-        # TODO Where do we need these following two lines?
+        # TODO Where do we need these following three lines?
         self.instance_wise = ret
         self.agg = self.aggregateToPivotTable(columndata)
+        logging.debug("Result of aggregateToPivotTable:\n{}\n".format(self.agg))
             
         self.filtered_agg = {}
         self.filtered_instancewise = {}
@@ -994,10 +1003,15 @@ class IPETEvaluation(IpetNode):
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
             reduceddata = self.applyFilterGroup(columndata, fg)
+            if (len(reduceddata) == 0):
+                fg.set_active(False)
+                logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
+                continue
             logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 
+        activefiltergroups = self.getActiveFilterGroups()
         if len(activefiltergroups) > 0:
             nonemptyfiltergroups = [fg for fg in activefiltergroups if not self.filtered_agg[fg.name].empty]
             dfs = [self.filtered_agg[fg.name] for fg in nonemptyfiltergroups]

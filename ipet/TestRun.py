@@ -202,7 +202,8 @@ class TestRun:
         if self.currentproblemdata != {}:
             # Add data collected by solver into currentproblemdata, such as primal and dual bound,
             self.addData(*solver.getData())
-            self.addData(Key.MetaData, self.metadatadict)
+            for key in self.metadatadict.keys():
+                self.addData(key, self.metadatadict[key])
 
             for key in self.currentproblemdata.keys():
                 self.datadict.setdefault(key, {})[self.currentproblemid] = self.currentproblemdata[key]

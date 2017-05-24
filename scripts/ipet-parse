@@ -14,6 +14,7 @@ please refer to README.md for how to cite IPET.
 from ipet import Experiment
 from ipet.parsing import ReaderManager
 from ipet import TestRun
+from ipet.misc import loader
 import argparse
 import sys
 import os
@@ -51,13 +52,19 @@ To make the information more readible, the syntax has further options for format
     2 misc03                                           0.79
     3 aflow40b                                        600.0
 """
+explainAutoloading = """
+Autoloading behaviour
+---------------------
+
+By default
+"""
 
 # possible arguments in the form name,default,short,description #
 # clarguments = []
 
 argparser = argparse.ArgumentParser(prog = "Ipet Parsing script", \
                                  description = "parses test run log files and saves parsed data",
-                                 epilog = textwrap.dedent(formatstrExamples),
+                                 epilog = textwrap.dedent(formatstrExamples + explainAutoloading),
                                  formatter_class = argparse.RawDescriptionHelpFormatter)
 # for name, default, short, description in clarguments:
 #     argparser.add_argument(short, name, default = default, help = description)
@@ -101,30 +108,15 @@ if __name__ == '__main__':
     # initialize an experiment
     experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
 
-    if arguments.readers == []:
-        readers = []
-        # TODO Test this
-        for _file in os.listdir('./') + os.listdir(os.path.expanduser('~/.ipet/readers')):
-            if _file.endswith(".xml") or _file.endswith(".ipr"):
-                try:
-                    rm = ReaderManager.fromXMLFile(_file)
-                    readers.append(_file)
-                except:
-                    pass
-        logging.info("No additional readers specified. Found following %d reader files (.ipr, .xml) in directory: [%s]", len(readers), ", ".join(readers))
-    else:
-        readers = arguments.readers
+    readers = loader.loadAdditionalReaders(arguments.readers)
+    logging.info("No additional readers specified. Found following %d reader files (.ipr, .xml) in directory: [%s]", len(readers), ", ".join(readers))
 
-    for additionalfile in readers:
-        rm = ReaderManager.fromXMLFile(additionalfile)
-        for reader in rm.getManageables():
-            experiment.readermanager.registerReader(reader)
-            logging.info("Registered reader with name %s" % reader.getName())
+    for reader in readers:
+        experiment.readermanager.registerReader(reader)
+        logging.info("Registered reader with name %s" % reader.getName())
 
-    # search for solver files in user home directory
-    #solversdir = os.expanduser("~/.ipet/solvers/")
-    #for solverfile in os.listdir(solversdir):
-    #    experiment.addSolver(solverfile)
+    for solver in loader.loadAdditionalSolvers():
+        experiment.readermanager.addSolver(solver)
     
     # search for solu files in current directory
     if arguments.solufiles == []:

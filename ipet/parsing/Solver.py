@@ -6,6 +6,8 @@ from ipet.misc import misc
 from operator import itemgetter
 from pip._vendor.distlib._backport.tarfile import TUREAD
 from IPython.utils import ulinecache
+from builtins import int, str
+from numpy import char
 
 class Solver():
     """ The solver-class acts as Reader for solver-specific data.
@@ -102,7 +104,7 @@ class Solver():
         Parameters
         ----------
         line
-            a line of solver output
+            a line of solver output that the information shall be read from
         expr
             regular expression with (at least) one group
         key
@@ -120,11 +122,25 @@ class Solver():
 
     def addData(self, key, datum):
         """Add data to local data-dictionary
+
+        Parameters
+        ----------
+        key
+            string (or int or float) that acts as key for datum in data dictionary
+        datum
+            the datum which shoul dbe saved
         """
         self.data[key] = datum
 
     def addHistoryData(self, key, timestr : str, boundstr : str):
-        """Add data to local data-dictionary
+        """Add data to local historydata dictionary.
+
+        Parameters
+        ----------
+        timestr
+            string containing time
+        boundstr
+            string containing bound that should be saved
         """
         try:
             time = float(timestr)
@@ -140,7 +156,12 @@ class Solver():
                 history.append((time, bound))
 
     def readLine(self, line : str):
-        """Read solver-specific data from that line
+        """Read solver-specific data from that lin
+
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read frome
         """
         self.extractElementaryInformation(line)
         self.extractOptionalInformation(line)
@@ -148,6 +169,11 @@ class Solver():
 
     def extractElementaryInformation(self, line : str):
         """Read Data that is needed for validation
+
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read from
         """
         self.extractPrimalbound(line)
         self.extractDualbound(line)
@@ -159,7 +185,10 @@ class Solver():
     def extractHistory(self, line):
         """ Extract the sequence of primal and dual bounds.
 
-        Method has to be overwritten.
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read from
         """
         self.extractPrimalboundHistory(line)
         self.extractDualboundHistory(line)
@@ -167,6 +196,10 @@ class Solver():
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds.
 
+        Parameters
+        ----------v
+        line
+            a line of solver output that the information shall be read from
         Method has to be overwritten.
         """
         pass
@@ -174,6 +207,10 @@ class Solver():
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds.
 
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read from
         Method should be overwritten.
         """
         pass
@@ -181,11 +218,21 @@ class Solver():
     # This method should be overwritten by subclasses
     def extractOptionalInformation(self, line : str):
         """Read optional data
+
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read from
         """
         pass
 
     def extractGeneralInformation(self, line : str):
         """Read general data
+
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read from
         """
         self.extractDualboundHistory(line)
 
@@ -199,25 +246,45 @@ class Solver():
         self.data.setdefault(Key.PrimalBoundHistory, [])
         self.data.setdefault(Key.DualBoundHistory, [])
 
-    def recognizeOutput(self, line : str):
+    def recognizeOutput(self, line : str) -> bool:
+        """ decide if line was created by the current solver
+
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read from
+        """
         return self.recognition_expr.match(line) != None
 
     def getData(self, datakey = None):
-        """Return data stored under datakey or return collected data as a tuple of two generators
+        """Return data stored under datakey
+
+        Or return collected data as a tuple of two generators
         """
         if datakey is None:
             return map(list, zip(*self.data.items()))
         else:
             return self.data.get(datakey)
 
-    def getName(self):
+    def getName(self) -> str:
+        """ Return the name of current solver instance
+        """
         return self.solverId
 
-    def isSolverInstance(self, filecontext):
+    def isSolverInstance(self, filecontext : str) -> bool:
+        """ Decide if filecontext is (solver specific) logfile or errorfile.
+        """
         return filecontext in [Key.CONTEXT_ERRFILE, Key.CONTEXT_LOGFILE]
 
     # Helper for primalboundhistory-reading
-    def readBoundAndTime(self, line, boundidx, timeidx, timestripchars="", cutidx=-1):
+    def readBoundAndTime(self, line : str, boundidx : int, timeidx : float, timestripchars : char = "", cutidx : int = -1):
+        """ Read and save bound and time
+
+        Parameters
+        ----------
+        line
+            a line of solver output that the information shall be read from
+        """
         splitline = line.split()
         primalbound = line[:cutidx].split()[boundidx]
         pointInTime = splitline[timeidx].strip(timestripchars)
@@ -266,6 +333,8 @@ class SCIPSolver(Solver):
         super(SCIPSolver, self).__init__(**kw)
 
     def reset(self):
+        """ reset stored data
+        """
         Solver.reset(self)
         # variables needed for dual bound history
         self.lastdualbound = misc.FLOAT_INFINITY
@@ -329,7 +398,9 @@ class SCIPSolver(Solver):
         except IndexError:
             return None
      
-    def isTableLine(self, line):
+    def isTableLine(self, line : str) -> bool:
+        """ decide if line is a data line of the table
+        """
         if self.primalboundhistory_exp.match(line):
             self.inTable = True
             self.ugmode = False

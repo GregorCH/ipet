@@ -979,6 +979,8 @@ class IPETEvaluation(IpetNode):
         columns = columndata.columns
         diff = lambda l1, l2: [x for x in l1 if x not in l2]
         lcolumns = diff(columns, ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'])
+        # show more info in table
+#        lcolumns = columndata.columns
 
         # compile a results table containing all instances
         ret = self.convertToHorizontalFormat(columndata[lcolumns])
@@ -1002,7 +1004,7 @@ class IPETEvaluation(IpetNode):
         activefiltergroups = self.getActiveFilterGroups()
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
-            reduceddata = self.applyFilterGroup(columndata, fg)
+            reduceddata = self.applyFilterGroup(columndata, fg, self.indexkeys[0])
             if (len(reduceddata) == 0):
                 fg.set_active(False)
                 logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
@@ -1023,8 +1025,8 @@ class IPETEvaluation(IpetNode):
         self.setEvaluated(True)
         return self.rettab, self.retagg
 
-    def applyFilterGroup(self, df, fg):
-        return fg.filterDataFrame(df)
+    def applyFilterGroup(self, df, fg, index):
+        return fg.filterDataFrame(df, index)
 
     def aggregateToPivotTable(self, df):
         # the general part sums up the number of instances falling into different categories

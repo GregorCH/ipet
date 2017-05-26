@@ -366,12 +366,12 @@ class IPETFilterGroup(IpetNode):
         return [f for f in self.filters if f.isActive()]
 
 
-    def filterDataFrame(self, df):
+    def filterDataFrame(self, df, index):
         """
         filters a data frame object as the intersection of all values that match the criteria defined by the filters
         """
 
-        groups = df.groupby(level=0)
+        groups = df.groupby(index)
         # first, get the highest number of problem occurrences. This number must be matched to keep the problem
         if self.filtertype == "intersection":
             instancecount = groups.apply(len).max()

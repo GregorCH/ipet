@@ -22,14 +22,14 @@ DEFAULT_BOUNDKEY = Key.PrimalBound
 
 def calcIntegralValue(thedatalist, pwlinear=False):
     """
-       calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
+    calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
 
-       Keyword arguments:
-       thedatalist -- a list of tuples (x_i,f(x_i)) (sorted by x_i-1 <= x_i)
-                      interpreted as step-wise constant function f between the x_i, and 0 outside the range of the x_i
-       pwlinear -- optional : should the method treat the function as piece-wise linear (True) or piece-wise constant
-                              step-function.
-
+    Parameters
+    ----------
+    thedatalist: a list of tuples (x_i,f(x_i)) (sorted by x_i-1 <= x_i)
+        interpreted as step-wise constant function f between the x_i, and 0 outside the range of the x_i
+    pwlinear: optional : should the method treat the function as piece-wise linear (True) or piece-wise constant
+        step-function.
     """
     assert len(thedatalist) >= 2
 

@@ -197,7 +197,7 @@ class Solver():
         """ Extract the sequence of primal bounds.
 
         Parameters
-        ----------v
+        ----------
         line
             a line of solver output that the information shall be read from
         Method has to be overwritten.

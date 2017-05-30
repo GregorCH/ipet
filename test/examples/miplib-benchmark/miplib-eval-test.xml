@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<Evaluation comparecolformat="%.3f" defaultgroup="tanglegram1" evaluateoptauto="False" index="LogFileName" columnindex="ProblemName" sortlevel="0">
+	<Column active="True" minval="1" name="LogDTime" transformfunc="log" translevel="0" reduction="mean">
+		<Column active="True" minval="1" name="DTime" transformfunc="subtract" translevel="0" reduction="mean">
+			<Column active="True" origcolname="Datetime_End" translevel="0"/>
+			<Column active="True" origcolname="Datetime_Start" translevel="0"/>
+		</Column>
+		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
+		<Aggregation aggregation="median" name="median" shiftby="100.0"/>
+	</Column>
+    <Column active="True" comp="quot" name="Nodes" origcolname="Nodes" nanrep="100" reduction="mean">
+		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
+	</Column>
+
+	<FilterGroup active="True" filtertype="intersection" name="all"/>
+	<FilterGroup active="False" filtertype="intersection" name="alloptimal">
+		<Filter active="True" anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>
+	</FilterGroup>
+	<FilterGroup active="False" filtertype="intersection" name="diff-timeouts">
+		<Filter active="True" anytestrun="one" expression1="_solved_" expression2="1" operator="eq"/>
+		<Filter active="True" anytestrun="one" expression1="_solved_" expression2="0" operator="eq"/>
+	</FilterGroup>
+	<FilterGroup active="False" filtertype="intersection" name="easyinstances">
+		<Filter active="True" anytestrun="all" expression1="Time" expression2="100" operator="le"/>
+	</FilterGroup>
+</Evaluation>

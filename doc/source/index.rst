@@ -1,5 +1,5 @@
-.. IPET: Interactive Performance Evaluation Tools documentation master file, created by
-   sphinx-quickstart on Wed Jun 15 10:27:58 2016.
+.. IPET documentation master file, created by
+   sphinx-quickstart on Mon May 29 12:59:01 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -8,15 +8,17 @@ IPET: Interactive Performance Evaluation Tools
 
 .. include:: description.md
 
-Contents:
----------
+Contents
+--------
+
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
 
    installation.md
    overview.md
    exampleusage.md
+   scripts.rst
    All modules of IPET <modules.rst>
 
 Indices and tables

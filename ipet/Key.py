@@ -79,9 +79,11 @@ class SolverStatusCodes:
 
     There are several reasons for a solver to terminate its calculations:
     It could have
+
         - found the optimal solution
         - found, that the problem was infeasible
         - hit a limit of memory, time or nodes,
+    
     or it could have simply been cancelled by the user
     or worse, could have crashed.
     """

@@ -2,3 +2,4 @@ numpy==1.11.0
 pandas==0.18.0
 scipy==0.17.0
 toposort==1.5
+pypandoc==1.4

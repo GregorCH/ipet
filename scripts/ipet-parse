@@ -23,6 +23,8 @@ import re
 import logging
 #from IPython.utils.text import dedent
 import textwrap
+import pypandoc
+
 DEFAULT_FORMATSTR = "{idx} {d}"
 
 formatstrExamples = """
@@ -79,8 +81,11 @@ argparser.add_argument("-f", "--formatstr", default = DEFAULT_FORMATSTR,
                                    )
 argparser.add_argument("-v", "--validatedual", action = "store_true", default = Experiment.DEFAULT_VALIDATEDUAL, help = "Enable dual validation, relative to 'gaptol' parameter")
 argparser.add_argument("-g", "--gaptol", type = float, default = Experiment.DEFAULT_GAPTOL, help = "relative tolerance for primal and dual objective validation")
+argparser.add_argument("--docmode", action = "store_true", default = False, help = "print this help as restructured text")
 
 if __name__ == '__main__':
+
+
     try:
         arguments = argparser.parse_args()
     except:
@@ -89,22 +94,27 @@ if __name__ == '__main__':
         exit()
     # if globals().get("help") is not None:
     logger = logging.getLogger()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')  
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     ch = logging.StreamHandler()
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+
+    if arguments.docmode:
+        print(pypandoc.convert_text(formatstrExamples, "rst", "md"))
+        exit()
+
     if arguments.debug:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-    # disable logging to console, in this case we just want the printstatement at the end  
+    # disable logging to console, in this case we just want the printstatement at the end
     if type(arguments.logfiles) == io.TextIOWrapper:
         logger.setLevel(logging.ERROR)
-    
+
     if arguments.logfiles is None:
         logging.info("No testruns specified, exiting")
         sys.exit(0)
-        
+
     # initialize an experiment
     experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
 
@@ -117,7 +127,7 @@ if __name__ == '__main__':
 
     for solver in loader.loadAdditionalSolvers():
         experiment.readermanager.addSolver(solver)
-    
+
     # search for solu files in current directory
     if arguments.solufiles == []:
         solufiles = [_file for _file in os.listdir("./") if _file.endswith(".solu")]
@@ -133,9 +143,9 @@ if __name__ == '__main__':
     if type(arguments.logfiles) != io.TextIOWrapper:
         for logfile in arguments.logfiles:
             experiment.addOutputFile(logfile)
-    
+
         experiment.collectData()
-        
+
         # Write output
         for tr in experiment.getTestRuns():
             try:
@@ -145,9 +155,9 @@ if __name__ == '__main__':
                 logging.info("converted %s --> %s" % (filename, newfilename))
             except:
                 logging.info("skipped testrun %s" % tr.getIdentification())
-    else: 
+    else:
         experiment.addStdinput()
         experiment.collectData()
         experiment.printToConsole(arguments.formatstr)
-        
-        
+
+

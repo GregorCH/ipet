@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Evaluation comparecolformat="%.3f" defaultgroup="benchmark.gurobi.out" evaluateoptauto="False" index="ProblemName" columnindex="" sortlevel="0">
+	<Column active="True" minval="1" name="LogDTime" transformfunc="log" translevel="0" reduction="mean">
+		<Column active="True" minval="1" name="DTime" transformfunc="subtract" translevel="0" reduction="mean">
+			<Column active="True" origcolname="Datetime_End" translevel="0"/>
+			<Column active="True" origcolname="Datetime_Start" translevel="0"/>
+		</Column>
+	</Column>
+	<Column active="True" name="LogTime1" translevel="0" reduction="lQuart" origcolname="LogDTime" />
+	<Column active="True" name="LogTime2" translevel="0" reduction="median" origcolname="LogDTime" />
+	<Column active="True" name="LogTime3" translevel="0" reduction="uQuart" origcolname="LogDTime" />
+	<Column active="True" name="LogTimeIQR" translevel="0" reduction="iqr" origcolname="LogDTime" />
+    <Column active="True" name="LTshmean" translevel="0" reduction="shmean" origcolname="LogDTime" />
+    <Column active="True" comp="quot" name="Nodes" origcolname="Nodes" nanrep="100" reduction="mean">
+		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
+		<Aggregation aggregation="gemean" name="gemean" shiftby="100.0"/>
+	</Column>
+
+	<FilterGroup active="True" filtertype="intersection" name="all"/>
+	<FilterGroup active="True" filtertype="intersection" name="alloptimal">
+		<Filter active="True" anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>
+	</FilterGroup>
+	<FilterGroup active="True" filtertype="intersection" name="diff-timeouts">
+		<Filter active="True" anytestrun="one" expression1="_solved_" expression2="1" operator="eq"/>
+		<Filter active="True" anytestrun="one" expression1="_solved_" expression2="0" operator="eq"/>
+	</FilterGroup>
+	<FilterGroup active="True" filtertype="intersection" name="easyinstances">
+		<Filter active="True" anytestrun="all" expression1="LogDTime" expression2="100" operator="le"/>
+	</FilterGroup>
+</Evaluation>

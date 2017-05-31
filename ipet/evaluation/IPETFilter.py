@@ -380,7 +380,6 @@ class IPETFilterGroup(IpetNode):
             intersectionfunction = lambda x:len(x) >= 1
 
         activefilters = self.getActiveFilters()
-
         # return a filtered data frame as intersection of all values that match all filter criteria and appear in every test run
         return groups.filter(lambda x:intersectionfunction(x) and np.all([filter_.filterDataFrame(x) for filter_ in activefilters]))
 

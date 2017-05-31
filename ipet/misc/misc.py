@@ -161,6 +161,21 @@ def listGetArithmeticMean(listofnumbers):
     arithmeticmean /= max(len(listofnumbers), 1) * 1.0
     return arithmeticmean
 
+def iqr(listofnumbers):
+    """ Convenience function to have better access to interQuartileRange
+    """
+    return np.percentile(listofnumbers, 75) - np.percentile(listofnumbers, 25)
+
+def lQuart(listofnumbers):
+    """ Convenience function to have better access to first quartile
+    """
+    return np.percentile(listofnumbers, 25)
+
+def uQuart(listofnumbers):
+    """ Convenience function to have better access to third quartile
+    """
+    return np.percentile(listofnumbers, 75)
+
 def shmean(listofnumbers, shiftby=10.0):
     """ Convenience function to have shorter access to shifted geometric mean
     """

@@ -47,7 +47,10 @@ class IPETEvaluationColumn(IpetNode):
                                "max":(1, -1),
                                "getBestStatus" : (1, -1),
                                "getWorstStatus" : (1, -1),
-                               "convertTimeStamp" : (1, 1)}
+                               "convertTimeStamp" : (1, 1),
+                               "iqr" : (1, -1),
+                               "lQuart" : (1, -1),
+                               "uQuart" : (1, -1), }
     
     possiblereductions = [  None,
                             "mean",
@@ -55,6 +58,9 @@ class IPETEvaluationColumn(IpetNode):
                             "min",
                             "std",
                             "gemean",
+                            "lQuart",
+                            "uQuart",
+                            "iqr",
                             "shmean",
                             "getBestStatus",
                             "getWorstStatus",
@@ -301,6 +307,7 @@ class IPETEvaluationColumn(IpetNode):
         """
         tries to find the transformation function from the numpy, misc, or Experiment modules
         """
+        # Do we also have to search in module Key (for getWorstStatus etc)?
         for module in [numpy, misc, Experiment]:
             try:
                 return getattr(module, self.transformfunc)
@@ -316,6 +323,7 @@ class IPETEvaluationColumn(IpetNode):
         funcname = self.reduction
         if funcname is None:
             funcname = "mean"
+        # Do we also have to search in module Key (for getWorstStatus etc)?
         for module in [numpy, misc, Experiment]:
             try:
                 return getattr(module, funcname)
@@ -490,7 +498,7 @@ class IPETEvaluation(IpetNode):
     def splitStringList(self, strList, splitChar = " "):
         """Split a string that represents list elements separated by optional split-character
         """
-        if strList is None:
+        if strList is None or strList == "":
             return []
         elif type(strList) is str:
             return strList.split(splitChar)
@@ -625,6 +633,7 @@ class IPETEvaluation(IpetNode):
             if col.getTransLevel() == 0:
                 df_long[col.getName()] = col.getColumnData(df_long)
 
+                # FARI
                 continue
                 # TODO Isn't this a problem with columnnames that are not unique?
                 # look if a comparison with the default group should be made
@@ -762,7 +771,6 @@ class IPETEvaluation(IpetNode):
 
         horidf = pd.concat(newcols, axis = 1)
         horidf = horidf.reset_index(self.indexkeys[0] + self.indexkeys[1])
-
         return horidf
 
     def convertToHorizontalFormat(self, df):
@@ -973,8 +981,9 @@ class IPETEvaluation(IpetNode):
         columndata = self.calculateNeededData(columndata)
         logging.debug("Result of calculateNeededData:\n{}\n".format(columndata))
 
+        #print(columndata)
         columndata = self.reduceByIndex(columndata)
-
+        #print(columndata)
         # show less info in long table
         columns = columndata.columns
         diff = lambda l1, l2: [x for x in l1 if x not in l2]
@@ -1031,61 +1040,71 @@ class IPETEvaluation(IpetNode):
     def aggregateToPivotTable(self, df):
         # the general part sums up the number of instances falling into different categories
         indices = ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + self.indexkeys[1]
-        generalpart = df[indices].pivot_table(index = self.indexkeys[1], aggfunc = sum)
+        if self.indexkeys[1] == []:
+            generalpart = df[indices].apply(sum)
+        else:
+            generalpart = df[indices].pivot_table(index = self.indexkeys[1], aggfunc = sum)
 
         # test if there is any aggregation to be calculated
         activecolumns = self.getActiveColumns()
         colsandaggregations = [(col, agg) for col in activecolumns for agg in col.aggregations]
+        logging.debug("Cols and aggregations:\n".format([(c.getName(), a.getName()) for (c, a) in colsandaggregations]))
 
         # if no aggregation was specified, return only the general part
         if len(colsandaggregations) == 0:
             return generalpart
 
         # column aggregations aggregate every column and every column aggregation
-        tabs = (df[[col.getName()] + self.indexkeys[1]].pivot_table(index = self.indexkeys[1], aggfunc = agg.aggregate) for col, agg in colsandaggregations)
+
+        if self.indexkeys[1] == []:
+            tabs = (df[[col.getName()] + self.indexkeys[1]].apply(agg.aggregate) for col, agg in colsandaggregations)
+        else:
+            tabs = (df[[col.getName()] + self.indexkeys[1]].pivot_table(index = self.indexkeys[1], aggfunc = agg.aggregate) for col, agg in colsandaggregations)
         colaggpart = pd.concat(tabs, axis = 1)
-        
-        # print df[["DualInt", "Settings"]].pivot_table(index = "Settings", aggfunc = numpy.min)
         # rename the column aggregations
-        # print colaggpart
         newnames = ['_'.join((col.getName(), agg.getName())) for col, agg in colsandaggregations]
         # set newnames
         colaggpart.columns = newnames
 
-        # determine the row in the aggregated table corresponding to the default group
-        logging.debug("Index of colaggpart:\n{}".format(colaggpart.index))
-
-        if (self.defaultgroup is not None) and (self.defaultgroup in colaggpart.index):
-            defaultrow = colaggpart.loc[self.defaultgroup, :]
+        if self.indexkeys[1] == []:
+            return pd.DataFrame(generalpart.append(colaggpart.iloc[0])).T
         else:
-            # if there is no default setting, take the first group as default group
-            try:
-                self.defaultgroup = colaggpart.index[0]
-                defaultrow = colaggpart.iloc[0, :]
-            except:
-                defaultrow = numpy.nan
+            # determine the row in the aggregated table corresponding to the default group
+            logging.debug("Index of colaggpart:\n{}".format(colaggpart.index))
 
-        # determine quotients
-        comppart = colaggpart / defaultrow
-        comppart.columns = [col + 'Q' for col in colaggpart.columns]
+            if (self.defaultgroup is not None) and (self.defaultgroup in colaggpart.index):
+                defaultrow = colaggpart.loc[self.defaultgroup, :]
+            else:
+                # if there is no default setting, take the first group as default group
+                try:
+                    self.defaultgroup = colaggpart.index[0]
+                    defaultrow = colaggpart.iloc[0, :]
+                except:
+                    defaultrow = numpy.nan
 
-        # apply statistical tests, whereever possible
-        statspart = self.applyStatsTests(df)
+            # determine quotients
+            comppart = colaggpart / defaultrow
+            comppart.columns = [col + 'Q' for col in colaggpart.columns]
 
-        # glue the parts together
-        parts = [generalpart, colaggpart, comppart]
+            # apply statistical tests, whereever possible
+            statspart = self.applyStatsTests(df)
 
-        logging.debug("Statspart : \n{}".format(statspart))
-        if statspart is not None:
-            parts.append(statspart)
+            # glue the parts together
+            parts = [generalpart, colaggpart, comppart]
 
-        return pd.concat(parts, axis=1)
+            logging.debug("Statspart : \n{}".format(statspart))
+            if statspart is not None:
+                parts.append(statspart)
+
+            return pd.concat(parts, axis = 1)
 
     def applyStatsTests(self, df):
         """
         apply statistical tests defined by each column
         """
-
+        # TODO What if indexkeys[1] is empty?
+        if self.indexkeys[1] == []:
+            return None
         # group the data by the groupkey
         groupeddata = dict(list(df.groupby(self.indexkeys[1])))
         stats = []

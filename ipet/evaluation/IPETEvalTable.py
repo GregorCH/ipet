@@ -21,6 +21,8 @@ import logging
 from ipet import Experiment
 from ipet import Key
 from cgi import log
+from pandas.core.frame import DataFrame
+from unittest.mock import inplace
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -590,6 +592,8 @@ class IPETEvaluation(IpetNode):
             x = [float(d) for d in dg]
         except:
             x = dg
+        if len(x) > len(self.indexkeys[1]):
+            x = x[:len(self.indexkeys[1])]
         if len(x) == 1:
             self.defaultgroup = x[0]
         else:
@@ -608,6 +612,38 @@ class IPETEvaluation(IpetNode):
         """ Should the evaluation calculate optimal auto settings?
         """
         self.set_evaluateoptauto(evaloptauto)
+
+    def addComparisonColumns(self, df):
+        if self.indexkeys[1] == []:
+            return df
+        usercolumns = []
+
+        for col in self.toposortColumns(self.getActiveColumns()):
+            # look if a comparison with the default group should be made
+            if col.getTransLevel() == 0 and col.getCompareMethod() is not None:
+
+                grouped = df.groupby(self.indexkeys[1])[col.getName()]
+                compcol = dict(list(grouped))[self.defaultgroup]
+
+                comparecolname = col.getCompareColName()
+
+                # apply the correct comparison method to the original and the temporary column
+                compmethod = col.getCompareMethod()
+                method = lambda x:compmethod(*x)
+
+                df[comparecolname] = 0
+                for name, group in grouped:
+                    tmpgroup = DataFrame(group.reset_index(drop = True))
+                    tmpgroup["_tmpcol_"] = compcol.reset_index(drop = True)
+                    tmpgroup[comparecolname] = tmpgroup[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)#.set_index(group.index)
+                    df[comparecolname].update((tmpgroup.set_index(group.index))[comparecolname])
+
+#                print(df[comparecolname])
+                usercolumns.append(comparecolname)
+
+        # TODO Sort usercolumns?
+        self.usercolumns = self.usercolumns + usercolumns
+        return df
 
     def reduceToColumns(self, df_long):
         """ reduces the huge number of columns
@@ -629,32 +665,8 @@ class IPETEvaluation(IpetNode):
         # We are only interested in the columns that are activated in the eval file
         usercolumns = [c.getName() for c in self.getActiveColumns()]
         for col in self.toposortColumns(self.getActiveColumns()):
-#        for col in self.getActiveColumns():
             if col.getTransLevel() == 0:
                 df_long[col.getName()] = col.getColumnData(df_long)
-
-                # FARI
-                continue
-                # TODO Isn't this a problem with columnnames that are not unique?
-                # look if a comparison with the default group should be made
-                if col.getCompareMethod() is not None:
-
-                    #
-                    # ATTENTION: This assumes that the index for 'defaultgroup' is already unique.
-                    #
-                    compcol = dict(list(df_long.groupby(self.indexkeys[1])[col.getName()]))[self.defaultgroup]
-
-                    # save as temporary column. This will expand the smaller compcol index to the larger data frame
-                    df_long["_tmpcol_"] = compcol
-
-                    # append the right suffix to the column name
-                    comparecolname = col.getCompareColName()
-
-                    # apply the correct comparison method to the original and the temporary column
-                    compmethod = col.getCompareMethod()
-                    method = lambda x:compmethod(*x)
-                    df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis=1)
-                    usercolumns.append(comparecolname)
 
         # concatenate level one columns into a new data frame and treat them as the altogether setting
         newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
@@ -981,9 +993,9 @@ class IPETEvaluation(IpetNode):
         columndata = self.calculateNeededData(columndata)
         logging.debug("Result of calculateNeededData:\n{}\n".format(columndata))
 
-        #print(columndata)
         columndata = self.reduceByIndex(columndata)
-        #print(columndata)
+        columndata = self.addComparisonColumns(columndata)
+
         # show less info in long table
         columns = columndata.columns
         diff = lambda l1, l2: [x for x in l1 if x not in l2]
@@ -1037,7 +1049,13 @@ class IPETEvaluation(IpetNode):
     def applyFilterGroup(self, df, fg, index):
         return fg.filterDataFrame(df, index)
 
-    def aggregateToPivotTable(self, df):
+    def aggregateToPivotTable(self, df : DataFrame) -> DataFrame:
+        """ Aggregates data to table
+
+        Parameters
+        ----------
+        df: DataFrame containing the old data
+        """
         # the general part sums up the number of instances falling into different categories
         indices = ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + self.indexkeys[1]
         if self.indexkeys[1] == []:

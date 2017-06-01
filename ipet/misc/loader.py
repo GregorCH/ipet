@@ -46,6 +46,20 @@ def loadAdditionalSolvers():
         return addsolvers
     else:
         return []
+
+def loadAdditionalSolufiles(filenames = []):
+    solufiles = []
+    # search for solu files in current directory
+    if filenames == []:
+        for _file in os.listdir("./"):
+            if _file.endswith(".solu"):
+                solufiles.append(_file)
+    if solufiles == []:
+        if solufilesDirExists():
+            for _file in os.listdir(getSolufilesDir()):
+                if _file.endswith(".solu"):
+                    solufiles.append(_file)
+    return solufiles
     
 def getIpetDir():
     return os.path.expanduser("~/.ipet")
@@ -53,6 +67,9 @@ def getIpetDir():
 def getReadersDir():
     return os.path.expanduser('~/.ipet/readers')
     
+def getSolufilesDir():
+    return os.path.expanduser('~/.ipet/solufiles')
+
 def getSolversDir():
     return os.path.expanduser('~/.ipet/solvers')
 
@@ -61,6 +78,9 @@ def dirExists(path):
 
 def ipetDirExists():
     return dirExists(getIpetDir())
+
+def solufilesDirExists():
+    return dirExists(getSolufilesDir())
 
 def solversDirExists():
     return dirExists(getSolversDir())

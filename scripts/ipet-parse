@@ -55,10 +55,19 @@ To make the information more readible, the syntax has further options for format
     3 aflow40b                                        600.0
 """
 explainAutoloading = """
-Autoloading behaviour
----------------------
+Loading additional files
+------------------------
 
-By default
+Ipet-parse can load additional .solu-files, .meta-files, Readers specified via xml and Solvers specified as python classes.
+
+    - Solvers are automatically loaded from the ~/.ipet/solvers directory.
+        They have to be derived from the 'Solver' class and implement some basic methods.
+    - Readers are automatically loaded from the current and the ~/.ipet/readers directories.
+        A (list of) readers can also be passed via the commandline -r parameter.
+        They have to be specified via xml, i.e. via the graphical user interface.
+    - .solu-files are loaded from the current directory if none are specified via the commandline -s parameter.
+        If no solu-file is found in the current directory, IPET loads them from ~/.ipet/solufiles.
+    - For .meta-files IPET simply substitutes for every logfile the extension .out with .meta and tries to load it from the same location.
 """
 
 # possible arguments in the form name,default,short,description #
@@ -118,25 +127,16 @@ if __name__ == '__main__':
     # initialize an experiment
     experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
 
-    readers = loader.loadAdditionalReaders(arguments.readers)
-    logging.info("No additional readers specified. Found following %d reader files (.ipr, .xml) in directory: [%s]", len(readers), ", ".join(readers))
-
-    for reader in readers:
+    for reader in loader.loadAdditionalReaders(arguments.readers):
         experiment.readermanager.registerReader(reader)
         logging.info("Registered reader with name %s" % reader.getName())
 
     for solver in loader.loadAdditionalSolvers():
         experiment.readermanager.addSolver(solver)
 
-    # search for solu files in current directory
-    if arguments.solufiles == []:
-        solufiles = [_file for _file in os.listdir("./") if _file.endswith(".solu")]
-        logging.info("No '.solu'-files specified. Found %d .solu files in directory: %s", len(solufiles), ", ".join(solufiles))
-    else:
-        solufiles = arguments.solufiles
-
-    for solufile in solufiles:
+    for solufile in loader.loadAdditionalSolufiles(arguments.solufiles):
         experiment.addSoluFile(solufile)
+        logging.info("Imported solufile with name %s" % solufile.getName())
 
     logging.info("Start parsing process")
 

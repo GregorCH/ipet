@@ -20,9 +20,7 @@ from ipet.misc import misc
 import logging
 from ipet import Experiment
 from ipet import Key
-from cgi import log
 from pandas.core.frame import DataFrame
-from unittest.mock import inplace
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -613,7 +611,22 @@ class IPETEvaluation(IpetNode):
         """
         self.set_evaluateoptauto(evaloptauto)
 
-    def addComparisonColumns(self, df):
+    def addComparisonColumns(self, df: DataFrame) -> DataFrame:
+        """ Add the comparison columns.
+
+        Add the specified comparison columns to df, returns extended df in the same format
+
+        Parameters
+        ----------
+        df
+            DataFrame containing only relevant data.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The original DataFrame with the extra columns appended.
+        """
         if self.indexkeys[1] == []:
             return df
         usercolumns = []
@@ -645,11 +658,21 @@ class IPETEvaluation(IpetNode):
         self.usercolumns = self.usercolumns + usercolumns
         return df
 
-    def reduceToColumns(self, df_long):
-        """ reduces the huge number of columns
+    def reduceToColumns(self, df_long : DataFrame) -> DataFrame:
+        """ Reduce the huge number of columns
         
-        reduces df_long to the columns specified in evaluation xmlfile
-        (concatenates usercolumns, neededcolumns and additionalfiltercolumns from df_long)
+        Reduce the raw data to the columns specified in evaluation xmlfile.
+        (concatenate usercolumns, neededcolumns and additionalfiltercolumns from df_long)
+
+        Parameters
+        ----------
+        df_long
+            The DataFrame containing the parsed data from one or multiple .trn files created by ipet-parse.
+
+        Returns
+        -------
+        DataFrame
+            A DataFrame in the same format as df_long with only the relevant columns.
         """
         #
         # Attention: this will be deleted soon because it is not flexible enough
@@ -687,8 +710,18 @@ class IPETEvaluation(IpetNode):
         self.usercolumns = usercolumns
         return result
     
-    def toposortColumns(self, columns):
-        """Compute a topological ordering respecting the data dependencies of the specified column list
+    def toposortColumns(self, columns : list) -> list:
+        """ Compute a topological ordering respecting the data dependencies of the specified column list.
+        
+        Parameters
+        ----------
+        columns
+            A list of the column-objects to be sorted.
+        
+        Returns
+        -------
+        list 
+            A list of topologically sorted column objects.
         """
         adj = self.getDependencies(columns)
 
@@ -704,15 +737,38 @@ class IPETEvaluation(IpetNode):
 
         return sorted(columns, key = lambda x: indices.get(x.getName(), -1))
 
-    def getDependencies(self, columns):
-        # TODO is this the right thing?
+    def getDependencies(self, columns : list) -> dict:
+        """ Recursively collect the dependencies of a list of columns.
+        
+        Parameters
+        ----------
+        columns 
+            A list of columns
+            
+        Returns
+        -------
+            A dictionary containing the names and dependencies of the columns.
+        """
         adj = {}
         for col in columns:
             adj.update(col.getDependencies())
         return adj
     
-    def calculateNeededData(self, df):
-        """ Calculate and concatenate needed data about status and problemname 
+    def calculateNeededData(self, df : DataFrame) -> DataFrame:
+        """ Add the status columns.
+
+        Calculate and append needed data about statuses
+
+        Parameters
+        ----------
+        df
+            DataFrame containing only relevant data.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The original DataFrame with the extra columns appended.
         """
         df['_time_'] = (df[Key.ProblemStatus].isin((Key.ProblemStatusCodes.Better, Key.ProblemStatusCodes.TimeLimit)))
         df['_limit_'] = ((df['_time_']) | df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.NodeLimit,
@@ -768,7 +824,22 @@ class IPETEvaluation(IpetNode):
                 ev.addColumn(IPETEvaluationColumn.processXMLElem(child))
         return ev
 
-    def reduceByIndex(self, df):
+    def reduceByIndex(self, df : DataFrame) -> DataFrame:
+        """ Reduce data to have a unique index given by indexkeys.
+
+        Each column is reduced by it's reduction function such that indexkeys yield a unique hierarchical index.
+
+        Parameters
+        ----------
+        df
+            DataFrame containing data to be reduced.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The reduced DataFrame.
+        """
         tmpcols = list(set(self.usercolumns + self.indexkeys[0] + self.indexkeys[1] + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
         horidf = df[tmpcols]
         grouped = horidf.groupby(by = self.indexkeys[0] + self.indexkeys[1])
@@ -785,7 +856,24 @@ class IPETEvaluation(IpetNode):
         horidf = horidf.reset_index(self.indexkeys[0] + self.indexkeys[1])
         return horidf
 
-    def convertToHorizontalFormat(self, df):
+    def convertToHorizontalFormat(self, df : DataFrame) -> DataFrame:
+        """ Convert data to have an index given by indexkeys.
+
+        Indexkeys are defined by "index" and "columnindex", these yield a unique index.
+        indexkeys[0] is taken as (hierarchical) row index,
+        indexkeys[1] is taken as (hierarchical) column index.
+
+        Parameters
+        ----------
+        df
+            DataFrame containing data to be converted.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The converted DataFrame.
+        """
         df = df.set_index(self.indexkeys[0] + self.indexkeys[1]).sort_index(level = 0)
         df = df.unstack(self.indexkeys[1])
         if len(self.indexkeys[1]) > 0 :
@@ -954,18 +1042,21 @@ class IPETEvaluation(IpetNode):
     def getInstanceData(self):
         return self.rettab
 
-    def evaluate(self, exp):
+    def evaluate(self, exp : Experiment):
         """
         evaluate the data of an Experiment instance exp
 
         Parameters
         ----------
-        exp : an experiment instance for which data has already been collected
+        exp
+            an experiment instance for which data has already been collected
 
         Returns
         -------
-        rettab : an instance-wise table of the specified columns
-        retagg : aggregated results for every filter group and every entry of the specified
+        rettab
+            an instance-wise table of the specified columns
+        retagg
+            aggregated results for every filter group and every entry of the specified
         """
         self.checkMembers()
 
@@ -1050,11 +1141,22 @@ class IPETEvaluation(IpetNode):
         return fg.filterDataFrame(df, index)
 
     def aggregateToPivotTable(self, df : DataFrame) -> DataFrame:
-        """ Aggregates data to table
+        """ Aggregates long data to short table
+
+        Aggregate long table to short one.
+        Values of columns are aggregated over "index", therefore "columnindex" becomes rowindex.
+        In case "columnindex" was empty, the result is a table with only one row.
 
         Parameters
         ----------
-        df: DataFrame containing the old data
+        df
+            DataFrame containing the long data (with unique index),
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The aggregated DataFrame.
         """
         # the general part sums up the number of instances falling into different categories
         indices = ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + self.indexkeys[1]

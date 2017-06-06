@@ -1265,14 +1265,14 @@ class IPETEvaluation(IpetNode):
                 continue
             defaultvalues = None
             try:
-                defaultvalues = groupeddata[self.defaultgroup][col.getName()]
+                defaultvalues = groupeddata[self.defaultgroup][col.getName()].reset_index(drop = True)
             except KeyError:
                 logging.info("Sorry, cannot retrieve default values for column %s, key %s for applying statistical test)" % (col.getName(), self.defaultgroup))
                 continue
 
             # iterate through the stats tests associated with each column
             for statstest in col.getStatsTests():
-                stats.append(df[self.getColIndex() + [col.getName()]].pivot_table(index = self.getColIndex(), aggfunc = lambda x:statstest(x, defaultvalues)))
+                stats.append(df[self.getColIndex() + [col.getName()]].pivot_table(index = self.getColIndex(), aggfunc = lambda x:statstest(x.reset_index(drop = True), defaultvalues)))
                 names.append('_'.join((col.getName(), statstest.__name__)))
 
         if len(stats) > 0:

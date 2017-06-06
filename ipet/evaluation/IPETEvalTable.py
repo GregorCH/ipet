@@ -434,6 +434,34 @@ class FormatFunc:
 
     def beautify(self, x):
         return (self.formatstr % x)
+    
+    
+class StrTuple:
+    """
+    Represents an easier readible and parsable list of strings
+    """
+    def __init__(self, strList, splitChar = " "):
+        self.tuple = StrTuple.splitStringList(strList, splitChar)
+        self.splitChar = splitChar
+        
+    @staticmethod        
+    def splitStringList(strList, splitChar = " "):
+        """Split a string that represents list elements separated by optional split-character
+        """
+        if strList is None or strList == "":
+            return None
+        elif type(strList) is str:
+            return tuple(strList.split(splitChar))
+        else:
+            return tuple(strList)
+
+    def getTuple(self):
+        if self.tuple is None:
+            return tuple()
+        return self.tuple
+        
+    def __str__(self):
+        return self.splitChar.join(self.tuple)
 
 class IPETEvaluation(IpetNode):
     """
@@ -453,15 +481,16 @@ class IPETEvaluation(IpetNode):
 #    DEFAULT_GROUPKEY = "Settings"
     DEFAULT_GROUPKEY = Key.ProblemStatus
     DEFAULT_COMPARECOLFORMAT = "%.3f"
-    DEFAULT_INDEX = Key.ProblemName
+    DEFAULT_INDEX = " ".join((Key.ProblemName, "LogFileName"))
     DEFAULT_COLUMNINDEX = "ProblemStatus"
+    DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 
-    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat", "index", "columnindex"]
+    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat", "index", "indexsplit"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
 
     def __init__(self, groupkey = DEFAULT_GROUPKEY, defaultgroup = None, evaluateoptauto = True,
-                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT, index = DEFAULT_INDEX, columnindex = DEFAULT_COLUMNINDEX):
+                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT, index = DEFAULT_INDEX, indexsplit=DEFAULT_INDEXSPLIT):
         """
         constructs an Ipet-Evaluation
 
@@ -472,8 +501,8 @@ class IPETEvaluation(IpetNode):
         evaluateoptauto : should optimal auto settings be calculated?
         sortlevel : level on which to base column sorting, '0' for group level, '1' for column level
         comparecolformat : format string for comparison columns
-        index : (string or list or None) single or multiple column names that serve as (row) indices
-        columnindex : (string or list or None) single or multiple column names that serve as column indices
+        index : (string or list or None) single or multiple column names that serve as (row) and column index levels
+        indexsplit : (int) position to split index into row and column levels, negative to count from the end.
         """
 
         # construct super class first, Evaluation is currently always active
@@ -481,30 +510,17 @@ class IPETEvaluation(IpetNode):
 
         self.filtergroups = []
         self.groupkey = groupkey
-        self.defaultgroupvalues = []
         self.comparecolformat = comparecolformat[:]
         self.columns = []
         self.set_evaluateoptauto(evaluateoptauto)
         self.sortlevel = int(sortlevel)
         self.evaluated = False
-        self.indexkeys = [[], []]
 
-        self.set_index(self.splitStringList(index))
-        self.set_index(self.splitStringList(columnindex), level = 1)
+        self.set_index(index)
+        self.indexsplit = int(indexsplit)
 
-        self.defaultgroupvalues = self.splitStringList(defaultgroup, ":")
-        self.setDefaultGroup(self.defaultgroupvalues)
-
-    def splitStringList(self, strList, splitChar = " "):
-        """Split a string that represents list elements separated by optional split-character
-        """
-        if strList is None or strList == "":
-            return []
-        elif type(strList) is str:
-            return strList.split(splitChar)
-        else:
-            return strList
-
+        self.set_defaultgroup(defaultgroup)
+        
     def getName(self):
         return self.nodetag
 
@@ -528,6 +544,9 @@ class IPETEvaluation(IpetNode):
 
     def setCompareColFormat(self, comparecolformat):
         self.comparecolformat = comparecolformat[:]
+        
+    def attributesToStringDict(self):
+        return {k:str(v) for k, v in self.attributesToDict().items() if v is not None and str(v) != ""}
 
     @staticmethod
     def getNodeTag():
@@ -578,24 +597,36 @@ class IPETEvaluation(IpetNode):
 #    def setGroupKey(self, gk):
 #        self.groupkey = gk
 
-    def set_index(self, index : list, level : int = 0):
+    def set_index(self, index : list):
         """Set index identifier list, optionally with level specification (0 for row index, 1 for column index)
         """
-        logging.debug("Set index for level {} to {}".format(level, index))
-        self.indexkeys[level] = index
+        self.index = StrTuple(index)
+        logging.debug("Set index to '{}'".format(index))
+        
+    def getRowIndex(self) -> list:
+        """Return (list of) keys to create row index 
+        """
+        return list(self.index.getTuple())[:self.indexsplit]
+    
+    def getColIndex(self) -> list:
+        """Return (list of) keys to create column index
+        """
+        return list(self.index.getTuple())[self.indexsplit:]
 
-    def setDefaultGroup(self, dg):
-        dg = self.splitStringList(dg, ":")
+    def set_defaultgroup(self, dg):
+        dg = StrTuple.splitStringList(dg, ":")
         try:
             x = [float(d) for d in dg]
         except:
             x = dg
-        if len(x) > len(self.indexkeys[1]):
-            x = x[:len(self.indexkeys[1])]
-        if len(x) == 1:
+        if x is not None and len(x) > len(self.getColIndex()):
+            x = x[:len(self.getColIndex())]
+        if x is not None and len(x) == 1:
             self.defaultgroup = x[0]
+        elif x is not None:
+            self.defaultgroup = StrTuple(tuple(x), ":")
         else:
-            self.defaultgroup = tuple(x)
+            self.defaultgroup = None
         self.setEvaluated(False)
     
     def addColumn(self, col):
@@ -627,7 +658,7 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The original DataFrame with the extra columns appended.
         """
-        if self.indexkeys[1] == []:
+        if self.getColIndex() == []:
             return df
         usercolumns = []
 
@@ -635,7 +666,7 @@ class IPETEvaluation(IpetNode):
             # look if a comparison with the default group should be made
             if col.getTransLevel() == 0 and col.getCompareMethod() is not None:
 
-                grouped = df.groupby(self.indexkeys[1])[col.getName()]
+                grouped = df.groupby(self.getColIndex())[col.getName()]
                 compcol = dict(list(grouped))[self.defaultgroup]
 
                 comparecolname = col.getCompareColName()
@@ -694,7 +725,7 @@ class IPETEvaluation(IpetNode):
         # concatenate level one columns into a new data frame and treat them as the altogether setting
         newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
 
-        for x in self.indexkeys[0] + self.indexkeys[1]:
+        for x in self.index.getTuple():
             if x not in newcols:
                 newcols.append(x)
         neededcolumns = [col for col in newcols if col not in usercolumns]
@@ -840,9 +871,9 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The reduced DataFrame.
         """
-        tmpcols = list(set(self.usercolumns + self.indexkeys[0] + self.indexkeys[1] + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
+        tmpcols = list(set(self.usercolumns + list(self.index.getTuple()) + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
         horidf = df[tmpcols]
-        grouped = horidf.groupby(by = self.indexkeys[0] + self.indexkeys[1])
+        grouped = horidf.groupby(by = self.index.getTuple())
         newcols = []
 
         reductionMap = {'_solved_' : numpy.all, '_count_' : numpy.max}
@@ -853,7 +884,7 @@ class IPETEvaluation(IpetNode):
             newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
 
         horidf = pd.concat(newcols, axis = 1)
-        horidf = horidf.reset_index(self.indexkeys[0] + self.indexkeys[1])
+        horidf = horidf.reset_index(self.index.getTuple())
         return horidf
 
     def convertToHorizontalFormat(self, df : DataFrame) -> DataFrame:
@@ -874,10 +905,10 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The converted DataFrame.
         """
-        df = df.set_index(self.indexkeys[0] + self.indexkeys[1]).sort_index(level = 0)
-        df = df.unstack(self.indexkeys[1])
-        if len(self.indexkeys[1]) > 0 :
-            df = df.swaplevel(0, len(self.indexkeys[1]), axis = 1)
+        df = df.set_index(list(self.index.getTuple())).sort_index(level = 0)
+        df = df.unstack(self.getColIndex())
+        if len(self.getColIndex()) > 0 :
+            df = df.swaplevel(0, len(self.getColIndex()), axis = 1)
         return df
 
     def checkStreamType(self, streamtype):
@@ -1066,8 +1097,8 @@ class IPETEvaluation(IpetNode):
 
         if not self.groupkey in data.columns:
             raise KeyError(" Group key is missing in data:", self.groupkey)
-#        elif self.defaultgroup is not None and self.defaultgroup not in data[self.indexkeys[1][0]].values:
-#            possiblebasegroups = sorted(data[self.indexkeys[1][0]].unique())
+#        elif self.defaultgroup is not None and self.defaultgroup not in data[self.getColIndex()[0]].values:
+#            possiblebasegroups = sorted(data[self.getColIndex()[0]].unique())
 #            logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
 #            self.defaultgroup = possiblebasegroups[0]
 #            logging.info(" Using value <%s> as base group" % (self.defaultgroup))
@@ -1116,7 +1147,7 @@ class IPETEvaluation(IpetNode):
         activefiltergroups = self.getActiveFilterGroups()
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
-            reduceddata = self.applyFilterGroup(columndata, fg, self.indexkeys[0])
+            reduceddata = self.applyFilterGroup(columndata, fg, self.getRowIndex())
             if (len(reduceddata) == 0):
                 fg.set_active(False)
                 logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
@@ -1159,11 +1190,11 @@ class IPETEvaluation(IpetNode):
             The aggregated DataFrame.
         """
         # the general part sums up the number of instances falling into different categories
-        indices = ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + self.indexkeys[1]
-        if self.indexkeys[1] == []:
+        indices = ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + self.getColIndex()
+        if self.getColIndex() == []:
             generalpart = df[indices].apply(sum)
         else:
-            generalpart = df[indices].pivot_table(index = self.indexkeys[1], aggfunc = sum)
+            generalpart = df[indices].pivot_table(index = self.getColIndex(), aggfunc = sum)
 
         # test if there is any aggregation to be calculated
         activecolumns = self.getActiveColumns()
@@ -1176,17 +1207,17 @@ class IPETEvaluation(IpetNode):
 
         # column aggregations aggregate every column and every column aggregation
 
-        if self.indexkeys[1] == []:
-            tabs = (df[[col.getName()] + self.indexkeys[1]].apply(agg.aggregate) for col, agg in colsandaggregations)
+        if self.getColIndex() == []:
+            tabs = (df[[col.getName()] + self.getColIndex()].apply(agg.aggregate) for col, agg in colsandaggregations)
         else:
-            tabs = (df[[col.getName()] + self.indexkeys[1]].pivot_table(index = self.indexkeys[1], aggfunc = agg.aggregate) for col, agg in colsandaggregations)
+            tabs = (df[[col.getName()] + self.getColIndex()].pivot_table(index = self.getColIndex(), aggfunc = agg.aggregate) for col, agg in colsandaggregations)
         colaggpart = pd.concat(tabs, axis = 1)
         # rename the column aggregations
         newnames = ['_'.join((col.getName(), agg.getName())) for col, agg in colsandaggregations]
         # set newnames
         colaggpart.columns = newnames
 
-        if self.indexkeys[1] == []:
+        if self.getColIndex() == []:
             return pd.DataFrame(generalpart.append(colaggpart.iloc[0])).T
         else:
             # determine the row in the aggregated table corresponding to the default group
@@ -1223,10 +1254,10 @@ class IPETEvaluation(IpetNode):
         apply statistical tests defined by each column
         """
         # TODO What if indexkeys[1] is empty?
-        if self.indexkeys[1] == []:
+        if self.getColIndex() == []:
             return None
         # group the data by the groupkey
-        groupeddata = dict(list(df.groupby(self.indexkeys[1])))
+        groupeddata = dict(list(df.groupby(self.getColIndex())))
         stats = []
         names = []
         for col in self.getActiveColumns():
@@ -1241,7 +1272,7 @@ class IPETEvaluation(IpetNode):
 
             # iterate through the stats tests associated with each column
             for statstest in col.getStatsTests():
-                stats.append(df[self.indexkeys[1] + [col.getName()]].pivot_table(index = self.indexkeys[1], aggfunc = lambda x:statstest(x, defaultvalues)))
+                stats.append(df[self.getColIndex() + [col.getName()]].pivot_table(index = self.getColIndex(), aggfunc = lambda x:statstest(x, defaultvalues)))
                 names.append('_'.join((col.getName(), statstest.__name__)))
 
         if len(stats) > 0:

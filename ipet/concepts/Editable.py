@@ -62,7 +62,7 @@ class Editable:
         elif other.__class__ != self.__class__:
             return False
         
-        return self.attributesToDict() == other.attributesToDict()
+        return self.attributesToStringDict() == other.attributesToStringDict()
         
 class EditableAttributeError(Exception):
     """

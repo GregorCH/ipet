@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
     for solufile in loader.loadAdditionalSolufiles(arguments.solufiles):
         experiment.addSoluFile(solufile)
-        logging.info("Imported solufile with name %s" % solufile.getName())
+        logging.info("Imported solufile with name %s" % solufile)
 
     logging.info("Start parsing process")
 

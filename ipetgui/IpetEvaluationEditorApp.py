@@ -262,7 +262,7 @@ if __name__ == "__main__":
     app.setApplicationName("Evaluation editor")
     mainwindow = IpetEvaluationEditorApp()
     ev = IPETEvaluation.fromXMLFile("../test/testevaluate.xml")
-    ev.setDefaultGroup('testmode')
+    ev.set_defaultgroup('testmode')
     ExperimentManagement.addOutputFiles(["../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"])
     ExperimentManagement.getExperiment().collectData()
     mainwindow.setEvaluation(ev)

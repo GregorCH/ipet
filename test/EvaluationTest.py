@@ -57,8 +57,6 @@ class EvaluationTest(unittest.TestCase):
             try:
                 saveAsXML(node, os.path.join(TMPDIR, basename + ".xml"))
             except TypeError as e:
-                print(node.toXMLElem())
-                print(node.attributesToStringDict())
                 raise e
 
         ev = IPETEvaluation.fromXMLFile(EVALTEST)
@@ -76,15 +74,13 @@ class EvaluationTest(unittest.TestCase):
 
         modificationlist = [{},
                             {"sortlevel":1},
-                            {"groupkey":"foo"},
+                            {"index":"foo bar"},
                             {"defaultgroup":"bar"},
                             {"evaluateoptauto":False}
                             ]
         for mod in modificationlist:
-
             evaluation = IPETEvaluation(**mod)
             evaluation2 = IPETEvaluation.fromXML(ElementTree.tostring(evaluation.toXMLElem()))
-
             self.assertTrue(evaluation.equals(evaluation2),
                              "The two evaluations are not the same after modifying %s" % mod)
 

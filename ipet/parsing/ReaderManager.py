@@ -38,6 +38,9 @@ class ReaderManager(Manager, IpetNode):
 
     xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
 
+    context2string = {Key.CONTEXT_LOGFILE:"LogFile",
+                      Key.CONTEXT_ERRFILE:"ErrFile"}
+
     def __init__(self, problemexpression = "@01", problemendexpression = "=ready="):
         """
         constructs a new reader Manager
@@ -183,9 +186,7 @@ class ReaderManager(Manager, IpetNode):
         """
         Saves the information about in what lines to find relevant information
         """
-        context2string = {Key.CONTEXT_LOGFILE:"LogFile",
-                          Key.CONTEXT_ERRFILE:"ErrFile"}
-        contextstring = context2string.get(currentcontext)
+        contextstring = self.context2string.get(currentcontext)
         if contextstring is None:
             return
         self.testrun.addData("%s%s" % (prefix, contextstring), linenumber)

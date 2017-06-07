@@ -4,8 +4,6 @@ import os
 from ipet import Key
 from ipet.misc import misc
 from operator import itemgetter
-from pip._vendor.distlib._backport.tarfile import TUREAD
-from IPython.utils import ulinecache
 from builtins import int, str
 from numpy import char
 

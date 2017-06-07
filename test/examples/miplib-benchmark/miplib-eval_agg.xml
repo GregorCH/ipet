@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Evaluation comparecolformat="%.3f" defaultgroup="tanglegram1" evaluateoptauto="False" index="LogFileName" columnindex="ProblemName" sortlevel="0">
+<Evaluation comparecolformat="%.3f" defaultgroup="tanglegram1" evaluateoptauto="False" index="LogFileName ProblemName" indexsplit="1" sortlevel="0">
 	<Column active="True" minval="1" name="LogDTime" transformfunc="log" translevel="0" reduction="mean">
 		<Column active="True" minval="1" name="DTime" transformfunc="subtract" translevel="0" reduction="mean">
 			<Column active="True" origcolname="Datetime_End" translevel="0"/>

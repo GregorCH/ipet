@@ -14,6 +14,7 @@ import numpy as np
 from ipet import Experiment
 from ipet.concepts import IpetNode, IpetNodeAttributeError
 import logging
+import pandas as pd
 
 class IPETValue(IpetNode):
     nodetag = "Value"
@@ -244,6 +245,14 @@ class IPETFilter(IpetNode):
             return False
         return True
 
+    def compareDataFrame(self, df):
+        if self.operator in self.valueoperators:
+            return self.applyValueOperator(df[[self.datakey]])
+
+        x = self.evaluateValueDataFrame(df, self.expression1)
+        y = self.evaluateValueDataFrame(df, self.expression2)
+        booleanseries = self.comparison.compare(x, y)
+        return booleanseries
 
     def filterDataFrame(self, df):
         if self.operator in self.valueoperators:
@@ -255,12 +264,10 @@ class IPETFilter(IpetNode):
         mymethod = np.any
         if self.anytestrun == 'all':
             mymethod = np.all
-
         return mymethod(booleanseries)
 
     def getNeededColumns(self, df):
         return [exp for exp in [self.expression1, self.expression2] if exp in df.columns]
-
 
     def evaluateValueDataFrame(self, df, value):
         if value in df.columns:
@@ -282,7 +289,6 @@ class IPETFilter(IpetNode):
                     return conversion(value)
                 except ValueError:
                     pass
-
         return value
 
     def filterProblems(self, probnames, testruns=[]):
@@ -365,12 +371,10 @@ class IPETFilterGroup(IpetNode):
     def getActiveFilters(self):
         return [f for f in self.filters if f.isActive()]
 
-
     def filterDataFrame(self, df, index):
         """
         filters a data frame object as the intersection of all values that match the criteria defined by the filters
         """
-
         groups = df.groupby(index)
         # first, get the highest number of problem occurrences. This number must be matched to keep the problem
         if self.filtertype == "intersection":
@@ -396,7 +400,6 @@ class IPETFilterGroup(IpetNode):
             needed += filter_.getNeededColumns(df)
 
         return needed
-
 
     def toXMLElem(self):
         me = ElementTree.Element('FilterGroup', self.attributesToStringDict())

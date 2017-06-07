@@ -13,7 +13,7 @@ import pandas as pd
 from toposort import toposort
 from ipet.evaluation import Aggregation
 import xml.etree.ElementTree as ElementTree
-from .IPETFilter import IPETFilterGroup
+from .IPETFilter import IPETFilterGroup, IPETFilter
 import numpy
 from ipet.concepts.IPETNode import IpetNode, IpetNodeAttributeError
 from ipet.misc import misc
@@ -21,13 +21,14 @@ import logging
 from ipet import Experiment
 from ipet import Key
 from pandas.core.frame import DataFrame
+from numpy import isnan
 
 class IPETEvaluationColumn(IpetNode):
 
     nodetag = "Column"
 
     editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "reduction", "constant",
-                 "nanrep", "minval", "maxval", "comp", "translevel", "regex"]
+                 "alternative", "minval", "maxval", "comp", "translevel", "regex"]
 
     possibletransformations = {None:(0, 0),
                                "abs":(1, 1),
@@ -77,7 +78,7 @@ class IPETEvaluationColumn(IpetNode):
                        "reduction" : possiblereductions}
 
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
-                 nanrep=None, minval=None, maxval=None, comp=None, regex=None, translevel=None, active=True, reduction=None):
+                 alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None, active = True, reduction = None):
         """
         constructor of a column for the IPET evaluation
 
@@ -92,7 +93,7 @@ class IPETEvaluationColumn(IpetNode):
 
         constant : should this column represent a constant value?
 
-        nanrep : replacement of nan-values for this column
+        alternative : replacement of nan and other values for this column
 
         minval : a minimum value for all elements in this column
 
@@ -120,7 +121,7 @@ class IPETEvaluationColumn(IpetNode):
         self.transformfunc = transformfunc
         self.constant = constant
 
-        self.nanrep = nanrep
+        self.alternative = alternative
         self.minval = minval
         self.maxval = maxval
         self.translevel = translevel
@@ -129,6 +130,7 @@ class IPETEvaluationColumn(IpetNode):
         self.set_reduction(reduction)
 
         self.aggregations = []
+        self.filters = []
         self.children = []
 
     def checkAttributes(self):
@@ -153,18 +155,22 @@ class IPETEvaluationColumn(IpetNode):
             self.children.append(child)
         elif child.__class__ is Aggregation:
             self.aggregations.append(child)
+        elif child.__class__ is IPETFilter:
+            self.filters.append(child)
 
     def getChildren(self):
-        return self.children + self.aggregations
+        return self.children + self.aggregations + self.filters
 
     def acceptsAsChild(self, child):
-        return child.__class__ in (IPETEvaluationColumn, Aggregation)
+        return child.__class__ in (IPETEvaluationColumn, Aggregation, IPETFilter)
 
     def removeChild(self, child):
         if child.__class__ is IPETEvaluationColumn:
             self.children.remove(child)
         elif child.__class__ is Aggregation:
             self.aggregations.remove(child)
+        elif child.__class__ is IPETFilter:
+            self.filters.remove(child)
 
     @staticmethod
     def getNodeTag():
@@ -215,8 +221,14 @@ class IPETEvaluationColumn(IpetNode):
         """
         return self.parseValue(self.constant)
 
+    def getActiveFilters(self):
+        return [f for f in self.filters if f.isActive()]
+
     def addAggregation(self, agg):
         self.aggregations.append(agg)
+
+    def addFilter(self, filter_):
+        self.filters.append(filter_)
 
     def getFormatString(self):
         return self.formatstr
@@ -289,6 +301,9 @@ class IPETEvaluationColumn(IpetNode):
         for agg in self.aggregations:
             me.append(agg.toXMLElem())
 
+        for filter_ in self.filters:
+            me.append(filter_.toXMLElem())
+
         return me
 
     @staticmethod
@@ -299,6 +314,12 @@ class IPETEvaluationColumn(IpetNode):
             for child in elem:
                 if child.tag == 'Aggregation':
                     column.addAggregation(Aggregation.processXMLElem(child))
+                if child.tag == IPETFilter.getNodeTag():
+                    elemdict = dict(child.attrib)
+                    print(elemdict)
+                    filter_ = IPETFilter.fromDict(elemdict)
+                    column.addFilter(filter_)
+                    print(filter_.isActive())
                 elif child.tag == IPETEvaluationColumn.getNodeTag():
                     column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column
@@ -390,10 +411,14 @@ class IPETEvaluationColumn(IpetNode):
                 # apply the wrapper function instead
                 result = argdf.apply(tmpwrapper, **applydict)
 
-        if self.nanrep is not None:
-            nanrep = self.parseValue(self.nanrep, df)
-            if nanrep is not None:
-                result = result.fillna(nanrep)
+        if self.alternative is not None:
+            alternative = self.parseValue(self.alternative, df)
+            if alternative is not None:
+                #FARI
+                booleanseries = numpy.isnan(result)
+                for f in self.getActiveFilters():
+                    booleanseries = numpy.logical_or(booleanseries, f.compareDataFrame(df).iloc[:, 0])
+                result = numpy.where(booleanseries, alternative, result)
         if self.minval is not None:
             minval = self.parseValue(self.minval, df)
             if minval is not None:
@@ -402,7 +427,6 @@ class IPETEvaluationColumn(IpetNode):
             maxval = self.parseValue(self.maxval, df)
             if maxval is not None:
                 result = numpy.minimum(result, maxval)
-
         return result
 
     def getStatsTests(self):
@@ -418,7 +442,7 @@ class IPETEvaluationColumn(IpetNode):
         dependencies = {self.getName() : set()}
         if self.origcolname is not None:
             self.addDependency(dependencies, self.origcolname)
-        for c in [self.minval, self.nanrep, self.maxval]:
+        for c in [self.minval, self.alternative, self.maxval]:
             if c is not None and self.parseValue(c) is None:
                 self.addDependency(dependencies, c)
         for i in self.children:

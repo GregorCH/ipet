@@ -128,6 +128,7 @@ if __name__ == '__main__':
     experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
 
     for reader in loader.loadAdditionalReaders(arguments.readers):
+
         experiment.readermanager.registerReader(reader)
         logging.info("Registered reader with name %s" % reader.getName())
 

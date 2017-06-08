@@ -51,17 +51,17 @@ def quickAggregationOnIndex(df, col, aggfunc=np.min, threshold=None):
         return pd.Series(aggforindex <= threshold, name=newcolname)
 
 def getWilcoxonQuotientSignificance(x, y, shiftby=10):
-      shiftedquotients = (x + shiftby) / (y + shiftby)
-      logshifted = np.log2(shiftedquotients)
+    shiftedquotients = (x + shiftby) / (y + shiftby)
+    logshifted = np.log2(shiftedquotients)
 
-      # filter elements that are too close to zero
-      logshifted = logshifted[np.abs(logshifted) >= np.log2(1 + 1e-2)]
-      if logshifted.size < 10:
-          return np.nan
-      try:
-          return stats.wilcoxon(logshifted.values)[1]
-      except ValueError:
-          return np.nan
+    # filter elements that are too close to zero
+    logshifted = logshifted[np.abs(logshifted) >= np.log2(1 + 1e-2)]
+    if logshifted.size < 10:
+        return np.nan
+    try:
+        return stats.wilcoxon(logshifted.values)[1]
+    except ValueError:
+        return np.nan
 
 def quickAggregateAndSignificance(df, collist, rowlist, aggfunc=np.mean, wilcoxonfuncs=None, defindex=0):
    parts = []

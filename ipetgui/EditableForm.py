@@ -213,7 +213,7 @@ if __name__ == "__main__":
     
     EditableForm.extendAvailableOptions("datakey", list("ABCDEFHIJKLMNOPQRSTUVWXYZ1234567890"))
     
-    col = IPETEvaluationColumn(origcolname="A", name="name", formatstr="%.2f", transformfunc="sum", constant=None, nanrep="2", minval="0.5", maxval="10.0", comp="default", translevel="1")
+    col = IPETEvaluationColumn(origcolname = "A", name = "name", formatstr = "%.2f", transformfunc = "sum", constant = None, alternative = "2", minval = "0.5", maxval = "10.0", comp = "default", translevel = "1")
     
     mainwindow = QMainWindow()
     mainwindow.menuBar()

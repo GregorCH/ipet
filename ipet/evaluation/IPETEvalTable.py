@@ -350,7 +350,7 @@ class IPETEvaluationColumn(IpetNode):
         if funcname is None:
             funcname = "mean"
         # Do we also have to search in module Key (for getWorstStatus etc)?
-        for module in [numpy, misc, Experiment]:
+        for module in [numpy, misc, Experiment, Key.ProblemStatusCodes]:
             try:
                 return getattr(module, funcname)
             except AttributeError:
@@ -430,7 +430,7 @@ class IPETEvaluationColumn(IpetNode):
         if self.maxval is not None:
             maxval = self.parseValue(self.maxval, df)
             if maxval is not None:
-                result = numpy.minimum(result, maxval)
+                result = numpy.minimum(result, maxval.astype(result.dtype))
         return result
 
     def getStatsTests(self):
@@ -476,8 +476,8 @@ class StrTuple:
     def __init__(self, strList, splitChar = " "):
         self.tuple = StrTuple.splitStringList(strList, splitChar)
         self.splitChar = splitChar
-        
-    @staticmethod        
+
+    @staticmethod
     def splitStringList(strList, splitChar = " "):
         """Split a string that represents list elements separated by optional split-character
         """
@@ -550,7 +550,7 @@ class IPETEvaluation(IpetNode):
         self.evaluated = False
 
         self.set_index(index)
-        self.indexsplit = int(indexsplit)
+        self.set_indexsplit(indexsplit)
 
         self.set_defaultgroup(defaultgroup)
         
@@ -661,6 +661,9 @@ class IPETEvaluation(IpetNode):
         else:
             self.defaultgroup = None
         self.setEvaluated(False)
+
+    def set_indexsplit(self, indexsplit):
+        self.indexsplit = int(indexsplit)
     
     def addColumn(self, col):
         self.columns.append(col)
@@ -753,7 +756,12 @@ class IPETEvaluation(IpetNode):
         usercolumns = [c.getName() for c in self.getActiveColumns()]
         for col in self.toposortColumns(self.getActiveColumns()):
             if col.getTransLevel() == 0:
-                df_long[col.getName()] = col.getColumnData(df_long)
+                try:
+                    df_long[col.getName()] = col.getColumnData(df_long)
+                except Exception as e:
+                    print("An error occurred for the column '{}':\n{}".format(col.getName(), col.attributesToStringDict()))
+                    raise e
+
         # concatenate level one columns into a new data frame and treat them as the altogether setting
         newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
 
@@ -772,15 +780,15 @@ class IPETEvaluation(IpetNode):
         result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns]
         self.usercolumns = usercolumns
         return result
-    
+
     def toposortColumns(self, columns : list) -> list:
         """ Compute a topological ordering respecting the data dependencies of the specified column list.
-        
+
         Parameters
         ----------
         columns
             A list of the column-objects to be sorted.
-        
+
         Returns
         -------
         list 
@@ -1185,7 +1193,7 @@ class IPETEvaluation(IpetNode):
                 logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
             logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
-            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
+            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata[lcolumns])
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 
         activefiltergroups = self.getActiveFilterGroups()

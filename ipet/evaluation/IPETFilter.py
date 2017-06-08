@@ -142,7 +142,9 @@ class IPETFilter(IpetNode):
         
     def checkAttributes(self):
         if self.operator in self.valueoperators and self.values == []:
-            raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty problem set".format(self.operator))
+            raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty value set".format(self.operator))
+        if self.operator in self.valueoperators and self.datakey is None or self.datakey == "":
+            raise IpetNodeAttributeError("datakey", "Trying to use a filter with operator '{}' and unspecified data key '{}'".format(self.operator, self.datakey))
         return True
         
         

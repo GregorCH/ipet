@@ -79,8 +79,11 @@ class IPETEvaluationColumn(IpetNode):
                        "transformfunc":list(possibletransformations.keys()),
                        "reduction" : possiblereductions}
 
+    deprecatedattrdir = {"nanrep" : "has been replaced by 'alternative'",
+                            "groupkey" : "groupkey is specified using 'index' and 'indexsplit'"}
+
     def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
-                 alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None, active = True, reduction = None):
+                 alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None, active = True, reduction = None, **kw):
         """
         constructor of a column for the IPET evaluation
 
@@ -95,7 +98,7 @@ class IPETEvaluationColumn(IpetNode):
 
         constant : should this column represent a constant value?
 
-        alternative : replacement of nan and other values for this column
+        alternative : conditional alternative constant or column name (also used to replace nans)
 
         minval : a minimum value for all elements in this column
 
@@ -115,7 +118,7 @@ class IPETEvaluationColumn(IpetNode):
         reduction : aggregation function that is applied to reduce multiple occurrences of index 
         """
 
-        super(IPETEvaluationColumn, self).__init__(active)
+        super(IPETEvaluationColumn, self).__init__(active, **kw)
         self.origcolname = origcolname
         self.name = name
 
@@ -208,6 +211,8 @@ class IPETEvaluationColumn(IpetNode):
         """
         parse a value into an integer (prioritized) or float
         """
+        if val in [None, ""]:
+            return None
         for conversion in [int, float]:
             try:
                 return conversion(val)
@@ -215,7 +220,7 @@ class IPETEvaluationColumn(IpetNode):
                 pass
         if df is not None and val in df.columns:
             return df[val]
-        return None
+        return val
 
     def parseConstant(self):
         """
@@ -414,10 +419,9 @@ class IPETEvaluationColumn(IpetNode):
         if self.alternative is not None:
             alternative = self.parseValue(self.alternative, df)
             if alternative is not None:
-                #FARI
-                booleanseries = numpy.isnan(result)
+                booleanseries = pd.isnull(result)
                 for f in self.getActiveFilters():
-                    booleanseries = numpy.logical_or(booleanseries, f.compareDataFrame(df).iloc[:, 0])
+                    booleanseries = numpy.logical_or(booleanseries, f.applyFilter(df).iloc[:, 0])
                 result = numpy.where(booleanseries, alternative, result)
         if self.minval is not None:
             minval = self.parseValue(self.minval, df)
@@ -1258,8 +1262,13 @@ class IPETEvaluation(IpetNode):
                     defaultrow = numpy.nan
 
             # determine quotients
-            comppart = colaggpart / defaultrow
-            comppart.columns = [col + 'Q' for col in colaggpart.columns]
+            columns = []
+            for col in colaggpart.columns:
+                if not numpy.issubdtype(colaggpart[col].dtype, numpy.number):
+                    continue
+                columns.append(col)
+            comppart = colaggpart[columns] / defaultrow[columns]
+            comppart.columns = [col + 'Q' for col in columns]
 
             # apply statistical tests, whereever possible
             statspart = self.applyStatsTests(df)

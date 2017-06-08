@@ -245,7 +245,13 @@ class IPETFilter(IpetNode):
             return False
         return True
 
-    def compareDataFrame(self, df):
+    def applyFilter(self, df):
+        """Apply the filter to a data frame rowwise
+
+           Returns
+           -------
+           booleanseries :
+        """
         if self.operator in self.valueoperators:
             return self.applyValueOperator(df[[self.datakey]])
 

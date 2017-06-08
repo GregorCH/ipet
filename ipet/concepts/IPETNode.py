@@ -10,15 +10,16 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 from ipet.concepts.Editable import Editable, EditableAttributeError
-
+import logging
 class IpetNode(Editable):
     """
     A Node is an interface to an XML-like ancestor-structure
     """
     active = True
     _attributes2options = {"active":[True, False]}
+    deprecatedattrdir = {}
     
-    def __init__(self, active=True):
+    def __init__(self, active = True, **kw):
         """
         constructs a new IpetNode
 
@@ -27,6 +28,10 @@ class IpetNode(Editable):
         active : True or "True" if this element should be active, False otherwise
         """
         self.set_active(active)
+
+        for d, message in self.deprecatedattrdir.items():
+            if d in kw:
+                logging.warn("Warning : The attribute '{0}' is deprecated and will be ignored; {1}. ".format(d, message))
 
     def addChild(self, child):
         """

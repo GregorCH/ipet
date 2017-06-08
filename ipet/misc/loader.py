@@ -26,7 +26,7 @@ def loadAdditionalReaders(filenames = []):
         if _file.endswith(".xml") or _file.endswith(".ipr"):
             try:
                 rm = ReaderManager.fromXMLFile(_file)
-                readers.append(_file)
+                readers = readers + rm.getChildren()
             except:
                 pass
     return readers

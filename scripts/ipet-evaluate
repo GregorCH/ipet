@@ -81,6 +81,7 @@ argparser.add_argument('-s', '--saveexperiment', action = "store_true", default 
 argparser.add_argument('-r', '--recollect', action = "store_true", default = False, help = "Should the loaded experiment recollect data before proceeding?")
 argparser.add_argument('-i', '--index', action = "append", default = None, help = "specification of (multilevel) index seperated by whitespaces")
 argparser.add_argument('--indexsplit', default = None, help = "position to split index into row and column levels, negative to count from the end.")
+argparser.add_argument('--quiet', action = "store_true", default = False, help = "Supress all output (may be useful for profiling)")
 
 if __name__ == '__main__':
     try:
@@ -95,7 +96,9 @@ if __name__ == '__main__':
     ch = logging.StreamHandler()
     ch.setFormatter(formatter)
     logger.addHandler(ch)
-    if arguments.debug:
+    if arguments.quiet:
+        logger.setLevel(logging.ERROR)
+    elif arguments.debug:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
@@ -210,10 +213,12 @@ if __name__ == '__main__':
     # returntable and returnaggregation
     rettab, retagg = theeval.evaluate(experiment)
 
-    if arguments.long:
-        theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
 
-    theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
+    if not arguments.quiet:
+        if arguments.long:
+            theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
+
+        theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
 
     #for tr in comp.testrunmanager.getManageables():
         #for col in tr.data.columns:

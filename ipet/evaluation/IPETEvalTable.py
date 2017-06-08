@@ -51,7 +51,8 @@ class IPETEvaluationColumn(IpetNode):
                                "convertTimeStamp" : (1, 1),
                                "iqr" : (1, -1),
                                "lQuart" : (1, -1),
-                               "uQuart" : (1, -1), }
+                               "uQuart" : (1, -1),
+                               "strConcat" : (1, -1)}
     
     possiblereductions = [  None,
                             "mean",
@@ -66,7 +67,8 @@ class IPETEvaluationColumn(IpetNode):
                             "getBestStatus",
                             "getWorstStatus",
                             "median",
-                            "sum"
+                            "sum",
+                            "strConcat"
                             ]
     
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
@@ -316,10 +318,8 @@ class IPETEvaluationColumn(IpetNode):
                     column.addAggregation(Aggregation.processXMLElem(child))
                 if child.tag == IPETFilter.getNodeTag():
                     elemdict = dict(child.attrib)
-                    print(elemdict)
                     filter_ = IPETFilter.fromDict(elemdict)
                     column.addFilter(filter_)
-                    print(filter_.isActive())
                 elif child.tag == IPETEvaluationColumn.getNodeTag():
                     column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column

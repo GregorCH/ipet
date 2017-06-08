@@ -255,6 +255,20 @@ def listGetMinColWidth(listofitems):
             maxlen = len(item)
     return maxlen
 
+def strConcat(strings : list) -> str:
+    """Concatenate a list of string objects
+
+    Parameters
+    ----------
+    strings
+        list of input strings to concatenate
+
+    Returns
+    -------
+    concatenated string
+    """
+    return "".join(strings)
+
 def saveAsXML(nodeobject, filename : str) -> None:
     """ Save object as XML file.
 

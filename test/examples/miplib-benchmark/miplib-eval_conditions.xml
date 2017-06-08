@@ -4,7 +4,12 @@
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 		<Filter active="True" anytestrun="all" expression1="SolvingTime" expression2="100" operator="ge"/>
 	</Column>
+        <Column constant="+" alternative='-' name="Indic" reduction="strConcat">
+            <Aggregation aggregation="strConcat" name="conc" />
+            <Filter active="True" anytestrun="all" expression1="SolvingTime" expression2="100" operator="le"/>
+        </Column>
 	<FilterGroup active="True" filtertype="intersection" name="noneasyinstances">
 		<Filter active="True" anytestrun="all" expression1="Time" expression2="100" operator="ge"/>
 	</FilterGroup>
+        <FilterGroup name="all"/>
 </Evaluation>

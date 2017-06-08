@@ -22,7 +22,7 @@ class Aggregation(IpetNode):
     from misc-module
     """
     nodetag = "Aggregation"
-    possibleaggregations = [None, 'shmean', 'gemean', 'min', 'max', 'mean', 'size', 'std', 'sum', 'median', 'lQuart', 'uQuart', 'iqr']
+    possibleaggregations = [None, 'shmean', 'gemean', 'min', 'max', 'mean', 'size', 'std', 'sum', 'median', 'lQuart', 'uQuart', 'iqr', 'strConcat']
     agg2Stat = {'shmean':qWilcox}
     
     agg2keywords = {'shmean':[("shiftby", 10.0)]}

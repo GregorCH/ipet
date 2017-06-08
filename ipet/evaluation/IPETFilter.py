@@ -257,6 +257,14 @@ class IPETFilter(IpetNode):
 
         x = self.evaluateValueDataFrame(df, self.expression1)
         y = self.evaluateValueDataFrame(df, self.expression2)
+        try:
+            x.columns = ["comp"]
+        except:
+            pass
+        try:
+            y.columns = ["comp"]
+        except:
+            pass
         booleanseries = self.comparison.compare(x, y)
         return booleanseries
 
@@ -308,6 +316,17 @@ class IPETFilter(IpetNode):
         for value in self.values:
             me.append(value.toXMLElem())
         return me
+
+    def getDependency(self, i):
+        if i == 1:
+            value = self.expression1
+        else:
+            value = self.expression2
+        try:
+            float(value)
+        except:
+            return value
+        return None
 
 class IPETFilterGroup(IpetNode):
     """

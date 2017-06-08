@@ -213,7 +213,6 @@ if __name__ == '__main__':
     # returntable and returnaggregation
     rettab, retagg = theeval.evaluate(experiment)
 
-
     if not arguments.quiet:
         if arguments.long:
             theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")

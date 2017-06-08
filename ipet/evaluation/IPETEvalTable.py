@@ -452,6 +452,11 @@ class IPETEvaluationColumn(IpetNode):
         for i in self.children:
             self.addDependency(dependencies, i.getName())
             dependencies.update(i.getDependencies())
+        for i in self.filters:
+            for j in [1, 2]:
+                dep = i.getDependency(j)
+                if dep is not None:
+                    self.addDependency(dependencies, dep)
 
         return dependencies
 
@@ -749,7 +754,6 @@ class IPETEvaluation(IpetNode):
         for col in self.toposortColumns(self.getActiveColumns()):
             if col.getTransLevel() == 0:
                 df_long[col.getName()] = col.getColumnData(df_long)
-
         # concatenate level one columns into a new data frame and treat them as the altogether setting
         newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
 

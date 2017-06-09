@@ -798,7 +798,6 @@ class IPETEvaluation(IpetNode):
 
         toposorted = list(toposort(adj))
         logging.debug("TOPOSORT:\nDependency List: {},\nTopological Ordering: {}".format(adj, toposorted))
-
         def getIndex(name, toposorted):
             for idx, topo in enumerate(toposorted):
                 if name in topo: return idx
@@ -822,7 +821,9 @@ class IPETEvaluation(IpetNode):
         """
         adj = {}
         for col in columns:
-            adj.update(col.getDependencies())
+            newdeps = col.getDependencies()
+            for key, val in newdeps.items():
+                adj.setdefault(key, set()).update(val)
         return adj
     
     def calculateNeededData(self, df : DataFrame) -> DataFrame:
@@ -1243,7 +1244,7 @@ class IPETEvaluation(IpetNode):
 
         # if no aggregation was specified, return only the general part
         if len(colsandaggregations) == 0:
-            return generalpart
+            return DataFrame(generalpart).T
 
         # column aggregations aggregate every column and every column aggregation
 
@@ -1258,7 +1259,8 @@ class IPETEvaluation(IpetNode):
         colaggpart.columns = newnames
 
         if self.getColIndex() == []:
-            return pd.DataFrame(generalpart.append(colaggpart.iloc[0])).T
+            ret = pd.DataFrame(generalpart.append(colaggpart.iloc[0])).T
+            return ret
         else:
             # determine the row in the aggregated table corresponding to the default group
             logging.debug("Index of colaggpart:\n{}".format(colaggpart.index))

@@ -269,8 +269,11 @@ class TestRun:
                 if dat == problemname:
                     collecteddata.append(self.getProblemDataById(key, datakey))
         else:
-            collecteddata = list(self.data[self.data[Key.ProblemName] == problemname].loc[:, datakey])[0]
-        return collecteddata
+            collecteddata = list(self.data[self.data[Key.ProblemName] == problemname].loc[:, datakey])
+        try:
+            return collecteddata[0]
+        except IndexError:
+            return None
 
     def getProblemDataById(self, problemid, datakey = None):
         """Return data for a specific datakey, or None, if no such data exists for this (probname, datakey) key pair

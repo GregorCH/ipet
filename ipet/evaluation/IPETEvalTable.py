@@ -54,22 +54,7 @@ class IPETEvaluationColumn(IpetNode):
                                "uQuart" : (1, -1),
                                "strConcat" : (1, -1)}
     
-    possiblereductions = [  None,
-                            "mean",
-                            "max",
-                            "min",
-                            "std",
-                            "gemean",
-                            "lQuart",
-                            "uQuart",
-                            "iqr",
-                            "shmean",
-                            "getBestStatus",
-                            "getWorstStatus",
-                            "median",
-                            "sum",
-                            "strConcat"
-                            ]
+    possiblereductions = [None] + [k for k, v in possibletransformations.items() if v == (1, -1)]
     
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 

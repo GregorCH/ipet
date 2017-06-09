@@ -34,9 +34,7 @@ def calcIntegralValue(thedatalist, pwlinear=False):
     assert len(thedatalist) >= 2
 
     # unzip the datalist
-    times, gaps = list(zip(*thedatalist))
-    times = np.array(times)
-    gaps = np.array(gaps)
+    times, gaps = thedatalist
 
     # for piece-wise linear functions, use trapez triangulation
     # note that only n - 1 gaps are used
@@ -80,14 +78,11 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
     if history is None:
         history = []
     
-    lastboundkey = kw.get('boundkey', DEFAULT_BOUNDKEY)
-    lastbound = getmethod(probid, lastboundkey)
-    if lastbound is None:
-        try:
-            lastbound = history[-1][1]
-        except:
-            lastbound = misc.FLOAT_INFINITY
-    
+    try:
+        lastbound = history[-1][1]
+    except:
+        lastbound = misc.FLOAT_INFINITY
+
     if len(history) > 0:
         x, y = list(zip(*history))
         x = list(x)
@@ -101,6 +96,8 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
         y.insert(0, misc.FLOAT_INFINITY)
 
     if xaftersolve is not None and lastbound is not None:
+        if len(history) > 0:
+            xaftersolve = max(xaftersolve, history[-1][0])
         x.append(xaftersolve)
         y.append(lastbound)
 
@@ -113,7 +110,7 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
     x = numpy.array(x)
     y = numpy.array(list(map(normfunction, y)))
 
-    return list(zip(x, y))
+    return x, y
 
 def getMeanIntegral(testrun, problemlist, meanintegralpoints, access = "id", **kw):
     """
@@ -134,21 +131,17 @@ def getMeanIntegral(testrun, problemlist, meanintegralpoints, access = "id", **k
     else:
         getmethod = testrun.getProblemDataByName
 
-    THE_XLIMIT = max([getmethod(prob, kw.get('xlimitkey', DEFAULT_XLIMITKEY)) for prob in problemlist])
+    lim = [getmethod(prob, kw.get('xlimitkey', DEFAULT_XLIMITKEY)) for prob in problemlist]
+    THE_XLIMIT = max((l for l in lim if l is not None))
 
     scale = float(THE_XLIMIT) / float(meanintegralpoints)
     
     # go through problem list and add up integrals for every problem
     for probname in problemlist:
         plotpoints = getProcessPlotData(testrun, probname, access = access, ** kw)
-        try:
-            it = plotpoints[1:].__iter__()
-        except Exception as e:
-            print(probname, e)
-            continue
         lastX = -1.0
         lastgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
-        for xi, itgap in it:
+        for xi, itgap in zip(plotpoints[0], plotpoints[1]):
             startindex = int(lastX + 1) / scale
             lastindex = int(xi + 1) / scale
             meanintegral[startindex:lastindex] += lastgap

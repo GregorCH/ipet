@@ -209,7 +209,6 @@ class IPETFilter(IpetNode):
         return self.attribute2Options.get(attr, super(IPETFilter, self).getRequiredOptionsByAttribute(attr))
 
     def applyValueOperator(self, df):
-        contained = False
         # loop through problem set
         contained = df.isin([x.getValue() for x in self.getActiveValue()])
 

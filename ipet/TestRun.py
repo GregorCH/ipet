@@ -264,9 +264,12 @@ class TestRun:
         """Return the data collected for problems with given name
         """
         collecteddata = []
-        for key, dat in self.datadict.get("Problemname", None):
-            if dat == problemname:
-                collecteddata.append(self.getProblemDataById(key, datakey))
+        if self.datadict != {}:
+            for key, dat in self.datadict.get("ProblemName", None):
+                if dat == problemname:
+                    collecteddata.append(self.getProblemDataById(key, datakey))
+        else:
+            collecteddata = list(self.data[self.data[Key.ProblemName] == problemname].loc[:, datakey])[0]
         return collecteddata
 
     def getProblemDataById(self, problemid, datakey = None):

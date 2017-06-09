@@ -46,25 +46,34 @@ def calcIntegralValue(thedatalist, pwlinear=False):
         gaps = gaps[:-1]
     return np.sum((times[1:] - times[:-1]) * gaps)
     
-def getProcessPlotData(testrun, probname, normalize=True, **kw):
+def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
     """
     get process plot data for a selected history (X_i,Y_i)
     
     returns a list of tuples, where the second value of the history (Y's) are mapped via a gap function
+
+    Parameters
+    ----------
+    access : str
+        either "id" or "name" to determine if testrun data should be accessed by name or by id
     """
     # read keys from kw dictionary
+    if access == "id":
+        getmethod = testrun.getProblemDataById
+    else:
+        getmethod = testrun.getProblemDataByName
     historytouse = kw.get('historytouse', DEFAULT_HISTORYTOUSE)
-    history = testrun.getProblemDataById(probname, historytouse)
+    history = getmethod(probid, historytouse)
     
     xaftersolvekey = kw.get('xaftersolvekey', DEFAULT_XAFTERSOLVEKEY)
-    xaftersolve = testrun.getProblemDataById(probname, xaftersolvekey)
+    xaftersolve = getmethod(probid, xaftersolvekey)
     
     xlimitkey = kw.get('xlimitkey', DEFAULT_XLIMITKEY)
-    xlim = testrun.getProblemDataById(probname, xlimitkey)
+    xlim = getmethod(probid, xlimitkey)
     
     cutoffgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
     
-    optimum = testrun.getProblemDataById(probname, 'OptVal')
+    optimum = getmethod(probid, 'OptVal')
     
     if xlim is None and xaftersolve is None:
         return None
@@ -72,7 +81,7 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
         history = []
     
     lastboundkey = kw.get('boundkey', DEFAULT_BOUNDKEY)
-    lastbound = testrun.getProblemDataById(probname, lastboundkey)
+    lastbound = getmethod(probid, lastboundkey)
     if lastbound is None:
         try:
             lastbound = history[-1][1]
@@ -86,42 +95,52 @@ def getProcessPlotData(testrun, probname, normalize=True, **kw):
     else:
         x = []
         y = []
-        
+
     if normalize:
         x.insert(0, 0.0)
         y.insert(0, misc.FLOAT_INFINITY)
-        
+
     if xaftersolve is not None and lastbound is not None:
         x.append(xaftersolve)
         y.append(lastbound)
-         
+
     # depending on the normalization parameter, the normfunction used is either the CPlex gap, or the identity  
     if normalize:
         normfunction = lambda z : min(cutoffgap, misc.getGap(z, optimum, True))
     else:
         normfunction = lambda z : z
-        
+
     x = numpy.array(x)
     y = numpy.array(list(map(normfunction, y)))
-        
-    
+
     return list(zip(x, y))
 
-def getMeanIntegral(testrun, problemlist, meanintegralpoints, **kw):
+def getMeanIntegral(testrun, problemlist, meanintegralpoints, access = "id", **kw):
     """
     returns a numpy array that represents the mean integral over the selected problem list.
     
+    Parameters
+    ----------
+    access : str
+        access modifier to determine if data should be accessed by 'id' or by "name"
+
     """
     # initialize mean integral to be zero at all points of the chosen granularity
     meanintegral = np.zeros(meanintegralpoints)
     
     # get the x axis limit, usually the
-    THE_XLIMIT = max(testrun.getProblemsDataById(problemlist, kw.get('xlimitkey', DEFAULT_XLIMITKEY)))
-    scale = THE_XLIMIT / float(meanintegralpoints)
+    if access == "id":
+        getmethod = testrun.getProblemDataById
+    else:
+        getmethod = testrun.getProblemDataByName
+
+    THE_XLIMIT = max([getmethod(prob, kw.get('xlimitkey', DEFAULT_XLIMITKEY)) for prob in problemlist])
+
+    scale = float(THE_XLIMIT) / float(meanintegralpoints)
     
     # go through problem list and add up integrals for every problem
     for probname in problemlist:
-        plotpoints = getProcessPlotData(testrun, probname, **kw)
+        plotpoints = getProcessPlotData(testrun, probname, access = access, ** kw)
         try:
             it = plotpoints[1:].__iter__()
         except Exception as e:

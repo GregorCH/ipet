@@ -361,7 +361,6 @@ class IPETEvaluationColumn(IpetNode):
         """
         Retrieve the data associated with this column
         """
-
         # if no children are associated with this column, it is either
         # a column represented in the data frame by an 'origcolname',
         # or a constant
@@ -777,7 +776,7 @@ class IPETEvaluation(IpetNode):
         additionalfiltercolumns = list(set(additionalfiltercolumns))
         additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(usercolumns + neededcolumns)]
 
-        result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns]
+        result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns + ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_']]
         self.usercolumns = usercolumns
         return result
 
@@ -1144,6 +1143,9 @@ class IPETEvaluation(IpetNode):
 #            self.defaultgroup = possiblebasegroups[0]
 #            logging.info(" Using value <%s> as base group" % (self.defaultgroup))
 
+        data = self.calculateNeededData(data)
+        logging.debug("Result of calculateNeededData:\n{}\n".format(data))
+
         columndata = self.reduceToColumns(data)
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
 
@@ -1152,9 +1154,6 @@ class IPETEvaluation(IpetNode):
             #opt = self.calculateOptimalAutoSettings(columndata)
             #columndata = pd.concat([columndata, opt])
             #logging.debug("Result of calculateOptimalAutoSettings:\n{}\n".format(columndata))
-
-        columndata = self.calculateNeededData(columndata)
-        logging.debug("Result of calculateNeededData:\n{}\n".format(columndata))
 
         columndata = self.reduceByIndex(columndata)
         columndata = self.addComparisonColumns(columndata)

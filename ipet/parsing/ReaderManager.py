@@ -27,7 +27,6 @@ from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
-from scipy.linalg import _solvers
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -78,6 +77,11 @@ class ReaderManager(Manager, IpetNode):
         Returns the name of the class
         """
         return "ReaderManager"
+
+    def isActive(self) -> bool:
+        """Return if this reader manager is active or not
+        """
+        return IpetNode.isActive(self)
 
     def addChild(self, child):
         """

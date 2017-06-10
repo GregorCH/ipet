@@ -142,7 +142,9 @@ class IPETFilter(IpetNode):
         
     def checkAttributes(self):
         if self.operator in self.valueoperators and self.values == []:
-            raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty problem set".format(self.operator))
+            raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty value set".format(self.operator))
+        if self.operator in self.valueoperators and self.datakey is None or self.datakey == "":
+            raise IpetNodeAttributeError("datakey", "Trying to use a filter with operator '{}' and unspecified data key '{}'".format(self.operator, self.datakey))
         return True
         
         
@@ -207,7 +209,6 @@ class IPETFilter(IpetNode):
         return self.attribute2Options.get(attr, super(IPETFilter, self).getRequiredOptionsByAttribute(attr))
 
     def applyValueOperator(self, df):
-        contained = False
         # loop through problem set
         contained = df.isin([x.getValue() for x in self.getActiveValue()])
 
@@ -257,6 +258,14 @@ class IPETFilter(IpetNode):
 
         x = self.evaluateValueDataFrame(df, self.expression1)
         y = self.evaluateValueDataFrame(df, self.expression2)
+        try:
+            x.columns = ["comp"]
+        except:
+            pass
+        try:
+            y.columns = ["comp"]
+        except:
+            pass
         booleanseries = self.comparison.compare(x, y)
         return booleanseries
 
@@ -308,6 +317,17 @@ class IPETFilter(IpetNode):
         for value in self.values:
             me.append(value.toXMLElem())
         return me
+
+    def getDependency(self, i):
+        if i == 1:
+            value = self.expression1
+        else:
+            value = self.expression2
+        try:
+            float(value)
+        except:
+            return value
+        return None
 
 class IPETFilterGroup(IpetNode):
     """

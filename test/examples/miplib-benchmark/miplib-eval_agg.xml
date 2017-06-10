@@ -6,12 +6,16 @@
 			<Column active="True" origcolname="Datetime_Start" translevel="0"/>
 		</Column>
 		<Aggregation aggregation="lQuart" name="lQuart" />
-		<Aggregation aggregation="median" name="median" shiftby="100.0"/>
+		<Aggregation aggregation="median" name="median"/>
 		<Aggregation aggregation="uQuart" name="uQuart" />
 		<Aggregation aggregation="iqr" name="iqr" />
 		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
 	</Column>
-    <Column active="True" comp="quot" name="Nodes" origcolname="Nodes" nanrep="100" reduction="mean">
+    <Column active="True" constant="-" alternative="+" reduction="strConcat">
+        <Filter active="True" expression1="_solved_" expression2="1" operator="eq"/>                                            
+        <Aggregation aggregation="strConcat" name="indic" />
+    </Column>
+    <Column active="True" comp="quot" name="Nodes" origcolname="Nodes" alternative="100" reduction="mean">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
 	</Column>
 

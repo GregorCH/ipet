@@ -232,7 +232,7 @@ class Solver():
         line
             a line of solver output that the information shall be read from
         """
-        self.extractDualboundHistory(line)
+        pass
 
     def reset(self):
         """Reset all Data except the solverId
@@ -434,7 +434,6 @@ class SCIPSolver(Solver):
         """
         self.extractPath(line)
         self.extractMoreData(line)
-        self.extractDualboundHistory(line)
 
 class GurobiSolver(Solver):
 

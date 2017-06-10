@@ -82,6 +82,7 @@ argparser.add_argument('-r', '--recollect', action = "store_true", default = Fal
 argparser.add_argument('-i', '--index', action = "append", default = None, help = "specification of (multilevel) index seperated by whitespaces")
 argparser.add_argument('--indexsplit', default = None, help = "position to split index into row and column levels, negative to count from the end.")
 argparser.add_argument('--quiet', action = "store_true", default = False, help = "Supress all output (may be useful for profiling)")
+argparser.add_argument('--displaygroup', default = None, help = "Name of the group for which the long display should be printed. Only available for long output mode")
 
 if __name__ == '__main__':
     try:
@@ -162,7 +163,7 @@ if __name__ == '__main__':
         #
         #ipet-evaluate -t results/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.gamma_*_beta_0*.trn -e eval-test.xml -l -n -d 0.01 -D
 #        theeval.setDefaultGroup((0.10, 0.05))
-        theeval.setDefaultGroup(arguments.defaultgroup)
+        theeval.set_defaultgroup(arguments.defaultgroup)
 
     if arguments.indexsplit is not None:
         theeval.set_indexsplit(arguments.indexsplit)
@@ -213,10 +214,14 @@ if __name__ == '__main__':
     # returntable and returnaggregation
     rettab, retagg = theeval.evaluate(experiment)
 
-
     if not arguments.quiet:
         if arguments.long:
-            theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
+            if arguments.displaygroup is not None:
+                for fg in theeval.getActiveFilterGroups():
+                    if fg.getName() == arguments.displaygroup:
+                        theeval.streamDataFrame(theeval.getInstanceGroupData(fg), "Instancewise Results", "stdout")
+            else:
+                theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
 
         theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
 

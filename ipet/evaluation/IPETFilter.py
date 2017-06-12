@@ -15,6 +15,7 @@ from ipet import Experiment
 from ipet.concepts import IpetNode, IpetNodeAttributeError
 import logging
 import pandas as pd
+from ipet.evaluation import TestSets
 
 class IPETValue(IpetNode):
     nodetag = "Value"
@@ -136,6 +137,7 @@ class IPETFilter(IpetNode):
 
         self.anytestrun = anytestrun
         self.values = []
+        self._updatevalueset = False
         
         self.set_operator(operator)
         self.datakey = datakey
@@ -198,20 +200,44 @@ class IPETFilter(IpetNode):
     
     def addChild(self, child):
         self.values.append(child)
+        self._updatevalueset = True
         
     def removeChild(self, child):
         self.values.remove(child)
+        self._updatevalueset = True
 
-    def getActiveValue(self):
+    def getActiveValues(self):
         return [x for x in self.values if x.isActive()]
             
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2Options.get(attr, super(IPETFilter, self).getRequiredOptionsByAttribute(attr))
 
-    def applyValueOperator(self, df):
-        # loop through problem set
-        contained = df.isin([x.getValue() for x in self.getActiveValue()])
+    def checkAndUpdateValueSet(self):
+        """Update the value set of this filter if necessary
+        """
+        if not self._updatevalueset:
+            return
 
+        self.valueset = set([x.getValue() for x in self.getActiveValues()])
+        updateset = set()
+
+        #
+        # check for test set names among the values
+        #
+        for i in self.valueset:
+
+            if i in TestSets.getTestSets():
+                logging.debug("Adding test set {} to value set".format(i))
+                updateset = updateset.union(set(TestSets.getTestSetByName(i)))
+        self.valueset = self.valueset.union(updateset)
+        logging.debug("Complete value set of filter {}:\n{}".format(self.getName(), self.valueset))
+
+        self._updatevalueset = False
+
+    def applyValueOperator(self, df):
+        self.checkAndUpdateValueSet()
+        contained = df.isin(self.valueset)
+        logging.debug("Contained: {}\nData: {}".format(contained, df))
         if self.anytestrun:
             contained = contained.any().bool()
         else:

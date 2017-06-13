@@ -91,6 +91,7 @@ if __name__ == '__main__':
         if not re.search(" -+h", ' '.join(sys.argv)) :
             print("Wrong Usage, use --help for more information.")
         exit()
+
     #if globals().get("help") is not None:
     logger = logging.getLogger()
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -156,6 +157,12 @@ if __name__ == '__main__':
     if arguments.saveexperiment is not False:
         experiment.saveToFile(arguments.experimentfile)
 
+    if arguments.indexsplit is not None:
+        theeval.set_indexsplit(arguments.indexsplit)
+
+    if arguments.index is not None:
+        theeval.set_index(arguments.index)
+
     if arguments.defaultgroup is not None:
         #theeval.setDefaultGroup(arguments.defaultgroup)
         #
@@ -164,12 +171,6 @@ if __name__ == '__main__':
         #ipet-evaluate -t results/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.gamma_*_beta_0*.trn -e eval-test.xml -l -n -d 0.01 -D
 #        theeval.setDefaultGroup((0.10, 0.05))
         theeval.set_defaultgroup(arguments.defaultgroup)
-
-    if arguments.indexsplit is not None:
-        theeval.set_indexsplit(arguments.indexsplit)
-
-    if arguments.index is not None:
-        theeval.set_index(arguments.index)
 
 #    if arguments.groupkey is not None:
 #        theeval.setGroupKey(arguments.groupkey)

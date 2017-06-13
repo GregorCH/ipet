@@ -58,7 +58,6 @@ class EvaluationEditorWindow(IPETApplicationTab):
         vlayout.addWidget(tabwidget)
         self.setLayout(vlayout)
 
-
         self.defineActions()
         self.initConnections()
         self.passGroupToTableViews()
@@ -72,11 +71,11 @@ class EvaluationEditorWindow(IPETApplicationTab):
 
     def defineActions(self):
 
-        self.loadaction = self.createAction("&Load", self.loadEvaluation, QKeySequence.Open, icon = "Load-icon",
+        self.loadaction = self.createAction("&Load evaluation", self.loadEvaluation, QKeySequence.Open, icon = "Load-icon",
                                        tip="Load evaluation from XML file (current evaluation gets discarded)")
-        self.saveaction = self.createAction("&Save", self.saveEvaluation, QKeySequence.Save, icon = "disk-icon",
+        self.saveaction = self.createAction("&Save evaluation", self.saveEvaluation, QKeySequence.Save, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
-        self.saveasaction = self.createAction("&Save as", self.saveEvaluationAs, QKeySequence.SaveAs, icon = "disk-icon",
+        self.saveasaction = self.createAction("&Save evaluation as", self.saveEvaluationAs, QKeySequence.SaveAs, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
         self.addcolaction = self.createAction("Add &Column", self.addColumn, "Alt+C", icon="Letter-C-violet-icon",
                                          tip="Add new column as a child of the currently selected element")

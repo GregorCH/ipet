@@ -114,9 +114,10 @@ class IPETFilter(IpetNode):
                          "anytestrun":["one", "all"],
                          "operator":list(IPETComparison.comparisondict.keys()) + valueoperators}
     nodetag = "Filter"
+    DEFAULT_ANYTESTRUN = 'all'
     
 
-    def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = 'all', active = True, datakey = None):
+    def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = DEFAULT_ANYTESTRUN, active = True, datakey = None):
         """
         filter constructor
         
@@ -155,7 +156,7 @@ class IPETFilter(IpetNode):
         expression1 = attrdict.get('expression1')
         expression2 = attrdict.get('expression2')
 
-        anytestrun = attrdict.get('anytestrun')
+        anytestrun = attrdict.get('anytestrun', IPETFilter.DEFAULT_ANYTESTRUN)
         operator = attrdict.get('operator')
         datakey = attrdict.get('datakey')
         active = attrdict.get('active', True)

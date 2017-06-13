@@ -22,6 +22,7 @@ from ipet import Experiment
 from ipet import Key
 from pandas.core.frame import DataFrame
 from numpy import isnan
+from ipet.evaluation.IPETFilter import IPETValue
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -42,6 +43,7 @@ class IPETEvaluationColumn(IpetNode):
                                "log10":(1, 1),
                                "log":(1, 1),
                                "mean":(1, -1),
+                               "shmean":(1, -1),
                                "median":(1, -1),
                                "std":(1, -1),
                                "min":(1, -1),
@@ -406,7 +408,7 @@ class IPETEvaluationColumn(IpetNode):
                 booleanseries = pd.isnull(result)
                 for f in self.getActiveFilters():
                     booleanseries = numpy.logical_or(booleanseries, f.applyFilter(df).iloc[:, 0])
-                result = numpy.where(booleanseries, alternative, result)
+                result = result.where(~booleanseries, alternative)
         if self.minval is not None:
             minval = self.parseValue(self.minval, df)
             if minval is not None:
@@ -533,10 +535,9 @@ class IPETEvaluation(IpetNode):
         self.sortlevel = int(sortlevel)
         self.evaluated = False
 
-        self.set_index(index)
+        self.orig_defaultgroup = defaultgroup
         self.set_indexsplit(indexsplit)
-
-        self.set_defaultgroup(defaultgroup)
+        self.set_index(index)
         
     def getName(self):
         return self.nodetag
@@ -619,6 +620,7 @@ class IPETEvaluation(IpetNode):
         """
         self.index = StrTuple(index)
         logging.debug("Set index to '{}'".format(index))
+        self.set_defaultgroup(self.orig_defaultgroup)
         
     def getRowIndex(self) -> list:
         """Return (list of) keys to create row index 
@@ -631,17 +633,20 @@ class IPETEvaluation(IpetNode):
         return list(self.index.getTuple())[self.indexsplit:]
 
     def set_defaultgroup(self, dg):
+        self.orig_defaultgroup = dg
         dg = StrTuple.splitStringList(dg, ":")
-        try:
-            x = [float(d) for d in dg]
-        except:
-            x = dg
+        x = list(dg)
+        for i in range(len(x)):
+            try:
+                x[i] = float(x[i])
+            except:
+                pass
         if x is not None and len(x) > len(self.getColIndex()):
             x = x[:len(self.getColIndex())]
         if x is not None and len(x) == 1:
             self.defaultgroup = x[0]
         elif x is not None:
-            self.defaultgroup = StrTuple(tuple(x), ":")
+            self.defaultgroup = tuple(x)
         else:
             self.defaultgroup = None
         self.setEvaluated(False)
@@ -712,7 +717,7 @@ class IPETEvaluation(IpetNode):
     def reduceToColumns(self, df_long : DataFrame) -> DataFrame:
         """ Reduce the huge number of columns
         
-        Reduce the raw data to the columns specified in evaluation xmlfile.
+        Select from the raw data: the columns specified in evaluation xmlfile.
         (concatenate usercolumns, neededcolumns and additionalfiltercolumns from df_long)
 
         Parameters

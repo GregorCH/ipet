@@ -136,22 +136,18 @@ class IpetTreeView(QTreeWidget):
             self.updateSelectedItem()
             return
         
-        
     def createAndAddItem(self, editable, parent=None):
         if parent is None:
             parent = self
         me = IpetTreeViewItem(editable, parent)
         self.editable2item[editable] = me
         self.bindItemIcon(me, editable)
-        try:
-            if editable.getChildren() is not None:
-                for child in editable.getChildren():
-                    self.createAndAddItem(child, me)
-                
-                self.expandItem(me)
-        except AttributeError as e:
-            print(e)
-            pass
+
+        if editable.getChildren():
+            for idx, child in enumerate(editable.getChildren()):
+                self.createAndAddItem(child, me)
+
+        self.expandItem(me)
 
 editframecontent = None
 if __name__ == "__main__":

@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
-<Evaluation comparecolformat="%.3f" defaultgroup="benchmark.gurobi.out" evaluateoptauto="False" index="ProblemName LogFileName" indexsplit='1' sortlevel="0">
-	<Column active="True" comp="quot" maxval="TimeLimit" minval="0.5" name="Time" nanrep="TimeLimit" origcolname="SolvingTime" translevel="0" reduction="mean">
+<Evaluation comparecolformat="%.3f" defaultgroup="benchmark.gurobi.out" evaluateoptauto="False" index="ProblemName SolverStatus LogFileName" indexsplit='2' sortlevel="0">
+	<Column active="True" comp="quot" maxval="TimeLimit" minval="0.5" name="Time" alternative="TimeLimit" origcolname="SolvingTime" translevel="0" reduction="mean">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
+		<Aggregation aggregation="mean" name="mean" shiftby="10.0"/>
 	</Column>
 	<Column active="True" minval="1" name="DTime" transformfunc="subtract" translevel="0" reduction="mean">
 		<Column active="True" origcolname="Datetime_End" translevel="0"/>

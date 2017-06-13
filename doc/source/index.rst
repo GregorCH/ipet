@@ -17,6 +17,8 @@ Contents
 
    installation.md
    overview.md
+   dataflow.md
+   example_tables.md
    exampleusage.md
    scripts.rst
    All modules of IPET <modules.rst>

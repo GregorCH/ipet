@@ -9,5 +9,5 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 """
-version_info = (0, 0, 8)
+version_info = (0, 0, 9)
 __version__ = '.'.join(str(v) for v in version_info)

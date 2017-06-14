@@ -115,6 +115,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
         newcolname = "New Column %d"%self.addedcolumns
         newcol = IPETEvaluationColumn(name=newcolname)
         self.browser.addNewElementAsChildOfSelectedElement(newcol)
+        EditableForm.extendAvailableOptions("datakey", [col.getName() for col in self.evaluation.getActiveColumns()])
 
     def addFilterGroup(self):
         self.updateStatus("Add filter group")
@@ -219,8 +220,8 @@ class EvaluationEditorWindow(IPETApplicationTab):
         if self.browser.treewidget.getSelectedEditable().__class__ is IPETFilterGroup:
             selectedfiltergroup = self.browser.treewidget.getSelectedEditable()
 
-        if selectedfiltergroup is not None and selectedfiltergroup.isActive():
-            return
+#        if selectedfiltergroup is not None and selectedfiltergroup.isActive():
+#            return
 
         if selectedfiltergroup != self.lastfiltergroup:
             if selectedfiltergroup is not None:

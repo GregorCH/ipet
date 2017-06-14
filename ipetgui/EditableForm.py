@@ -32,7 +32,7 @@ class EditableForm(QWidget):
     @staticmethod
     def extendAvailableOptions(key, moreoptions):
         currentoptionsforkey = EditableForm.availableOptions.get(key, [EditableForm.NOSELECTIONTEXT, ])
-        EditableForm.availableOptions[key] = sorted(currentoptionsforkey + moreoptions)
+        EditableForm.availableOptions[key] = sorted(set(currentoptionsforkey + moreoptions))
         
     def __init__(self, editable, parent=None):
         """
@@ -133,7 +133,6 @@ class EditableForm(QWidget):
         construct a widget container for the specified attribute
         """
         options = self.getRequiredOptionsListForAttribute(attr)
-
         # the default container type is the more general one
         if type(val) is bool:
             # create a new check box with checked state set to val

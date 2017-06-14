@@ -68,6 +68,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
     def setEvaluation(self, evaluation):
         self.browser.setRootElement(evaluation)
         self.evaluation = evaluation
+        EditableForm.extendAvailableOptions("datakey", [col.getName() for col in evaluation.getActiveColumns()])
 
     def defineActions(self):
 

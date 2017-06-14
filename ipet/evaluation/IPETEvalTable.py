@@ -413,9 +413,9 @@ class IPETEvaluationColumn(IpetNode):
             minval = self.parseValue(self.minval, df)
             if minval is not None:
                 if type(minval) in [int, float]:
-                    result = numpy.minimum(result, minval)
+                    result = numpy.maximum(result, minval)
                 else:
-                    result = numpy.minimum(result, minval.astype(result.dtype))
+                    result = numpy.maximum(result, minval.astype(result.dtype))
         if self.maxval is not None:
             maxval = self.parseValue(self.maxval, df)
             if maxval is not None:

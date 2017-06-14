@@ -54,6 +54,9 @@ def loadAdditionalSolufiles(filenames = []):
         for _file in os.listdir("./"):
             if _file.endswith(".solu"):
                 solufiles.append(_file)
+    else:
+        solufiles = filenames
+
     if solufiles == []:
         if solufilesDirExists():
             for _file in os.listdir(getSolufilesDir()):

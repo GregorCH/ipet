@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <Evaluation defaultgroup="default" groupkey="LogFileName">
-	<Column origcolname="SolvingTime" minval="0.5" maxval="TimeLimit" nanrep="TimeLimit" name="Time" translevel="0" comp="quot">
+	<Column origcolname="SolvingTime" minval="0.5" name="Time" translevel="0" comp="quot">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>
 	<Column name="Nodes" origcolname="Nodes" comp="quot">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0" />
 	</Column>
-	<Column origcolname="Status"/>
+	<Column origcolname="Status" reduction="getBestStatus"/>
 	<FilterGroup name="all"/>
 	<FilterGroup name="alloptimal">
 		<Filter anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>

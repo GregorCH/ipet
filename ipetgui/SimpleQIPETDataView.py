@@ -103,7 +103,7 @@ class IpetTableDataModel(QAbstractTableModel):
         if type(stringortuple) is str:
             return stringortuple
         elif type(stringortuple) is tuple:
-            return join.join(stringortuple)
+            return join.join(map(str, stringortuple))
         else:
             raise TypeError("Wrong type %s, expected string or tuple" % type(stringortuple))
     

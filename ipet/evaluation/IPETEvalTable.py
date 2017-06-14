@@ -635,12 +635,15 @@ class IPETEvaluation(IpetNode):
     def set_defaultgroup(self, dg):
         self.orig_defaultgroup = dg
         dg = StrTuple.splitStringList(dg, ":")
-        x = list(dg)
-        for i in range(len(x)):
-            try:
-                x[i] = float(x[i])
-            except:
-                pass
+        if dg is None:
+            x = None
+        else:
+            x = list(dg)
+            for i in range(len(x)):
+                try:
+                    x[i] = float(x[i])
+                except:
+                    pass
         if x is not None and len(x) > len(self.getColIndex()):
             x = x[:len(self.getColIndex())]
         if x is not None and len(x) == 1:

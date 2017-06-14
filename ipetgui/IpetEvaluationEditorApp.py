@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from PyQt4.QtGui import QFrame, QWidget, QLabel,\
     QApplication, QKeySequence, QFileDialog, \
     QVBoxLayout, QHBoxLayout
@@ -20,7 +20,7 @@ from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
 from ipet.misc import misc
 from ipet.evaluation.Aggregation import Aggregation
-from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
+from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETValue
 from ipet.evaluation.IPETFilter import IPETFilter
 from .IpetMainWindow import IpetMainWindow
 from .EditableBrowser import EditableBrowser
@@ -36,9 +36,9 @@ class EvaluationEditorWindow(IPETApplicationTab):
     addedinstances = 0
 
     def __init__(self, parent=None):
-        '''
+        """
         Constructor
-        '''
+        """
         super(EvaluationEditorWindow, self).__init__(parent)
 
         self.browser = EditableBrowser(self)
@@ -58,7 +58,6 @@ class EvaluationEditorWindow(IPETApplicationTab):
         vlayout.addWidget(tabwidget)
         self.setLayout(vlayout)
 
-
         self.defineActions()
         self.initConnections()
         self.passGroupToTableViews()
@@ -69,14 +68,15 @@ class EvaluationEditorWindow(IPETApplicationTab):
     def setEvaluation(self, evaluation):
         self.browser.setRootElement(evaluation)
         self.evaluation = evaluation
+        EditableForm.extendAvailableOptions("datakey", [col.getName() for col in evaluation.getActiveColumns()])
 
     def defineActions(self):
 
-        self.loadaction = self.createAction("&Load", self.loadEvaluation, QKeySequence.Open, icon = "Load-icon",
+        self.loadaction = self.createAction("&Load evaluation", self.loadEvaluation, QKeySequence.Open, icon = "Load-icon",
                                        tip="Load evaluation from XML file (current evaluation gets discarded)")
-        self.saveaction = self.createAction("&Save", self.saveEvaluation, QKeySequence.Save, icon = "disk-icon",
+        self.saveaction = self.createAction("&Save evaluation", self.saveEvaluation, QKeySequence.Save, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
-        self.saveasaction = self.createAction("&Save as", self.saveEvaluationAs, QKeySequence.SaveAs, icon = "disk-icon",
+        self.saveasaction = self.createAction("&Save evaluation as", self.saveEvaluationAs, QKeySequence.SaveAs, icon = "disk-icon",
                                        tip="Save evaluation to XML format")
         self.addcolaction = self.createAction("Add &Column", self.addColumn, "Alt+C", icon="Letter-C-violet-icon",
                                          tip="Add new column as a child of the currently selected element")
@@ -115,6 +115,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
         newcolname = "New Column %d"%self.addedcolumns
         newcol = IPETEvaluationColumn(name=newcolname)
         self.browser.addNewElementAsChildOfSelectedElement(newcol)
+        EditableForm.extendAvailableOptions("datakey", [col.getName() for col in self.evaluation.getActiveColumns()])
 
     def addFilterGroup(self):
         self.updateStatus("Add filter group")
@@ -145,7 +146,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.updateStatus("Add instance")
         self.addedinstances += 1
         newinstancename = "new Instance %d"%self.addedinstances
-        newinstance = IPETInstance(newinstancename)
+        newinstance = IPETValue(newinstancename)
 
         self.browser.addNewElementAsChildOfSelectedElement(newinstance)
 
@@ -192,7 +193,7 @@ class EvaluationEditorWindow(IPETApplicationTab):
 
     def enableOrDisableActions(self):
         for action, addclass in zip([self.addcolaction, self.addfiltergroupaction, self.addfilteraction, self.addaggregationaction, self.addinstancenaction],
-                                    [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETInstance()]):
+                                    [IPETEvaluationColumn(), IPETFilterGroup(), IPETFilter(), Aggregation(), IPETValue()]):
             if self.browser.treewidget.currentItemAcceptsClassAsChild(addclass):
                 action.setEnabled(True)
             else:
@@ -203,9 +204,9 @@ class EvaluationEditorWindow(IPETApplicationTab):
         self.passGroupToTableViews()
 
     def setDataFrames(self, tableviewdf, aggtableviewdf):
-        '''
+        """
         sets both data frames and formatters for the views
-        '''
+        """
         self.tableview.setDataFrame(tableviewdf, self.evaluation.getColumnFormatters(tableviewdf))
         self.aggtableview.setDataFrame(aggtableviewdf, self.evaluation.getColumnFormatters(aggtableviewdf))
 
@@ -219,8 +220,8 @@ class EvaluationEditorWindow(IPETApplicationTab):
         if self.browser.treewidget.getSelectedEditable().__class__ is IPETFilterGroup:
             selectedfiltergroup = self.browser.treewidget.getSelectedEditable()
 
-        if selectedfiltergroup is not None and selectedfiltergroup.isActive():
-            return
+#        if selectedfiltergroup is not None and selectedfiltergroup.isActive():
+#            return
 
         if selectedfiltergroup != self.lastfiltergroup:
             if selectedfiltergroup is not None:
@@ -238,9 +239,9 @@ class EvaluationEditorWindow(IPETApplicationTab):
             self.setDataFrames(rettab, retagg)
 
 class IpetEvaluationEditorApp(IpetMainWindow):
-    '''
+    """
     This app represents the Editable Browser in a single, executable window
-    '''
+    """
 
     def __init__(self, parent = None):
         super(IpetEvaluationEditorApp, self).__init__(parent)
@@ -262,7 +263,7 @@ if __name__ == "__main__":
     app.setApplicationName("Evaluation editor")
     mainwindow = IpetEvaluationEditorApp()
     ev = IPETEvaluation.fromXMLFile("../test/testevaluate.xml")
-    ev.setDefaultGroup('testmode')
+    ev.set_defaultgroup('testmode')
     ExperimentManagement.addOutputFiles(["../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"])
     ExperimentManagement.getExperiment().collectData()
     mainwindow.setEvaluation(ev)

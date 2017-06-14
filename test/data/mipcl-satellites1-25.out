@@ -1,0 +1,163 @@
+@01 instances/miplib2010/satellites1-25.mps.gz ===========
+-----------------------------
+Sun Apr  9 13:24:05 MST 2017
+-----------------------------
+@03 1491769445
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.satellites1-25.mps.sol
+/home/beck/miplib2010-1.1.0/bin/mipcl -solfile /home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.satellites1-25.mps.sol -threads 1 -time 7200 instances/miplib2010/satellites1-25.mps.gz
+Reading data...
+NAME           satellites1-25
+Start preprocessing: Rows - 5996, Cols - 9013 (Int - 8509, Bin - 8509), NZs - 59023
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    2.077      1         5187          37           823        64786       6713737
+    3.612      2         5151           0            80        60905       6781461
+==================================================================================
+After preprocessing: Rows - 4734, Cols - 5341 (Int - 5151, Bin - 5151), NZs - 54939
+Scaling...
+Max exp = 4
+
+Preprocessing Time: 3.661
+Optimizing...
+
+      Time        Its   Deg. Its   Method                     Obj
+     3.692        100         99      D/S                -21.0000
+     3.700        200        199      D/S                -21.0010
+     3.708        300        215      D/S                -21.0005
+     3.718        400        245      D/S                -21.0002
+     3.728        500        276      D/S                -20.9998
+     3.739        600        315      D/S                -21.0010
+     3.751        700        321      D/S                -21.0007
+     3.763        800        334      D/S                -19.9998
+     3.774        900        344      D/S                -19.9988
+     3.787       1000        352      D/S                -19.9983
+
+      Time        Its   Deg. Its   Method                     Obj
+     3.801       1100        389      D/S                -19.9981
+     3.817       1200        434      D/S                -20.0014
+     3.831       1300        445      D/S                -20.0012
+     3.848       1400        477      D/S                -20.0012
+     3.864       1500        508      D/S                -20.0011
+     3.882       1600        538      D/S                -20.0021
+     3.900       1700        568      D/S                -20.0020
+     3.922       1800        606      D/S                -20.0026
+     3.941       1900        626      D/S                -20.0025
+     3.962       2000        655      D/S                -20.0025
+
+      Time        Its   Deg. Its   Method                     Obj
+     3.985       2100        709      D/S                -20.0025
+     4.010       2200        759      D/S                -20.0035
+     4.033       2300        786      D/S                -20.0035
+     4.060       2400        843      D/S                -20.0041
+     4.083       2500        877      D/S                -20.0041
+     4.110       2600        921      D/S                -20.0046
+     4.135       2700        967      D/S                -20.0046
+     4.162       2800       1015      D/S                -20.0052
+     4.182       2900       1021      D/S                -20.0051
+     4.202       3000       1030      D/S                -20.0051
+
+      Time        Its   Deg. Its   Method                     Obj
+     4.220       3100       1045      D/S                -20.0051
+     4.227       3117       1047      D/S                -20.0000
+     4.260          1          0      P/S                -20.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     4.286                -20.0000        132      166
+     4.729                -20.0000        125       77
+     5.008                -20.0000        117       57
+     5.292                -20.0000        129      123
+Start preprocessing: Rows - 4754, Cols - 5341 (Int - 5151, Bin - 5151), NZs - 56381
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    9.065      1         5151           4             4        73737       5147567
+   10.632      2         5147           0             4        73705       5145739
+==================================================================================
+After preprocessing: Rows - 4575, Cols - 5337 (Int - 5147, Bin - 5147), NZs - 43501
+Scaling...
+Max exp = 5
+
+
+      Time        Its   Deg. Its   Method                     Obj
+    10.714        100         99      D/S                -25.0000
+    10.722        200        199      D/S                -25.0015
+    10.731        300        241      D/S                -21.0011
+    10.741        400        279      D/S                -21.0034
+    10.750        500        297      D/S                -20.0026
+    10.761        600        326      D/S                -20.0025
+    10.773        700        372      D/S                -20.0021
+    10.786        800        423      D/S                -20.0038
+    10.800        900        465      D/S                -20.0037
+    10.815       1000        504      D/S                -20.0048
+
+      Time        Its   Deg. Its   Method                     Obj
+    10.828       1100        524      D/S                -20.0047
+    10.844       1200        559      D/S                -20.0047
+    10.859       1300        603      D/S                -20.0047
+    10.876       1400        652      D/S                -20.0059
+    10.893       1500        687      D/S                -20.0059
+    10.911       1600        735      D/S                -20.0068
+    10.930       1700        779      D/S                -20.0068
+    10.948       1800        827      D/S                -20.0080
+    10.964       1900        845      D/S                -20.0080
+    10.978       2000        852      D/S                -20.0080
+    10.990       2082        858      D/S                -20.0000
+    11.017          1          0      P/S                -20.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+    11.040                -20.0000        133       67
+    11.319                -20.0000        125      112
+    11.671                -20.0000        127       40
+    11.949                -20.0000        156       25
+
+Cut statistics
+========== Cuts = Generated === Used
+          click         435       40
+ mixed knapsack           3        2
+            mir           2        1
+    sparse MOD2         115       21
+     dense MOD2          10        3
+  sparse Gomory          66        2
+      var bound          25        4
+    disjunction          11        0
+========= total         667       73
+
+After processing root node: Rows - 4586, Cols - 5337 (Int - 5147, Bin - 5147), NZs - 43749
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound     Gap%
+    14.046         1         1      0                 inf            -20.0000      inf
+    47.735       100        47      0                 inf            -12.9995      inf
+    59.726       200        75      0                 inf            -10.9998      inf
+    64.654       300       105      0                 inf             -9.0000      inf
+    68.789       400       143      0                 inf             -8.9996      inf
+    71.393       446       157      1            123.0000             -8.9907      inf
+    71.412       446       151      2             33.0000             -8.9907      inf
+    75.348       500       145      2             33.0000             -8.0000      inf
+    78.119       543        60      3             -5.0000             -7.9996    59.99
+    80.802       600        38      3             -5.0000             -6.9998    40.00
+===========================================
+MIPCL version 1.3.1
+Solution time: 81.802
+Branch-and-Cut nodes: 618
+Objective value: -5.0000 - optimality proven
+rm: cannot remove '*_mipcl.log': No such file or directory
+
+@04 1491769527
+@05 7200
+
+Read MPS: 1
+MIP has 9013 vars and 5996 constraints
+Read SOL: 1
+Objective value computed by solver: -5
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 5e-05 Objective 0
+
+-----------------------------
+Sun Apr  9 13:25:27 MST 2017
+-----------------------------
+
+=ready=

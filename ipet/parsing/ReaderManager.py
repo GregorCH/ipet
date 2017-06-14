@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,27 +8,25 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
-from .StatisticReader import StatisticReader, ListReader
-from ipet.parsing.StatisticReader_CustomReader import CustomReader
+"""
 import os
-import re
-from ipet.concepts.Manager import Manager
+import logging
 import xml.etree.ElementTree as ElementTree
-from .StatisticReader import PrimalBoundReader, DualBoundReader, ErrorFileReader, \
-    GapReader, SolvingTimeReader, TimeLimitReader, \
-    BestSolInfeasibleReader, MaxDepthReader, LimitReachedReader, ObjlimitReader, NodesReader, RootNodeFixingsReader, \
+from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, StatisticReader, ListReader, \
+    BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
-from .StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader, ParascipDualBoundHistoryReader
-from .StatisticReader_GeneralInformationReader import GeneralInformationReader
 from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
-from .StatisticReader_PrimalBoundHistoryReader import PrimalBoundHistoryReader
 from .StatisticReader_VariableReader import VariableReader
 from .StatisticReader_SoluFileReader import SoluFileReader
+from .StatisticReader_CustomReader import CustomReader
 from .TraceFileReader import TraceFileReader
-import logging
+from ipet.concepts.Manager import Manager
 from ipet.concepts.IPETNode import IpetNode
-
+from ipet.parsing.Solver import Solver, SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, CplexSolver
+from ipet.misc import misc
+# CbcSolver, CouenneSolver, \
+#     XpressSolver, GurobiSolver, CplexSolver
+from ipet import Key
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -37,78 +35,78 @@ class ReaderManager(Manager, IpetNode):
     extensions = [".mps", ".cip", ".fzn", ".pip", ".lp", ".gms", ".dat"]
     nodetag = "Readers"
 
-    solvertype_recognition = {
-                              StatisticReader.SOLVERTYPE_SCIP:"SCIP version ",
-                              StatisticReader.SOLVERTYPE_GUROBI:"Gurobi Optimizer version",
-                              StatisticReader.SOLVERTYPE_CPLEX:"Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer",
-                              StatisticReader.SOLVERTYPE_XPRESS:"FICO Xpress-Optimizer",
-                              StatisticReader.SOLVERTYPE_CBC:"Welcome to the CBC MILP Solver",
-                              StatisticReader.SOLVERTYPE_COUENNE:" Couenne  --  an Open-Source solver for Mixed Integer Nonlinear Optimization"
-                              }
-    """recognition patterns to distinguish between solver types"""
-
-    othersolvers = [solver for solver in list(solvertype_recognition.keys()) if solver != StatisticReader.solvertype]
-
-
-    fileextension2context = {
-                             ".err" : StatisticReader.CONTEXT_ERRFILE,
-                             ".out" : StatisticReader.CONTEXT_LOGFILE,
-                             ".set" : StatisticReader.CONTEXT_SETFILE,
-                             ".solu": StatisticReader.CONTEXT_SOLUFILE,
-                             ".trc" : StatisticReader.CONTEXT_TRACEFILE
-                             }
-    """map for file extensions to the file contexts to specify the relevant readers"""
-
-    context2Sortkey = {
-                       StatisticReader.CONTEXT_ERRFILE : 2,
-                       StatisticReader.CONTEXT_LOGFILE : 1,
-                       StatisticReader.CONTEXT_SETFILE : 3,
-                       StatisticReader.CONTEXT_SOLUFILE : 4,
-                       StatisticReader.CONTEXT_TRACEFILE : 5
-                       }
-    """ defines a sorting order for file contexts """
-
-
     xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
 
+    context2string = {Key.CONTEXT_LOGFILE:"LogFile",
+                      Key.CONTEXT_ERRFILE:"ErrFile"}
+
     def __init__(self, problemexpression = "@01", problemendexpression = "=ready="):
-        '''
+        """
         constructs a new reader Manager
 
         Parameters:
         -----------
 
-        problemexpression : an expression that accompanies the start of a new instance in a log file context
+        problemexpression : an expression that accompanies the start of a new problem in a log file context
 
-        problemendexpression : an expression that signals the end of an instance in a log file context
-        '''
+        problemendexpression : an expression that signals the end of an problem in a log file context
+        """
         Manager.__init__(self)
         # an ipet Node is always active
         IpetNode.__init__(self, True)
         self.problemexpression = problemexpression
         self.problemendexpression = problemendexpression
+        self.solvers = []
+        self.addSolvers()
+        self.activeSolver = self.solvers[0]
+        self.solverCanRead = True
 
     def getEditableAttributes(self):
         return ["problemexpression", "problemendexpression"]
 
+    def addSolvers(self):
+        for s in [SCIPSolver(), CbcSolver(), XpressSolver(), GurobiSolver(), CplexSolver()]:
+            self.addSolver(s)
+
+    def addSolver(self, solver):
+        self.solvers.append(solver)
+        logging.debug("Added a solver: {}".format(solver.getName()))
+
     def getName(self):
+        """
+        Returns the name of the class
+        """
         return "ReaderManager"
 
+    def isActive(self) -> bool:
+        """Return if this reader manager is active or not
+        """
+        return IpetNode.isActive(self)
+
     def addChild(self, child):
+        """
+        adds a new reader as child
+        """
         self.registerReader(child)
 
     def removeChild(self, child):
+        """
+        removes a reader
+        """
         self.deleteManageable(child)
 
     def acceptsAsChild(self, child):
+        """
+        only accepts certain reader as children
+        """
         return child.__class__() in list(self.xmlfactorydict.values())
 
     def getChildren(self):
-        return sorted([m for m in self.getManageables(False) if m.__class__ in list(self.xmlfactorydict.values())], key = lambda x:x.getName())
-
-    @staticmethod
-    def getNodeTag():
-        return ReaderManager.nodetag
+        """
+        returns a sortet list of all readers
+        """
+        children = [m for m in self.getManageables(False) if m.__class__ in list(self.xmlfactorydict.values())]
+        return sorted(children, key = lambda x:x.getName())
 
     def setTestRun(self, testrun):
         """
@@ -116,46 +114,25 @@ class ReaderManager(Manager, IpetNode):
         """
         logging.debug("Setting testrun to %s" % testrun.getName())
         self.testrun = testrun
-        self.filestrings = testrun.filenames
         for reader in self.getManageables():
             reader.setTestRun(testrun)
 
     def addFileExtension2Context(self, extension, context):
-        oldcontext = self.fileextension2context.get(extension)
+        """
+        Adds a new file context (associated to extension)
+        """
+        oldcontext = Key.fileextension2context.get(extension)
+        # don't overwrite existing content
         if  oldcontext is not None and oldcontext != context:
             raise ValueError("context for file extension %s already set to %d" % (extension, oldcontext))
-        self.fileextension2context[extension] = context
+        Key.fileextension2context[extension] = context
 
     def getFileExtensions(self):
-        '''
+        """
         returns a list of all recognized file extensions by this Reader manager
-        '''
-        return list(self.fileextension2context.keys())
-
-    def addLogFileExtension(self, extension):
         """
-        adds a new log file extension to the log file contexts
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_LOGFILE)
-
-    def addErrorFileExtension(self, extension):
-        """
-        adds a new error file extension to the error file contexts
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_ERRFILE)
-
-    def addSettingsFileExtension(self, extension):
-        """
-        adds a new settings file extension to settings file contexts
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_SETFILE)
-
-    def addSoluFileExtension(self, extension):
-        """
-        adds a new solu file extension to solu file contexts
-        """
-        self.addFileExtension2Context(extension, StatisticReader.CONTEXT_SOLUFILE)
-
+        return list(Key.fileextension2context.keys())
+#
     def getNReaders(self):
         """
         returns the number of readers
@@ -163,6 +140,9 @@ class ReaderManager(Manager, IpetNode):
         return len(self.countManageables())
 
     def hasReader(self, reader):
+        """
+        Returns True if given reader is being managed at the moment
+        """
         listofnames = [installedreader.getName() for installedreader in self.getManageables()]
         if reader.getName() in listofnames:
             return True
@@ -170,34 +150,35 @@ class ReaderManager(Manager, IpetNode):
             return False
 
     def registerReader(self, reader):
+        """
+        Registration and activation of a reader
+        """
         self.addAndActivate(reader)
 
     def registerListOfReaders(self, readers):
+        """
+        Registration of custom readers
+        """
         for reader in readers:
             self.addAndActivate(reader)
 
     def registerDefaultReaders(self):
-
+        """
+        Registration of all default readers
+        """
         self.registerListOfReaders([
              BestSolInfeasibleReader(),
              DateTimeReader(),
-             DualBoundReader(),
-             DualBoundHistoryReader(),
              ErrorFileReader(),
-             ParascipDualBoundHistoryReader(),
              GapReader(),
-             GeneralInformationReader(),
              MaxDepthReader(),
-             LimitReachedReader(),
+             MetaDataReader(),
              NodesReader(),
              ObjsenseReader(),
              PluginStatisticsReader(),
-             PrimalBoundHistoryReader(),
-             PrimalBoundReader(),
              VariableReader(),
              RootNodeFixingsReader(),
              SettingsFileReader(),
-             SolvingTimeReader(),
              SoluFileReader(),
              TimeLimitReader(),
              TimeToFirstReader(),
@@ -205,17 +186,20 @@ class ReaderManager(Manager, IpetNode):
              TraceFileReader()
              ])
 
-    def updateLineNumberData(self, linenumber, problemname, currentcontext, prefix):
-        context2string = {StatisticReader.CONTEXT_LOGFILE:"LogFile",
-                          StatisticReader.CONTEXT_ERRFILE:"ErrFile"}
-        if problemname is None:
-            return
-        contextstring = context2string.get(currentcontext)
+    def updateLineNumberData(self, linenumber, currentcontext, prefix):
+        """
+        Saves the information about in what lines to find relevant information
+        """
+        contextstring = self.context2string.get(currentcontext)
         if contextstring is None:
             return
-        self.testrun.addData(problemname, "%s%s" % (prefix, contextstring), linenumber)
+        self.testrun.addData("%s%s" % (prefix, contextstring), linenumber)
 
     def getProblemName(self, line):
+        """
+        tries to return name of problem, which is read via the line that is beginning with @1
+        """
+
         fullname = line.split()[1]
         namewithextension = os.path.basename(fullname)
         if namewithextension.endswith("gz"):
@@ -224,119 +208,96 @@ class ReaderManager(Manager, IpetNode):
             if namewithextension.endswith(extension):
                 namewithextension = os.path.splitext(namewithextension)[0]
 
+        # now name without extension
         return namewithextension
 
     def finishProblemParsing(self, line, filecontext, readers):
-        if filecontext in [StatisticReader.CONTEXT_ERRFILE, StatisticReader.CONTEXT_LOGFILE] and StatisticReader.getProblemName() is not None:
-            self.updateLineNumberData(line[0], StatisticReader.getProblemName(), filecontext, "LineNumbers_End")
+        """
+        only for error and logfiles: the lineinformation is written and the datacollection
+        is being finalized, active solver is being reset
+        """
+        if filecontext in [Key.CONTEXT_ERRFILE, Key.CONTEXT_LOGFILE] and not self.testrun.emptyCurrentProblemData():
+            self.updateLineNumberData(line[0], filecontext, "LineNumbers_End")
             for reader in readers:
                 reader.execEndOfProb()
 
-            if filecontext == StatisticReader.CONTEXT_LOGFILE and not self.endOfInstanceReached(line[1]):
-                logging.warning("Malformatted log output for instance %s, probably a missing expression %s" % \
-                               (StatisticReader.getProblemName(), self.problemendexpression))
-
-            StatisticReader.setProblemName(None)
-
+            if filecontext == Key.CONTEXT_LOGFILE and not self.endOfProblemReached(line[1]):
+                logging.warning("Malformatted log output, probably a missing expression %s" % \
+                               (self.problemendexpression))
+            self.testrun.finalizeCurrentCollection(self.activeSolver)
+            self.activeSolver.reset()
 
     def updateProblemName(self, line, currentcontext, readers):
-        '''
-        sets up data structures for a new problem instance if necessary
-        '''
+        """
+        sets up data structures for a new problem if necessary
+        """
+        problemname = self.getProblemName(line[1])
 
-        if line[1].startswith(self.problemexpression):
+        self.testrun.addData(Key.ProblemName, problemname)
+        self.testrun.addData(Key.LogFileName, self.testrun.getCurrentLogfilename())
+        self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
-            self.finishProblemParsing(line, currentcontext, readers)
+    def endOfProblemReached(self, line):
+        """
+        Returns a boolean which is True is the line implies the end of the current problem
+        """
+        return line.startswith(self.problemendexpression)
 
-            problemname = self.getProblemName(line[1])
-            StatisticReader.setProblemName(problemname)
-
-
-            # overwrite previous output information from a log file
-            if problemname in self.testrun.getProblems() and currentcontext == StatisticReader.CONTEXT_LOGFILE:
-                self.testrun.deleteProblemData(problemname)
-
-            self.testrun.addData(problemname, 'Settings', self.testrun.getSettings())
-
-            self.updateLineNumberData(line[0], StatisticReader.getProblemName(), currentcontext, "LineNumbers_Begin")
-
-    def endOfInstanceReached(self, line):
-        if line.startswith(self.problemendexpression):
-            return True
-        else:
-            return False
-
-    def readSolverType(self, filename):
-        '''
+    def startOfProblemReached(self, line):
+        """
+        Returns a boolean which is True is the line implies the start of a new problem
+        """
+        return line.startswith(self.problemexpression)
+#
+    def readSolverType(self):
+        """
         check the solver type for a given log file
-        '''
-
-        with open(filename, "r") as currentfile:
-            for line in currentfile:
-                for key in list(ReaderManager.solvertype_recognition.keys()):
-                    if line.startswith(ReaderManager.solvertype_recognition[key]):
-                        StatisticReader.changeSolverType(key)
-                        ReaderManager.othersolvers = [solver for solver in list(ReaderManager.solvertype_recognition.keys()) \
-                                                      if solver != StatisticReader.solvertype]
-                        return
-
-    def sortingKeyContext(self, context):
-        try:
-            return self.context2Sortkey[context]
-        except IndexError:
-            raise IndexError("Unknown context %d" % context)
-
-    def filenameGetContext(self, filename):
-        extension = os.path.splitext(os.path.basename(filename))[1]
-        return self.fileextension2context[extension]
+        """
+        lines = []
+        for i,line in self.testrun:
+            lines.append(line)
+            for solver in self.solvers:
+                if solver.recognizeOutput(line):
+                    self.activeSolver = solver
+                    self.testrun.iterationAddConsumedStdinput(lines)
+                    return
+        # raise ValueError("Input does not have a recognized format.")
 
     def collectData(self):
         """
-        runs data collection on the specified test run
+        runs data collection on the specified testrun
         """
         assert(self.testrun != None)
+        
+        self.testrun.iterationPrepare()
+        while self.testrun.iterationNextFile():
+            self.readSolverType()
+            
+            context = misc.filenameGetContext(self.testrun.iterationGetCurrentFile())
+            readers = [r for r in self.getManageables(True) if r.supportsContext(context)]
+            
+            line = (0,"")
+            for line in self.testrun:
+                if self.startOfProblemReached(line[1]):
+                    self.updateProblemName(line, context, readers)
 
-        # sort the files by context
-        self.filestrings = sorted(self.filestrings, key = lambda x:self.sortingKeyContext(self.filenameGetContext(x)))
+                if self.endOfProblemReached(line[1]):
+                    self.finishProblemParsing(line, context, readers)
 
-        for filename in self.filestrings:
-            f = None
-            try:
-                f = open(filename, 'r')
-            except IOError:
-                print('File', filename, "doesn't exist!")
-                continue
-
-            # only enable readers that support the file context
-            filecontext = self.filenameGetContext(filename)
-            readers = [r for r in self.getManageables(True) if r.supportsContext(filecontext)]
-
-            # search the file for information about the type of the solver
-            self.readSolverType(filename)
-
-            # reset the problem name before a new problem is read in
-            StatisticReader.setProblemName(None)
-
-            # we enumerate the file so that line is a tuple (idx, line) that contains the line content and its number
-            for line in enumerate(f):
-                self.updateProblemName(line, filecontext, readers)
-
-                if self.endOfInstanceReached(line[1]):
-                    self.finishProblemParsing(line, filecontext, readers)
                 else:
+                    if self.activeSolver.isSolverInstance(context):
+                        self.activeSolver.readLine(line[1])
                     for reader in readers:
                         reader.operateOnLine(line[1])
 
-            else:
-                self.finishProblemParsing(line, filecontext, readers)
+            # in case solver crashed, make sure that parsing is finished
+            self.finishProblemParsing(line, context, readers)
+            self.testrun.finishedReadingFile(self.activeSolver)
 
-
-
-            f.close()
-        # print("Collection of data finished")
+        self.testrun.iterationCleanUp()
         return 1
 
-    ### XML IO methods
+    # ## XML IO methods
     def toXMLElem(self):
         me = ElementTree.Element(ReaderManager.getNodeTag())
         readers = self.getManageables(False)
@@ -348,8 +309,14 @@ class ReaderManager(Manager, IpetNode):
                     if reader.__class__ is ReaderManager.xmlfactorydict[key]:
                         break
                 me.append(ElementTree.Element(key, readerstrattrs))
-
         return me
+
+    @staticmethod
+    def getNodeTag():
+        """
+        returns the name of the Readermanager
+        """
+        return ReaderManager.nodetag
 
     @staticmethod
     def fromXML(xmlstring):
@@ -369,7 +336,4 @@ class ReaderManager(Manager, IpetNode):
             reader = ReaderManager.xmlfactorydict[child.tag](**child.attrib)
             rm.registerReader(reader)
         return rm
-
-
-
 

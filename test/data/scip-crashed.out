@@ -1,0 +1,100 @@
+Linux optc-02-11 4.4.0-75-generic #96-Ubuntu SMP Thu Apr 20 09:56:33 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+hard time limit: 00:30:00
+hard mem limit: 38600
+@01 /optimi/kombadon/IP/miplib2003/aflow40b.mps.gz ===========
+-----------------------------
+Mi 3. Mai 19:54:42 CEST 2017
+-----------------------------
+@03 1493834082
+SCIP version 4.0.0 [precision: 8 byte] [memory: block] [mode: optimized] [LP solver: CPLEX 12.6.0.0] [GitHash: dd19a7b]
+Copyright (C) 2002-2017 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)
+
+External codes: 
+  Readline 6.3         GNU library for command line editing (gnu.org/s/readline)
+  CPLEX 12.6.0.0       Linear Programming Solver developed by IBM (www.cplex.com)
+  CppAD 20160000.1     Algorithmic Differentiation of C++ algorithms developed by B. Bell (www.coin-or.org/CppAD)
+  ZLIB 1.2.8           General purpose compression library by J. Gailly and M. Adler (zlib.net)
+  GMP 6.1.0            GNU Multiple Precision Arithmetic Library developed by T. Granlund (gmplib.org)
+  ZIMPL 3.3.2          Zuse Institute Mathematical Programming Language developed by T. Koch (zimpl.zib.de)
+
+user parameter file <scip.set> not found - using default parameters
+
+SCIP> 
+SCIP> set load /home/optimi/bzfhende/opti-projects/scip-opti/check/../settings/n o-lns.set
+loaded parameter file </home/optimi/bzfhende/opti-projects/scip-opti/check/../settings/no-lns.set>
+SCIP> set misc referencevalue 1168.000000000
+misc/referencevalue = 1168
+SCIP> set limits time 600
+limits/time = 600
+SCIP> set limits nodes 2100000000
+limits/nodes = 2100000000
+SCIP> set limits memory 35000
+limits/memory = 35000
+SCIP> set lp advanced threads 1
+lp/threads = 1
+SCIP> set timing clocktype 1
+timing/clocktype = 1
+SCIP> set display freq 10000
+display/freq = 10000
+SCIP> set memory savefac 1.0
+memory/savefac = 1
+SCIP> set save /home/optimi/bzfhende/opti-projects/scip-opti/check/results/bzfhe nde.MMMc.9_aflow40b.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.no-lns.set
+saved parameter file </home/optimi/bzfhende/opti-projects/scip-opti/check/results/bzfhende.MMMc.9_aflow40b.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.no-lns.set>
+SCIP> read /optimi/kombadon/IP/miplib2003/aflow40b.mps.gz
+
+read problem </optimi/kombadon/IP/miplib2003/aflow40b.mps.gz>
+============
+
+original problem has 2728 variables (1364 bin, 0 int, 0 impl, 1364 cont) and 1442 constraints
+SCIP> display parameters
+
+number of parameters = 2184
+non-default parameter settings:
+display/freq = 10000
+limits/time = 600
+limits/nodes = 2100000000
+limits/memory = 35000
+lp/threads = 1
+memory/savefac = 1
+misc/referencevalue = 1168
+heuristics/lns/freq = -1
+
+SCIP> optimize
+
+presolving:
+(round 1, exhaustive) 0 del vars, 0 del conss, 0 add conss, 0 chg bounds, 0 chg sides, 0 chg coeffs, 1403 upgd conss, 0 impls, 39 clqs
+   (0.5s) probing: 1000/1364 (73.3%) - 0 fixings, 0 aggregations, 52811 implications, 0 bound changes
+   (0.5s) probing: 1001/1364 (73.4%) - 0 fixings, 0 aggregations, 52859 implications, 0 bound changes
+   (0.5s) probing aborted: 1000/1000 successive useless probings
+presolving (2 rounds: 2 fast, 2 medium, 2 exhaustive):
+ 0 deleted vars, 0 deleted constraints, 0 added constraints, 0 tightened bounds, 0 added holes, 0 changed sides, 0 changed coefficients
+ 54223 implications, 13111 cliques
+presolved problem has 2728 variables (1364 bin, 0 int, 0 impl, 1364 cont) and 1442 constraints
+   1364 constraints of type <varbound>
+     39 constraints of type <setppc>
+     39 constraints of type <linear>
+transformed objective value is always integral (scale: 1)
+Presolving Time: 0.53
+
+ time | node  | left  |LP iter|LP it/n| mem |mdpt |frac |vars |cons |cols |rows |cuts |confs|strbr|  dualbound   | primalbound  |  gap   
+k 0.6s|     1 |     0 |     0 |     - |  23M|   0 |   - |2728 |1442 |2728 |1442 |   0 |   0 |   0 | 0.000000e+00 | 8.410000e+03 |    Inf 
+  0.6s|     1 |     0 |  5048 |     - |  23M|   0 |  38 |2728 |1442 |2728 |1442 |   0 |   0 |   0 | 1.005665e+03 | 8.410000e+03 | 736.26%
+  0.7s|     1 |     0 |  5143 |     - |  26M|   0 |  58 |2728 |1442 |2728 |1494 |  52 |   0 |   0 | 1.026169e+03 | 8.410000e+03 | 719.55%
+  0.8s|     1 |     0 |  5325 |     - |  27M|   0 |  62 |2728 |1442 |2728 |1558 | 116 |   0 |   0 | 1.050806e+03 | 8.410000e+03 | 700.34%
+  1.0s|     1 |     0 |  5486 |     - |  27M|   0 |  95 |2728 |1442 |2728 |1629 | 187 |   0 |   0 | 1.064791e+03 | 8.410000e+03 | 689.83%
+  1.4s|     1 |     0 |  5702 |     - |  28M|   0 |  95 |2728 |1442 |2728 |1709 | 267 |   0 |   0 | 1.072336e+03 | 8.410000e+03 | 684.27%
+  2.0s|     1 |     0 |  5885 |     - |  31M|   0 | 105 |2728 |1442 |2728 |1789 | 347 |   0 |   0 | 1.078736e+03 | 8.410000e+03 | 679.62%
+  2.8s|     1 |     0 |  6080 |     - |  34M|   0 | 106 |2728 |1442 |2728 |1874 | 432 |   0 |   0 | 1.081368e+03 | 8.410000e+03 | 677.72%
+  4.0s|     1 |     0 |  6268 |     - |  34M|   0 | 120 |2728 |1442 |2728 |1955 | 513 |   0 |   0 | 1.084298e+03 | 8.410000e+03 | 675.62%
+  5.7s|     1 |     0 |  6484 |     - |  36M|   0 | 124 |2728 |1442 |2728 |2036 | 594 |   0 |   0 | 1.086791e+03 | 8.410000e+03 | 673.84%
+  8.3s|     1 |     0 |  6730 |     - |  37M|   0 | 112 |2728 |1442 |2728 |2121 | 679 |   0 |   0 | 1.091018e+03 | 8.410000e+03 | 670.84%
+ 11.6s|     1 |     0 |  6920 |     - |  38M|   0 | 132 |2728 |1442 |2728 |2184 | 742 |   0 |   0 | 1.092366e+03 | 8.410000e+03 | 669.89%
+ 11.9s|     1 |     0 |  7064 |     - |  38M|   0 | 126 |2728 |1442 |2728 |2193 | 771 |   0 |   0 | 1.092972e+03 | 8.410000e+03 | 669.46%
+ 12.3s|     1 |     0 |  7183 |     - |  38M|   0 | 125 |2728 |1442 |2728 |2216 | 794 |   0 |   0 | 1.093509e+03 | 8.410000e+03 | 669.08%
+ 12.6s|     1 |     0 |  7320 |     - |  38M|   0 | 127 |2728 |1442 |2728 |2237 | 815 |   0 |   0 | 1.093839e+03 | 8.410000e+03 | 668.85%
+ time | node  | left  |LP iter|LP it/n| mem |mdpt |frac |vars |cons |cols |rows |cuts |confs|strbr|  dualbound   | primalbound  |  gap   
+ 12.8s|     1 |     0 |  7409 |     - |  38M|   0 | 132 |2728 |1442 |2728 |2251 | 829 |   0 |   0 | 1.094021e+03 | 8.410000e+03 | 668.72%
+ 13.1s|     1 |     0 |  7502 |     - |  38M|   0 | 134 |2728 |1442 |2728 |2265 | 843 |   0 |   0 | 1.094140e+03 | 8.410000e+03 | 668.64%
+ 13.1s|     1 |     0 |  7529 |     - |  38M|   0 | 136 |2728 |1442 |2728 |2266 | 844 |   0 |   0 | 1.094157e+03 | 8.410000e+03 | 668.63%
+F14.8s|     1 |     0 | 12835 |     - |  39M|   0 |   0 |2728 |1443 |2728 |2266 | 844 |   0 |   0 | 1.094157e+03 | 3.166000e+03 | 189.36%
+E16.9s|     1 |     0 | 12835 |     - |  39M|   0 | 136 |2728 |1443 |2728 |2266 | 844 |   0 |   0 | 1.094157e+03 | 1.249000e+03 |  14.15%

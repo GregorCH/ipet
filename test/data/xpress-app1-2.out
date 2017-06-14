@@ -1,0 +1,164 @@
+@01 instances/miplib2010/app1-2.mps.gz ===========
+-----------------------------
+Wed Dec  7 10:22:51 MST 2016
+-----------------------------
+@03 1481131371
+FICO Xpress-Optimizer 64-bit v30.01.03 (Hyper64 capacity)
+FICO Xpress-SLP release version 30.01.03 Dec  2 2016
+(c) Copyright Fair Isaac Corporation 1983-2017. All rights reserved
+Xpress-Nonlinear Knitro 10.0.0 extension
+Using Xpress-Optimizer [/home/beck/math/opt/xpressmp/lib/libxprs.so.30.01.03]
+Using Xpress-SLP       [/home/beck/math/opt/xpressmp/lib/libxslp.so]
+Using Knitro           [/home/beck/math/opt/xpressmp/lib/libxknitro.so]
+MAXTIME=-7200
+CPUTIME=0
+THREADS=1
+MIPRELSTOP=0
+
+Reading Problem app1-2
+Problem Statistics
+       53468 (      0 spare) rows
+       26871 (      0 spare) structural columns
+      199441 (      0 spare) non-zero elements
+Global Statistics
+       13300 entities        0 sets        0 set members
+Minimizing MILP app1-2
+Original problem has:
+     53468 rows        26871 cols       199441 elements     13300 globals
+Presolved problem has:
+     28045 rows        12774 cols       177167 elements     12509 globals
+LP relaxation tightened
+Will try to keep branch and bound tree memory usage below 18.0Gb
+Crash basis containing 260 structural columns created
+
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       -261.000000      D   4574     0        .000000     0
+   784       -245.140749      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  784 simplex iterations in 0s
+
+Final objective                         : -2.451407487322739e+02
+  Max primal violation      (abs / rel) : 2.216e-07 / 2.216e-07
+  Max dual violation        (abs / rel) :       0.0 /       0.0
+  Max complementarity viol. (abs / rel) :       0.0 /       0.0
+All values within tolerances
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+   1  K                -192.148076      0   1002      0              282      3
+   2  K                -163.360792      0   4466    909              350      3
+   3  K                -152.749577      0    455   4345              315      4
+   4  K                -144.441606      0   3094    454              324      4
+   5  K                -138.272961      0   2102   3087              316      5
+   6  K                -137.380677      0    522   2088              325      5
+   7  K                -136.759441      0    249    497              322      6
+   8  K                -135.900701      0    285    230              319      6
+   9  K                -135.769575      0    415    273              316      7
+  10  K                -135.732666      0    405    402              317      7
+  11  K                -135.644920      0    154    377              321      8
+  12  K                -135.525875      0    865    148              317      8
+  13  K                -135.311161      0    328    810              318      9
+  14  K                -135.283785      0    238    326              317      9
+  15  K                -135.264692      0    214    231              317      9
+  16  K                -135.246578      0    362    212              318     10
+  17  K                -135.235958      0    237    354              319     10
+  18  K                -135.148201      0     48    219              318     11
+  19  K                -134.914529      0    225     60              321     11
+  20  K                -134.724146      0    110    511              318     12
+Heuristic search started
+Heuristic search stopped
+
+Cuts in the matrix         : 243
+Cut elements in the matrix : 1605
+
+Performing root presolve...
+
+Reduced problem has:   11076 rows    4588 columns     67611 elements
+Presolve dropped   :   17212 rows    8186 columns    109803 elements
+Presolve tightened :      1379 elements
+Will try to keep branch and bound tree memory usage below 18.0Gb
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+   1  K                 -57.865606      0   1745    107              425     20
+   2  K                 -54.385664      0   3566   5062              426     20
+Heuristic search started
+Heuristic search stopped
+
+Cuts in the matrix         : 280
+Cut elements in the matrix : 1416
+
+Performing root presolve...
+
+Reduced problem has:    6172 rows    2364 columns     36771 elements
+Presolve dropped   :    5046 rows    2224 columns     29900 elements
+Presolve tightened :      1647 elements
+Will try to keep branch and bound tree memory usage below 18.0Gb
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+   1  K                 -48.658557      0   1086     76              345     24
+   2  K                 -47.423071      0   1942   2820              337     24
+Heuristic search started
+Heuristic search stopped
+
+Cuts in the matrix         : 232
+Cut elements in the matrix : 1502
+
+Starting tree search.
+Deterministic mode with up to 1 running thread and up to 1 task.
+
+    Node     BestSoln    BestBound   Sols Active  Depth     Gap     GInf   Time
+       1                -47.423071      0      2      1              269     26
+       2                -47.423071      0      2      2              279     26
+       3                -45.860828      0      2      1                1     26
+       4                -45.860828      0      2      3              157     26
+       5                -45.495447      0      2      1                1     26
+       6                -45.495447      0      2      4               46     27
+       7                -45.495447      0      2      1                1     27
+       8                -45.495447      0      2      3              275     27
+       9                -45.472849      0      3      4              275     27
+      10                -45.472849      0      2      4              251     27
+      21                -43.868125      0      4     11              235     28
+      35                -43.765234      0     11     24              211     28
+      47                -43.765234      0     11     32              215     28
+      61                -43.765234      0     11     42              195     28
+      73                -43.765234      0     11     48              185     28
+      90                -43.765234      0     11     58              169     28
+     110                -43.765234      0     11     69              161     28
+a    208   -41.000000   -43.130510      1     50     27    4.94%       0     29
+     261   -41.000000   -43.130510      1      4      1    4.94%       1     29
+ *** Search completed ***     Time:    29 Nodes:        265
+Number of integer feasible solutions found is 1
+Best integer solution found is   -41.000000
+Best bound is   -41.000000
+Uncrunching matrix
+Objective value = -41
+Best Bound = -41
+Nodes explored = 265
+file3
+
+@04 1481131401
+@05 7200
+
+Read MPS: 1
+MIP has 26871 vars and 53467 constraints
+Read SOL: 1
+Objective value computed by solver: -41
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 2.33e-14 Objective 0
+
+-----------------------------
+Wed Dec  7 10:23:22 MST 2016
+-----------------------------
+
+=ready=

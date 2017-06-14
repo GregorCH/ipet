@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -9,7 +9,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 
 # embedding_in_qt4.py --- Simple Qt4 application embedding matplotlib canvases
 #
@@ -23,7 +23,7 @@ please refer to README.md for how to cite IPET.
 
 import sys
 import os
-
+import os.path as osp
 from PyQt4 import QtGui, QtCore
 
 from numpy import arange, sin, pi
@@ -32,18 +32,21 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 from matplotlib.figure import Figure
 from PyQt4.Qt import QListWidget, QAbstractItemView, QFileDialog, QApplication, QKeySequence, \
-    QFrame, QListWidgetItem
+    QFrame, QListWidgetItem, QAction, QIcon, QVBoxLayout
 from PyQt4.QtCore import SIGNAL
 from ipet.TestRun import TestRun
 from ipet.misc.integrals import getProcessPlotData, getMeanIntegral
-from .IpetMainWindow import IpetMainWindow
-from ipet.parsing.StatisticReader_DualBoundHistoryReader import DualBoundHistoryReader
-from ipet.parsing.StatisticReader import DualBoundReader
+from ipetgui.IpetMainWindow import IpetMainWindow
 from matplotlib.pyplot import cm
+from ipet import Key
 import numpy
+import logging
+from ipet.evaluation import TestSets
+from ipet.evaluation.IPETEvalTable import IPETEvaluation
 
 progname = os.path.basename(sys.argv[0])
 progversion = "0.1"
+
 
 
 class MyMplCanvas(FigureCanvas):
@@ -77,9 +80,9 @@ class MyStaticMplCanvas(MyMplCanvas):
 
 
 class IpetNavigationToolBar(NavigationToolbar2QT):
-    '''
+    """
     This class overrides some methods of the base navigation toolbar
-    '''
+    """
     def edit_parameters(self):
         theresult = NavigationToolbar2QT.edit_parameters(self)
 
@@ -104,10 +107,12 @@ class IpetNavigationToolBar(NavigationToolbar2QT):
 
 class IpetPbHistoryWindow(IpetMainWindow):
 
+    NO_SELECTION_TEXT = "no selection"
     default_cmap = 'spectral'
+    imagepath = osp.sep.join((osp.dirname(__file__), osp.pardir, "images"))
 
     DEBUG = True
-    def __init__(self):
+    def __init__(self, testrunfiles = [], evaluationfile = None):
         QtGui.QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
@@ -152,26 +157,71 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
         self.trListWidget.itemChanged.connect(self.testrunItemChanged)
 
+        v = QtGui.QVBoxLayout(lwframe)
+
         self.probListWidget = QListWidget()
 #         for item in list("12345"):
 #             self.probListWidget.addItem((item))
         self.probListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        h.addWidget(self.probListWidget)
+        v.addWidget(self.probListWidget)
         self.connect(self.probListWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
+
+        self.testSetWidget = QListWidget()
+        v.addWidget(self.testSetWidget)
+        self.testSetWidget.addItem(self.NO_SELECTION_TEXT)
+        for t in TestSets.getTestSets():
+            self.testSetWidget.addItem(str(t))
+        h.addLayout(v)
+        self.connect(self.testSetWidget, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
         self.testruns = []
         self.testrunnames = {}
 
+
+        for tr in testrunfiles:
+            tr = TestRun.loadFromFile(str(tr))
+            try:
+                self.addTestrun(tr)
+            except Exception as e:
+                print(e)
+
+        self.evaluation = None
+        if evaluationfile is not None:
+            self.evaluation = IPETEvaluation.fromXMLFile(evaluationfile)
 #         self.primallines = {}
 #         self.duallines = {}
 #         self.primalpatches = {}
 
         self.statusBar().showMessage("Ready to load some test run data!", 5000)
 
+    def createAction(self, text, slot = None, shortcut = None, icon = None,
+        tip = None, checkable = False, signal = "triggered()"):
+        action = QAction(text, self)
+        if icon is not None:
+            action.setIcon(QIcon(osp.sep.join((self.imagepath, "%s.png" % icon))))
+        if shortcut is not None:
+            action.setShortcut(shortcut)
+        if tip is not None:
+            action.setToolTip(tip)
+            action.setStatusTip(tip)
+        if slot is not None:
+            self.connect(action, SIGNAL(signal), slot)
+        if checkable:
+            action.setCheckable(True)
+
+        return action
+
     def getSelectedProblist(self):
-        return [str(item.text()) for item in self.probListWidget.selectedItems()]
+        selectedprobs = [str(item.text()) for item in self.probListWidget.selectedItems()]
+        selitem = self.testSetWidget.selectedItems()[0]
+        if selitem.text() != self.NO_SELECTION_TEXT:
+            testsetprobs = set(TestSets.getTestSetByName(selitem.text()))
+            selectedprobs = [p for p in selectedprobs if p in testsetprobs]
+
+        return selectedprobs
+
 
     def getSelectedTestrunList(self):
         return [tr for idx, tr in enumerate(self.testruns) if self.trListWidget.isItemSelected(self.trListWidget.item(idx))]
@@ -188,7 +238,6 @@ class IpetPbHistoryWindow(IpetMainWindow):
         testruns = self.getSelectedTestrunList()
         if len(testruns) == 0:
             return
-
 
         self.update_Axis(problist, testruns)
 
@@ -211,9 +260,9 @@ class IpetPbHistoryWindow(IpetMainWindow):
             self.resetTestrunName(tr)
 
     def getTestrunName(self, testrun):
-        '''
+        """
         returns the test run name as specified by the user
-        '''
+        """
         return self.testrunnames.get(testrun.getName(), testrun.getName())
     
     def setTestrunName(self, testrun, newname):
@@ -229,10 +278,6 @@ class IpetPbHistoryWindow(IpetMainWindow):
         except KeyError:
             pass
     
-    
-
-
-
     def updateStatus(self, message):
         self.statusBar().showMessage(message, 5000)
 
@@ -245,16 +290,20 @@ class IpetPbHistoryWindow(IpetMainWindow):
         self.probListWidget.clear()
         self.trListWidget.clear()
 
-        problems = []
         for testrun in self.testruns:
             item = QListWidgetItem((self.getTestrunName(testrun)))
             self.trListWidget.addItem(item)
             item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-            
-            problems += testrun.getProblems()
 
-        for prob in sorted(list(set(problems))):
-            self.probListWidget.addItem((prob))
+        problems = []
+        if len(self.testruns) > 0:
+            problems = self.testruns[0].getProblemNames()
+        if len(self.testruns) > 1:
+            for testrun in self.testruns[1:]:
+                problems = [p for p in problems if p in set(testrun.getProblemNames())]
+
+        for prob in sorted(problems):
+            self.probListWidget.addItem(str(prob))
 
         self.trListWidget.selectAll()
 
@@ -294,9 +343,9 @@ class IpetPbHistoryWindow(IpetMainWindow):
         pass
 
     def update_Axis(self, probnames, testruns):
-        '''
+        """
         update method called every time a new instance was selected
-        '''
+        """
         #self.resetAxis()
         # make up data for plotting method
         x = {}
@@ -321,9 +370,9 @@ class IpetPbHistoryWindow(IpetMainWindow):
             testrunname = self.getTestrunName(testrun)
 
             if len(probnames) == 1:
-                x[testrunname], y[testrunname] = list(zip(*getProcessPlotData(testrun, probnames[0], usenormalization)))
+                x[testrunname], y[testrunname] = getProcessPlotData(testrun, probnames[0], usenormalization, access = "name")
             else:
-                y[testrunname], scale = getMeanIntegral(testrun, probnames, 200)
+                y[testrunname], scale = getMeanIntegral(testrun, probnames, 200, access = "name")
                 x[testrunname] = numpy.arange(200) * scale
             if not usenormalization and len(probnames) == 1:
                 baseline = testrun.problemGetOptimalSolution(probnames[0])
@@ -332,12 +381,16 @@ class IpetPbHistoryWindow(IpetMainWindow):
             xmax = max(xmax, max(x[testrunname]))
             ymax = max(ymax, max(y[testrunname]))
             ymin = min(ymin, min(y[testrunname]))
+            print(y[testrunname])
+            print(y[testrunname][1:] - y[testrunname][:-1] > 0)
+            if numpy.any(y[testrunname][1:] - y[testrunname][:-1] > 0):
+                logging.warn("Error: Increasing primal gap function on problems {}".format(probnames))
             if showdualbound:
-                arguments = {"historytouse":DualBoundHistoryReader.datakey, "boundkey":DualBoundReader.datakey}
+                arguments = {"historytouse":Key.DualBoundHistory, "boundkey":Key.DualBound}
                 if len(probnames) == 1:
-                    zx[testrunname], z[testrunname] = list(zip(*getProcessPlotData(testrun, probnames[0], usenormalization, **arguments)))
+                    zx[testrunname], z[testrunname] = getProcessPlotData(testrun, probnames[0], usenormalization, access = "name", **arguments)
                 else:
-                    z[testrunname], scale = getMeanIntegral(testrun, probnames, 200, **arguments)
+                    z[testrunname], scale = getMeanIntegral(testrun, probnames, 200, access = "name", **arguments)
                     zx[testrunname] = numpy.arange(200) * scale
 
                 # normalization requires negative dual gap
@@ -370,7 +423,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
 
     def axisPlotForTestrunData(self, dataX, dataY, bars=False, step=True, barwidthfactor=1.0, baseline=0, testrunnames=None, legend=True, labelsuffix="",
          colormapname = "spectral", plotkw = None, barkw = None, labelorder = []):
-        '''
+        """
         create a plot for your X and Y data. The data can either be specified as matrix, or as a dictionary
         specifying containing the labels as keys.
 
@@ -395,7 +448,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         -kw, other keywords for the plotting function, such as transparency, etc. can be specified for every plot
             separately, either as a dictionary with the dataX-keys, or as a kw-list with the same length as the
             dataX list
-        '''
+        """
 
         # index everything by labels, either given as dictionary keys, or integer indices ranging from 0 to len(dataX) - 1
         assert type(dataX) is type(dataY)
@@ -458,11 +511,10 @@ class IpetPbHistoryWindow(IpetMainWindow):
             self.sc.axes.legend(fontsize=8)
         return (patches, lines, self.sc.axes)
 
-
     def resetAxis(self):
-        '''
+        """
         reset axis by removing all primallines and primalpatches previously drawn.
-        '''
+        """
         self.sc.axes.cla()
 
     def about(self):
@@ -480,7 +532,7 @@ if __name__ == "__main__":
 
     qApp = QtGui.QApplication(sys.argv)
 
-    aw = IpetPbHistoryWindow()
+    aw = IpetPbHistoryWindow(['/OPTI/bzfhende/results/MMMc-lns/logfiles-ipetdev/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M620v3.agg_oldschool_lns.trn'])
     aw.setWindowTitle("%s" % progname)
     aw.show()
     sys.exit(qApp.exec_())

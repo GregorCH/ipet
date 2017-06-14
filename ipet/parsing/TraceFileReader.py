@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,16 +8,18 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from .StatisticReader import StatisticReader
 from ipet.misc import FLOAT_INFINITY
+from ipet import Key
 import logging
+
 class TraceFileReader(StatisticReader):
-    '''
+    """
     classdocs
-    '''
+    """
     active = False
-    context = StatisticReader.CONTEXT_TRACEFILE
+    context = Key.CONTEXT_TRACEFILE
     tracefilestartexpression = "* Trace Record Definition"
     input = "InputFileName,ModelType,SolverName,OptionFile,Direction,NumberOfEquations,NumberOfVariables,NumberOfDiscreteVariables,NumberOfNonZeros,NumberOfNonlinearNonZeros," + \
             "ModelStatus,SolverStatus,ObjectiveValue,ObjectiveValueEstimate,SolverTime,ETSolver,NumberOfIterations,NumberOfNodes"
@@ -41,7 +43,6 @@ class TraceFileReader(StatisticReader):
 
         return value
 
-
     def extractStatistic(self, line):
         if line.startswith(self.tracefilestartexpression):
             self.active = True
@@ -51,7 +52,7 @@ class TraceFileReader(StatisticReader):
             datavalues = list(map(self.prepareData, splitline[1:]))
 
             logging.debug("Trace File Reader adds data for problem %s", probname)
-            self.testrun.addData(probname, self.datakeys, datavalues)
+            self.testrun.addDataByName(self.datakeys, datavalues, probname)
 
 
 

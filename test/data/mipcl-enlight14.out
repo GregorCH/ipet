@@ -1,0 +1,89 @@
+@01 instances/miplib2010/enlight14.mps.gz ===========
+-----------------------------
+Fri Apr  7 19:55:02 MST 2017
+-----------------------------
+@03 1491620102
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.enlight14.mps.sol
+/home/beck/miplib2010-1.1.0/bin/mipcl -solfile /home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.enlight14.mps.sol -threads 1 -time 7200 instances/miplib2010/enlight14.mps.gz
+Reading data...
+NAME           enlight14
+Start preprocessing: Rows - 196, Cols - 392 (Int - 392, Bin - 196), NZs - 1120
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.001      1          392           0             0            0            44
+==================================================================================
+After preprocessing: Rows - 196, Cols - 392 (Int - 392, Bin - 200), NZs - 1120
+Scaling...
+Max exp = 1
+
+Preprocessing Time: 0.002
+Optimizing...
+     0.002          7          5      D/S                  1.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     0.002                  1.0000          3        9
+     0.002                  2.5000         17       57
+     0.003                  4.0000          7       21
+     0.003                  4.6667         27       60
+     0.005                  5.2000         36      100
+     0.006                  5.6667         32      168
+     0.008                  6.0000         29       92
+Start preprocessing: Rows - 218, Cols - 392 (Int - 392, Bin - 200), NZs - 1340
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.011      1          392           0             0            0            44
+==================================================================================
+After preprocessing: Rows - 218, Cols - 392 (Int - 392, Bin - 200), NZs - 1332
+Scaling...
+Max exp = 3
+
+     0.012         63         52      D/S                  6.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     0.013                  6.0000         21      306
+     0.014                  6.0000         28      159
+     0.016                  6.0000         44      580
+     0.029                  6.0000         32      547
+     0.039                  6.0448         55       79
+     0.042                  6.5000         49      653
+
+Cut statistics
+========== Cuts = Generated === Used
+            mir         144       31
+    sparse MOD2         137       12
+  sparse Gomory         211        9
+         parity         160        9
+    disjunction        2179       44
+========= total        2831      105
+
+After processing root node: Rows - 237, Cols - 392 (Int - 392, Bin - 200), NZs - 1699
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound     Gap%
+     0.047         1         1      0                 inf              6.5000      inf
+    49.189       100        50      0                 inf             36.1215      inf
+    95.652       200        97      0                 inf             46.0520      inf
+   147.151       300       140      0                 inf             51.8535      inf
+   207.622       387       161      0                 inf             58.5742      inf
+   219.242       400       159      0                 inf             59.8754      inf
+   279.475       447       128      0                 inf             67.6954      inf
+   340.961       495        49      0                 inf             82.7299      inf
+   352.270       500        21      0                 inf             89.1760      inf
+===========================================
+MIPCL version 1.3.1
+Solution time: 356.711
+Branch-and-Cut nodes: 506
+This problem is infeasible
+rm: cannot remove '*_mipcl.log': No such file or directory
+
+@04 1491620459
+@05 7200
+
+Read MPS: 1
+MIP has 392 vars and 196 constraints
+Read SOL: 0
+
+-----------------------------
+Fri Apr  7 20:00:59 MST 2017
+-----------------------------
+
+=ready=

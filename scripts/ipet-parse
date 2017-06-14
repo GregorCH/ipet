@@ -1,0 +1,164 @@
+#!/usr/bin/env python
+'''
+The MIT License (MIT)
+
+Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+
+Permissions are granted as stated in the license file you have obtained
+with this software. If you find the library useful for your purpose,
+please refer to README.md for how to cite IPET.
+
+@author: Gregor Hendel
+'''
+
+from ipet import Experiment
+from ipet.parsing import ReaderManager
+from ipet import TestRun
+from ipet.misc import loader
+import argparse
+import sys
+import os
+import io
+import re
+import logging
+#from IPython.utils.text import dedent
+import textwrap
+import pypandoc
+
+DEFAULT_FORMATSTR = "{idx} {d}"
+
+formatstrExamples = """
+Format String Examples
+----------------------
+
+With the -f option, a format string can be specified to control the parsing output. Normal Python format syntax
+with curly braces '{}' is used for this. The default value for the format string is '{idx} {d}', which will
+output the index of every instance together with its complete data series. 'd' stands for 'data'. By accessing the elements of
+'d' with the format string, only relevant information is displayed on the console.
+
+    >>> cat test/data/scip-*.out | ipet-parse -f "{idx} {d.ProblemName} {d.SolvingTime}"
+
+should yield
+
+    0 enlight16 0.02
+    1 janos-us-DDM 6807.85
+    2 misc03 0.79
+    3 aflow40b 600.0
+
+To make the information more readible, the syntax has further options for formatting:
+
+    >>> cat test/data/scip-*.out | ipet-parse -f "{idx:3} {d.ProblemName:40} {d.SolvingTime:12}"
+
+    0 enlight16                                        0.02
+    1 janos-us-DDM                                  6807.85
+    2 misc03                                           0.79
+    3 aflow40b                                        600.0
+"""
+explainAutoloading = """
+Loading additional files
+------------------------
+
+Ipet-parse can load additional .solu-files, .meta-files, Readers specified via xml and Solvers specified as python classes.
+
+    - Solvers are automatically loaded from the ~/.ipet/solvers directory.
+        They have to be derived from the 'Solver' class and implement some basic methods.
+    - Readers are automatically loaded from the current and the ~/.ipet/readers directories.
+        A (list of) readers can also be passed via the commandline -r parameter.
+        They have to be specified via xml, i.e. via the graphical user interface.
+    - .solu-files are loaded from the current directory if none are specified via the commandline -s parameter.
+        If no solu-file is found in the current directory, IPET loads them from ~/.ipet/solufiles.
+    - For .meta-files IPET simply substitutes for every logfile the extension .out with .meta and tries to load it from the same location.
+"""
+
+# possible arguments in the form name,default,short,description #
+# clarguments = []
+
+argparser = argparse.ArgumentParser(prog = "Ipet Parsing script", \
+                                 description = "parses test run log files and saves parsed data",
+                                 epilog = textwrap.dedent(formatstrExamples + explainAutoloading),
+                                 formatter_class = argparse.RawDescriptionHelpFormatter)
+# for name, default, short, description in clarguments:
+#     argparser.add_argument(short, name, default = default, help = description)
+
+argparser.add_argument('-l', '--logfiles', nargs = '*', help = "list of outfiles that should be parsed", default=sys.stdin)
+argparser.add_argument('-r', '--readers', nargs = '*', default = [], help = "list of additional readers in xml format that should be used for parsing")
+argparser.add_argument('-s', '--solufiles', nargs = '*', default = [], help = "list of solu files that should be taken into account")
+argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
+argparser.add_argument("-f", "--formatstr", default = DEFAULT_FORMATSTR,
+                       help = """format string for displaying output per instance to console. The internal formatter uses 'idx'
+                                   to reference the index and 'd' for the collected data for this instance. default : "%s" """ % DEFAULT_FORMATSTR
+                                   )
+argparser.add_argument("-v", "--validatedual", action = "store_true", default = Experiment.DEFAULT_VALIDATEDUAL, help = "Enable dual validation, relative to 'gaptol' parameter")
+argparser.add_argument("-g", "--gaptol", type = float, default = Experiment.DEFAULT_GAPTOL, help = "relative tolerance for primal and dual objective validation")
+argparser.add_argument("--docmode", action = "store_true", default = False, help = "print this help as restructured text")
+
+if __name__ == '__main__':
+
+
+    try:
+        arguments = argparser.parse_args()
+    except:
+        if not re.search(" -+h", ' '.join(sys.argv)) :
+            print("Wrong Usage, use --help for more information.")
+        exit()
+    # if globals().get("help") is not None:
+    logger = logging.getLogger()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    if arguments.docmode:
+        print(pypandoc.convert_text(formatstrExamples, "rst", "md"))
+        exit()
+
+    if arguments.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+    # disable logging to console, in this case we just want the printstatement at the end
+    if type(arguments.logfiles) == io.TextIOWrapper:
+        logger.setLevel(logging.ERROR)
+
+    if arguments.logfiles is None:
+        logging.info("No testruns specified, exiting")
+        sys.exit(0)
+
+    # initialize an experiment
+    experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
+
+    for reader in loader.loadAdditionalReaders(arguments.readers):
+
+        experiment.readermanager.registerReader(reader)
+        logging.info("Registered reader with name %s" % reader.getName())
+
+    for solver in loader.loadAdditionalSolvers():
+        experiment.readermanager.addSolver(solver)
+
+    for solufile in loader.loadAdditionalSolufiles(arguments.solufiles):
+        experiment.addSoluFile(solufile)
+        logging.info("Imported solufile with name %s" % solufile)
+
+    logging.info("Start parsing process")
+
+    if type(arguments.logfiles) != io.TextIOWrapper:
+        for logfile in arguments.logfiles:
+            experiment.addOutputFile(logfile)
+
+        experiment.collectData()
+
+        # Write output
+        for tr in experiment.getTestRuns():
+            try:
+                filename = tr.filenames[0]
+                newfilename = "%s%s" % (os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
+                tr.saveToFile(newfilename)
+                logging.info("converted %s --> %s" % (filename, newfilename))
+            except:
+                logging.info("skipped testrun %s" % tr.getIdentification())
+    else:
+        experiment.addStdinput()
+        experiment.collectData()
+        experiment.printToConsole(arguments.formatstr)
+
+

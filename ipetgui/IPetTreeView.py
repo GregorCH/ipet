@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,7 +8,7 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from PyQt4.QtGui import QTreeWidget, QTreeWidgetItem, QMainWindow, QApplication,\
     QWidget, QHBoxLayout, QFrame, QIcon, QLabel, QVBoxLayout, QGridLayout, QColor
 from ipet.evaluation import IPETEvaluation, IPETEvaluationColumn
@@ -16,7 +16,7 @@ import sys
 from PyQt4.QtCore import SIGNAL, Qt
 from .EditableForm import EditableForm
 from ipet.evaluation import Aggregation
-from ipet.evaluation import IPETFilterGroup, IPETInstance
+from ipet.evaluation import IPETFilterGroup, IPETValue
 from ipet.evaluation import IPETFilter
 from PyQt4 import QtCore
 import os.path as osp
@@ -53,20 +53,20 @@ class IpetTreeViewItem(QTreeWidgetItem):
 
 
 class IpetTreeView(QTreeWidget):
-    '''
+    """
     classdocs
-    '''
+    """
     imagepath = osp.sep.join((osp.dirname(__file__), osp.pardir, "images"))
     icons = {IPETEvaluationColumn:(osp.sep.join((imagepath, "Letter-C-violet-icon.png"))),
              Aggregation:(osp.sep.join((imagepath, "Letter-A-dg-icon.png"))),
              IPETFilterGroup:(osp.sep.join((imagepath, "Letter-G-gold-icon.png"))),
              IPETFilter:(osp.sep.join((imagepath, "Letter-F-lg-icon.png"))),
-             IPETInstance:(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
+             IPETValue:(osp.sep.join((imagepath, "Letter-I-blue-icon.png")))}
 
     def __init__(self, parent = None):
-        '''
+        """
         Constructor
-        '''
+        """
         super(IpetTreeView, self).__init__(parent)
         self.header().hide()
         self.setAlternatingRowColors(True)
@@ -89,9 +89,9 @@ class IpetTreeView(QTreeWidget):
             item.setMyIcon(QIcon(filename))
             
     def itemGetEditable(self, item):
-        '''
+        """
         returns the Editable object corresponding to the given item
-        '''
+        """
         return item.getIpetNode()
         
     def currentItemAcceptsClassAsChild(self, nodeclass):
@@ -136,22 +136,18 @@ class IpetTreeView(QTreeWidget):
             self.updateSelectedItem()
             return
         
-        
     def createAndAddItem(self, editable, parent=None):
         if parent is None:
             parent = self
         me = IpetTreeViewItem(editable, parent)
         self.editable2item[editable] = me
         self.bindItemIcon(me, editable)
-        try:
-            if editable.getChildren() is not None:
-                for child in editable.getChildren():
-                    self.createAndAddItem(child, me)
-                
-                self.expandItem(me)
-        except AttributeError as e:
-            print(e)
-            pass
+
+        if editable.getChildren():
+            for idx, child in enumerate(editable.getChildren()):
+                self.createAndAddItem(child, me)
+
+        self.expandItem(me)
 
 editframecontent = None
 if __name__ == "__main__":

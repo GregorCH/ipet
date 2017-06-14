@@ -1,6 +1,9 @@
 # project-specific
 .testcomp.cmp
 .testrun.trn
+logfiles
+*.trn
+*.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -27,6 +30,10 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Eclipse
+.project
+.settings/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

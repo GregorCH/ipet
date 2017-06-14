@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 The MIT License (MIT)
 
@@ -11,6 +12,7 @@ please refer to README.md for how to cite IPET.
 '''
 
 from ipet import Experiment
+from ipet import Key
 import argparse
 import sys
 from ipet.evaluation import IPETEvaluation
@@ -51,7 +53,6 @@ epilog = \
 
     '''
 
-
 # possible arguments in the form name,default,short,description #
 clarguments = [('--experimentfile', None, '-x', "An experiment file name (must have .ipx file extension) in ipx-format to read"),
                ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
@@ -59,7 +60,7 @@ clarguments = [('--experimentfile', None, '-x', "An experiment file name (must h
                ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation"),
                ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
                ('--compformatstring', None,'-C', "a format string like %%.5f for compare columns (those ending with ...'Q')"),
-               ('--groupkey', None,'-g', "overwrites the group key as, e.g., 'Settings' specified in the evaluation by something else"),
+               #('--groupkey', None,'-g', "overwrites the group key as, e.g., 'Settings' specified in the evaluation by something else"),
                ('--prefix', None,'-p', "a prefix string for every file written, only useful combined with --filextension"),
                ('--keysearch', None,'-k', "a string containing a regular expression to search all columns that match this expression")]
 
@@ -78,6 +79,10 @@ argparser.add_argument("-l", "--long", action = "store_true", default = False, h
 argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
 argparser.add_argument('-s', '--saveexperiment', action = "store_true", default = False, help = "Should the experiment data be overwritten? Makes only sense if combined with '--recollect True'")
 argparser.add_argument('-r', '--recollect', action = "store_true", default = False, help = "Should the loaded experiment recollect data before proceeding?")
+argparser.add_argument('-i', '--index', action = "append", default = None, help = "specification of (multilevel) index seperated by whitespaces")
+argparser.add_argument('--indexsplit', default = None, help = "position to split index into row and column levels, negative to count from the end.")
+argparser.add_argument('--quiet', action = "store_true", default = False, help = "Supress all output (may be useful for profiling)")
+argparser.add_argument('--displaygroup', default = None, help = "Name of the group for which the long display should be printed. Only available for long output mode")
 
 if __name__ == '__main__':
     try:
@@ -86,17 +91,20 @@ if __name__ == '__main__':
         if not re.search(" -+h", ' '.join(sys.argv)) :
             print("Wrong Usage, use --help for more information.")
         exit()
+
     #if globals().get("help") is not None:
     logger = logging.getLogger()
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     ch = logging.StreamHandler()
     ch.setFormatter(formatter)
     logger.addHandler(ch)
-    if arguments.debug:
+    if arguments.quiet:
+        logger.setLevel(logging.ERROR)
+    elif arguments.debug:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-    # initialize a experiment
+    # initialize an experiment
     experiment = None
     if arguments.evalfile is None:
         evalfile = None
@@ -121,10 +129,9 @@ if __name__ == '__main__':
             logging.info("No eval-file specified, using standard evaluation %s" % evalfile)
     else: 
         evalfile = arguments.evalfile
-            
 
     if arguments.experimentfile is None and arguments.testrunfiles == []:
-        print("please provide either a experimentfile or (multiple, if needed) .trn testrun files")
+        print("please provide either an experimentfile or (multiple, if needed) .trn testrun files")
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
 
@@ -143,15 +150,30 @@ if __name__ == '__main__':
     if arguments.recollect is not False:
         logging.info("Recollecting data")
         experiment.collectData()
+        # TODO What was it about the validation?
+        #if arguments.recheckTestrun:
+        #    experiment.checkProblemStatus()
 
     if arguments.saveexperiment is not False:
         experiment.saveToFile(arguments.experimentfile)
 
-    if arguments.defaultgroup is not None:
-        theeval.setDefaultGroup(arguments.defaultgroup)
+    if arguments.indexsplit is not None:
+        theeval.set_indexsplit(arguments.indexsplit)
 
-    if arguments.groupkey is not None:
-        theeval.setGroupKey(arguments.groupkey)
+    if arguments.index is not None:
+        theeval.set_index(arguments.index)
+
+    if arguments.defaultgroup is not None:
+        #theeval.setDefaultGroup(arguments.defaultgroup)
+        #
+        # this will only work from our test directory using the following command
+        #
+        #ipet-evaluate -t results/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.gamma_*_beta_0*.trn -e eval-test.xml -l -n -d 0.01 -D
+#        theeval.setDefaultGroup((0.10, 0.05))
+        theeval.set_defaultgroup(arguments.defaultgroup)
+
+#    if arguments.groupkey is not None:
+#        theeval.setGroupKey(arguments.groupkey)
 
     if arguments.externaldata is not None:
         experiment.addExternalDataFile(arguments.externaldata)
@@ -184,30 +206,35 @@ if __name__ == '__main__':
             pass
         ExperimentManagement.setExperiment(experiment)
         mainwindow.setExperiment(ExperimentManagement.getExperiment())
+
         theeval.evaluate(ExperimentManagement.getExperiment())
         mainwindow.show()
 
         sys.exit(application.exec_())
 
+    # returntable and returnaggregation
     rettab, retagg = theeval.evaluate(experiment)
 
+    if not arguments.quiet:
+        if arguments.long:
+            if arguments.displaygroup is not None:
+                for fg in theeval.getActiveFilterGroups():
+                    if fg.getName() == arguments.displaygroup:
+                        theeval.streamDataFrame(theeval.getInstanceGroupData(fg), "Instancewise Results", "stdout")
+            else:
+                theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
 
-    if arguments.long:
-        theeval.streamDataFrame(rettab, "Instancewise Results", "stdout")
-
-
-    theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
+        theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
 
     #for tr in comp.testrunmanager.getManageables():
         #for col in tr.data.columns:
             #print col
 
-
     if arguments.fileextension is not None:
         path = "."
         extension = arguments.fileextension
         prefixstr = arguments.prefix if arguments.prefix else ""
-        for fg in theeval.filtergroups:
+        for fg in theeval.getActiveFilterGroups():
             instancewisename = "%s/%s%s"%(path, prefixstr, fg.name)
             theeval.streamDataFrame(theeval.filtered_instancewise[fg.name], instancewisename, extension)
             logging.info("Instance-wise data written to %s.%s" % (instancewisename, extension))

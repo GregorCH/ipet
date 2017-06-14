@@ -1,13 +1,13 @@
-'''
+"""
 Created on 21.09.2016
 
 @author: bzfhende
-'''
-'''
+"""
+"""
 Created on 26.03.2015
 
 @author: bzfhende
-'''
+"""
 from PyQt4.QtGui import QFrame, QWidget, QLabel, \
     QApplication, QKeySequence, QFileDialog, \
     QVBoxLayout, QHBoxLayout
@@ -18,14 +18,14 @@ from ipet.evaluation.IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
 import sys
 from ipet.misc import misc
 from ipet.evaluation.Aggregation import Aggregation
-from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETInstance
+from ipet.evaluation.IPETFilter import IPETFilterGroup, IPETValue
 from ipet.evaluation.IPETFilter import IPETFilter
 from .IpetMainWindow import IpetMainWindow
 
 class EditableBrowser(QWidget):
-    '''
+    """
     classdocs
-    '''
+    """
     addedcolumns = 0
     addedfiltergroups = 0
     addedfilters = 0
@@ -34,9 +34,9 @@ class EditableBrowser(QWidget):
     ITEMEVENT = "itemchanged"
 
     def __init__(self, parent = None):
-        '''
+        """
         Constructor
-        '''
+        """
         super(EditableBrowser, self).__init__(parent)
 
         self.treewidget = IpetTreeView(self)

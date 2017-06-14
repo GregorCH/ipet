@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<Evaluation comparecolformat="%.3f" defaultgroup="tanglegram1" evaluateoptauto="True" groupkey="Status" index="LogFileName ProblemName" indexsplit="1" sortlevel="0">
+	<Column active="True" minval="1" name="LogDTime" reduction="mean" transformfunc="log" translevel="0">
+		<Column active="True" minval="1" name="DTime" reduction="mean" transformfunc="subtract" translevel="0">
+			<Column active="True" origcolname="Datetime_End" reduction="meanOrConcat" translevel="0"/>
+			<Column active="True" origcolname="Datetime_Start" reduction="meanOrConcat" translevel="0"/>
+		</Column>
+		<Aggregation aggregation="lQuart" name="lQuart"/>
+		<Aggregation aggregation="median" name="median"/>
+		<Aggregation aggregation="uQuart" name="uQuart"/>
+		<Aggregation aggregation="iqr" name="iqr"/>
+		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0"/>
+	</Column>
+	<Column active="True" alternative="+" constant="-" reduction="strConcat">
+		<Aggregation aggregation="strConcat" name="indic"/>
+		<Filter active="True" anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>
+	</Column>
+	<FilterGroup active="True" filtertype="intersection" name="all"/>
+	<FilterGroup active="True" filtertype="intersection" name="alloptimal">
+		<Filter active="True" anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>
+	</FilterGroup>
+	<FilterGroup active="True" filtertype="intersection" name="easyinstances">
+		<Filter active="True" anytestrun="all" expression1="LogDTime" expression2="10" operator="le"/>
+	</FilterGroup>
+</Evaluation>

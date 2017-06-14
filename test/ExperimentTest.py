@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,36 +8,46 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import unittest
 import os
 import json
 import re
-import numpy
 import shutil
+import sys
+import numpy as np
 from pandas.util.testing import assert_frame_equal
-
 from ipet.Experiment import Experiment
 from ipet.TestRun import TestRun
 from ipet.parsing import ListReader
 from ipet.parsing import ReaderManager
-from ipet.misc import convertTimeStamp
-
+from ipet import Key
 
 DATADIR = os.path.join(os.path.dirname(__file__), "data")
 TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")
 
 
 class ExperimentTest(unittest.TestCase):
+#     datasamples = [
+#         ("meanvarx", 'Datetime_Start', convertTimeStamp(1406905030)),
+#         ("lseu", 'Settings', 'testmode'),
+#         ("misc03", "Datetime_End", convertTimeStamp(1406904997)),
+#         ("findRoot", "Nodes", 8),
+#         ("linking", "LineNumbers_BeginLogFile", 4),
+#         ("j301_2", "LineNumbers_BeginLogFile", 276),
+#         ("j301_2", "LineNumbers_EndLogFile", 575),
+#     ]
     datasamples = [
-        ("meanvarx", 'Datetime_Start', convertTimeStamp(1406905030)),
-        ("lseu", 'Settings', 'testmode'),
-        ("misc03", "Datetime_End", convertTimeStamp(1406904997)),
-        ("findRoot", "Nodes", 8),
-        ("linking", "LineNumbers_BeginLogFile", 4),
-        ("j301_2", "LineNumbers_BeginLogFile", 276),
-        ("j301_2", "LineNumbers_EndLogFile", 575),
+        #(26, 'Datetime_Start', convertTimeStamp(1406905030)),
+        #(12, 'Settings', 'testmode'),
+        #(14, "Datetime_End", convertTimeStamp(1406904997)),
+        (39, "Nodes", 8),
+        (0, "LineNumbers_BeginLogFile", 4),
+        (1, "LineNumbers_BeginLogFile", 276),
+        (1, "LineNumbers_EndLogFile", 575),
     ]
+    
+    checkColumns=['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
 
     def setUp(self):
         try:
@@ -60,22 +70,45 @@ class ExperimentTest(unittest.TestCase):
         df = self.experiment.getTestRuns()[0].getData()
         for index, column, value in self.datasamples:
             entry = df.loc[index, column]
-            msg = "Wrong value parsed for instance %s in column %s: should be %s, have %s" % \
+            msg = "Wrong value parsed for problem %s in column %s: should be %s, have %s" % \
                   (index, column, repr(value), repr(entry))
             self.assertEqual(entry, value, msg)
 
-    def test_instance_name_parsing(self):
+    def test_datacollection_from_stdin(self):
+        fname = "bell3a.out"
+        out_file = os.path.join(DATADIR, fname)
+        with open(out_file, "r") as f:
+            sys.stdin = f
+             
+            self.experiment.addStdinput()
+            self.experiment.collectData()
+            sys.stdin = sys.__stdin__
+
+        experimentFromFile = Experiment()
+        experimentFromFile.addOutputFile(out_file)
+        experimentFromFile.collectData()
+        
+        trstdin = self.experiment.getTestRuns()[0]
+        trfile = experimentFromFile.getTestRuns()[0]
+        
+        columns = ["PrimalBound", "DualBound", "SolvingTime"]
+
+        self.checkTestrunsEqual(trstdin, trfile, columns)
+
+    def test_problem_name_parsing(self):
         fname = "check.IP_0s_1s.scip-3.2.1.2.linux.x86_64.gnu.dbg.cpx.opt-low.default.out"
         out_file = os.path.join(DATADIR, fname)
         solu_file = os.path.join(DATADIR, "IP_0s_1s.solu")
         self.experiment.addOutputFile(out_file)
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
-
-        
         data = self.experiment.getTestRuns()[0].getData()
-        # ensure that the correct number of instances are properly parsed
-        self.assertEqual(len(data), 408)
+        # ensure that the correct number of problems are properly parsed
+        self.assertEqual(len(data), 411)
+
+    def checkTestrunsEqual(self, tr, tr2, columns=checkColumns):
+        msg = "Testruns do not have exactly same column data."
+        return self.assertIsNone(assert_frame_equal(tr.getData()[columns], tr2.getData()[columns]), msg)
 
     def test_saveAndLoad(self):
         fname = "check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"
@@ -92,10 +125,7 @@ class ExperimentTest(unittest.TestCase):
         trn_file = os.path.join(DATADIR, ".testrun.trn")
         tr.saveToFile(trn_file)
         tr2 = TestRun.loadFromFile(trn_file)
-
-        columns = ['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
-        msg = "Testruns do not have exactly same column data:"
-        self.assertIsNone(assert_frame_equal(tr.getData()[columns], tr2.getData()[columns]), msg)
+        self.checkTestrunsEqual(tr, tr2)
 
     def test_problemNameRecognition(self):
         rm = ReaderManager()
@@ -117,14 +147,13 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addOutputFile(out_file)
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
-        manageables = self.experiment.testrunmanager.getManageables()[0]
-        data = json.loads(manageables.data.to_json())
+        data = self.experiment.getTestRuns()[0].data
+        
+        for v in data["LineNumbers_BeginLogFile"]:
+            self.assertTrue(isinstance(v, np.int64))
 
-        for k, v in data["LineNumbers_BeginLogFile"].items():
-            self.assertTrue(isinstance(v, int))
-
-        for k, v in data["LineNumbers_EndLogFile"].items():
-            self.assertTrue(isinstance(v, int))
+        for v in data["LineNumbers_EndLogFile"]:
+            self.assertTrue(isinstance(v, np.int64))
 
     def test_trnfileextension(self):
         trn_file = os.path.join(DATADIR, ".testrun.trn")
@@ -132,10 +161,9 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.collectData()
 
     def test_fileExtensions(self):
-        '''
+        """
         Test if an experiment accepts
-        '''
-
+        """
         # all possible extensions  should be accepted
         for extension in ReaderManager().getFileExtensions():
             self.experiment.addOutputFile("bla" + extension)
@@ -159,7 +187,7 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addOutputFile(set_file)
         self.experiment.collectData()
 
-        tr = self.experiment.testrunmanager.getManageables()[0]
+        tr = self.experiment.getTestRuns()[0]
         values, defaultvalues = tr.getParameterData()
 
         crappysettings = collect_settings(set_file)
@@ -172,7 +200,6 @@ class ExperimentTest(unittest.TestCase):
             "presolving/abortfac": 0.0001,
             "vbc/filename": "\"-\"",
         }
-
         for key, val in valuesamples.items():
             msg = "wrong parameter value %s parsed for parameter <%s>, should be %s" % \
                   (repr(values[key]), key, repr(val))
@@ -187,23 +214,21 @@ class ExperimentTest(unittest.TestCase):
             self.assertEqual(val, values[key], msg)
 
     def testStatusComparisons(self):
-        goodStatusList = [Experiment.Status_Ok, Experiment.Status_Better, Experiment.Status_SolvedNotVerified]
-        badStatusList = [Experiment.Status_FailAbort, Experiment.Status_FailObjectiveValue, Experiment.Status_Fail]
+        goodStatusList = [Key.ProblemStatusCodes.Ok, Key.ProblemStatusCodes.Better, Key.ProblemStatusCodes.SolvedNotVerified]
+        badStatusList = [Key.ProblemStatusCodes.FailAbort, Key.ProblemStatusCodes.FailObjectiveValue, Key.ProblemStatusCodes.Fail]
         
         msg = "Returned status {0} is not the expected {1}"
-        for status, expected in [(Experiment.getBestStatus(goodStatusList + badStatusList), Experiment.Status_Ok),
-                     (Experiment.getBestStatus(*(goodStatusList + badStatusList)), Experiment.Status_Ok),
-                     (Experiment.getWorstStatus(goodStatusList + badStatusList), Experiment.Status_FailAbort),
-                     (Experiment.getBestStatus(badStatusList + ["dummy"]), "dummy"),
-                     (Experiment.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
+        for status, expected in [(Key.ProblemStatusCodes.getBestStatus(goodStatusList + badStatusList), Key.ProblemStatusCodes.Ok),
+                     (Key.ProblemStatusCodes.getBestStatus(*(goodStatusList + badStatusList)), Key.ProblemStatusCodes.Ok),
+                     (Key.ProblemStatusCodes.getWorstStatus(goodStatusList + badStatusList), Key.ProblemStatusCodes.FailAbort),
+                     (Key.ProblemStatusCodes.getBestStatus(badStatusList + ["dummy"]), "dummy"),
+                     (Key.ProblemStatusCodes.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
             self.assertEqual(status, expected, msg.format(status, expected)) 
             
-        
-
 def collect_settings(path):
-    '''
+    """
     A crappy settings file parser
-    '''
+    """
     with open(path, "r") as f:
         settings_contents = f.readlines()
 
@@ -217,7 +242,6 @@ def collect_settings(path):
 
     return settings
 
-
 def boolify(value):
     if value.lower() == "true":
         return True
@@ -225,11 +249,10 @@ def boolify(value):
         return False
     raise ValueError("{} is not a bool".format(value))
 
-
 def estimate_type(var):
-    '''
+    """
     Guesses the str representation of the variables type
-    '''
+    """
     var = str(var)
 
     for caster in (boolify, int, float):
@@ -239,6 +262,7 @@ def estimate_type(var):
             pass
     return var
 
-
 if __name__ == "__main__":
     unittest.main()
+    
+    

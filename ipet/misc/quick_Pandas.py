@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,16 +8,16 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import pandas as pd
 import numpy as np
 import itertools
 from scipy import stats
 
-default_to_latex_kw = dict(float_format=lambda x:"%.1f"%x, index_names=False)
-colformatlatex = lambda x: "\\%s"%x
+default_to_latex_kw = dict(float_format=lambda x:"%.1f" % x, index_names=False)
+colformatlatex = lambda x: "\\%s" % x
 
-def quickAggregateAndPercentage(df, collist, rowlist, aggfunc=np.mean, defindex = 0):
+def quickAggregateAndPercentage(df, collist, rowlist, aggfunc=np.mean, defindex=0):
    parts = []
    if type(aggfunc) is not list:
       aggfuncs = [aggfunc] * len(collist)
@@ -40,30 +40,30 @@ def quickToLatex(df, index_makros=False, **to_latex_kw):
    to_latex_kws = {key:val for key, val in itertools.chain(list(default_to_latex_kw.items()), list(to_latex_kw.items()))}
    return newdf.to_latex(**to_latex_kw)
 
-def quickAggregationOnIndex(df, col, aggfunc=np.min, threshold = None):
+def quickAggregationOnIndex(df, col, aggfunc=np.min, threshold=None):
     aggforindex = pd.Series(df.groupby(level=0).apply(lambda x:aggfunc(x[col])))
     newcolname = aggfunc.__name__ + col
     aggforindex.name = newcolname
     if threshold is None:
         return aggforindex
     else:
-        newcolname += 'LE'+repr(threshold)
-        return pd.Series(aggforindex <= threshold, name = newcolname)
+        newcolname += 'LE' + repr(threshold)
+        return pd.Series(aggforindex <= threshold, name=newcolname)
 
-def getWilcoxonQuotientSignificance(x,y, shiftby=10):
-      shiftedquotients = (x + shiftby) / (y + shiftby)
-      logshifted = np.log2(shiftedquotients)
+def getWilcoxonQuotientSignificance(x, y, shiftby=10):
+    shiftedquotients = (x + shiftby) / (y + shiftby)
+    logshifted = np.log2(shiftedquotients)
 
-      # filter elements that are too close to zero
-      logshifted = logshifted[np.abs(logshifted) >= np.log2(1 + 1e-2)]
-      if logshifted.size < 10:
-          return np.nan
-      try:
-          return stats.wilcoxon(logshifted.values)[1]
-      except ValueError:
-          return np.nan
+    # filter elements that are too close to zero
+    logshifted = logshifted[np.abs(logshifted) >= np.log2(1 + 1e-2)]
+    if logshifted.size < 10:
+        return np.nan
+    try:
+        return stats.wilcoxon(logshifted.values)[1]
+    except ValueError:
+        return np.nan
 
-def quickAggregateAndSignificance(df, collist, rowlist, aggfunc=np.mean, wilcoxonfuncs=None, defindex = 0):
+def quickAggregateAndSignificance(df, collist, rowlist, aggfunc=np.mean, wilcoxonfuncs=None, defindex=0):
    parts = []
    if type(aggfunc) is not list:
       aggfuncs = [aggfunc] * len(collist)

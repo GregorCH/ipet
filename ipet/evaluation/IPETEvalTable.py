@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,23 +8,28 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 import pandas as pd
+from toposort import toposort
 from ipet.evaluation import Aggregation
 import xml.etree.ElementTree as ElementTree
-from .IPETFilter import IPETFilterGroup
+from .IPETFilter import IPETFilterGroup, IPETFilter
 import numpy
 from ipet.concepts.IPETNode import IpetNode, IpetNodeAttributeError
 from ipet.misc import misc
 import logging
 from ipet import Experiment
+from ipet import Key
+from pandas.core.frame import DataFrame
+from numpy import isnan
+from ipet.evaluation.IPETFilter import IPETValue
 
 class IPETEvaluationColumn(IpetNode):
 
     nodetag = "Column"
 
-    editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "constant",
-                 "nanrep", "minval", "maxval", "comp", "translevel", "regex"]
+    editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "reduction", "constant",
+                 "alternative", "minval", "maxval", "comp", "translevel", "regex"]
 
     possibletransformations = {None:(0, 0),
                                "abs":(1, 1),
@@ -38,23 +43,37 @@ class IPETEvaluationColumn(IpetNode):
                                "log10":(1, 1),
                                "log":(1, 1),
                                "mean":(1, -1),
+                               "shmean":(1, -1),
                                "median":(1, -1),
                                "std":(1, -1),
                                "min":(1, -1),
                                "max":(1, -1),
                                "getBestStatus" : (1, -1),
-                               "getWorstStatus" : (1, -1)}
+                               "getWorstStatus" : (1, -1),
+                               "convertTimeStamp" : (1, 1),
+                               "iqr" : (1, -1),
+                               "lQuart" : (1, -1),
+                               "uQuart" : (1, -1),
+                               "strConcat" : (1, -1),
+                               "meanOrConcat" : (1, -1)}
+    
+    possiblereductions = [None] + [k for k, v in possibletransformations.items() if v == (1, -1)]
     
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 
     requiredOptions = {"comp":possiblecomparisons,
                        "origcolname":"datakey",
                        "translevel":[0, 1],
-                       "transformfunc":list(possibletransformations.keys())}
+                       "transformfunc":list(possibletransformations.keys()),
+                       "reduction" : possiblereductions}
+
+    deprecatedattrdir = {"nanrep" : "has been replaced by 'alternative'",
+                            "groupkey" : "groupkey is specified using 'index' and 'indexsplit'"}
 
     def __init__(self, origcolname = None, name = None, formatstr = None, transformfunc = None, constant = None,
-                 nanrep = None, minval = None, maxval = None, comp = None, regex = None, translevel = None, active = True):
-        '''
+                 alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None,
+                 active = True, reduction = "meanOrConcat", **kw):
+        """
         constructor of a column for the IPET evaluation
 
         Parameters
@@ -68,7 +87,7 @@ class IPETEvaluationColumn(IpetNode):
 
         constant : should this column represent a constant value?
 
-        nanrep : replacement of nan-values for this column
+        alternative : conditional alternative constant or column name (also used to replace nans)
 
         minval : a minimum value for all elements in this column
 
@@ -84,9 +103,11 @@ class IPETEvaluationColumn(IpetNode):
                      if five permutations were tested. Columns with translevel=1 are appended at the end of the instance-wise table
 
         active : True or "True" if this column should be active, False otherwise
-        '''
+        
+        reduction : aggregation function that is applied to reduce multiple occurrences of index 
+        """
 
-        super(IPETEvaluationColumn, self).__init__(active)
+        super(IPETEvaluationColumn, self).__init__(active, **kw)
         self.origcolname = origcolname
         self.name = name
 
@@ -94,15 +115,16 @@ class IPETEvaluationColumn(IpetNode):
         self.transformfunc = transformfunc
         self.constant = constant
 
-        self.nanrep = nanrep
+        self.alternative = alternative
         self.minval = minval
         self.maxval = maxval
         self.translevel = translevel
         self.set_comp(comp)
         self.regex = regex
-
+        self.set_reduction(reduction)
 
         self.aggregations = []
+        self.filters = []
         self.children = []
 
     def checkAttributes(self):
@@ -114,6 +136,10 @@ class IPETEvaluationColumn(IpetNode):
             minval, maxval = self.possibletransformations[self.transformfunc]
             if len(self.children) < minval or maxval != -1 and len(self.children) > maxval:
                 raise IpetNodeAttributeError("transformfunc", "wrong number of children for transformation <%s>" % (self.transformfunc))
+            
+        if self.reduction is not None:
+            if self.reduction not in self.possiblereductions:
+                raise IpetNodeAttributeError("Attribute 'reduction' has illegal value '%s'"% self.reduction)
         return True
 
     def addChild(self, child):
@@ -123,18 +149,22 @@ class IPETEvaluationColumn(IpetNode):
             self.children.append(child)
         elif child.__class__ is Aggregation:
             self.aggregations.append(child)
+        elif child.__class__ is IPETFilter:
+            self.filters.append(child)
 
     def getChildren(self):
-        return self.children + self.aggregations
+        return self.children + self.aggregations + self.filters
 
     def acceptsAsChild(self, child):
-        return child.__class__ in (IPETEvaluationColumn, Aggregation)
+        return child.__class__ in (IPETEvaluationColumn, Aggregation, IPETFilter)
 
     def removeChild(self, child):
         if child.__class__ is IPETEvaluationColumn:
             self.children.remove(child)
         elif child.__class__ is Aggregation:
             self.aggregations.remove(child)
+        elif child.__class__ is IPETFilter:
+            self.filters.remove(child)
 
     @staticmethod
     def getNodeTag():
@@ -147,14 +177,14 @@ class IPETEvaluationColumn(IpetNode):
         return self.requiredOptions.get(attr, super(IPETEvaluationColumn, self).getRequiredOptionsByAttribute(attr))
 
     def getName(self):
-        '''
+        """
         infer the name for this column
 
         if this column was constructed with a column name, the name is used
         else if this column represents an original column of the data frame,
         the original column name is used, otherwise, we construct an
         artificial name that represents how this column is constructed
-        '''
+        """
         if self.name is not None:
             return self.name
         elif self.origcolname is not None:
@@ -164,12 +194,17 @@ class IPETEvaluationColumn(IpetNode):
         elif self.constant is not None:
             return "Const_%s" % self.constant
         else:
-            return self.transformfunc + ','.join((child.getName() for child in self.children))
+            prefix = self.transformfunc
+            if prefix is None:
+                prefix = ""
+            return prefix + ','.join((child.getName() for child in self.children))
 
-    def parseValue(self, val, df = None):
-        '''
+    def parseValue(self, val, df=None):
+        """
         parse a value into an integer (prioritized) or float
-        '''
+        """
+        if val in [None, ""]:
+            return None
         for conversion in [int, float]:
             try:
                 return conversion(val)
@@ -177,16 +212,22 @@ class IPETEvaluationColumn(IpetNode):
                 pass
         if df is not None and val in df.columns:
             return df[val]
-        return None
+        return val
 
     def parseConstant(self):
-        '''
+        """
         parse the constant attribute, which is a string, into an integer (prioritized) or float
-        '''
+        """
         return self.parseValue(self.constant)
+
+    def getActiveFilters(self):
+        return [f for f in self.filters if f.isActive()]
 
     def addAggregation(self, agg):
         self.aggregations.append(agg)
+
+    def addFilter(self, filter_):
+        self.filters.append(filter_)
 
     def getFormatString(self):
         return self.formatstr
@@ -204,6 +245,14 @@ class IPETEvaluationColumn(IpetNode):
             except ValueError:
                 raise ValueError("Trying to set an unknown comparison method '%s' for column '%s', should be in\n %s" % (newvalue, self.getName(), ", ".join((repr(c) for c in self.possiblecomparisons))))
 
+    def set_reduction(self, reduction):
+        """Set the reduction function
+        """
+        self.reduction = reduction
+
+    def getCompareColName(self):
+        return self.getName() + self.getCompareSuffix()
+
     def getCompareMethod(self):
         if self.comp is None or self.comp == "":
             return None
@@ -218,8 +267,6 @@ class IPETEvaluationColumn(IpetNode):
                     return lambda x, y:numpy.true_divide(x + shift, y + shift)
                 except ValueError:
                     return None
-
-
 
     def getCompareSuffix(self):
         if self.getCompareMethod() is not None:
@@ -241,9 +288,9 @@ class IPETEvaluationColumn(IpetNode):
         return {k:str(v) for k, v in self.attributesToDict().items() if v is not None}
 
     def toXMLElem(self):
-        '''
+        """
         convert this Column into an XML node
-        '''
+        """
         me = ElementTree.Element(IPETEvaluationColumn.getNodeTag(), self.attributesToStringDict())
 
         # iterate through children and aggregations and convert them to xml nodes
@@ -252,6 +299,9 @@ class IPETEvaluationColumn(IpetNode):
 
         for agg in self.aggregations:
             me.append(agg.toXMLElem())
+
+        for filter_ in self.filters:
+            me.append(filter_.toXMLElem())
 
         return me
 
@@ -263,14 +313,19 @@ class IPETEvaluationColumn(IpetNode):
             for child in elem:
                 if child.tag == 'Aggregation':
                     column.addAggregation(Aggregation.processXMLElem(child))
+                if child.tag == IPETFilter.getNodeTag():
+                    elemdict = dict(child.attrib)
+                    filter_ = IPETFilter.fromDict(elemdict)
+                    column.addFilter(filter_)
                 elif child.tag == IPETEvaluationColumn.getNodeTag():
                     column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column
         
     def getTransformationFunction(self):
-        '''
+        """
         tries to find the transformation function from the numpy, misc, or Experiment modules
-        '''
+        """
+        # Do we also have to search in module Key (for getWorstStatus etc)?
         for module in [numpy, misc, Experiment]:
             try:
                 return getattr(module, self.transformfunc)
@@ -278,11 +333,24 @@ class IPETEvaluationColumn(IpetNode):
                 pass
         raise IpetNodeAttributeError(self.transformfunc, "Unknown transformation function %s" % self.transformfunc)
 
-    def getColumnData(self, df):
-        '''
-        Retrieve the data associated with this column
-        '''
+    def getReductionFunction(self):
+        """
+        tries to find the reduction function from the numpy, misc, or Experiment modules
+        """
 
+        funcname = self.reduction
+        # Do we also have to search in module Key (for getWorstStatus etc)?
+        for module in [numpy, misc, Experiment, Key.ProblemStatusCodes]:
+            try:
+                return getattr(module, funcname)
+            except AttributeError:
+                pass
+        raise IpetNodeAttributeError(funcname, "Unknown reduction function %s" % self.reduction)
+
+    def getColumnData(self, df):
+        """
+        Retrieve the data associated with this column
+        """
         # if no children are associated with this column, it is either
         # a column represented in the data frame by an 'origcolname',
         # or a constant
@@ -294,11 +362,11 @@ class IPETEvaluationColumn(IpetNode):
                     # print an error message and make a series with NaN's
                     print(e)
                     print("Could not retrieve data %s" % self.origcolname)
-                    result = pd.Series(numpy.nan, index = df.index)
+                    result = pd.Series(numpy.nan, index=df.index)
 
 
             elif self.regex is not None:
-                result = df.filter(regex = self.regex)
+                result = df.filter(regex=self.regex)
             elif self.constant is not None:
                 df[self.getName()] = self.parseConstant()
                 result = df[self.getName()]
@@ -308,18 +376,18 @@ class IPETEvaluationColumn(IpetNode):
             transformfunc = self.getTransformationFunction()
 
             # concatenate the children data into a new data frame object
-            argdf = pd.concat([child.getColumnData(df) for child in self.children], axis = 1)
+            argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)
 
             if self.getTransLevel() == 1:
 
                 # group the whole table per instance #
 
-                argdf = argdf.groupby(level = 0)
+                argdf = argdf.groupby(level=0)
 
                 # determine the axis along which to apply the transformation later on
                 applydict = {}
             else:
-                applydict = dict(axis = 1)
+                applydict = dict(axis=1)
 
             try:
                 # try to directly apply the transformation function, this might fail for
@@ -337,25 +405,55 @@ class IPETEvaluationColumn(IpetNode):
                 # apply the wrapper function instead
                 result = argdf.apply(tmpwrapper, **applydict)
 
-        if self.nanrep is not None:
-            nanrep = self.parseValue(self.nanrep, df)
-            if nanrep is not None:
-                result = result.fillna(nanrep)
+        if self.alternative is not None:
+            alternative = self.parseValue(self.alternative, df)
+            if alternative is not None:
+                booleanseries = pd.isnull(result)
+                for f in self.getActiveFilters():
+                    booleanseries = numpy.logical_or(booleanseries, f.applyFilter(df).iloc[:, 0])
+                result = result.where(~booleanseries, alternative)
         if self.minval is not None:
             minval = self.parseValue(self.minval, df)
             if minval is not None:
-                result = numpy.maximum(result, minval)
+                if type(minval) in [int, float]:
+                    result = numpy.maximum(result, minval)
+                else:
+                    result = numpy.maximum(result, minval.astype(result.dtype))
         if self.maxval is not None:
             maxval = self.parseValue(self.maxval, df)
             if maxval is not None:
-                result = numpy.minimum(result, maxval)
-
+                if type(maxval) in [int, float]:
+                    result = numpy.minimum(result, maxval)
+                else:
+                    result = numpy.minimum(result, maxval.astype(result.dtype))
         return result
-
 
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
 
+    def addDependency(self, dependencies, dep):
+        if dep not in dependencies[self.getName()]:
+            dependencies[self.getName()].add(dep)
+
+    def getDependencies(self):
+        """Return a list of data frame column names that this column requires
+        """
+        dependencies = {self.getName() : set()}
+        if self.origcolname is not None:
+            self.addDependency(dependencies, self.origcolname)
+        for c in [self.minval, self.alternative, self.maxval]:
+            if c is not None and self.parseValue(c) is None:
+                self.addDependency(dependencies, c)
+        for i in self.children:
+            self.addDependency(dependencies, i.getName())
+            dependencies.update(i.getDependencies())
+        for i in self.filters:
+            for j in [1, 2]:
+                dep = i.getDependency(j)
+                if dep is not None:
+                    self.addDependency(dependencies, dep)
+
+        return dependencies
 
 class FormatFunc:
 
@@ -364,11 +462,37 @@ class FormatFunc:
 
     def beautify(self, x):
         return (self.formatstr % x)
+    
+    
+class StrTuple:
+    """
+    Represents an easier readible and parsable list of strings
+    """
+    def __init__(self, strList, splitChar = " "):
+        self.tuple = StrTuple.splitStringList(strList, splitChar)
+        self.splitChar = splitChar
 
+    @staticmethod
+    def splitStringList(strList, splitChar = " "):
+        """Split a string that represents list elements separated by optional split-character
+        """
+        if strList is None or strList == "":
+            return None
+        elif type(strList) is str:
+            return tuple(strList.split(splitChar))
+        else:
+            return tuple(strList)
 
+    def getTuple(self):
+        if self.tuple is None:
+            return tuple()
+        return self.tuple
+        
+    def __str__(self):
+        return self.splitChar.join(self.tuple)
 
 class IPETEvaluation(IpetNode):
-    '''
+    """
     evaluates a comparator with given group keys, columns, and filter groups
 
     An evaluation transfers raw, collected data from a collection of testruns
@@ -378,56 +502,65 @@ class IPETEvaluation(IpetNode):
     By defining multiple evaluations,
     it is therefore possible to view the same raw data through multiple angles
 
-    '''
+    """
     nodetag = "Evaluation"
     # todo put tex, csv etc. here as other possible streams for filter group output
     possiblestreams = ['stdout', 'tex', 'txt', 'csv']
-    DEFAULT_GROUPKEY = "Settings"
-    DEFAULT_DEFAULTGROUP = "default"
+#    DEFAULT_GROUPKEY = "Settings"
+    DEFAULT_GROUPKEY = Key.ProblemStatus
     DEFAULT_COMPARECOLFORMAT = "%.3f"
+    DEFAULT_INDEX = " ".join((Key.ProblemName, "LogFileName"))
+    DEFAULT_COLUMNINDEX = "ProblemStatus"
+    DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 
-    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat"]
+    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat", "index", "indexsplit"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
-    def __init__(self, groupkey = DEFAULT_GROUPKEY, defaultgroup = DEFAULT_DEFAULTGROUP, evaluateoptauto = True,
-                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT):
-        '''
+
+    def __init__(self, groupkey = DEFAULT_GROUPKEY, defaultgroup = None, evaluateoptauto = True,
+                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT, index = DEFAULT_INDEX, indexsplit=DEFAULT_INDEXSPLIT):
+        """
         constructs an Ipet-Evaluation
 
         Parameters
         ----------
         groupkey : the key by which groups should be built, eg, 'Settings'
-        defaultgroup : the name of the default group
+        defaultgroupvalues : the values of the default group to be compared with. usually corresponds to specified columns
         evaluateoptauto : should optimal auto settings be calculated?
         sortlevel : level on which to base column sorting, '0' for group level, '1' for column level
         comparecolformat : format string for comparison columns
-        '''
+        index : (string or list or None) single or multiple column names that serve as (row) and column index levels
+        indexsplit : (int) position to split index into row and column levels, negative to count from the end.
+        """
 
         # construct super class first, Evaluation is currently always active
         super(IPETEvaluation, self).__init__(True)
 
         self.filtergroups = []
         self.groupkey = groupkey
-        self.defaultgroup = defaultgroup
         self.comparecolformat = comparecolformat[:]
         self.columns = []
         self.set_evaluateoptauto(evaluateoptauto)
         self.sortlevel = int(sortlevel)
         self.evaluated = False
 
+        self.orig_defaultgroup = defaultgroup
+        self.set_indexsplit(indexsplit)
+        self.set_index(index)
+        
     def getName(self):
         return self.nodetag
 
     def isEvaluated(self):
-        '''
+        """
         returns whether this evaluation has been evaluated since its columns or filter groups have been modified
-        '''
+        """
         return self.evaluated
 
     def setEvaluated(self, evaluated):
-        '''
+        """
         change the flag if this evaluation has been evaluated since its last modification
-        '''
+        """
         self.evaluated = evaluated
 
     def set_evaluateoptauto(self, evaluateoptauto):
@@ -438,6 +571,9 @@ class IPETEvaluation(IpetNode):
 
     def setCompareColFormat(self, comparecolformat):
         self.comparecolformat = comparecolformat[:]
+        
+    def attributesToStringDict(self):
+        return {k:str(v) for k, v in self.attributesToDict().items() if v is not None and str(v) != ""}
 
     @staticmethod
     def getNodeTag():
@@ -448,7 +584,6 @@ class IPETEvaluation(IpetNode):
 
     def getChildren(self):
         return self.columns + self.filtergroups
-
 
     def acceptsAsChild(self, child):
         return child.__class__ in (IPETEvaluationColumn, IPETFilterGroup)
@@ -486,14 +621,51 @@ class IPETEvaluation(IpetNode):
         self.filtergroups.remove(fg)
         self.setEvaluated(False)
 
-    def setGroupKey(self, gk):
-        self.groupkey = gk
+#    def setGroupKey(self, gk):
+#        self.groupkey = gk
 
+    def set_index(self, index : list):
+        """Set index identifier list, optionally with level specification (0 for row index, 1 for column index)
+        """
+        self.index = StrTuple(index)
+        logging.debug("Set index to '{}'".format(index))
+        self.set_defaultgroup(self.orig_defaultgroup)
+        
+    def getRowIndex(self) -> list:
+        """Return (list of) keys to create row index 
+        """
+        return list(self.index.getTuple())[:self.indexsplit]
+    
+    def getColIndex(self) -> list:
+        """Return (list of) keys to create column index
+        """
+        return list(self.index.getTuple())[self.indexsplit:]
 
-    def setDefaultGroup(self, dg):
-        self.defaultgroup = dg
+    def set_defaultgroup(self, dg):
+        self.orig_defaultgroup = dg
+        dg = StrTuple.splitStringList(dg, ":")
+        if dg is None:
+            x = None
+        else:
+            x = list(dg)
+            for i in range(len(x)):
+                try:
+                    x[i] = float(x[i])
+                except:
+                    pass
+        if x is not None and len(x) > len(self.getColIndex()):
+            x = x[:len(self.getColIndex())]
+        if x is not None and len(x) == 1:
+            self.defaultgroup = x[0]
+        elif x is not None:
+            self.defaultgroup = tuple(x)
+        else:
+            self.defaultgroup = None
         self.setEvaluated(False)
 
+    def set_indexsplit(self, indexsplit):
+        self.indexsplit = int(indexsplit)
+    
     def addColumn(self, col):
         self.columns.append(col)
         self.setEvaluated(False)
@@ -503,47 +675,101 @@ class IPETEvaluation(IpetNode):
         self.setEvaluated(False)
 
     def setEvaluateOptAuto(self, evaloptauto):
-        '''
-        should the evaluation calculate optimal auto settings?
-        '''
+        """ Should the evaluation calculate optimal auto settings?
+        """
         self.set_evaluateoptauto(evaloptauto)
 
-    def reduceToColumns(self, df_long):
+    def addComparisonColumns(self, df: DataFrame) -> DataFrame:
+        """ Add the comparison columns.
+
+        Add the specified comparison columns to df, returns extended df in the same format
+
+        Parameters
+        ----------
+        df
+            DataFrame containing only relevant data.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The original DataFrame with the extra columns appended.
+        """
+        if self.getColIndex() == []:
+            return df
         usercolumns = []
 
+        for col in self.toposortColumns(self.getActiveColumns()):
+            # look if a comparison with the default group should be made
+            if col.getTransLevel() == 0 and col.getCompareMethod() is not None:
+
+                grouped = df.groupby(self.getColIndex())[col.getName()]
+                compcol = dict(list(grouped))[self.defaultgroup]
+
+                comparecolname = col.getCompareColName()
+
+                # apply the correct comparison method to the original and the temporary column
+                compmethod = col.getCompareMethod()
+                method = lambda x:compmethod(*x)
+
+                df[comparecolname] = 0
+                for name, group in grouped:
+                    tmpgroup = DataFrame(group.reset_index(drop = True))
+                    tmpgroup["_tmpcol_"] = compcol.reset_index(drop = True)
+                    tmpgroup[comparecolname] = tmpgroup[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)#.set_index(group.index)
+                    df[comparecolname].update((tmpgroup.set_index(group.index))[comparecolname])
+
+#                print(df[comparecolname])
+                usercolumns.append(comparecolname)
+
+        # TODO Sort usercolumns?
+        self.usercolumns = self.usercolumns + usercolumns
+        return df
+
+    def reduceToColumns(self, df_long : DataFrame) -> DataFrame:
+        """ Reduce the huge number of columns
+        
+        Select from the raw data: the columns specified in evaluation xmlfile.
+        (concatenate usercolumns, neededcolumns and additionalfiltercolumns from df_long)
+
+        Parameters
+        ----------
+        df_long
+            The DataFrame containing the parsed data from one or multiple .trn files created by ipet-parse.
+
+        Returns
+        -------
+        DataFrame
+            A DataFrame in the same format as df_long with only the relevant columns.
+        """
+        #
+        # Attention: this will be deleted soon because it is not flexible enough
+        # --> will be replaced by reduction function in IPETEvaluationColumn
+        #
         lvlonecols = [col for col in self.getActiveColumns() if col.getTransLevel() == 1]
         if len(lvlonecols) > 0:
-            self.levelonedf = pd.concat([col.getColumnData(df_long) for col in lvlonecols], axis = 1)
+            self.levelonedf = pd.concat([col.getColumnData(df_long) for col in lvlonecols], axis=1)
             self.levelonedf.columns = [col.getName() for col in lvlonecols]
         else:
             self.levelonedf = None
         # treat columns differently for level=0 and level=1
-        for col in self.getActiveColumns():
+        # We are only interested in the columns that are activated in the eval file
+        usercolumns = [c.getName() for c in self.getActiveColumns()]
+        for col in self.toposortColumns(self.getActiveColumns()):
             if col.getTransLevel() == 0:
-                df_long[col.getName()] = col.getColumnData(df_long)
-                usercolumns.append(col.getName())
-
-                # look if a comparison with the default group should be made
-                if col.getCompareMethod() is not None:
-                    compcol = dict(list(df_long.groupby(self.groupkey)[col.getName()]))[self.defaultgroup]
-
-                    # save as temporary column. This will expand the smaller compcol index to the larger data frame
-                    df_long["_tmpcol_"] = compcol
-
-                    # append the right suffix to the column name
-                    comparecolname = col.getName() + col.getCompareSuffix()
-
-                    # apply the correct comparison method to the original and the temporary column
-                    compmethod = col.getCompareMethod()
-                    method = lambda x:compmethod(*x)
-                    df_long[comparecolname] = df_long[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)
-                    usercolumns.append(comparecolname)
-
-
+                try:
+                    df_long[col.getName()] = col.getColumnData(df_long)
+                except Exception as e:
+                    print("An error occurred for the column '{}':\n{}".format(col.getName(), col.attributesToStringDict()))
+                    raise e
 
         # concatenate level one columns into a new data frame and treat them as the altogether setting
+        newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
 
-        neededcolumns = [col for col in [self.groupkey, 'Status', 'SolvingTime', 'TimeLimit'] if col not in usercolumns]
+        for x in self.index.getTuple():
+            if x not in newcols:
+                newcols.append(x)
+        neededcolumns = [col for col in newcols if col not in usercolumns]
 
         additionalfiltercolumns = []
         for fg in self.getActiveFilterGroups():
@@ -552,22 +778,88 @@ class IPETEvaluation(IpetNode):
         additionalfiltercolumns = list(set(additionalfiltercolumns))
         additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(usercolumns + neededcolumns)]
 
-        result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns]
+        result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns + ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_']]
         self.usercolumns = usercolumns
         return result
 
-    def calculateNeededData(self, df):
-        df['_time_'] = (df.Status.isin(('better', 'timelimit')))
-        df['_limit_'] = ((df['_time_']) | df.Status.isin(['nodelimit', 'memorylimit', 'userinterrupt', 'gaplimit']))
-        df['_fail_'] = (df.Status.apply(lambda x: True if x.startswith("fail") else False))
-        df['_abort_'] = (df.Status == 'fail_abort')
+    def toposortColumns(self, columns : list) -> list:
+        """ Compute a topological ordering respecting the data dependencies of the specified column list.
+
+        Parameters
+        ----------
+        columns
+            A list of the column-objects to be sorted.
+
+        Returns
+        -------
+        list 
+            A list of topologically sorted column objects.
+        """
+        adj = self.getDependencies(columns)
+
+        toposorted = list(toposort(adj))
+        logging.debug("TOPOSORT:\nDependency List: {},\nTopological Ordering: {}".format(adj, toposorted))
+        def getIndex(name, toposorted):
+            for idx, topo in enumerate(toposorted):
+                if name in topo: return idx
+            return -1
+
+        indices = {col.getName() : getIndex(col.getName(), toposorted) for col in columns}
+
+        return sorted(columns, key = lambda x: indices.get(x.getName(), -1))
+
+    def getDependencies(self, columns : list) -> dict:
+        """ Recursively collect the dependencies of a list of columns.
+        
+        Parameters
+        ----------
+        columns 
+            A list of columns
+            
+        Returns
+        -------
+            A dictionary containing the names and dependencies of the columns.
+        """
+        adj = {}
+        for col in columns:
+            newdeps = col.getDependencies()
+            for key, val in newdeps.items():
+                adj.setdefault(key, set()).update(val)
+        return adj
+    
+    def calculateNeededData(self, df : DataFrame) -> DataFrame:
+        """ Add the status columns.
+
+        Calculate and append needed data about statuses
+
+        Parameters
+        ----------
+        df
+            DataFrame containing only relevant data.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The original DataFrame with the extra columns appended.
+        """
+        df['_time_'] = (df[Key.ProblemStatus].isin((Key.ProblemStatusCodes.Better, Key.ProblemStatusCodes.TimeLimit)))
+        df['_limit_'] = ((df['_time_']) | df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.NodeLimit,
+                                                                      Key.ProblemStatusCodes.MemoryLimit,
+                                                                      Key.ProblemStatusCodes.Interrupted
+                                                                      ]))
+        df['_fail_'] = df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailDualBound,
+                                                    Key.ProblemStatusCodes.FailObjectiveValue,
+                                                    Key.ProblemStatusCodes.FailSolInfeasible,
+                                                    Key.ProblemStatusCodes.FailSolOnInfeasibleInstance,
+                                                    Key.ProblemStatusCodes.Fail
+                                        ])
+        df['_abort_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.FailAbort)
 
         df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_'])
 
         df['_count_'] = 1
-        df['_unkn_'] = (df.Status == 'unknown')
-        df['ProblemNames'] = df.index
-
+        df['_unkn_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.Unknown)
         return df
 
     def toXMLElem(self):
@@ -577,7 +869,6 @@ class IPETEvaluation(IpetNode):
         for fg in self.filtergroups:
             fgelem = fg.toXMLElem()
             me.append(fgelem)
-
         return me
 
     @staticmethod
@@ -593,6 +884,7 @@ class IPETEvaluation(IpetNode):
     @staticmethod
     def processXMLElem(elem):
         if elem.tag == IPETEvaluation.getNodeTag():
+            logging.debug("Construct IPET Evaluation with attributes : \n{}".format(elem.attrib))
             ev = IPETEvaluation(**elem.attrib)
 
         for child in elem:
@@ -605,10 +897,61 @@ class IPETEvaluation(IpetNode):
                 ev.addColumn(IPETEvaluationColumn.processXMLElem(child))
         return ev
 
-    def convertToHorizontalFormat(self, df):
-        horidf = df[self.usercolumns + ['ProblemNames', self.groupkey]].pivot('ProblemNames', self.groupkey).swaplevel(0, 1, axis = 1)
-        horidf.sortlevel(axis = 1, level = self.sortlevel)
+    def reduceByIndex(self, df : DataFrame) -> DataFrame:
+        """ Reduce data to have a unique index given by indexkeys.
+
+        Each column is reduced by it's reduction function such that indexkeys yield a unique hierarchical index.
+
+        Parameters
+        ----------
+        df
+            DataFrame containing data to be reduced.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The reduced DataFrame.
+        """
+        tmpcols = list(set(self.usercolumns + list(self.index.getTuple()) + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
+        horidf = df[tmpcols]
+        grouped = horidf.groupby(by = self.index.getTuple())
+        newcols = []
+
+        reductionMap = {'_solved_' : numpy.all, '_count_' : numpy.max}
+        for col in ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']:
+            newcols.append(grouped[col].apply(reductionMap.get(col, numpy.any)))
+
+        for col in self.getActiveColumns():
+            newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
+
+        horidf = pd.concat(newcols, axis = 1)
+        horidf = horidf.reset_index(self.index.getTuple())
         return horidf
+
+    def convertToHorizontalFormat(self, df : DataFrame) -> DataFrame:
+        """ Convert data to have an index given by indexkeys.
+
+        Indexkeys are defined by "index" and "columnindex", these yield a unique index.
+        indexkeys[0] is taken as (hierarchical) row index,
+        indexkeys[1] is taken as (hierarchical) column index.
+
+        Parameters
+        ----------
+        df
+            DataFrame containing data to be converted.
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The converted DataFrame.
+        """
+        df = df.set_index(list(self.index.getTuple())).sort_index(level = 0)
+        df = df.unstack(self.getColIndex())
+        if len(self.getColIndex()) > 0 :
+            df = df.swaplevel(0, len(self.getColIndex()), axis = 1)
+        return df
 
     def checkStreamType(self, streamtype):
         if streamtype not in self.possiblestreams:
@@ -623,13 +966,12 @@ class IPETEvaluation(IpetNode):
         return [col for col in self.columns if col.isActive()]
 
     def getColumnFormatters(self, df):
-        '''
+        """
         returns a formatter dictionary for all columns of this data frame
 
         expects a Multiindex column data frame df
-        '''
+        """
         formatters = {}
-
         thelevel = 0
 
         # temporary hack to test which level is the maximum level
@@ -647,7 +989,7 @@ class IPETEvaluation(IpetNode):
             if col.getCompareMethod() is not None:
                 try:
                     if thelevel == 1:
-                        comptuples += df.xs(col.getName() + col.getCompareSuffix(), axis = 1, level = thelevel, drop_level = False).columns.values.tolist()
+                        comptuples += df.xs(col.getName() + col.getCompareSuffix(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
                     else:
                         comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and dfcol.endswith("Q")]
                 except:
@@ -661,7 +1003,7 @@ class IPETEvaluation(IpetNode):
             # settings 'default' and 'heuroff', the result should be [('default', 'Time'),('heuroff', 'Time')]
             try:
                 if thelevel == 1:
-                    tuples = df.xs(col.getName(), axis = 1, level = thelevel, drop_level = False).columns.values.tolist()
+                    tuples = df.xs(col.getName(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
 
                 else:
                     tuples = [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and not dfcol.endswith("Q") and not dfcol.endswith("p")]
@@ -669,12 +1011,9 @@ class IPETEvaluation(IpetNode):
                 # the column name is not contained in the final df
                 continue
 
-
-
             # add new formatting function to the map of formatting functions
             for thetuple in tuples:
                 formatters.update({thetuple:FormatFunc(col.getFormatString()).beautify})
-
 
         for comptuple in comptuples:
             formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
@@ -690,31 +1029,30 @@ class IPETEvaluation(IpetNode):
 
         streammethod(df, filebasename, formatters)
 
-    def streamDataFrame_stdout(self, df, filebasename, formatters = {}):
-        '''
+    def streamDataFrame_stdout(self, df, filebasename, formatters={}):
+        """
         print to console
-        '''
+        """
         print("%s:" % filebasename)
-        print(df.to_string(formatters = formatters))
+        print(df.to_string(formatters=formatters))
 
-    def streamDataFrame_tex(self, df, filebasename, formatters = {}):
-        '''
+    def streamDataFrame_tex(self, df, filebasename, formatters={}):
+        """
         write tex output
-        '''
+        """
         with open("%s.tex" % filebasename, "w") as texfile:
-            texfile.write(df.to_latex(formatters = formatters))
+            texfile.write(df.to_latex(formatters=formatters))
 
-    def streamDataFrame_csv(self, df, filebasename, formatters = {}):
+    def streamDataFrame_csv(self, df, filebasename, formatters={}):
         with open("%s.csv" % filebasename, "w") as csvfile:
-            df.to_csv(csvfile, formatters = formatters)
+            df.to_csv(csvfile, formatters=formatters)
 
-    def streamDataFrame_txt(self, df, filebasename, formatters = {}):
-        '''
+    def streamDataFrame_txt(self, df, filebasename, formatters={}):
+        """
         write txt output
-        '''
+        """
         with open("%s.txt" % filebasename, "w") as txtfile:
-            df.to_string(txtfile, formatters = formatters, index_names = False)
-
+            df.to_string(txtfile, formatters=formatters, index_names=False)
 
     def findStatus(self, statuscol):
         uniques = set(statuscol.unique())
@@ -725,36 +1063,36 @@ class IPETEvaluation(IpetNode):
             return statuscol.unique()[0]
 
     def calculateOptimalAutoSettings(self, df):
-        '''
+        """
         calculate optimal auto settings instancewise
-        '''
-        grouped = df.groupby(level = 0)
+        """
+        grouped = df.groupby(level=0)
 
+        #
+        # every apply operation on the group element returns a pandas series
+        #
         optstatus = grouped["Status"].apply(self.findStatus)
         opttime = grouped["SolvingTime"].apply(numpy.min)
         opttimelim = grouped["TimeLimit"].apply(numpy.mean)
 
-        optdf = pd.concat([optstatus, opttime, opttimelim], axis = 1)
+        optdf = pd.concat([optstatus, opttime, opttimelim], axis=1)
         optdf[self.groupkey] = "OPT. AUTO"
 
         aggfuncs = {'_solved_':numpy.max}
-        useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis = 1)
-        optdf = pd.concat([optdf, useroptdf], axis = 1)
-
+        useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis=1)
+        optdf = pd.concat([optdf, useroptdf], axis=1)
 
         return optdf
 
     def checkMembers(self):
-        '''
+        """
         checks the evaluation members for inconsistencies
-        '''
+        """
         for col in self.columns:
             try:
                 col.checkAttributes()
             except Exception as e:
                 raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
-
-
 
     def getAggregatedGroupData(self, filtergroup):
         if not filtergroup in self.filtergroups:
@@ -777,132 +1115,197 @@ class IPETEvaluation(IpetNode):
     def getInstanceData(self):
         return self.rettab
 
-    def evaluate(self, exp):
-        '''
+    def evaluate(self, exp : Experiment):
+        """
         evaluate the data of an Experiment instance exp
 
         Parameters
         ----------
-        exp : an experiment instance for which data has already been collected
+        exp
+            an experiment instance for which data has already been collected
 
         Returns
         -------
-        rettab : an instance-wise table of the specified columns
-        retagg : aggregated results for every filter group and every entry of the specified
-        '''
+        rettab
+            an instance-wise table of the specified columns
+        retagg
+            aggregated results for every filter group and every entry of the specified
+        """
         self.checkMembers()
 
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData()
+        logging.debug("Result of getJoinedData:\n{}\n".format(data))
 
         if not self.groupkey in data.columns:
             raise KeyError(" Group key is missing in data:", self.groupkey)
-        elif self.defaultgroup not in data[self.groupkey].values:
-            possiblebasegroups = sorted(data[self.groupkey].unique())
-            logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
-            self.defaultgroup = possiblebasegroups[0]
-            logging.info(" Using value <%s> as base group" % (self.defaultgroup))
+#        elif self.defaultgroup is not None and self.defaultgroup not in data[self.getColIndex()[0]].values:
+#            possiblebasegroups = sorted(data[self.getColIndex()[0]].unique())
+#            logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
+#            self.defaultgroup = possiblebasegroups[0]
+#            logging.info(" Using value <%s> as base group" % (self.defaultgroup))
+
+        data = self.calculateNeededData(data)
+        logging.debug("Result of calculateNeededData:\n{}\n".format(data))
 
         columndata = self.reduceToColumns(data)
+        logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
 
         if self.evaluateoptauto:
-            opt = self.calculateOptimalAutoSettings(columndata)
-            columndata = pd.concat([columndata, opt])
+            logging.warn("Optimal auto settings are currently not available, use reductions instead")
+            #opt = self.calculateOptimalAutoSettings(columndata)
+            #columndata = pd.concat([columndata, opt])
+            #logging.debug("Result of calculateOptimalAutoSettings:\n{}\n".format(columndata))
 
-        columndata = self.calculateNeededData(columndata)
+        columndata = self.reduceByIndex(columndata)
+        columndata = self.addComparisonColumns(columndata)
+
+        # show less info in long table
+        columns = columndata.columns
+        diff = lambda l1, l2: [x for x in l1 if x not in l2]
+        lcolumns = diff(columns, ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'])
+        # show more info in table
+#        lcolumns = columndata.columns
 
         # compile a results table containing all instances
-        ret = self.convertToHorizontalFormat(columndata)
+        ret = self.convertToHorizontalFormat(columndata[lcolumns])
+        logging.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
+
+        # TODO self.levelonedf is always None because it will be deprecated
         if self.levelonedf is not None:
             self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
-            self.rettab = pd.concat([ret, self.levelonedf], axis = 1)
+            self.rettab = pd.concat([ret, self.levelonedf], axis=1)
         else:
             self.rettab = ret
-
-
+        
+        # TODO Where do we need these following three lines?
         self.instance_wise = ret
         self.agg = self.aggregateToPivotTable(columndata)
-
+        logging.debug("Result of aggregateToPivotTable:\n{}\n".format(self.agg))
+            
         self.filtered_agg = {}
         self.filtered_instancewise = {}
-        # filter column data and group by group key #
+        # filter column data and group by group key
         activefiltergroups = self.getActiveFilterGroups()
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
-            reduceddata = self.applyFilterGroup(columndata, fg)
-            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata)
+            reduceddata = self.applyFilterGroup(columndata, fg, self.getRowIndex())
+            if (len(reduceddata) == 0):
+                fg.set_active(False)
+                logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
+                continue
+            logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
+            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata[lcolumns])
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 
+        activefiltergroups = self.getActiveFilterGroups()
         if len(activefiltergroups) > 0:
             nonemptyfiltergroups = [fg for fg in activefiltergroups if not self.filtered_agg[fg.name].empty]
             dfs = [self.filtered_agg[fg.name] for fg in nonemptyfiltergroups]
             names = [fg.name for fg in nonemptyfiltergroups]
-            self.retagg = pd.concat(dfs, keys = names, names = ['Group'])
+            self.retagg = pd.concat(dfs, keys=names, names=['Group'])
         else:
             self.retagg = pd.DataFrame()
 
         self.setEvaluated(True)
         return self.rettab, self.retagg
 
-    def applyFilterGroup(self, df, fg):
-        return fg.filterDataFrame(df)
+    def applyFilterGroup(self, df, fg, index):
+        return fg.filterDataFrame(df, index)
 
-    def aggregateToPivotTable(self, df):
+    def aggregateToPivotTable(self, df : DataFrame) -> DataFrame:
+        """ Aggregates long data to short table
+
+        Aggregate long table to short one.
+        Values of columns are aggregated over "index", therefore "columnindex" becomes rowindex.
+        In case "columnindex" was empty, the result is a table with only one row.
+
+        Parameters
+        ----------
+        df
+            DataFrame containing the long data (with unique index),
+            df has ids as index. The indexkeys are columns.
+
+        Returns
+        -------
+        DataFrame
+            The aggregated DataFrame.
+        """
         # the general part sums up the number of instances falling into different categories
-        generalpart = df[['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + [self.groupkey]].pivot_table(index = self.groupkey, aggfunc = sum)
+        indices = ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + self.getColIndex()
+        if self.getColIndex() == []:
+            generalpart = df[indices].apply(sum)
+        else:
+            generalpart = df[indices].pivot_table(index = self.getColIndex(), aggfunc = sum)
 
         # test if there is any aggregation to be calculated
-        hasaggregation = False
-        stop = False
         activecolumns = self.getActiveColumns()
         colsandaggregations = [(col, agg) for col in activecolumns for agg in col.aggregations]
+        logging.debug("Cols and aggregations:\n".format([(c.getName(), a.getName()) for (c, a) in colsandaggregations]))
 
         # if no aggregation was specified, return only the general part
-        if len(colsandaggregations) is 0:
-            return generalpart
-
+        if len(colsandaggregations) == 0:
+            return DataFrame(generalpart).T
 
         # column aggregations aggregate every column and every column aggregation
-        colaggpart = pd.concat((df[[col.getName(), self.groupkey]].pivot_table(index = self.groupkey, aggfunc = agg.aggregate) for col, agg in colsandaggregations), axis = 1)
 
-        # print df[["DualInt", "Settings"]].pivot_table(index = "Settings", aggfunc = numpy.min)
+        if self.getColIndex() == []:
+            tabs = (df[[col.getName()] + self.getColIndex()].apply(agg.aggregate) for col, agg in colsandaggregations)
+        else:
+            tabs = (df[[col.getName()] + self.getColIndex()].pivot_table(index = self.getColIndex(), aggfunc = agg.aggregate) for col, agg in colsandaggregations)
+        colaggpart = pd.concat(tabs, axis = 1)
         # rename the column aggregations
-        # print colaggpart
         newnames = ['_'.join((col.getName(), agg.getName())) for col, agg in colsandaggregations]
-        # print newnames
+        # set newnames
         colaggpart.columns = newnames
 
-        # determine the row in the aggregated table corresponding to the default group
-        if self.defaultgroup in colaggpart.index:
-            defaultrow = colaggpart.loc[self.defaultgroup, :]
+        if self.getColIndex() == []:
+            ret = pd.DataFrame(generalpart.append(colaggpart.iloc[0])).T
+            return ret
         else:
-            # if there is no default setting, take the first group as default group
-            try:
-                defaultrow = colaggpart.iloc[0, :]
-            except:
-                defaultrow = numpy.nan
+            # determine the row in the aggregated table corresponding to the default group
+            logging.debug("Index of colaggpart:\n{}".format(colaggpart.index))
 
-        # determine quotients
-        comppart = colaggpart / defaultrow
-        comppart.columns = [col + 'Q' for col in colaggpart.columns]
+            if (self.defaultgroup is not None) and (self.defaultgroup in colaggpart.index):
+                defaultrow = colaggpart.loc[self.defaultgroup, :]
+            else:
+                # if there is no default setting, take the first group as default group
+                try:
+                    self.defaultgroup = colaggpart.index[0]
+                    defaultrow = colaggpart.iloc[0, :]
+                except:
+                    defaultrow = numpy.nan
 
-        # apply statistical tests, whereever possible
-        statspart = self.applyStatsTests(df)
+            # determine quotients
+            columns = []
+            for col in colaggpart.columns:
+                if not numpy.issubdtype(colaggpart[col].dtype, numpy.number):
+                    continue
+                columns.append(col)
+            comppart = colaggpart[columns] / defaultrow[columns]
+            comppart.columns = [col + 'Q' for col in columns]
 
-        # glue the parts together
-        parts = [generalpart, colaggpart, comppart]
-        if statspart is not None:
-            parts.append(statspart)
+            # apply statistical tests, whereever possible
+            statspart = self.applyStatsTests(df)
 
-        return pd.concat(parts, axis = 1)
+            # glue the parts together
+            parts = [generalpart, colaggpart, comppart]
+
+            logging.debug("Statspart : \n{}".format(statspart))
+            if statspart is not None:
+                parts.append(statspart)
+
+            return pd.concat(parts, axis = 1)
 
     def applyStatsTests(self, df):
-        '''
+        """
         apply statistical tests defined by each column
-        '''
-
+        """
+        # TODO What if indexkeys[1] is empty?
+        if self.getColIndex() == []:
+            return None
         # group the data by the groupkey
-        groupeddata = dict(list(df.groupby(self.groupkey)))
+        groupeddata = dict(list(df.groupby(self.getColIndex())))
         stats = []
         names = []
         for col in self.getActiveColumns():
@@ -910,29 +1313,30 @@ class IPETEvaluation(IpetNode):
                 continue
             defaultvalues = None
             try:
-                defaultvalues = groupeddata[self.defaultgroup][col.getName()]
+                defaultvalues = groupeddata[self.defaultgroup][col.getName()].reset_index(drop = True)
             except KeyError:
                 logging.info("Sorry, cannot retrieve default values for column %s, key %s for applying statistical test)" % (col.getName(), self.defaultgroup))
                 continue
 
             # iterate through the stats tests associated with each column
             for statstest in col.getStatsTests():
-                stats.append(df[[self.groupkey, col.getName()]].pivot_table(index = self.groupkey, aggfunc = lambda x:statstest(x, defaultvalues)))
+                stats.append(df[self.getColIndex() + [col.getName()]].pivot_table(index = self.getColIndex(), aggfunc = lambda x:statstest(x.reset_index(drop = True), defaultvalues)))
                 names.append('_'.join((col.getName(), statstest.__name__)))
 
         if len(stats) > 0:
-            stats = pd.concat(stats, axis = 1)
+            stats = pd.concat(stats, axis=1)
             stats.columns = names
 
             return stats
         else:
             return None
+        
     def aggregateTable(self, df):
         results = {}
         columnorder = []
         for col in self.getActiveColumns():
             origcolname = col.getName()
-            partialdf = df.xs(origcolname, level = 1, axis = 1, drop_level = False)
+            partialdf = df.xs(origcolname, level=1, axis=1, drop_level=False)
 
             for partialcol in partialdf.columns:
                 columnorder.append(partialcol)

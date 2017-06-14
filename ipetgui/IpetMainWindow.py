@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License (MIT)
 
 Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
@@ -8,22 +8,22 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
-'''
+"""
 from PyQt4.QtGui import QMainWindow, QAction, QIcon
 from PyQt4.QtCore import SIGNAL
 import os.path as osp
 class IpetMainWindow(QMainWindow):
-    '''
+    """
     classdocs
-    '''
+    """
 
     menus = {}
     toolbars = {}
     _statusbar = None
     def __init__(self, parent=None):
-        '''
+        """
         Constructor
-        '''
+        """
         super(IpetMainWindow, self).__init__(parent)
         
         self.setGeometry(100, 100, 1200, 800)

@@ -2,8 +2,8 @@
 <Evaluation comparecolformat="%.3f" defaultgroup="tanglegram1" evaluateoptauto="True" groupkey="Status" index="LogFileName ProblemName" indexsplit="1" sortlevel="0">
 	<Column active="True" minval="1" name="LogDTime" reduction="mean" transformfunc="log" translevel="0">
 		<Column active="True" minval="1" name="DTime" reduction="mean" transformfunc="subtract" translevel="0">
-			<Column active="True" origcolname="Datetime_End" translevel="0"/>
-			<Column active="True" origcolname="Datetime_Start" translevel="0"/>
+			<Column active="True" origcolname="Datetime_End" reduction="meanOrConcat" translevel="0"/>
+			<Column active="True" origcolname="Datetime_Start" reduction="meanOrConcat" translevel="0"/>
 		</Column>
 		<Aggregation aggregation="lQuart" name="lQuart"/>
 		<Aggregation aggregation="median" name="median"/>
@@ -16,14 +16,10 @@
 		<Filter active="True" anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>
 	</Column>
 	<FilterGroup active="True" filtertype="intersection" name="all"/>
-	<FilterGroup active="False" filtertype="intersection" name="alloptimal">
+	<FilterGroup active="True" filtertype="intersection" name="alloptimal">
 		<Filter active="True" anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>
 	</FilterGroup>
-	<FilterGroup active="True" filtertype="intersection" name="diff-timeouts">
-		<Filter active="True" anytestrun="one" expression1="_solved_" expression2="1" operator="eq"/>
-		<Filter active="True" anytestrun="one" expression1="_solved_" expression2="0" operator="eq"/>
-	</FilterGroup>
-	<FilterGroup active="False" filtertype="intersection" name="easyinstances">
-		<Filter active="True" anytestrun="all" expression1="LogDTime" expression2="50" operator="le"/>
+	<FilterGroup active="True" filtertype="intersection" name="easyinstances">
+		<Filter active="True" anytestrun="all" expression1="LogDTime" expression2="10" operator="le"/>
 	</FilterGroup>
 </Evaluation>

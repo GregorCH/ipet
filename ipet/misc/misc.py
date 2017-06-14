@@ -269,6 +269,27 @@ def strConcat(strings : list) -> str:
     """
     return "".join(strings)
 
+def meanOrConcat(l : list):
+    """Reduce a list of unknown objects
+
+    Parameters
+    ----------
+    l
+        list of input numbers or strings to concatenate
+
+    Returns
+    -------
+    reduced list
+    """
+    try:
+        out = np.mean(l)
+    except:
+        try:
+            out = "".join(l)
+        except:
+            out = "".join(map(str, l))
+    return out
+
 def saveAsXML(nodeobject, filename : str) -> None:
     """ Save object as XML file.
 

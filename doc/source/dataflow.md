@@ -19,7 +19,7 @@ Long table
     - \_solved\_: all
     - \_count\_: max
     - \_\*\*\*\_: any
-    - default reduce for other columns: ??? mean/strConcat?
+    - default reduce for other columns: mean or string concatenation
 
 6. Add columns containing ``comp`` arison with ``defaultgroup``.
 

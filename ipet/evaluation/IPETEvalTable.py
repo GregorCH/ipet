@@ -54,7 +54,8 @@ class IPETEvaluationColumn(IpetNode):
                                "iqr" : (1, -1),
                                "lQuart" : (1, -1),
                                "uQuart" : (1, -1),
-                               "strConcat" : (1, -1)}
+                               "strConcat" : (1, -1),
+                               "meanOrConcat" : (1, -1)}
     
     possiblereductions = [None] + [k for k, v in possibletransformations.items() if v == (1, -1)]
     
@@ -69,8 +70,9 @@ class IPETEvaluationColumn(IpetNode):
     deprecatedattrdir = {"nanrep" : "has been replaced by 'alternative'",
                             "groupkey" : "groupkey is specified using 'index' and 'indexsplit'"}
 
-    def __init__(self, origcolname=None, name=None, formatstr=None, transformfunc=None, constant=None,
-                 alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None, active = True, reduction = None, **kw):
+    def __init__(self, origcolname = None, name = None, formatstr = None, transformfunc = None, constant = None,
+                 alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None,
+                 active = True, reduction = "meanOrConcat", **kw):
         """
         constructor of a column for the IPET evaluation
 
@@ -192,7 +194,10 @@ class IPETEvaluationColumn(IpetNode):
         elif self.constant is not None:
             return "Const_%s" % self.constant
         else:
-            return self.transformfunc + ','.join((child.getName() for child in self.children))
+            prefix = self.transformfunc
+            if prefix is None:
+                prefix = ""
+            return prefix + ','.join((child.getName() for child in self.children))
 
     def parseValue(self, val, df=None):
         """
@@ -334,8 +339,6 @@ class IPETEvaluationColumn(IpetNode):
         """
 
         funcname = self.reduction
-        if funcname is None:
-            funcname = "mean"
         # Do we also have to search in module Key (for getWorstStatus etc)?
         for module in [numpy, misc, Experiment, Key.ProblemStatusCodes]:
             try:

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Evaluation defaultgroup="default" groupkey="LogFileName">
+<Evaluation defaultgroup="benchmark.gurobi.out" index="ProblemName LogFileName">
 	<Column origcolname="SolvingTime" minval="0.5" name="Time" translevel="0" comp="quot">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>

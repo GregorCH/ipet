@@ -479,7 +479,10 @@ class StrTuple:
         if strList is None or strList == "":
             return None
         elif type(strList) is str:
-            return tuple(strList.split(splitChar))
+            if splitChar == " ":
+                return tuple(strList.split())
+            else:
+                return tuple(strList.split(splitChar))
         else:
             return tuple(strList)
 
@@ -931,6 +934,7 @@ class IPETEvaluation(IpetNode):
         index_dupl = [i for i in ind if i in horidf.columns]
         horidf = horidf.reset_index(index_uniq)
         horidf = horidf.reset_index(index_dupl, drop = True)
+#        horidf = horidf.reset_index(self.index.getTuple())
         return horidf
 
     def convertToHorizontalFormat(self, df : DataFrame) -> DataFrame:

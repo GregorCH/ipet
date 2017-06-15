@@ -926,7 +926,11 @@ class IPETEvaluation(IpetNode):
             newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
 
         horidf = pd.concat(newcols, axis = 1)
-        horidf = horidf.reset_index(self.index.getTuple())
+        ind = self.index.getTuple()
+        index_uniq = [i for i in ind if i not in horidf.columns]
+        index_dupl = [i for i in ind if i in horidf.columns]
+        horidf = horidf.reset_index(index_uniq)
+        horidf = horidf.reset_index(index_dupl, drop = True)
         return horidf
 
     def convertToHorizontalFormat(self, df : DataFrame) -> DataFrame:
@@ -1245,7 +1249,10 @@ class IPETEvaluation(IpetNode):
 
         # if no aggregation was specified, return only the general part
         if len(colsandaggregations) == 0:
-            return DataFrame(generalpart).T
+            if isinstance(generalpart, pd.Series):
+                return generalpart.to_frame().T
+            else:
+                return generalpart
 
         # column aggregations aggregate every column and every column aggregation
 

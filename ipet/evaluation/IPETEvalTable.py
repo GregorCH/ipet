@@ -1261,12 +1261,15 @@ class IPETEvaluation(IpetNode):
         # column aggregations aggregate every column and every column aggregation
 
         if self.getColIndex() == []:
-            tabs = (df[[col.getName()] + self.getColIndex()].apply(agg.aggregate) for col, agg in colsandaggregations)
+            tabs = (df[[col.getName()]].apply(agg.aggregate) for col, agg in colsandaggregations)
+
+            colaggpart = pd.DataFrame(pd.concat(tabs)).T
         else:
             tabs = (df[[col.getName()] + self.getColIndex()].pivot_table(index = self.getColIndex(), aggfunc = agg.aggregate) for col, agg in colsandaggregations)
-        colaggpart = pd.concat(tabs, axis = 1)
+            colaggpart = pd.concat(tabs, axis = 1)
         # rename the column aggregations
         newnames = ['_'.join((col.getName(), agg.getName())) for col, agg in colsandaggregations]
+
         # set newnames
         colaggpart.columns = newnames
 

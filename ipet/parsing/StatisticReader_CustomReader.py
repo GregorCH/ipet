@@ -102,6 +102,13 @@ class CustomReader(StatisticReader):
         if self.regexp.search(line):
 
             previousdata = self.testrun.getCurrentProblemData(self.datakey)
+            if self.methodint == CustomReader.METHOD_COUNT:
+                if previousdata is None:
+                    self.addData(self.datakey, 1)
+                else:
+                    self.addData(self.datakey, previousdata + 1)
+                    return
+
             try:
                 data = misc.getNumberAtIndex(line, self.index)
                 data = self.datatypemethod(data)
@@ -131,13 +138,6 @@ class CustomReader(StatisticReader):
                         self.addData(self.datakey, data)
                     elif data > previousdata:
                         self.addData(self.datakey, data)
-                elif self.methodint == CustomReader.METHOD_COUNT:
-                    if previousdata is None:
-                        self.addData(self.datakey, 1)
-                    else:
-                        self.addData(self.datakey, previousdata + 1)
-
-                    pass
 
             except:
                 logging.debug("Reader %s could not retrieve data at index %d from matching line '%s'", self.getName(), self.index, line)
@@ -167,7 +167,7 @@ class CustomReader(StatisticReader):
     def set_regpattern(self, regpattern):
         self.regexp = re.compile(regpattern)
         self.regpattern = regpattern
-        
+
     def set_name(self, name):
         if name == self.getName():
             return
@@ -177,8 +177,8 @@ class CustomReader(StatisticReader):
         else:
             self.name = name
             self.username = True
-        
-        
+
+
     def set_datakey(self, datakey):
         self.datakey = datakey
         if not self.username:

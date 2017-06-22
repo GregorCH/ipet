@@ -12,7 +12,7 @@ please refer to README.md for how to cite IPET.
 import os
 import logging
 import xml.etree.ElementTree as ElementTree
-from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, PathReader, ListReader, \
+from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, ListReader, \
     BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
 from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
@@ -175,7 +175,6 @@ class ReaderManager(Manager, IpetNode):
              MetaDataReader(),
              NodesReader(),
              ObjsenseReader(),
-             PathReader(),
              PluginStatisticsReader(),
              VariableReader(),
              RootNodeFixingsReader(),
@@ -201,8 +200,8 @@ class ReaderManager(Manager, IpetNode):
         tries to return name of problem, which is read via the line that is beginning with @1
         """
 
-        fullname = line.split()[1]
-        namewithextension = os.path.basename(fullname)
+        fullpath = line.split()[1]
+        namewithextension = os.path.basename(fullpath)
         if namewithextension.endswith("gz"):
             namewithextension = os.path.splitext(namewithextension)[0]
         for extension in self.extensions:
@@ -210,7 +209,7 @@ class ReaderManager(Manager, IpetNode):
                 namewithextension = os.path.splitext(namewithextension)[0]
 
         # now name without extension
-        return namewithextension
+        return namewithextension, fullpath
 
     def finishProblemParsing(self, line, filecontext, readers):
         """
@@ -232,10 +231,11 @@ class ReaderManager(Manager, IpetNode):
         """
         sets up data structures for a new problem if necessary
         """
-        problemname = self.getProblemName(line[1])
+        problemname, problempath = self.getProblemName(line[1])
 
         self.testrun.addData(Key.ProblemName, problemname)
         self.testrun.addData(Key.LogFileName, self.testrun.getCurrentLogfilename())
+        self.testrun.addData(Key.Path, problempath)
         self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
     def endOfProblemReached(self, line):
@@ -269,14 +269,14 @@ class ReaderManager(Manager, IpetNode):
         runs data collection on the specified testrun
         """
         assert(self.testrun != None)
-        
+
         self.testrun.iterationPrepare()
         while self.testrun.iterationNextFile():
             self.readSolverType()
-            
+
             context = misc.filenameGetContext(self.testrun.iterationGetCurrentFile())
             readers = [r for r in self.getManageables(True) if r.supportsContext(context)]
-            
+
             line = (0,"")
             for line in self.testrun:
                 if self.startOfProblemReached(line[1]):

@@ -12,7 +12,7 @@ please refer to README.md for how to cite IPET.
 import os
 import logging
 import xml.etree.ElementTree as ElementTree
-from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, StatisticReader, ListReader, \
+from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, PathReader, ListReader, \
     BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
 from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
@@ -175,6 +175,7 @@ class ReaderManager(Manager, IpetNode):
              MetaDataReader(),
              NodesReader(),
              ObjsenseReader(),
+             PathReader(),
              PluginStatisticsReader(),
              VariableReader(),
              RootNodeFixingsReader(),

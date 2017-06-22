@@ -193,6 +193,23 @@ class DateTimeReader(StatisticReader):
                 self.addData(key, timestamp)
                 break
 
+class PathReader(StatisticReader):
+    """
+    reads in the absolute Path
+
+    If found, the corresponding data key is AbsolutePath
+    """
+    name = 'PathReader'  # : the name for this reader
+    exp = re.compile(r"^@01 (.*) ===========")  # : the expression for the date time start
+    key = Key.Path  # : data key for start of run
+
+    def extractStatistic(self, line):
+        matched = self.exp.match(line)
+        if matched:
+            timestamp = matched.groups()[0]
+            #time = misc.convertTimeStamp(timestamp)
+            self.addData(self.key, timestamp)
+
 class DualLPTimeReader(StatisticReader):
     """
     reads the dual LP time

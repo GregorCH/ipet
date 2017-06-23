@@ -32,7 +32,6 @@ class ReaderManager(Manager, IpetNode):
     """
     acquires test run data. subclasses of manager, managing readers by their unique name
     """
-    extensions = [".mps", ".cip", ".fzn", ".pip", ".lp", ".gms", ".dat"]
     nodetag = "Readers"
 
     xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
@@ -197,19 +196,17 @@ class ReaderManager(Manager, IpetNode):
 
     def getProblemName(self, line):
         """
-        tries to return name of problem, which is read via the line that is beginning with @1
+        Returns name of problem, which is read from a line beginning with a problemexpression (@01)
         """
 
         fullpath = line.split()[1]
         namewithextension = os.path.basename(fullpath)
         if namewithextension.endswith("gz"):
             namewithextension = os.path.splitext(namewithextension)[0]
-        for extension in self.extensions:
-            if namewithextension.endswith(extension):
-                namewithextension = os.path.splitext(namewithextension)[0]
+        namewithoutextension = os.path.splitext(namewithextension)[0]
 
         # now name without extension
-        return namewithextension, fullpath
+        return namewithoutextension, fullpath
 
     def finishProblemParsing(self, line, filecontext, readers):
         """

@@ -162,8 +162,5 @@ class EvaluationTest(unittest.TestCase):
             self.assertTrue(evaluation.equals(evaluation2),
                              "The two evaluations are not the same after modifying %s" % mod)
 
-
-
-
 if __name__ == "__main__":
     unittest.main()

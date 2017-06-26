@@ -492,6 +492,8 @@ class StrTuple:
         return self.tuple
         
     def __str__(self):
+        if self.tuple is None:
+            return ""
         return self.splitChar.join(self.tuple)
 
 class IPETEvaluation(IpetNode):
@@ -512,8 +514,7 @@ class IPETEvaluation(IpetNode):
 #    DEFAULT_GROUPKEY = "Settings"
     DEFAULT_GROUPKEY = Key.ProblemStatus
     DEFAULT_COMPARECOLFORMAT = "%.3f"
-    DEFAULT_INDEX = " ".join((Key.ProblemName, "LogFileName"))
-    DEFAULT_COLUMNINDEX = "ProblemStatus"
+    DEFAULT_INDEX = ""
     DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 
@@ -1138,6 +1139,62 @@ class IPETEvaluation(IpetNode):
     def getInstanceData(self):
         return self.rettab
 
+    def generateDefaultGroup(self, data, colindex):
+        '''
+        generates a defaultgroup based on the colindexkeys and data
+
+        Parameters
+        ----------
+        data
+            raw DataFrame
+        colindex
+            keys of columnindex
+        '''
+        if self.orig_defaultgroup is None or self.defaultgroup == "":
+            subset = [tuple(x) for x in data[[s[0] for s in colindex]].values]
+            counts = {}
+            for x in subset:
+                counts[x] = counts.get(x, 0) + 1
+            
+            max_count = 0
+            max_key = None
+            for key, val in counts.items():
+                if val > max_count:
+                    max_count = val
+                    max_key = key
+            
+            self.orig_defaultgroup = ":".join(max_key)
+            self.set_defaultgroup(self.orig_defaultgroup)
+
+    def generateIndex(self, data):
+        '''
+        Generate a reasonable index based on the given data
+
+        Parameters
+        ----------
+        data
+            the data of the experiment
+        '''
+        lowerbound = 1 # 1 or bigger
+        possible_indices = [Key.ProblemName, Key.Solver, Key.ProblemStatus, Key.Version, Key.LogFileName]
+        height = data.shape[0]
+        
+        present_indices = [[key, len(set(data[key]))] for key in possible_indices if key in data.columns]
+        first = max(present_indices, key = lambda y: y[1])
+        
+        processed_indices = [[key, count] for [key, count] in present_indices if count > lowerbound and key != first[0]]
+        sorted_indices = sorted(processed_indices, key = lambda y: y[1])
+        
+        second = []
+        if len(sorted_indices) > 0 and sorted_indices[0][0] != first[0]:
+            second = [sorted_indices[0]]
+            if len(sorted_indices) > 1 and (height / first[1]) / second[1] > 1:
+                second.append(sorted_indices[1])
+
+        self.indexsplit = 1
+        self.generateDefaultGroup(data, second)
+        self.set_index(" ".join([i[0] for i in [first] + second]))
+
     def evaluate(self, exp : Experiment):
         """
         evaluate the data of an Experiment instance exp
@@ -1158,6 +1215,12 @@ class IPETEvaluation(IpetNode):
 
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData()
+        
+        if self.getRowIndex() == []:
+            self.generateIndex(data)
+        
+        print(self.index, self.getRowIndex(), self.getColIndex())
+
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
 
         if not self.groupkey in data.columns:

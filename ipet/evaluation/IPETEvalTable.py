@@ -632,6 +632,7 @@ class IPETEvaluation(IpetNode):
         """
         self.index = StrTuple(index)
         logging.debug("Set index to '{}'".format(index))
+        self.set_indexsplit(self.indexsplit)
         self.set_defaultgroup(self.orig_defaultgroup)
         
     def getRowIndex(self) -> list:
@@ -668,6 +669,16 @@ class IPETEvaluation(IpetNode):
 
     def set_indexsplit(self, indexsplit):
         self.indexsplit = int(indexsplit)
+        # make sure that we have at least one col as rowindex
+        indexsplitmod = self.indexsplit
+        try:
+            if self.index is not None:
+                indexsplitmod = self.indexsplit % len(self.index)
+        except:
+            pass
+        if indexsplitmod == 0:
+            logging.warn("Indexsplit 0 is not allowed, setting it to 1.")
+            self.indexsplit = 1;
     
     def addColumn(self, col):
         self.columns.append(col)
@@ -1096,6 +1107,10 @@ class IPETEvaluation(IpetNode):
         """
         checks the evaluation members for inconsistencies
         """
+        if self.columns == []:
+            raise AttributeError("Please specify at least one column.")
+        if self.filtergroups == []:
+            raise AttributeError("Please specify at least one filtergroup.")
         for col in self.columns:
             try:
                 col.checkAttributes()
@@ -1209,9 +1224,16 @@ class IPETEvaluation(IpetNode):
         activefiltergroups = self.getActiveFilterGroups()
         if len(activefiltergroups) > 0:
             nonemptyfiltergroups = [fg for fg in activefiltergroups if not self.filtered_agg[fg.name].empty]
+            if self.getColIndex() == []:
+                for fg in nonemptyfiltergroups:
+                    self.filtered_agg[fg.name].index = [fg.name]
             dfs = [self.filtered_agg[fg.name] for fg in nonemptyfiltergroups]
             names = [fg.name for fg in nonemptyfiltergroups]
-            self.retagg = pd.concat(dfs, keys=names, names=['Group'])
+            if self.getColIndex() == []:
+                self.retagg = pd.concat(dfs)
+                self.retagg.index.name = 'Group'
+            else:
+                self.retagg = pd.concat(dfs, keys=names, names=['Group'])
         else:
             self.retagg = pd.DataFrame()
 

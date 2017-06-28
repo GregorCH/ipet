@@ -46,24 +46,29 @@ testevalstr_agg = ['\t\t<Aggregation aggregation="mean" />\n',
 testevalstr_fg = ['\t<FilterGroup active="True" filtertype="intersection" name="all"/>\n',
                   '\t<FilterGroup name="hard">\n\t\t<Filter anytestrun="any" expression1="Time" expression2="100" operator="ge"/>\n\t</FilterGroup>\n']
 testevalstr_foot = '</Evaluation>'
-test_trn = os.path.join(DATADIR, 'check.MMM.scip-hashing.linux.x86_64.gnu.dbg.cpx.mip-dbg.heuraggr.trn')
+test_out = os.path.join(DATADIR, 'check.MMM.scip-hashing.linux.x86_64.gnu.dbg.cpx.mip-dbg.heuraggr.out')
 
 class EvaluationTest(unittest.TestCase):
 
-    test_fgs = [None, [0], [1], [0, 1]]
+    test_fgs = [None,
+                [0],
+                [1],
+                [0, 1]]
     test_cols = [None,
                  [[0, True]],
                  [[0, False]],
                  [[0, True], [2, True]],
                  [[0, True], [2, False]],
-#                 [[0, False], [2, True]],
                  [[0, False], [2, False]],
-                 [[0, True], [1, True], [2, True]],
-                 [[0, True], [1, True], [2, False]],
-                 [[0, False], [1, False], [2, False]],
+#                 [[0, True], [1, True], [2, True]],
+#                 [[0, True], [1, True], [2, False]],
+#                 [[0, False], [1, False], [2, False]],
                  ]
 
     def test_evalformat(self):
+        ex = Experiment()
+        ex.addOutputFile(test_out)
+        ex.collectData()
         for (evalstr, cols, fg) in ((evalstr, cols, fg) for evalstr in testevalstr_eval for cols in self.test_cols for fg in self.test_fgs):
             testevalstr = testevalstr_head + evalstr
             if cols is not None:
@@ -75,12 +80,11 @@ class EvaluationTest(unittest.TestCase):
             testevalstr = testevalstr + testevalstr_foot
 
             ev = IPETEvaluation.fromXML(testevalstr)
-            ex = Experiment()
-            ex.addOutputFile(test_trn)
             try:
                 tab_long, tab_agg = ev.evaluate(ex)
             except AttributeError as e:
-                print(e)
+                self.assertTrue((cols is None or fg is None), "Either the number of columns \
+                        or the number of filtergroups should be 0.")
                 continue
 
             self.assertEqual(type(tab_long), pd.DataFrame, "Type of long table wrong.")

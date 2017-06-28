@@ -1236,7 +1236,7 @@ class IPETEvaluation(IpetNode):
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
 
         if self.evaluateoptauto:
-            logging.warn("Optimal auto settings are currently not available, use reductions instead")
+            logging.warning("Optimal auto settings are currently not available, use reductions instead")
             #opt = self.calculateOptimalAutoSettings(columndata)
             #columndata = pd.concat([columndata, opt])
             #logging.debug("Result of calculateOptimalAutoSettings:\n{}\n".format(columndata))
@@ -1276,7 +1276,7 @@ class IPETEvaluation(IpetNode):
             reduceddata = self.applyFilterGroup(columndata, fg, self.getRowIndex())
             if (len(reduceddata) == 0):
                 fg.set_active(False)
-                logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
+                logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
             logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata[lcolumns])

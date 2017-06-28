@@ -1219,8 +1219,6 @@ class IPETEvaluation(IpetNode):
         if self.getRowIndex() == []:
             self.generateIndex(data)
         
-        print(self.index, self.getRowIndex(), self.getColIndex())
-
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
 
         if not self.groupkey in data.columns:

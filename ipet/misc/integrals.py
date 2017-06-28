@@ -13,6 +13,7 @@ import numpy as np
 from ipet.misc import misc
 import numpy
 from ipet import Key
+from queue import PriorityQueue
 
 DEFAULT_HISTORYTOUSE = Key.PrimalBoundHistory
 DEFAULT_XAFTERSOLVEKEY = Key.SolvingTime
@@ -112,7 +113,7 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
 
     return x, y
 
-def getMeanIntegral(testrun, problemlist, meanintegralpoints, access = "id", **kw):
+def getMeanIntegral(testrun, problemlist, access = "id", **kw):
     """
     returns a numpy array that represents the mean integral over the selected problem list.
     
@@ -122,33 +123,36 @@ def getMeanIntegral(testrun, problemlist, meanintegralpoints, access = "id", **k
         access modifier to determine if data should be accessed by 'id' or by "name"
 
     """
-    # initialize mean integral to be zero at all points of the chosen granularity
-    meanintegral = np.zeros(meanintegralpoints)
-    
-    # get the x axis limit, usually the
-    if access == "id":
-        getmethod = testrun.getProblemDataById
-    else:
-        getmethod = testrun.getProblemDataByName
 
-    lim = [getmethod(prob, kw.get('xlimitkey', DEFAULT_XLIMITKEY)) for prob in problemlist]
-    THE_XLIMIT = max((l for l in lim if l is not None))
-
-    scale = float(THE_XLIMIT) / float(meanintegralpoints)
-    
-    # go through problem list and add up integrals for every problem
+    history = PriorityQueue()
     for probname in problemlist:
+        # plotpoints contains time, data
         plotpoints = getProcessPlotData(testrun, probname, access = access, ** kw)
-        lastX = -1.0
-        lastgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
+        lastgap = None
         for xi, itgap in zip(plotpoints[0], plotpoints[1]):
-            startindex = int(lastX + 1) / scale
-            lastindex = int(xi + 1) / scale
-            meanintegral[startindex:lastindex] += lastgap
-            lastX = xi
+            if lastgap is None:
+                change = itgap
+            else:
+                change = itgap - lastgap
             lastgap = itgap
-    
+            history.put((xi, change))
+
+    # initialize mean integral: [ [x_0, f(x_0)], [x_1, f(x_1)], ...] ]
+    meanintegral = []
+    currmean = 0
+    while not history.empty():
+        # gets item with lowest priority value
+        xi, change = history.get()
+        # compute the new mean
+        currmean = currmean + change
+        # remove duplicate datapoints [xi,*]
+        while len(meanintegral) > 0 and meanintegral[-1][0] == xi:
+            del meanintegral[-1]
+        meanintegral.append([xi, currmean])
+
+    xvals, gapvals = zip(*meanintegral)
+
     # divide integral by problem number
-    meanintegral = np.true_divide(meanintegral, len(problemlist))
+    gapvals = np.true_divide(gapvals, len(problemlist))
     
-    return (meanintegral, scale)
+    return xvals, gapvals

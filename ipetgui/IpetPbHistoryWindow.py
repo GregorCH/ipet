@@ -254,7 +254,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
         newtext = str(curritem.text())
         testrun = self.testruns[rowindex]
 
-        self.setTestrunName(testrun, newtext) 
+        self.setTestrunName(testrun, newtext)
     def resetSelectedTestrunNames(self):
         for tr in self.getSelectedTestrunList():
             self.resetTestrunName(tr)
@@ -264,12 +264,12 @@ class IpetPbHistoryWindow(IpetMainWindow):
         returns the test run name as specified by the user
         """
         return self.testrunnames.get(testrun.getName(), testrun.getName())
-    
+
     def setTestrunName(self, testrun, newname):
         self.debugMessage("Changing testrun name from %s to %s"%(self.getTestrunName(testrun), newname))
-        
+
         self.testrunnames[testrun.getName()] = newname
-        
+
     def resetTestrunName(self, testrun):
         try:
             del self.testrunnames[testrun.getName()]
@@ -277,7 +277,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
             item.setText((self.getTestrunName(testrun)))
         except KeyError:
             pass
-    
+
     def updateStatus(self, message):
         self.statusBar().showMessage(message, 5000)
 
@@ -532,7 +532,7 @@ if __name__ == "__main__":
 
     qApp = QtGui.QApplication(sys.argv)
 
-    aw = IpetPbHistoryWindow(['/OPTI/bzfhende/results/MMMc-lns/logfiles-ipetdev/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M620v3.agg_oldschool_lns.trn'])
+    aw = IpetPbHistoryWindow()
     aw.setWindowTitle("%s" % progname)
     aw.show()
     sys.exit(qApp.exec_())

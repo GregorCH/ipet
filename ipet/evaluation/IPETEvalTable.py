@@ -1141,7 +1141,7 @@ class IPETEvaluation(IpetNode):
 
     def generateDefaultGroup(self, data, colindex):
         '''
-        generates a defaultgroup based on the colindexkeys and data
+        Generate a defaultgroup based on the colindexkeys and data
 
         Parameters
         ----------
@@ -1150,21 +1150,18 @@ class IPETEvaluation(IpetNode):
         colindex
             keys of columnindex
         '''
-        if self.orig_defaultgroup is None or self.defaultgroup == "":
-            subset = [tuple(x) for x in data[[s[0] for s in colindex]].values]
-            counts = {}
-            for x in subset:
-                counts[x] = counts.get(x, 0) + 1
-            
-            max_count = 0
-            max_key = None
-            for key, val in counts.items():
-                if val > max_count:
-                    max_count = val
-                    max_key = key
-            
-            self.orig_defaultgroup = ":".join(max_key)
-            self.set_defaultgroup(self.orig_defaultgroup)
+        # only generate a defaultgroup if the user did not specify one themself
+        if self.orig_defaultgroup is not None and self.defaultgroup != "":
+            return
+
+        # count values of (tuples of) column index
+        tuples = [tuple(x) for x in data[colindex].values]
+        counts = pd.Series(tuples).value_counts()
+        max_key = counts.idxmax()
+
+        # take the tuple with the highest occurrence
+        self.orig_defaultgroup = ":".join(max_key)
+        self.set_defaultgroup(self.orig_defaultgroup)
 
     def generateIndex(self, data):
         '''
@@ -1188,11 +1185,11 @@ class IPETEvaluation(IpetNode):
         second = []
         if len(sorted_indices) > 0 and sorted_indices[0][0] != first[0]:
             second = [sorted_indices[0]]
-            if len(sorted_indices) > 1 and (height / first[1]) / second[1] > 1:
+            if len(sorted_indices) > 1 and (height / first[1]) / second[0][1] > 1:
                 second.append(sorted_indices[1])
 
         self.indexsplit = 1
-        self.generateDefaultGroup(data, second)
+        self.generateDefaultGroup(data, [i[0] for i in second])
         self.set_index(" ".join([i[0] for i in [first] + second]))
 
     def evaluate(self, exp : Experiment):
@@ -1219,6 +1216,9 @@ class IPETEvaluation(IpetNode):
         if self.getRowIndex() == []:
             self.generateIndex(data)
         
+        if self.orig_defaultgroup == "":
+            self.generateIndex(data)
+
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
 
         if not self.groupkey in data.columns:

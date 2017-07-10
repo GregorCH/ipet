@@ -631,6 +631,10 @@ class IPETEvaluation(IpetNode):
     def set_index(self, index : list):
         """Set index identifier list, optionally with level specification (0 for row index, 1 for column index)
         """
+        self.autoIndex = False;
+        if index == "auto":
+            self.autoIndex = True;
+            return
         self.index = StrTuple(index)
         logging.debug("Set index to '{}'".format(index))
         self.set_indexsplit(self.indexsplit)
@@ -1141,7 +1145,10 @@ class IPETEvaluation(IpetNode):
 
     def generateDefaultGroup(self, data, colindex):
         '''
-        Generate a defaultgroup based on the colindexkeys and data
+        Generate a defaultgroup based on the colindexkeys and data.
+        
+        Based on the total number of occurences 
+        the tuple with the most occurences is chosen to be the defaultgroup.
 
         Parameters
         ----------
@@ -1173,7 +1180,7 @@ class IPETEvaluation(IpetNode):
             the data of the experiment
         '''
         lowerbound = 1 # 1 or bigger
-        possible_indices = [Key.ProblemName, Key.Solver, Key.ProblemStatus, Key.Version, Key.LogFileName]
+        possible_indices = [Key.ProblemName, Key.Solver, Key.Settings, Key.Version, Key.LogFileName]
         height = data.shape[0]
         
         present_indices = [[key, len(set(data[key]))] for key in possible_indices if key in data.columns]
@@ -1213,11 +1220,10 @@ class IPETEvaluation(IpetNode):
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData()
         
-        if self.getRowIndex() == []:
+        if self.autoIndex:
             self.generateIndex(data)
-        
         if self.orig_defaultgroup == "":
-            self.generateIndex(data)
+            self.generateDefaultGroup(data, list(self.getColIndex()))
 
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
 

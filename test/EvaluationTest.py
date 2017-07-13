@@ -28,81 +28,90 @@ TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")
 EVALTEST = os.path.join(DATADIR, 'testevaluate.xml')
 import shutil
 
-testevalstr_head = '<?xml version="1.0" ?>\n'
-testevalstr_eval = [
-                    '<Evaluation index="ProblemName Status" indexsplit="0">\n',
-                    '<Evaluation index="ProblemName Status" indexsplit="2">\n',
-#                    '<Evaluation index="ProblemName Indic Status" indexsplit="1">\n',
-#                    '<Evaluation index="ProblemName Indic Status" indexsplit="2">\n',
-#                    '<Evaluation index="ProblemName Indic Status" indexsplit="3">\n',
-                    ]
-testevalstr_col = ['\t<Column name="Time" origcolname="SolvingTime" alternative="100" reduction="mean">\n{}\t</Column>\n',
-                   '\t<Column origcolname="ProblemName" reduction="strConcat">\n{}\t</Column>\n',
-                   '\t<Column name="Indic" constant="0" alternative="1" reduction="max">\n\
-\t\t<Filter expression1="SolvingTime" expression2="10" operator="ge" />\n{}\n\t</Column>\n']
-testevalstr_agg = ['\t\t<Aggregation aggregation="mean" />\n',
-                   '\t\t<Aggregation aggregation="strConcat" />\n',
-                   '\t\t<Aggregation aggregation="strConcat" />\n']
-testevalstr_fg = ['\t<FilterGroup active="True" filtertype="intersection" name="all"/>\n',
-                  '\t<FilterGroup name="hard">\n\t\t<Filter anytestrun="any" expression1="Time" expression2="100" operator="ge"/>\n\t</FilterGroup>\n']
-testevalstr_foot = '</Evaluation>'
+eval_index = ["ProblemName Status"]
+
+eval_indexsplit = [1, 2]
+
+columns= [{"name":"Time", "origcolname":"SolvingTime", "alternative":"100", "reduction":"mean"},
+      {"origcolname":"ProblemName", "reduction":"strConcat"},
+      {"name":"Indic", "constant":1, "alternative":1, "reduction":"max"}, ]
+
+col_filters = [ None,
+                None,
+               {"expression1":"SolvingTime", "expression2":"10", "operator":"ge"}]
+
+aggs= [{"aggregation":"mean"},
+       {"aggregation":"strConcat"},
+       {"aggregation":"strConcat"}]
+
+filtergroups = [{"filtertype":"intersection", "name":"all"},
+                {"name":"hard"}]
+
+filters = [None,
+           {"anytestrun":"any", "expression1":"Time", "expression2":"100", "operator":"ge"}]
+
 test_out = os.path.join(DATADIR, 'check.MMM.scip-hashing.linux.x86_64.gnu.dbg.cpx.mip-dbg.heuraggr.out')
 
 class EvaluationTest(unittest.TestCase):
 
-    test_fgs = [None,
+    test_fgs = [#None,
                 [0],
                 [1],
                 [0, 1]]
-    test_cols = [None,
+    test_cols = [#None,
                  [[0, True]],
                  [[0, False]],
                  [[0, True], [2, True]],
                  [[0, True], [2, False]],
                  [[0, False], [2, False]],
-#                 [[0, True], [1, True], [2, True]],
-#                 [[0, True], [1, True], [2, False]],
-#                 [[0, False], [1, False], [2, False]],
                  ]
 
     def test_evalformat(self):
         ex = Experiment()
         ex.addOutputFile(test_out)
         ex.collectData()
-        for (evalstr, cols, fg) in ((evalstr, cols, fg) for evalstr in testevalstr_eval for cols in self.test_cols for fg in self.test_fgs):
-            testevalstr = testevalstr_head + evalstr
-            if cols is not None:
-                for (col, agg) in cols:
-                    testevalstr = testevalstr + testevalstr_col[col].format((testevalstr_agg[col] if agg else ""))
-            if fg is not None:
-                for pos in fg:
-                    testevalstr = testevalstr + testevalstr_fg[pos]
-            testevalstr = testevalstr + testevalstr_foot
 
-            ev = IPETEvaluation.fromXML(testevalstr)
-            try:
-                tab_long, tab_agg = ev.evaluate(ex)
-            except AttributeError as e:
-                self.assertTrue((cols is None or fg is None), "Either the number of columns \
-                        or the number of filtergroups should be 0.")
-                continue
+        for (index, indexsplit) in ((index, indexsplit) for index in eval_index for indexsplit in eval_indexsplit):
+            for (cols, fgs) in ((cols, fgs) for cols in self.test_cols for fgs in self.test_fgs):
+                ev = IPETEvaluation(index = index, indexsplit = indexsplit)
+                if cols is not None:
+                    for (ind_c, ind_a) in cols:
+                        col = IPETEvaluationColumn(**columns[ind_c])
+                        if col_filters[ind_c] is not None:
+                            colfilter = IPETFilter(**col_filters[ind_c])
+                            col.addFilter(colfilter)
+                        if ind_a:
+                            agg = Aggregation(**aggs[ind_c])
+                            col.addAggregation(agg)
+                        ev.addColumn(col)
+                if fgs is not None:
+                    for ind in fgs:
+                        fg = IPETFilterGroup(**filtergroups[ind])
+                        if filters[ind] is not None:
+                            fgfilter = IPETFilter(**filters[ind])
+                            fg.addFilter(fgfilter)
+                        ev.addFilterGroup(fg)
 
-            self.assertEqual(type(tab_long), pd.DataFrame, "Type of long table wrong.")
-            self.assertEqual(type(tab_agg), pd.DataFrame, "Type of aggregated table wrong.")
+                try:
+                    tab_long, tab_agg = ev.evaluate(ex)
+                except AttributeError as e:
+                    self.assertTrue((cols is None or fgs is None), "Either the number of columns or the number of filtergroups should be 0.")
+                    continue
 
-            index = self.getAttrFromStr("index", evalstr).split()
-            indexsplit = int(self.getAttrFromStr("indexsplit", evalstr))
-            # do not allow rowindex to be empty
-            if indexsplit == 0:
-                indexsplit = 1
+                self.assertEqual(type(tab_long), pd.DataFrame, "Type of long table wrong.")
+                self.assertEqual(type(tab_agg), pd.DataFrame, "Type of aggregated table wrong.")
 
-            rowindex_level = len(index[:indexsplit])
-            columns_level = len(index[indexsplit:])
+                # do not allow rowindex to be empty
+                if indexsplit == 0:
+                    indexsplit = 1
 
-            self.assertEqual(tab_long.columns.nlevels, columns_level + 1, "Level of columnindex of long table wrong.")
-            self.assertEqual(tab_agg.index.nlevels, columns_level + 1, "Level of rowindex of agg table wrong.")
+                rowindex_level = len(index.split()[:indexsplit])
+                columns_level = len(index.split()[indexsplit:])
 
-            self.assertEqual(tab_long.index.nlevels, rowindex_level, "Level of rowindex of long table wrong.")
+                self.assertEqual(tab_long.columns.nlevels, columns_level + 1, "Level of columnindex of long table wrong.")
+                self.assertEqual(tab_agg.index.nlevels, columns_level + 1, "Level of rowindex of agg table wrong.")
+
+                self.assertEqual(tab_long.index.nlevels, rowindex_level, "Level of rowindex of long table wrong.")
 
     def getAttrFromStr(self, attr, evalstr):
         start = re.search(attr, evalstr).end() + 2

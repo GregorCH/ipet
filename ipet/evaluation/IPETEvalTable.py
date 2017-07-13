@@ -514,7 +514,7 @@ class IPETEvaluation(IpetNode):
 #    DEFAULT_GROUPKEY = "Settings"
     DEFAULT_GROUPKEY = Key.ProblemStatus
     DEFAULT_COMPARECOLFORMAT = "%.3f"
-    DEFAULT_INDEX = ""
+    DEFAULT_INDEX = "ProblemName LogfileName"
     DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 
@@ -631,12 +631,13 @@ class IPETEvaluation(IpetNode):
     def set_index(self, index : list):
         """Set index identifier list, optionally with level specification (0 for row index, 1 for column index)
         """
-        self.autoIndex = False;
-        if index == "auto":
-            self.autoIndex = True;
-            return
+        self.autoIndex = False
         self.index = StrTuple(index)
         logging.debug("Set index to '{}'".format(index))
+        if index == "auto":
+            self.autoIndex = True
+            self.defaultgroup = ""
+            return
         self.set_indexsplit(self.indexsplit)
         self.set_defaultgroup(self.orig_defaultgroup)
         
@@ -671,6 +672,7 @@ class IPETEvaluation(IpetNode):
         else:
             self.defaultgroup = None
         self.setEvaluated(False)
+        logging.debug("Set defaultgroup to {} from origdefaultgroup {}".format(self.defaultgroup, self.orig_defaultgroup))
 
     def set_indexsplit(self, indexsplit):
         self.indexsplit = int(indexsplit)
@@ -754,7 +756,10 @@ class IPETEvaluation(IpetNode):
         Parameters
         ----------
         df_long
-            The DataFrame containing the parsed data from one or multiple .trn files created by ipet-parse.
+            Dataframe to evaluate, mostly joined data from an experiment,
+            that contains the necessary columns required by this evaluation.
+            For example: A dataframe containing the parsed data from one or
+            multiple .trn files created by ipet-parse.
 
         Returns
         -------
@@ -1168,11 +1173,10 @@ class IPETEvaluation(IpetNode):
 
         # take the tuple with the highest occurrence
         self.orig_defaultgroup = ":".join(max_key)
-        self.set_defaultgroup(self.orig_defaultgroup)
 
     def generateIndex(self, data):
         '''
-        Generate a reasonable index based on the given data
+        Generate a reasonable index and defaultgroup based on the given data
 
         Parameters
         ----------
@@ -1198,6 +1202,7 @@ class IPETEvaluation(IpetNode):
         self.indexsplit = 1
         self.generateDefaultGroup(data, [i[0] for i in second])
         self.set_index(" ".join([i[0] for i in [first] + second]))
+        logging.debug("Automatically set index to ({}, {})".format(self.getRowIndex(), self.getColIndex()))
 
     def evaluate(self, exp : Experiment):
         """
@@ -1219,13 +1224,12 @@ class IPETEvaluation(IpetNode):
 
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData()
-        
+        logging.debug("Result of getJoinedData:\n{}\n".format(data))
+
         if self.autoIndex:
             self.generateIndex(data)
-        if self.orig_defaultgroup == "":
+        elif self.orig_defaultgroup == "":
             self.generateDefaultGroup(data, list(self.getColIndex()))
-
-        logging.debug("Result of getJoinedData:\n{}\n".format(data))
 
         if not self.groupkey in data.columns:
             raise KeyError(" Group key is missing in data:", self.groupkey)
@@ -1240,6 +1244,7 @@ class IPETEvaluation(IpetNode):
 
         columndata = self.reduceToColumns(data)
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
+
 
         if self.evaluateoptauto:
             logging.warning("Optimal auto settings are currently not available, use reductions instead")

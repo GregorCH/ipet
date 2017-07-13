@@ -492,6 +492,8 @@ class StrTuple:
         return self.tuple
         
     def __str__(self):
+        if self.tuple is None:
+            return ""
         return self.splitChar.join(self.tuple)
 
 class IPETEvaluation(IpetNode):
@@ -512,8 +514,7 @@ class IPETEvaluation(IpetNode):
 #    DEFAULT_GROUPKEY = "Settings"
     DEFAULT_GROUPKEY = Key.ProblemStatus
     DEFAULT_COMPARECOLFORMAT = "%.3f"
-    DEFAULT_INDEX = " ".join((Key.ProblemName, "LogFileName"))
-    DEFAULT_COLUMNINDEX = "ProblemStatus"
+    DEFAULT_INDEX = "ProblemName LogfileName"
     DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 
@@ -630,8 +631,14 @@ class IPETEvaluation(IpetNode):
     def set_index(self, index : list):
         """Set index identifier list, optionally with level specification (0 for row index, 1 for column index)
         """
+        self.autoIndex = False
         self.index = StrTuple(index)
         logging.debug("Set index to '{}'".format(index))
+        if index == "auto":
+            self.autoIndex = True
+            self.defaultgroup = ""
+            return
+        self.set_indexsplit(self.indexsplit)
         self.set_defaultgroup(self.orig_defaultgroup)
         
     def getRowIndex(self) -> list:
@@ -665,9 +672,20 @@ class IPETEvaluation(IpetNode):
         else:
             self.defaultgroup = None
         self.setEvaluated(False)
+        logging.debug("Set defaultgroup to {} from origdefaultgroup {}".format(self.defaultgroup, self.orig_defaultgroup))
 
     def set_indexsplit(self, indexsplit):
         self.indexsplit = int(indexsplit)
+        # make sure that we have at least one col as rowindex
+        indexsplitmod = self.indexsplit
+        try:
+            if self.index is not None:
+                indexsplitmod = self.indexsplit % len(self.index)
+        except:
+            pass
+        if indexsplitmod == 0:
+            logging.warn("Indexsplit 0 is not allowed, setting it to 1.")
+            self.indexsplit = 1;
     
     def addColumn(self, col):
         self.columns.append(col)
@@ -738,7 +756,10 @@ class IPETEvaluation(IpetNode):
         Parameters
         ----------
         df_long
-            The DataFrame containing the parsed data from one or multiple .trn files created by ipet-parse.
+            Dataframe to evaluate, mostly joined data from an experiment,
+            that contains the necessary columns required by this evaluation.
+            For example: A dataframe containing the parsed data from one or
+            multiple .trn files created by ipet-parse.
 
         Returns
         -------
@@ -1096,6 +1117,10 @@ class IPETEvaluation(IpetNode):
         """
         checks the evaluation members for inconsistencies
         """
+        if self.columns == []:
+            raise AttributeError("Please specify at least one column.")
+        if self.filtergroups == []:
+            raise AttributeError("Please specify at least one filtergroup.")
         for col in self.columns:
             try:
                 col.checkAttributes()
@@ -1123,6 +1148,81 @@ class IPETEvaluation(IpetNode):
     def getInstanceData(self):
         return self.rettab
 
+    def generateDefaultGroup(self, data, colindex):
+        '''
+        Generate a defaultgroup based on the colindexkeys and data.
+        
+        Based on the total number of occurences 
+        the tuple with the most occurences is chosen to be the defaultgroup.
+
+        Parameters
+        ----------
+        data
+            raw DataFrame
+        colindex
+            keys of columnindex
+        '''
+        # only generate a defaultgroup if the user did not specify one themself
+        if self.orig_defaultgroup is not None and self.defaultgroup != "":
+            return
+
+        # count values of (tuples of) column index
+        tuples = [tuple(x) for x in data[colindex].values]
+        counts = pd.Series(tuples).value_counts()
+        max_key = counts.idxmax()
+
+        # take the tuple with the highest occurrence
+        self.orig_defaultgroup = ":".join(max_key)
+        logging.info("Using {} as default group.".format(self.orig_defaultgroup))
+
+    def tryGenerateIndexAndDefaultgroup(self, data):
+        '''
+        Generate a reasonable index and defaultgroup based on the given data
+
+        Take a look at the columns: Key.ProblemName, Key.Solver, Key.Settings,
+            Key.Version and Key.LogFileName.
+        Set indexsplit to 1 and choose the column with the most values as rowindex.
+        From the remaining columns choose as columnindex as one or two columns with
+            as little values as possible but at least two.
+        At last generate a defaultgroup based on the new index.
+
+        Parameters
+        ----------
+        data
+            the data of the experiment
+        '''
+        # do this only if the user requested an automatic index
+        if not self.autoIndex:
+            if self.orig_defaultgroup == "":
+                self.generateDefaultGroup(data, list(self.getColIndex()))
+            return
+
+        lowerbound = 1 # 1 or bigger
+        possible_indices = [Key.ProblemName, Key.Solver, Key.Settings, Key.Version, Key.LogFileName]
+        height = data.shape[0]
+
+        # find the indices that are represented in the data with their numbers of unique values
+        present_indices = [[key, data[key].nunique()] for key in possible_indices if key in data.columns]
+        # take the index with the max value of the previous as rowindex
+        first = max(present_indices, key = lambda y: y[1])
+
+        processed_indices = [[key, count] for [key, count] in present_indices if count > lowerbound and key != first[0]]
+        sorted_indices = sorted(processed_indices, key = lambda y: y[1])
+
+        # try to find a columnindex
+        second = []
+        if len(sorted_indices) > 0 and sorted_indices[0][0] != first[0]:
+            second = [sorted_indices[0]]
+            # check if a second columnindex can be helpful
+            if len(sorted_indices) > 1 and (height / first[1]) / second[0][1] > 1:
+                second.append(sorted_indices[1])
+
+        # set everything
+        self.indexsplit = 1
+        self.generateDefaultGroup(data, [i[0] for i in second])
+        self.set_index(" ".join([i[0] for i in [first] + second]))
+        logging.info("Automatically set index to ({}, {})".format(self.getRowIndex(), self.getColIndex()))
+        
     def evaluate(self, exp : Experiment):
         """
         evaluate the data of an Experiment instance exp
@@ -1145,6 +1245,8 @@ class IPETEvaluation(IpetNode):
         data = exp.getJoinedData()
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
 
+        self.tryGenerateIndexAndDefaultgroup(data)
+
         if not self.groupkey in data.columns:
             raise KeyError(" Group key is missing in data:", self.groupkey)
 #        elif self.defaultgroup is not None and self.defaultgroup not in data[self.getColIndex()[0]].values:
@@ -1159,8 +1261,9 @@ class IPETEvaluation(IpetNode):
         columndata = self.reduceToColumns(data)
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
 
+
         if self.evaluateoptauto:
-            logging.warn("Optimal auto settings are currently not available, use reductions instead")
+            logging.warning("Optimal auto settings are currently not available, use reductions instead")
             #opt = self.calculateOptimalAutoSettings(columndata)
             #columndata = pd.concat([columndata, opt])
             #logging.debug("Result of calculateOptimalAutoSettings:\n{}\n".format(columndata))
@@ -1200,7 +1303,7 @@ class IPETEvaluation(IpetNode):
             reduceddata = self.applyFilterGroup(columndata, fg, self.getRowIndex())
             if (len(reduceddata) == 0):
                 fg.set_active(False)
-                logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
+                logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
             logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata[lcolumns])
@@ -1209,9 +1312,16 @@ class IPETEvaluation(IpetNode):
         activefiltergroups = self.getActiveFilterGroups()
         if len(activefiltergroups) > 0:
             nonemptyfiltergroups = [fg for fg in activefiltergroups if not self.filtered_agg[fg.name].empty]
+            if self.getColIndex() == []:
+                for fg in nonemptyfiltergroups:
+                    self.filtered_agg[fg.name].index = [fg.name]
             dfs = [self.filtered_agg[fg.name] for fg in nonemptyfiltergroups]
             names = [fg.name for fg in nonemptyfiltergroups]
-            self.retagg = pd.concat(dfs, keys=names, names=['Group'])
+            if self.getColIndex() == []:
+                self.retagg = pd.concat(dfs)
+                self.retagg.index.name = 'Group'
+            else:
+                self.retagg = pd.concat(dfs, keys=names, names=['Group'])
         else:
             self.retagg = pd.DataFrame()
 

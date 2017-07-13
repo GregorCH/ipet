@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Evaluation comparecolformat="%.3f" defaultgroup="SCIP" evaluateoptauto="True" groupkey="Status" index="ProblemName Solver" indexsplit="1" sortlevel="0">
+<Evaluation >
 	<Column active="True" comp="quot shift. by 100" minval="10" name="Time" origcolname="SolvingTime" translevel="0">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
 	</Column>

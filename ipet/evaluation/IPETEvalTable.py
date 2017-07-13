@@ -1178,6 +1178,13 @@ class IPETEvaluation(IpetNode):
         '''
         Generate a reasonable index and defaultgroup based on the given data
 
+        Take a look at the columns: Key.ProblemName, Key.Solver, Key.Settings,
+            Key.Version and Key.LogFileName.
+        Set indexsplit to 1 and choose the column with the most values as rowindex.
+        From the remaining columns choose as columnindex as one or two columns with
+            as little values as possible but at least two.
+        At last generate a defaultgroup based on the new index.
+
         Parameters
         ----------
         data
@@ -1187,18 +1194,23 @@ class IPETEvaluation(IpetNode):
         possible_indices = [Key.ProblemName, Key.Solver, Key.Settings, Key.Version, Key.LogFileName]
         height = data.shape[0]
         
-        present_indices = [[key, len(set(data[key]))] for key in possible_indices if key in data.columns]
+        # find the indices that are represented in the data with their numbers of unique values
+        present_indices = [[key, data[key].nunique()] for key in possible_indices if key in data.columns]
+        # take the index with the max value of the previous as rowindex
         first = max(present_indices, key = lambda y: y[1])
-        
+
         processed_indices = [[key, count] for [key, count] in present_indices if count > lowerbound and key != first[0]]
         sorted_indices = sorted(processed_indices, key = lambda y: y[1])
         
+        # try to find a columnindex
         second = []
         if len(sorted_indices) > 0 and sorted_indices[0][0] != first[0]:
             second = [sorted_indices[0]]
+            # check if a second columnindex can be helpful
             if len(sorted_indices) > 1 and (height / first[1]) / second[0][1] > 1:
                 second.append(sorted_indices[1])
 
+        # set everything
         self.indexsplit = 1
         self.generateDefaultGroup(data, [i[0] for i in second])
         self.set_index(" ".join([i[0] for i in [first] + second]))

@@ -267,7 +267,7 @@ def strConcat(strings : list) -> str:
     -------
     concatenated string
     """
-    return "".join(strings)
+    return "".join(map(str, strings))
 
 def meanOrConcat(l : list):
     """Reduce a list of unknown objects

@@ -637,6 +637,7 @@ class IPETEvaluation(IpetNode):
         if index == "auto":
             self.autoIndex = True
             self.defaultgroup = ""
+            self.defaultgrouptuple = None
             return
         self.set_indexsplit(self.indexsplit)
         self.set_defaultgroup(self.defaultgroup)

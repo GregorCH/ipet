@@ -26,6 +26,8 @@ from ipet.evaluation.IPETFilter import IPETValue
 
 class IPETEvaluationColumn(IpetNode):
 
+    DEFAULT_REDUCTION = "meanOrConcat"
+    
     nodetag = "Column"
 
     editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "reduction", "constant",
@@ -72,7 +74,7 @@ class IPETEvaluationColumn(IpetNode):
 
     def __init__(self, origcolname = None, name = None, formatstr = None, transformfunc = None, constant = None,
                  alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None,
-                 active = True, reduction = "meanOrConcat", **kw):
+                 active = True, reduction = DEFAULT_REDUCTION, **kw):
         """
         constructor of a column for the IPET evaluation
 
@@ -320,32 +322,42 @@ class IPETEvaluationColumn(IpetNode):
                 elif child.tag == IPETEvaluationColumn.getNodeTag():
                     column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column
-        
+
+    @staticmethod
+    def getMethodByStr(funcname : str = DEFAULT_REDUCTION , modules = [numpy, misc]):
+        """
+        Find a method via name.
+
+        Parameters
+        ----------
+        funcname
+            string containing the name of the function
+        modules
+            list of modules to search for the function
+
+        Return
+        ------
+            the requested function if it was found. Else an IpetNodeAttributeError is thrown.
+        """
+        for module in modules:
+            try:
+                return getattr(module, funcname)
+            except AttributeError:
+                pass
+        raise IpetNodeAttributeError(funcname, "Unknown function %s" % funcname)
+
     def getTransformationFunction(self):
         """
         tries to find the transformation function from the numpy, misc, or Experiment modules
         """
         # Do we also have to search in module Key (for getWorstStatus etc)?
-        for module in [numpy, misc, Experiment]:
-            try:
-                return getattr(module, self.transformfunc)
-            except AttributeError:
-                pass
-        raise IpetNodeAttributeError(self.transformfunc, "Unknown transformation function %s" % self.transformfunc)
+        return IPETEvaluationColumn.getMethodByStr(self.transformfunc, [numpy, misc, Experiment])
 
     def getReductionFunction(self):
         """
         tries to find the reduction function from the numpy, misc, or Experiment modules
         """
-
-        funcname = self.reduction
-        # Do we also have to search in module Key (for getWorstStatus etc)?
-        for module in [numpy, misc, Experiment, Key.ProblemStatusCodes]:
-            try:
-                return getattr(module, funcname)
-            except AttributeError:
-                pass
-        raise IpetNodeAttributeError(funcname, "Unknown reduction function %s" % self.reduction)
+        return IPETEvaluationColumn.getMethodByStr(self.reduction, [numpy, misc, Experiment, Key.ProblemStatusCodes])
 
     def getColumnData(self, df):
         """
@@ -937,17 +949,22 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The reduced DataFrame.
         """
-        tmpcols = list(set(self.usercolumns + list(self.index.getTuple()) + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
-        horidf = df[tmpcols]
-        grouped = horidf.groupby(by = self.index.getTuple())
+        countercolumns = ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']
+        tmpcols = df.columns#list(set(self.usercolumns + list(self.index.getTuple()) + countercolumns))
+#        horidf = df[tmpcols]
+        grouped = df.groupby(by = self.index.getTuple())
         newcols = []
 
         reductionMap = {'_solved_' : numpy.all, '_count_' : numpy.max}
-        for col in ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']:
+        for col in countercolumns:
             newcols.append(grouped[col].apply(reductionMap.get(col, numpy.any)))
 
         for col in self.getActiveColumns():
             newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
+
+        missingcolumns = [c for c in tmpcols if c not in countercolumns + [col.getName() for col in self.getActiveColumns()]]
+        for col in missingcolumns:
+            newcols.append(grouped[col].apply(IPETEvaluationColumn.getMethodByStr()))
 
         horidf = pd.concat(newcols, axis = 1)
         ind = self.index.getTuple()
@@ -1260,7 +1277,6 @@ class IPETEvaluation(IpetNode):
 
         columndata = self.reduceToColumns(data)
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
-
 
         if self.evaluateoptauto:
             logging.warning("Optimal auto settings are currently not available, use reductions instead")

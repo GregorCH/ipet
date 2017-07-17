@@ -1213,30 +1213,38 @@ class IPETEvaluation(IpetNode):
                 self.set_defaultgroup(self.defaultgroup)
             return
 
-        lowerbound = 1 # 1 or bigger
         possible_indices = [Key.ProblemName, Key.Solver, Key.Settings, Key.Version, Key.LogFileName]
-        height = data.shape[0]
 
-        # find the indices that are represented in the data with their numbers of unique values
-        present_indices = [[key, data[key].nunique()] for key in possible_indices if key in data.columns]
-        # take the index with the max value of the previous as rowindex
-        first = max(present_indices, key = lambda y: y[1])
+        # find the key that has the most unique values
+        index = []
+        keys = [key for key in possible_indices if key in data.columns]
+        data = data[keys]
+        counts = [[key, len(data[key].unique())] for key in keys]
+        next = max(counts, key = lambda y: y[1])[0]
+        index.append(next)
+        keys.remove(next)
 
-        processed_indices = [[key, count] for [key, count] in present_indices if count > lowerbound and key != first[0]]
-        sorted_indices = sorted(processed_indices, key = lambda y: y[1])
+        # find keys that distinguish rows with same first-level index found above
+        # TODO find better breakcondition
+        done = False
+        while not done and len(keys) > 0:
+            counts = []
+            for key in keys:
+                # count occurrences of each value from column key in groups
+                erg = data.groupby(index + [key]).size()
+                # compute a rating for the key
+                rating = misc.gemean(erg)
+                if rating == 1:
+                    done = True
+                counts.append([key, rating])
+            next = min(counts, key = lambda y: y[1])[0]
+            index.append(next)
+            keys.remove(next)
 
-        # try to find a columnindex
-        second = []
-        if len(sorted_indices) > 0 and sorted_indices[0][0] != first[0]:
-            second = [sorted_indices[0]]
-            # check if a second columnindex can be helpful
-            if len(sorted_indices) > 1 and (height / first[1]) / second[0][1] > 1:
-                second.append(sorted_indices[1])
-
-        # set everything
         self.indexsplit = 1
-        self.generateDefaultGroup(data, [i[0] for i in second])
-        self.set_index(" ".join([i[0] for i in [first] + second]))
+        # set everything
+        self.generateDefaultGroup(data, index[self.indexsplit:])
+        self.set_index(" ".join(index))
         logging.info("Automatically set index to ({}, {})".format(self.getRowIndex(), self.getColIndex()))
         
     def evaluate(self, exp : Experiment):

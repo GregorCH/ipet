@@ -814,7 +814,7 @@ class IPETEvaluation(IpetNode):
         additionalfiltercolumns = list(set(additionalfiltercolumns))
         additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(usercolumns + neededcolumns)]
 
-        result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns + ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_']]
+        result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns + self.countercolumns]
         self.usercolumns = usercolumns
         return result
 
@@ -896,6 +896,7 @@ class IPETEvaluation(IpetNode):
 
         df['_count_'] = 1
         df['_unkn_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.Unknown)
+        self.countercolumns = ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']
         return df
 
     def toXMLElem(self):
@@ -949,20 +950,19 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The reduced DataFrame.
         """
-        countercolumns = ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']
         tmpcols = df.columns#list(set(self.usercolumns + list(self.index.getTuple()) + countercolumns))
 #        horidf = df[tmpcols]
         grouped = df.groupby(by = self.index.getTuple())
         newcols = []
 
         reductionMap = {'_solved_' : numpy.all, '_count_' : numpy.max}
-        for col in countercolumns:
+        for col in self.countercolumns:
             newcols.append(grouped[col].apply(reductionMap.get(col, numpy.any)))
 
         for col in self.getActiveColumns():
             newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
 
-        missingcolumns = [c for c in tmpcols if c not in countercolumns + [col.getName() for col in self.getActiveColumns()]]
+        missingcolumns = [c for c in tmpcols if c not in self.countercolumns + [col.getName() for col in self.getActiveColumns()]]
         for col in missingcolumns:
             newcols.append(grouped[col].apply(IPETEvaluationColumn.getMethodByStr()))
 
@@ -1288,9 +1288,9 @@ class IPETEvaluation(IpetNode):
         columndata = self.addComparisonColumns(columndata)
 
         # show less info in long table
-        columns = columndata.columns
+        columns = self.usercolumns + self.getColIndex() + self.getRowIndex()
         diff = lambda l1, l2: [x for x in l1 if x not in l2]
-        lcolumns = diff(columns, ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'])
+        lcolumns = diff(columns, self.countercolumns)
         # show more info in table
 #        lcolumns = columndata.columns
 
@@ -1366,7 +1366,7 @@ class IPETEvaluation(IpetNode):
             The aggregated DataFrame.
         """
         # the general part sums up the number of instances falling into different categories
-        indices = ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'] + self.getColIndex()
+        indices = self.countercolumns + self.getColIndex()
         if self.getColIndex() == []:
             generalpart = df[indices].apply(sum)
         else:

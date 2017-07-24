@@ -813,7 +813,6 @@ class IPETEvaluation(IpetNode):
 
         additionalfiltercolumns = list(set(additionalfiltercolumns))
         additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(usercolumns + neededcolumns)]
-
         result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns + self.countercolumns]
         self.usercolumns = usercolumns
         return result
@@ -950,8 +949,7 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The reduced DataFrame.
         """
-        tmpcols = df.columns#list(set(self.usercolumns + list(self.index.getTuple()) + countercolumns))
-#        horidf = df[tmpcols]
+        tmpcols = df.columns
         grouped = df.groupby(by = self.index.getTuple())
         newcols = []
 
@@ -962,6 +960,7 @@ class IPETEvaluation(IpetNode):
         for col in self.getActiveColumns():
             newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
 
+        # TODO Do we want this or do we want to change it? This concatenates Problemnames etc...
         missingcolumns = [c for c in tmpcols if c not in self.countercolumns + [col.getName() for col in self.getActiveColumns()]]
         for col in missingcolumns:
             newcols.append(grouped[col].apply(IPETEvaluationColumn.getMethodByStr()))
@@ -1274,7 +1273,6 @@ class IPETEvaluation(IpetNode):
 
         data = self.calculateNeededData(data)
         logging.debug("Result of calculateNeededData:\n{}\n".format(data))
-
         columndata = self.reduceToColumns(data)
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
 

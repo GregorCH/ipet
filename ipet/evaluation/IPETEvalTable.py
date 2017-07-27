@@ -31,7 +31,7 @@ class IPETEvaluationColumn(IpetNode):
     nodetag = "Column"
 
     editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "reduction", "constant",
-                 "alternative", "minval", "maxval", "comp", "translevel", "regex", "reductionindex"]
+                 "alternative", "minval", "maxval", "comp", "regex", "reductionindex"]
 
     possibletransformations = {None:(0, 0),
                                "abs":(1, 1),
@@ -65,15 +65,14 @@ class IPETEvaluationColumn(IpetNode):
 
     requiredOptions = {"comp":possiblecomparisons,
                        "origcolname":"datakey",
-                       "translevel":[0, 1],
                        "transformfunc":list(possibletransformations.keys()),
                        "reduction" : possiblereductions}
 
     deprecatedattrdir = {"nanrep" : "has been replaced by 'alternative'",
-                            "groupkey" : "groupkey is specified using 'index' and 'indexsplit'"}
+                        "translevel" : "use a suitable reduction index instead"}
 
     def __init__(self, origcolname = None, name = None, formatstr = None, transformfunc = None, constant = None,
-                 alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None,
+                 alternative = None, minval = None, maxval = None, comp = None, regex = None,
                  active = True, reduction = DEFAULT_REDUCTION, reductionindex = None, **kw):
         """
         constructor of a column for the IPET evaluation
@@ -100,10 +99,6 @@ class IPETEvaluationColumn(IpetNode):
 
         regex : use for selecting a set of columns at once by including regular expression wildcards such as '*+?' etc.
 
-        translevel : Specifies the level on which to apply the defined transformation for this column. Use translevel=0 to handle every instance
-                     and group separately, and translevel=1 for an instance-wise transformation over all groups, e.g., the mean solving time
-                     if five permutations were tested. Columns with translevel=1 are appended at the end of the instance-wise table
-
         active : True or "True" if this column should be active, False otherwise
         
         reduction : aggregation function that is applied to reduce multiple occurrences of index
@@ -122,7 +117,6 @@ class IPETEvaluationColumn(IpetNode):
         self.alternative = alternative
         self.minval = minval
         self.maxval = maxval
-        self.translevel = translevel
         self.set_comp(comp)
         self.regex = regex
         self.set_reduction(reduction)
@@ -316,12 +310,6 @@ class IPETEvaluationColumn(IpetNode):
             else:
                 return "Q+" + (self.comp[self.comp.rindex(" ") + 1:])
         return ""
-
-    def getTransLevel(self):
-        if self.translevel is None or int(self.translevel) == 0:
-            return 0
-        else:
-            return 1
 
     def attributesToStringDict(self):
         return {k:str(v) for k, v in self.attributesToDict().items() if v is not None}

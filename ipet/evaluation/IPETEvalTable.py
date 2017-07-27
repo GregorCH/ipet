@@ -1196,27 +1196,6 @@ class IPETEvaluation(IpetNode):
         else:
             return statuscol.unique()[0]
 
-    def calculateOptimalAutoSettings(self, df):
-        """
-        calculate optimal auto settings instancewise
-        """
-        grouped = df.groupby(level=0)
-
-        #
-        # every apply operation on the group element returns a pandas series
-        #
-        optstatus = grouped["Status"].apply(self.findStatus)
-        opttime = grouped["SolvingTime"].apply(numpy.min)
-        opttimelim = grouped["TimeLimit"].apply(numpy.mean)
-
-        optdf = pd.concat([optstatus, opttime, opttimelim], axis=1)
-
-        aggfuncs = {'_solved_':numpy.max}
-        useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis=1)
-        optdf = pd.concat([optdf, useroptdf], axis=1)
-
-        return optdf
-
     def checkMembers(self):
         """
         checks the evaluation members for inconsistencies

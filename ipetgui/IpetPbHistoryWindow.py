@@ -372,8 +372,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
             if len(probnames) == 1:
                 x[testrunname], y[testrunname] = getProcessPlotData(testrun, probnames[0], usenormalization, access = "name")
             else:
-                y[testrunname], scale = getMeanIntegral(testrun, probnames, 200, access = "name")
-                x[testrunname] = numpy.arange(200) * scale
+                x[testrunname], y[testrunname] = getMeanIntegral(testrun, probnames, access = "name")
             if not usenormalization and len(probnames) == 1:
                 baseline = testrun.problemGetOptimalSolution(probnames[0])
                 y[testrunname] -= baseline
@@ -390,8 +389,7 @@ class IpetPbHistoryWindow(IpetMainWindow):
                 if len(probnames) == 1:
                     zx[testrunname], z[testrunname] = getProcessPlotData(testrun, probnames[0], usenormalization, access = "name", **arguments)
                 else:
-                    z[testrunname], scale = getMeanIntegral(testrun, probnames, 200, access = "name", **arguments)
-                    zx[testrunname] = numpy.arange(200) * scale
+                    zx[testrunname], z[testrunname] = getMeanIntegral(testrun, probnames, access = "name", **arguments)
 
                 # normalization requires negative dual gap
                 if usenormalization:

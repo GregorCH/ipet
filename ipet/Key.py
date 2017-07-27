@@ -57,6 +57,7 @@ Nodes = "Nodes"
 ObjectiveLimit = "Objlimit"
 ObjectiveSense = "Objsense"
 OptimalValue = "OptVal"
+Path = "Path"
 PrimalBound = "PrimalBound"
 PrimalBoundHistory = "PrimalBoundHistory"
 PrimalIntegral = "PrimalIntegral"
@@ -83,7 +84,7 @@ class SolverStatusCodes:
         - found the optimal solution
         - found, that the problem was infeasible
         - hit a limit of memory, time or nodes,
-    
+
     or it could have simply been cancelled by the user
     or worse, could have crashed.
     """

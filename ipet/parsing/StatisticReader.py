@@ -31,7 +31,7 @@ class StatisticReader(IpetNode):
     lineindex = -1
 
     context = Key.CONTEXT_LOGFILE
-    
+
     sleepAfterReturn = True
     sleep = False
 
@@ -136,26 +136,26 @@ class StatisticReader(IpetNode):
 
 class MetaDataReader(StatisticReader):
     context = [Key.CONTEXT_METAFILE, Key.CONTEXT_LOGFILE, Key.CONTEXT_ERRFILE]
-    
+
     metadataexp = re.compile("^@\S{3,}\s+\S+$")
     name = 'MetaDataReader'
     datakey = Key.MetaData
-    
+
     def extractStatistic(self, line):
         """ Read metadata from specified line
-        
-        Parameters 
+
+        Parameters
         ----------
         line
-            string to be read from. has to have the form 
+            string to be read from. has to have the form
                 @attribute datum
         """
-        if self.metadataexp.match(line): 
+        if self.metadataexp.match(line):
 #            TODO better to allow more spaces?
             [attr, datum] = line.split('@')[1].split()
             datum = datum.split('\n')[0]
             self.testrun.metadatadict[attr] = datum
-    
+
 class BestSolInfeasibleReader(StatisticReader):
     """
     catches the expression 'best solution is not feasible in original problem'

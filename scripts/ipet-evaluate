@@ -131,7 +131,7 @@ if __name__ == '__main__':
         evalfile = arguments.evalfile
 
     if arguments.experimentfile is None and arguments.testrunfiles == []:
-        print("please provide either an experimentfile or (multiple, if needed) .trn testrun files")
+        print("Please provide either an experimentfile or (multiple, if needed) .trn testrun files")
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
 

@@ -29,7 +29,7 @@ class IPETEvaluationColumn(IpetNode):
     nodetag = "Column"
 
     editableAttributes = ["name", "origcolname", "formatstr", "transformfunc", "reduction", "constant",
-                 "alternative", "minval", "maxval", "comp", "translevel", "regex"]
+                 "alternative", "minval", "maxval", "comp", "translevel", "regex", "reductionindex"]
 
     possibletransformations = {None:(0, 0),
                                "abs":(1, 1),
@@ -72,7 +72,7 @@ class IPETEvaluationColumn(IpetNode):
 
     def __init__(self, origcolname = None, name = None, formatstr = None, transformfunc = None, constant = None,
                  alternative = None, minval = None, maxval = None, comp = None, regex = None, translevel = None,
-                 active = True, reduction = "meanOrConcat", **kw):
+                 active = True, reduction = "meanOrConcat", reductionindex=None, **kw):
         """
         constructor of a column for the IPET evaluation
 
@@ -104,7 +104,9 @@ class IPETEvaluationColumn(IpetNode):
 
         active : True or "True" if this column should be active, False otherwise
         
-        reduction : aggregation function that is applied to reduce multiple occurrences of index 
+        reduction : aggregation function that is applied to reduce multiple occurrences of index
+        
+        reductionindex : integer or string tuple (space separated)   
         """
 
         super(IPETEvaluationColumn, self).__init__(active, **kw)
@@ -122,6 +124,7 @@ class IPETEvaluationColumn(IpetNode):
         self.set_comp(comp)
         self.regex = regex
         self.set_reduction(reduction)
+        self.set_reductionindex(reductionindex)
 
         self.aggregations = []
         self.filters = []
@@ -249,6 +252,40 @@ class IPETEvaluationColumn(IpetNode):
         """Set the reduction function
         """
         self.reduction = reduction
+        
+    def set_reductionindex(self, reductionindex):
+        """Set the reduction index of this column
+        None
+        a custom reduction index to apply this columns reduction function.
+        An integer n can be used to cause the reduction after the n'th 
+        index column (starting at zero) of the corresponding evaluation. 
+        If a negative integer -n is passed, this column creates its reduction index
+        from the evaluation index before the element indexed by '-n'.
+        If the desired reduction index is not a subset of the corresponding evaluation
+        index, a string tuple can be passed to uniquely define the columns by which
+        the reduced column should be indexed.
+        
+        Example: The parent evaluation uses a three-level index 'A', 'B', 'C'. The column
+        should be reduced along the dimension 'B', meaning that the reduction yields
+        a unique index consisting of all combinations of 'A' X 'C'. This reduction can
+        be achieved by using "A C" as reduction index for this column. 
+        
+        Note that the reduction index must be a subset of the parent evaluation index.
+        
+        Parameters
+        ----------
+        reductionindex
+            integer or string (comma separated) reduction index for this column. None to use the entire index of the parent evaluation.
+            
+        """
+        if reductionindex is None or type(reductionindex) is int or isinstance(reductionindex, StrTuple):
+            self._reductionindex = reductionindex
+        elif type(reductionindex) is str:
+            try:
+                self._reductionindex = int(reductionindex)
+            except ValueError:
+                self._reductionindex = StrTuple(reductionindex)
+        self.reductionindex = reductionindex
 
     def getCompareColName(self):
         return self.getName() + self.getCompareSuffix()
@@ -346,10 +383,40 @@ class IPETEvaluationColumn(IpetNode):
             except AttributeError:
                 pass
         raise IpetNodeAttributeError(funcname, "Unknown reduction function %s" % self.reduction)
+    
+    def getReductionIndex(self, evalindexcols : list):
+        """Return this columns reduction index, which is a subset of the evaluation index columns 
+        """
+        if self._reductionindex is None:
+            return evalindexcols
+        if type(self._reductionindex) is int:
+            reductionindex = min(self._reductionindex, len(evalindexcols))
+            # negative indices are also allowed
+            reductionindex = max(self._reductionindex, -len(evalindexcols))
+            return tuple(evalindexcols[:reductionindex])
+            
+        else:# reduction index is a string tuple
+            for c in self._reductionindex.getTuple():
+                if c not in evalindexcols:
+                    raise IpetNodeAttributeError(self.reduction, "reduction index column {} is not contained in evaluation index columns {}".format(c, evalindexcols))
+            return self._reductionindex.getTuple()
 
-    def getColumnData(self, df):
+    def getColumnData(self, df_long : DataFrame, df_target : DataFrame, evalindexcols : list) -> tuple:
         """
         Retrieve the data associated with this column
+        
+        Parameters
+        ----------
+        df_long
+            DataFrame that contains original, raw data and already evaluated columns
+            
+        df_target
+            DataFrame that has already been grouped to only been reduced to the target index columns
+            
+        Returns
+        tuple
+            (df_long, df_target) to which data has been appended
+        
         """
         # if no children are associated with this column, it is either
         # a column represented in the data frame by an 'origcolname',
@@ -357,37 +424,30 @@ class IPETEvaluationColumn(IpetNode):
         if len(self.children) == 0:
             if self.origcolname is not None:
                 try:
-                    result = df[self.origcolname]
+                    result = df_long[self.origcolname]
                 except KeyError as e:
                     # print an error message and make a series with NaN's
                     print(e)
-                    print("Could not retrieve data %s" % self.origcolname)
-                    result = pd.Series(numpy.nan, index=df.index)
+                    logging.warn("Could not retrieve data %s" % self.origcolname)
+                    result = pd.Series(numpy.nan, index=df_long.index)
 
 
             elif self.regex is not None:
-                result = df.filter(regex=self.regex)
+                result = df_long.filter(regex=self.regex)
             elif self.constant is not None:
-                df[self.getName()] = self.parseConstant()
-                result = df[self.getName()]
+                df_long[self.getName()] = self.parseConstant()
+                result = df_long[self.getName()]
         else:
             # try to apply an element-wise transformation function to the children of this column
             # gettattr is equivalent to numpy.__dict__[self.transformfunc]
             transformfunc = self.getTransformationFunction()
 
             # concatenate the children data into a new data frame object
-            argdf = pd.concat([child.getColumnData(df) for child in self.children], axis=1)
+            for child in self.children:
+                df_long, df_target = child.getColumnData(df_long, df_target, evalindexcols)
+            argdf = df_long[[child.getName() for child in self.children if child.isActive()]]
 
-            if self.getTransLevel() == 1:
-
-                # group the whole table per instance #
-
-                argdf = argdf.groupby(level=0)
-
-                # determine the axis along which to apply the transformation later on
-                applydict = {}
-            else:
-                applydict = dict(axis=1)
+            applydict = dict(axis=1)
 
             try:
                 # try to directly apply the transformation function, this might fail for
@@ -406,27 +466,47 @@ class IPETEvaluationColumn(IpetNode):
                 result = argdf.apply(tmpwrapper, **applydict)
 
         if self.alternative is not None:
-            alternative = self.parseValue(self.alternative, df)
+            alternative = self.parseValue(self.alternative, df_long)
             if alternative is not None:
                 booleanseries = pd.isnull(result)
                 for f in self.getActiveFilters():
-                    booleanseries = numpy.logical_or(booleanseries, f.applyFilter(df).iloc[:, 0])
+                    booleanseries = numpy.logical_or(booleanseries, f.applyFilter(df_long).iloc[:, 0])
                 result = result.where(~booleanseries, alternative)
         if self.minval is not None:
-            minval = self.parseValue(self.minval, df)
+            minval = self.parseValue(self.minval, df_long)
             if minval is not None:
                 if type(minval) in [int, float]:
                     result = numpy.maximum(result, minval)
                 else:
                     result = numpy.maximum(result, minval.astype(result.dtype))
         if self.maxval is not None:
-            maxval = self.parseValue(self.maxval, df)
+            maxval = self.parseValue(self.maxval, df_long)
             if maxval is not None:
                 if type(maxval) in [int, float]:
                     result = numpy.minimum(result, maxval)
                 else:
                     result = numpy.minimum(result, maxval.astype(result.dtype))
-        return result
+                                        
+        
+        
+        
+        reductionindex = self.getReductionIndex(evalindexcols)
+        
+        if len(reductionindex) > 0:
+            # apply reduction and save the result by joining it into both data frames
+            df_long[self.getName()] = result
+            targetresult = df_long.groupby(by=reductionindex)[self.getName()].apply(self.getReductionFunction())
+            df_long = df_long.join(targetresult, on=reductionindex, lsuffix="_old")
+            df_target = df_target.join(targetresult, on=reductionindex, lsuffix="_old")
+        else:
+            #
+            # add scalar to both data frames
+            #
+            scalar = self.getReductionFunction()(result)
+            df_long[self.getName()] = scalar
+            df_target[self.getName()] = scalar
+        
+        return df_long, df_target
 
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
@@ -517,17 +597,18 @@ class IPETEvaluation(IpetNode):
     DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 
-    editableAttributes = ["groupkey", "defaultgroup", "evaluateoptauto", "sortlevel", "comparecolformat", "index", "indexsplit"]
+    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
 
-    def __init__(self, groupkey = DEFAULT_GROUPKEY, defaultgroup = None, evaluateoptauto = True,
-                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT, index = DEFAULT_INDEX, indexsplit=DEFAULT_INDEXSPLIT):
+    deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'", 
+                         "evaluateoptauto" : "Optimal auto settings are no longer available, use reductions instead"}
+    def __init__(self, defaultgroup = None,
+                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT, index = DEFAULT_INDEX, indexsplit=DEFAULT_INDEXSPLIT, **kw):
         """
         constructs an Ipet-Evaluation
 
         Parameters
         ----------
-        groupkey : the key by which groups should be built, eg, 'Settings'
         defaultgroupvalues : the values of the default group to be compared with. usually corresponds to specified columns
         evaluateoptauto : should optimal auto settings be calculated?
         sortlevel : level on which to base column sorting, '0' for group level, '1' for column level
@@ -537,13 +618,11 @@ class IPETEvaluation(IpetNode):
         """
 
         # construct super class first, Evaluation is currently always active
-        super(IPETEvaluation, self).__init__(True)
+        super(IPETEvaluation, self).__init__(True, **kw)
 
         self.filtergroups = []
-        self.groupkey = groupkey
         self.comparecolformat = comparecolformat[:]
         self.columns = []
-        self.set_evaluateoptauto(evaluateoptauto)
         self.sortlevel = int(sortlevel)
         self.evaluated = False
 
@@ -565,9 +644,6 @@ class IPETEvaluation(IpetNode):
         change the flag if this evaluation has been evaluated since its last modification
         """
         self.evaluated = evaluated
-
-    def set_evaluateoptauto(self, evaluateoptauto):
-        self.evaluateoptauto = True if evaluateoptauto in [True, "True"] else False
 
     def set_sortlevel(self, sortlevel):
         self.sortlevel = int(sortlevel)
@@ -624,25 +700,28 @@ class IPETEvaluation(IpetNode):
         self.filtergroups.remove(fg)
         self.setEvaluated(False)
 
-#    def setGroupKey(self, gk):
-#        self.groupkey = gk
-
     def set_index(self, index : list):
         """Set index identifier list, optionally with level specification (0 for row index, 1 for column index)
         """
-        self.index = StrTuple(index)
+        self._index = StrTuple(index)
+        self.index = index
         logging.debug("Set index to '{}'".format(index))
         self.set_defaultgroup(self.orig_defaultgroup)
         
     def getRowIndex(self) -> list:
         """Return (list of) keys to create row index 
         """
-        return list(self.index.getTuple())[:self.indexsplit]
+        return list(self.getIndex())[:self.indexsplit]
     
     def getColIndex(self) -> list:
         """Return (list of) keys to create column index
         """
-        return list(self.index.getTuple())[self.indexsplit:]
+        return list(self.getIndex())[self.indexsplit:]
+    
+    def getIndex(self) -> tuple:
+        """Return all index columns as a tuple
+        """
+        return self._index.getTuple()
 
     def set_defaultgroup(self, dg):
         self.orig_defaultgroup = dg
@@ -729,47 +808,40 @@ class IPETEvaluation(IpetNode):
         self.usercolumns = self.usercolumns + usercolumns
         return df
 
-    def reduceToColumns(self, df_long : DataFrame) -> DataFrame:
+    def reduceToColumns(self, df_long : DataFrame, df_target : DataFrame) -> tuple:
         """ Reduce the huge number of columns
         
-        Select from the raw data: the columns specified in evaluation xmlfile.
+        The data frame is reduced to the columns of the evaluation.
         (concatenate usercolumns, neededcolumns and additionalfiltercolumns from df_long)
 
         Parameters
         ----------
         df_long
-            The DataFrame containing the parsed data from one or multiple .trn files created by ipet-parse.
-
+            DataFrame returned by Experiment with preprocessed columns '_count_', '_solved_', etc..
+            
+        df_target
+            DataFrame with preprocessed columns that contain the index column
+            
         Returns
         -------
-        DataFrame
-            A DataFrame in the same format as df_long with only the relevant columns.
+        tuple
+            df_long, df_target after processing the user columns
         """
-        #
-        # Attention: this will be deleted soon because it is not flexible enough
-        # --> will be replaced by reduction function in IPETEvaluationColumn
-        #
-        lvlonecols = [col for col in self.getActiveColumns() if col.getTransLevel() == 1]
-        if len(lvlonecols) > 0:
-            self.levelonedf = pd.concat([col.getColumnData(df_long) for col in lvlonecols], axis=1)
-            self.levelonedf.columns = [col.getName() for col in lvlonecols]
-        else:
-            self.levelonedf = None
-        # treat columns differently for level=0 and level=1
-        # We are only interested in the columns that are activated in the eval file
+        
+        # We are only interested in the columns that are active in the eval file
         usercolumns = [c.getName() for c in self.getActiveColumns()]
+        evalindexcols = list(self.getIndex())
         for col in self.toposortColumns(self.getActiveColumns()):
-            if col.getTransLevel() == 0:
-                try:
-                    df_long[col.getName()] = col.getColumnData(df_long)
-                except Exception as e:
-                    print("An error occurred for the column '{}':\n{}".format(col.getName(), col.attributesToStringDict()))
-                    raise e
+            try:
+                df_long, df_target = col.getColumnData(df_long, df_target, evalindexcols)
+            except Exception as e:
+                logging.warning("An error occurred for the column '{}':\n{}".format(col.getName(), col.attributesToStringDict()))
+                raise e
+            logging.debug("Target data frame : \n{}\n".format(df_target))
 
-        # concatenate level one columns into a new data frame and treat them as the altogether setting
         newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
 
-        for x in self.index.getTuple():
+        for x in self.getIndex():
             if x not in newcols:
                 newcols.append(x)
         neededcolumns = [col for col in newcols if col not in usercolumns]
@@ -783,7 +855,8 @@ class IPETEvaluation(IpetNode):
 
         result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns + ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_']]
         self.usercolumns = usercolumns
-        return result
+        
+        return df_target
 
     def toposortColumns(self, columns : list) -> list:
         """ Compute a topological ordering respecting the data dependencies of the specified column list.
@@ -916,20 +989,20 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The reduced DataFrame.
         """
-        tmpcols = list(set(self.usercolumns + list(self.index.getTuple()) + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
+        tmpcols = list(set(list(self.getIndex()) + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
         horidf = df[tmpcols]
-        grouped = horidf.groupby(by = self.index.getTuple())
+        grouped = horidf.groupby(by = self.getIndex())
         newcols = []
 
         reductionMap = {'_solved_' : numpy.all, '_count_' : numpy.max}
         for col in ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']:
             newcols.append(grouped[col].apply(reductionMap.get(col, numpy.any)))
 
-        for col in self.getActiveColumns():
-            newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
+        #for col in self.getActiveColumns():
+        #    newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
 
         horidf = pd.concat(newcols, axis = 1)
-        ind = self.index.getTuple()
+        ind = self.getIndex()
         index_uniq = [i for i in ind if i not in horidf.columns]
         index_dupl = [i for i in ind if i in horidf.columns]
         horidf = horidf.reset_index(index_uniq)
@@ -955,7 +1028,7 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The converted DataFrame.
         """
-        df = df.set_index(list(self.index.getTuple())).sort_index(level = 0)
+        df = df.set_index(list(self.getIndex())).sort_index(level = 0)
         df = df.unstack(self.getColIndex())
         if len(self.getColIndex()) > 0 :
             df = df.swaplevel(0, len(self.getColIndex()), axis = 1)
@@ -1084,7 +1157,6 @@ class IPETEvaluation(IpetNode):
         opttimelim = grouped["TimeLimit"].apply(numpy.mean)
 
         optdf = pd.concat([optstatus, opttime, opttimelim], axis=1)
-        optdf[self.groupkey] = "OPT. AUTO"
 
         aggfuncs = {'_solved_':numpy.max}
         useroptdf = pd.concat([grouped[col].apply(aggfuncs.get(col, numpy.min)) for col in self.usercolumns if col not in ["Status", "SolvingTime", "TimeLimit"]], axis=1)
@@ -1142,11 +1214,9 @@ class IPETEvaluation(IpetNode):
         self.checkMembers()
 
         # data is concatenated along the rows and eventually extended by external data
-        data = exp.getJoinedData()
+        data = exp.getJoinedData().copy()
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
 
-        if not self.groupkey in data.columns:
-            raise KeyError(" Group key is missing in data:", self.groupkey)
 #        elif self.defaultgroup is not None and self.defaultgroup not in data[self.getColIndex()[0]].values:
 #            possiblebasegroups = sorted(data[self.getColIndex()[0]].unique())
 #            logging.info(" Default group <%s> not contained, have only: %s" % (self.defaultgroup, ", ".join(possiblebasegroups)))
@@ -1155,17 +1225,15 @@ class IPETEvaluation(IpetNode):
 
         data = self.calculateNeededData(data)
         logging.debug("Result of calculateNeededData:\n{}\n".format(data))
+        
+        #
+        # create a target data frame that has the desired index
+        #
+        columndata = self.reduceByIndex(data)
 
-        columndata = self.reduceToColumns(data)
+        columndata = self.reduceToColumns(data, columndata)
         logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
 
-        if self.evaluateoptauto:
-            logging.warn("Optimal auto settings are currently not available, use reductions instead")
-            #opt = self.calculateOptimalAutoSettings(columndata)
-            #columndata = pd.concat([columndata, opt])
-            #logging.debug("Result of calculateOptimalAutoSettings:\n{}\n".format(columndata))
-
-        columndata = self.reduceByIndex(columndata)
         columndata = self.addComparisonColumns(columndata)
 
         # show less info in long table
@@ -1173,18 +1241,12 @@ class IPETEvaluation(IpetNode):
         diff = lambda l1, l2: [x for x in l1 if x not in l2]
         lcolumns = diff(columns, ['_count_', '_solved_', '_time_', '_limit_', '_fail_', '_abort_', '_unkn_'])
         # show more info in table
-#        lcolumns = columndata.columns
 
         # compile a results table containing all instances
         ret = self.convertToHorizontalFormat(columndata[lcolumns])
         logging.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
 
-        # TODO self.levelonedf is always None because it will be deprecated
-        if self.levelonedf is not None:
-            self.levelonedf.columns = pd.MultiIndex.from_product([[IPETEvaluation.ALLTOGETHER], self.levelonedf.columns])
-            self.rettab = pd.concat([ret, self.levelonedf], axis=1)
-        else:
-            self.rettab = ret
+        self.rettab = ret
         
         # TODO Where do we need these following three lines?
         self.instance_wise = ret

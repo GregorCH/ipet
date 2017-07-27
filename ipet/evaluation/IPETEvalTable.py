@@ -813,7 +813,7 @@ class IPETEvaluation(IpetNode):
 
         for col in self.toposortColumns(self.getActiveColumns()):
             # look if a comparison with the default group should be made
-            if col.getTransLevel() == 0 and col.getCompareMethod() is not None:
+            if col.getCompareMethod() is not None:
 
                 grouped = df.groupby(self.getColIndex())[col.getName()]
                 compcol = dict(list(grouped))[self.getDefaultgroup()]

@@ -1374,25 +1374,24 @@ class IPETEvaluation(IpetNode):
         self.filtered_instancewise = {}
         # filter column data and group by group key
         activefiltergroups = self.getActiveFilterGroups()
+        nonemptyactivefiltergroups = activefiltergroups[:]
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
             reduceddata = self.applyFilterGroup(columndata, fg, self.getRowIndex())
             if (len(reduceddata) == 0):
-                fg.set_active(False)
-                logging.warn("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
+                nonemptyactivefiltergroups.remove(fg)
+                logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
             logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata[lcolumns])
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
 
-        activefiltergroups = self.getActiveFilterGroups()
-        if len(activefiltergroups) > 0:
-            nonemptyfiltergroups = [fg for fg in activefiltergroups if not self.filtered_agg[fg.name].empty]
+        if len(nonemptyactivefiltergroups) > 0:
             if self.getColIndex() == []:
-                for fg in nonemptyfiltergroups:
+                for fg in nonemptyactivefiltergroups:
                     self.filtered_agg[fg.name].index = [fg.name]
-            dfs = [self.filtered_agg[fg.name] for fg in nonemptyfiltergroups]
-            names = [fg.name for fg in nonemptyfiltergroups]
+            dfs = [self.filtered_agg[fg.name] for fg in nonemptyactivefiltergroups]
+            names = [fg.name for fg in nonemptyactivefiltergroups]
             if self.getColIndex() == []:
                 self.retagg = pd.concat(dfs)
                 self.retagg.index.name = 'Group'

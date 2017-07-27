@@ -1190,8 +1190,6 @@ class IPETEvaluation(IpetNode):
         """
         if self.columns == []:
             raise AttributeError("Please specify at least one column.")
-        if self.filtergroups == []:
-            raise AttributeError("Please specify at least one filtergroup.")
         for col in self.columns:
             try:
                 col.checkAttributes()

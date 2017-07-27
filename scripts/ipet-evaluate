@@ -72,7 +72,6 @@ for name, default, short, description in clarguments:
     argparser.add_argument(short, name, default=default,help=description)
 
 argparser.add_argument('-t', '--testrunfiles', nargs='*', default=[], help="list of .trn files that should used for the evaluation")
-argparser.add_argument("-n", "--nooptauto", action="store_true", default=False, help="Disable calculation of optimal auto settings")
 
 argparser.add_argument("-A", "--showapp", action = "store_true", default = False, help = "Display the Evaluation Editor app to modify the evaluation")
 argparser.add_argument("-l", "--long", action = "store_true", default = False, help = "use for long output (instancewise and aggregated results)")
@@ -135,10 +134,6 @@ if __name__ == '__main__':
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
 
-    if arguments.nooptauto:
-        theeval.setEvaluateOptAuto(False)
-    else:
-        theeval.setEvaluateOptAuto(True)
     if arguments.experimentfile is not None:
         experiment = Experiment.loadFromFile(arguments.experimentfile)
     else:

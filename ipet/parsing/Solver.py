@@ -288,6 +288,19 @@ class Solver():
         pointInTime = splitline[timeidx].strip(timestripchars)
         self.addHistoryData(Key.PrimalBoundHistory, pointInTime, primalbound)
 
+    def readBoundAndTimeDual(self, line: str, boundidx: int, timeidx: float, timestripchars: char = "", cutidx: int = -1):
+        """ Read and save bound and time
+
+        Parameters
+         ----------
+        line
+         a line of solver output that the information shall be read from
+        """
+        splitline = line.split()
+        dualbound = line[:cutidx].split()[boundidx]
+        pointInTime = splitline[timeidx].strip(timestripchars)
+        self.addHistoryData(Key.DualBoundHistory, pointInTime, dualbound)
+
 ###############################################################
 ##################### DERIVED Classes #########################
 ###############################################################
@@ -478,6 +491,22 @@ class GurobiSolver(Solver):
         elif self.gurobiextralist != [] and "Explored " in line:
             pointInTime = line.split()[-2]
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, self.gurobiextralist[-1])
+            self.gurobiextralist = []
+        return None
+    
+    def extractDualboundHistory(self, line : str):
+        """ Extract the sequence of dual bounds  
+        """
+        if "Expl Unexpl |  Obj  Depth" in line:
+            self.inTable = True
+        elif self.inTable and line.endswith("s\n"):
+            self.readBoundAndTimeDual(line, -4, -1, timestripchars="s")
+
+        elif "Cutting planes:" in line and self.inTable:
+            self.inTable = False
+        elif self.gurobiextralist != [] and "Explored " in line:
+            pointInTime = line.split()[-2]
+            self.addHistoryData(Key.DualBoundHistory, pointInTime, self.gurobiextralist[-1])
             self.gurobiextralist = []
         return None
     

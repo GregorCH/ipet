@@ -5,6 +5,7 @@ from ipet import Key
 from ipet.misc import misc
 from operator import itemgetter
 from builtins import int, str
+import logging
 from numpy import char
 
 class Solver():
@@ -374,6 +375,7 @@ class SCIPSolver(Solver):
             PrimalBound = allmatches[-1]
             # in the case of ugscip, we reacted on a disp char, so no problem at all.
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
+            logging.debug("pointinTime %s, primalbound %s \n" % (pointInTime, PrimalBound))
 
         elif not self.inTable and self.firstsolexp.match(line):
             matches = self.numericExpression.findall(line)
@@ -492,6 +494,8 @@ class GurobiSolver(Solver):
             pointInTime = line.split()[-2]
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, self.gurobiextralist[-1])
             self.gurobiextralist = []
+        if "Explored " in line and "simplex iterations" in line:
+            self.inTable = False
         return None
     
     def extractDualboundHistory(self, line : str):
@@ -504,10 +508,18 @@ class GurobiSolver(Solver):
 
         elif "Cutting planes:" in line and self.inTable:
             self.inTable = False
-        elif self.gurobiextralist != [] and "Explored " in line:
+        if "Explored " in line and "simplex iterations" in line:
+            self.inTable = False
+        if self.gurobiextralist != [] and "Explored " in line:
             pointInTime = line.split()[-2]
             self.addHistoryData(Key.DualBoundHistory, pointInTime, self.gurobiextralist[-1])
             self.gurobiextralist = []
+        return None
+
+    def extractOptionalInformation(self, line : str):
+        if "Explored " in line and "simplex iterations" in line:
+            nnodes = line.split()[1]
+            self.addData('Nodes', int(nnodes))
         return None
     
 class CplexSolver(Solver):

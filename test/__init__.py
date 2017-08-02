@@ -8,7 +8,6 @@ import logging
 test_cases = (EvaluationTest, 
               ExperimentTest, 
               SolverTest,
-              ReductionIndexTest,
               PrimalDualBoundHistoryTest
               )
 

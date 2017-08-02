@@ -2,8 +2,15 @@ from unittest import TestSuite
 from .ExperimentTest import ExperimentTest
 from .EvaluationTest import EvaluationTest
 from .SolverTest import SolverTest
+from .PrimalDualBoundHistoryTest import PrimalDualBoundHistoryTest
+import logging
 
-test_cases = (EvaluationTest, ExperimentTest, SolverTest)
+test_cases = (EvaluationTest, 
+              ExperimentTest, 
+              SolverTest,
+              ReductionIndexTest,
+              PrimalDualBoundHistoryTest
+              )
 
 def load_tests(loader, tests, pattern):
     suite = TestSuite()

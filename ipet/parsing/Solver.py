@@ -342,12 +342,18 @@ class SCIPSolver(Solver):
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds  
         """
-        if not self.isTableLine(line):
+        if self.firstsolexp.match(line):
+            matches = misc.numericExpression.findall(line)
+            PrimalBound = matches[0]
+            pointInTime = matches[3]
+            # store newly found (time, primal bound) tuple if it differs from the last primal bound
+            self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
+        elif not self.isTableLine(line):
             return 
         
         # history reader should be in a table. check if a display char indicates a new primal bound
-        if self.inTable and self.heurdispcharexp.match(line) and not self.ugmode or \
-            self.inTable and self.heurdispcharexpugmode.match(line) and self.ugmode:
+        if self.heurdispcharexp.match(line) and not self.ugmode or \
+            self.heurdispcharexpugmode.match(line) and self.ugmode:
 
             if not self.ugmode:
                 allmatches = misc.numericExpression.findall(line[:line.rindex("|")])
@@ -362,12 +368,6 @@ class SCIPSolver(Solver):
             # in the case of ugscip, we reacted on a disp char, so no problem at all.
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
 
-        elif not self.inTable and self.firstsolexp.match(line):
-            matches = self.numericExpression.findall(line)
-            PrimalBound = matches[0]
-            pointInTime = matches[3]
-            # store newly found (time, primal bound) tuple if it differs from the last primal bound
-            self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
     
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds  
@@ -375,10 +375,6 @@ class SCIPSolver(Solver):
         timeindex = 0
     
         if not self.isTableLine(line):
-            if self.inTable:
-                # parse index of dual bound entry
-                columnheaders = list(map(str.strip, line.split('|')))
-                self.dualboundindex = columnheaders.index('dualbound')
             return 
 
         try:
@@ -400,13 +396,15 @@ class SCIPSolver(Solver):
         """ decide if line is a data line of the table
         """
         if self.primalboundhistory_exp.match(line):
-            self.inTable = True
+            columnheaders = list(map(str.strip, line.split('|')))
+            self.dualboundindex = columnheaders.index('dualbound')
             self.ugmode = False
-            return False
+            return True
+        elif self.shorttablecheckexp.search(line):
+            return True
         elif line.startswith("     Time          Nodes        Left   Solvers     Best Integer        Best Node"):
-            self.inTable = True
             self.ugmode = True
-            return False
+            return True
         elif self.inTable and ((line.startswith("SCIP Status") and self.ugmode) \
                          or ((not self.ugmode) and not self.shorttablecheckexp.search(line))):
             self.inTable = False

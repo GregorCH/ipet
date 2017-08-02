@@ -526,7 +526,7 @@ class IPETEvaluation(IpetNode):
 #    DEFAULT_GROUPKEY = "Settings"
     DEFAULT_GROUPKEY = Key.ProblemStatus
     DEFAULT_COMPARECOLFORMAT = "%.3f"
-    DEFAULT_INDEX = "ProblemName LogfileName"
+    DEFAULT_INDEX = " ".join([Key.ProblemName, Key.LogFileName])
     DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 

@@ -303,7 +303,6 @@ class SCIPSolver(Solver):
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
 
     # variables needed for primal bound history
-    inTable = False
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
     heurdispcharexp = re.compile('^[^ \d]')
     heurdispcharexpugmode = re.compile('^\*')
@@ -313,7 +312,6 @@ class SCIPSolver(Solver):
     firstsolexp = re.compile('^  First Solution   :')
     ugtableexp = re.compile('^\s+Time\s+Nodes')
     ugmode = False
-    shorttablecheckexp = re.compile('s\|')
     
     # variables needed for dual bound history
     regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
@@ -405,10 +403,7 @@ class SCIPSolver(Solver):
         elif line.startswith("     Time          Nodes        Left   Solvers     Best Integer        Best Node"):
             self.ugmode = True
             return True
-        elif self.inTable and ((line.startswith("SCIP Status") and self.ugmode) \
-                         or ((not self.ugmode) and not self.shorttablecheckexp.search(line))):
-            self.inTable = False
-        return self.inTable
+        return False
 
     def extractMoreData(self, line : str):
         """Handle more than just the version

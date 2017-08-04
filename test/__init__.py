@@ -3,11 +3,13 @@ from .ExperimentTest import ExperimentTest
 from .EvaluationTest import EvaluationTest
 from .SolverTest import SolverTest
 from .FormatTest import FormatTest
+import logging
+
 
 test_cases = (EvaluationTest, 
-              ExperimentTest,
+              ExperimentTest, 
               SolverTest,
-              FormatTest
+              FormatTest,
               )
 
 def load_tests(loader, tests, pattern):

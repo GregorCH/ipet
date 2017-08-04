@@ -3,11 +3,17 @@ from .ExperimentTest import ExperimentTest
 from .EvaluationTest import EvaluationTest
 from .SolverTest import SolverTest
 from .ReductionIndexTest import ReductionIndexTest
+from .FormatTest import FormatTest
+from .PrimalDualBoundHistoryTest import PrimalDualBoundHistoryTest
 import logging
+
+
 
 test_cases = (EvaluationTest, 
               ExperimentTest, 
               SolverTest,
+              FormatTest,
+              PrimalDualBoundHistoryTest,
               ReductionIndexTest
               )
 

@@ -591,7 +591,7 @@ class IPETEvaluation(IpetNode):
 #    DEFAULT_GROUPKEY = "Settings"
     DEFAULT_GROUPKEY = Key.ProblemStatus
     DEFAULT_COMPARECOLFORMAT = "%.3f"
-    DEFAULT_INDEX = "ProblemName LogfileName"
+    DEFAULT_INDEX = " ".join([Key.ProblemName, Key.LogFileName])
     DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
 
@@ -1399,6 +1399,13 @@ class IPETEvaluation(IpetNode):
                 self.retagg = pd.concat(dfs, keys=names, names=['Group'])
         else:
             self.retagg = pd.DataFrame()
+            
+        # cast all numeric columns back
+        self.rettab = self.rettab.apply(pd.to_numeric, errors='ignore')
+        self.retagg = self.retagg.apply(pd.to_numeric, errors='ignore')
+        for d in [self.filtered_agg, self.filtered_instancewise]:
+            for k,v in d.items():
+                d[k] = v.apply(pd.to_numeric, errors='ignore')
 
         self.setEvaluated(True)
         return self.rettab, self.retagg

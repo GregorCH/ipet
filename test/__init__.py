@@ -2,13 +2,14 @@ from unittest import TestSuite
 from .ExperimentTest import ExperimentTest
 from .EvaluationTest import EvaluationTest
 from .SolverTest import SolverTest
-from .PrimalDualBoundHistoryTest import PrimalDualBoundHistoryTest
+from .FormatTest import FormatTest
 import logging
+
 
 test_cases = (EvaluationTest, 
               ExperimentTest, 
               SolverTest,
-              PrimalDualBoundHistoryTest
+              FormatTest,
               )
 
 def load_tests(loader, tests, pattern):

@@ -2,8 +2,13 @@ from unittest import TestSuite
 from .ExperimentTest import ExperimentTest
 from .EvaluationTest import EvaluationTest
 from .SolverTest import SolverTest
+from .FormatTest import FormatTest
 
-test_cases = (EvaluationTest, ExperimentTest, SolverTest)
+test_cases = (EvaluationTest, 
+              ExperimentTest,
+              SolverTest,
+              FormatTest
+              )
 
 def load_tests(loader, tests, pattern):
     suite = TestSuite()

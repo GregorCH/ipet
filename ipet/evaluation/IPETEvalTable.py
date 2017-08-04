@@ -1372,6 +1372,13 @@ class IPETEvaluation(IpetNode):
                 self.retagg = pd.concat(dfs, keys=names, names=['Group'])
         else:
             self.retagg = pd.DataFrame()
+            
+        # cast all numeric columns back
+        self.rettab = self.rettab.apply(pd.to_numeric, errors='ignore')
+        self.retagg = self.retagg.apply(pd.to_numeric, errors='ignore')
+        for d in [self.filtered_agg, self.filtered_instancewise]:
+            for k,v in d.items():
+                d[k] = v.apply(pd.to_numeric, errors='ignore')
 
         self.setEvaluated(True)
         return self.rettab, self.retagg

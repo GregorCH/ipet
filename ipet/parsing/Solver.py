@@ -151,8 +151,10 @@ class Solver():
         if history == [] or history[-1][1] != bound:
             if(key == Key.PrimalBoundHistory):
                 history.append((time, bound))
-            elif(key == Key.DualBoundHistory) and (history == [] or history[-1][0] != time):
+            elif (key == Key.DualBoundHistory) and (history == [] or history[-1][0] != time):
                 history.append((time, bound))
+            elif (key == Key.DualBoundHistory and history[-1][0] == time):
+                history.pop(-1)
 
     def readLine(self, line : str):
         """Read solver-specific data from that lin
@@ -241,7 +243,7 @@ class Solver():
         self.data = {}
         self.addData(Key.Solver, self.solverId)
         self.addData(Key.SolverStatus, Key.SolverStatusCodes.Crashed)
-#        TODO how does the historydata work ?
+        #        TODO how does the historydata work ?
         self.data.setdefault(Key.PrimalBoundHistory, [])
         self.data.setdefault(Key.DualBoundHistory, [])
 
@@ -328,10 +330,10 @@ class SCIPSolver(Solver):
     ugtableexp = re.compile('^\s+Time\s+Nodes')
     ugmode = False
     shorttablecheckexp = re.compile('s\|')
-    
+
     # variables needed for dual bound history
     regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
-    
+
     solverstatusmap = {
         "SCIP Status        : problem is solved \[optimal solution found\]":Key.SolverStatusCodes.Optimal,
         "SCIP Status        : problem is solved \[infeasible\]": Key.SolverStatusCodes.Infeasible,
@@ -339,7 +341,7 @@ class SCIPSolver(Solver):
         "SCIP Status        : solving was interrupted \[memory limit reached\]" : Key.SolverStatusCodes.MemoryLimit,
         "SCIP Status        : solving was interrupted \[node limit reached\]" : Key.SolverStatusCodes.NodeLimit,
         "SCIP Status        : solving was interrupted" : Key.SolverStatusCodes.Interrupted,
-        }
+    }
 
     def __init__(self, **kw):
         super(SCIPSolver, self).__init__(**kw)
@@ -352,16 +354,16 @@ class SCIPSolver(Solver):
         self.lastdualbound = misc.FLOAT_INFINITY
         self.lasttime = -1
         self.dualboundindex = -1
-    
+
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds  
         """
         if not self.isTableLine(line):
-            return 
-        
-        # history reader should be in a table. check if a display char indicates a new primal bound
+            return
+
+            # history reader should be in a table. check if a display char indicates a new primal bound
         if self.inTable and self.heurdispcharexp.match(line) and not self.ugmode or \
-            self.inTable and self.heurdispcharexpugmode.match(line) and self.ugmode:
+                                self.inTable and self.heurdispcharexpugmode.match(line) and self.ugmode:
 
             if not self.ugmode:
                 allmatches = misc.numericExpression.findall(line[:line.rindex("|")])
@@ -383,18 +385,18 @@ class SCIPSolver(Solver):
             pointInTime = matches[3]
             # store newly found (time, primal bound) tuple if it differs from the last primal bound
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
-    
+
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds  
         """
         timeindex = 0
-    
+
         if not self.isTableLine(line):
             if self.inTable:
                 # parse index of dual bound entry
                 columnheaders = list(map(str.strip, line.split('|')))
                 self.dualboundindex = columnheaders.index('dualbound')
-            return 
+            return
 
         try:
             # TODO This works, why is eclipse complaining?
@@ -402,15 +404,15 @@ class SCIPSolver(Solver):
             # parse time and dual bound from the table
             time = lineelems[timeindex]
             dualbound = lineelems[self.dualboundindex]
-            
+
             # store newly found (time, dual bound) tuple if it differs from the last dual bound
             self.addHistoryData(Key.DualBoundHistory, time, dualbound)
-            
+
         except ValueError:
             return None
         except IndexError:
             return None
-     
+
     def isTableLine(self, line : str) -> bool:
         """ decide if line is a data line of the table
         """
@@ -423,7 +425,7 @@ class SCIPSolver(Solver):
             self.ugmode = True
             return False
         elif self.inTable and ((line.startswith("SCIP Status") and self.ugmode) \
-                         or ((not self.ugmode) and not self.shorttablecheckexp.search(line))):
+                                       or ((not self.ugmode) and not self.shorttablecheckexp.search(line))):
             self.inTable = False
         return self.inTable
 
@@ -458,19 +460,19 @@ class GurobiSolver(Solver):
     dualbound_expr = re.compile("^Best objective (?:\S+), best bound (\S+),")
     solvingtime_expr = re.compile("Explored \d* nodes \(.*\) in (\S*) seconds")
     version_expr = re.compile("Gurobi Optimizer version (\S+)")
- 
+
     solverstatusmap = {"Optimal solution found" : Key.SolverStatusCodes.Optimal,
                        "Model is infeasible" : Key.SolverStatusCodes.Infeasible,
-#                       "" : Key.SolverStatusCodes.TimeLimit,
-#                       "" : Key.SolverStatusCodes.MemoryLimit,
-#                       "" : Key.SolverStatusCodes.NodeLimit,
-#                       "" : Key.SolverStatusCodes.Interrupted
+                       #                       "" : Key.SolverStatusCodes.TimeLimit,
+                       #                       "" : Key.SolverStatusCodes.MemoryLimit,
+                       #                       "" : Key.SolverStatusCodes.NodeLimit,
+                       #                       "" : Key.SolverStatusCodes.Interrupted
                        }
 
     # variables needed for bound history
     inTable = False
     gurobiextralist = []
-    
+
     def __init__(self, **kw):
         super(GurobiSolver, self).__init__(**kw)
 
@@ -497,7 +499,7 @@ class GurobiSolver(Solver):
         if "Explored " in line and "simplex iterations" in line:
             self.inTable = False
         return None
-    
+
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds  
         """
@@ -521,7 +523,7 @@ class GurobiSolver(Solver):
             nnodes = line.split()[1]
             self.addData('Nodes', int(nnodes))
         return None
-    
+
 class CplexSolver(Solver):
 
     solverId = "CPLEX"
@@ -533,10 +535,10 @@ class CplexSolver(Solver):
 
     solverstatusmap = {"MIP - Integer optimal solution" : Key.SolverStatusCodes.Optimal,
                        "MIP - Integer infeasible." : Key.SolverStatusCodes.Infeasible,
-#                       "" : Key.SolverStatusCodes.TimeLimit,
-#                       "" : Key.SolverStatusCodes.MemoryLimit,
-#                       "" : Key.SolverStatusCodes.NodeLimit,
-#                       "" : Key.SolverStatusCodes.Interrupted
+                       #                       "" : Key.SolverStatusCodes.TimeLimit,
+                       #                       "" : Key.SolverStatusCodes.MemoryLimit,
+                       #                       "" : Key.SolverStatusCodes.NodeLimit,
+                       #                       "" : Key.SolverStatusCodes.Interrupted
                        }
 
     # variables needed for primal bound history extraction
@@ -546,7 +548,7 @@ class CplexSolver(Solver):
     lastnnodes = 0
     cpxprimals = []
     inTable = False
-    
+
     def __init__(self, **kw):
         super(CplexSolver, self).__init__(**kw)
 
@@ -604,7 +606,7 @@ class CplexSolver(Solver):
             elif "Solution time =" in line:
                 thetime = float(line.split()[3])
                 self.processCpxprimals(thetime)
-    
+
     def processCpxprimals(self, currenttime):
         solvednodes = (self.lastnnodes - self.nnodessincelastelapsedtime)
         timespentonnode = (currenttime - self.lastelapsedtime) / max(1.0, float(solvednodes))
@@ -612,7 +614,7 @@ class CplexSolver(Solver):
         for node, bound in self.cpxprimals:
             estimatedtime = self.lastelapsedtime + (node - self.nnodessincelastelapsedtime) * timespentonnode
             self.addHistoryData(Key.PrimalBoundHistory, estimatedtime, bound)
-            
+
         self.cpxprimals = []
 
 class CbcSolver(Solver):
@@ -627,9 +629,9 @@ class CbcSolver(Solver):
     solverstatusmap = {"Result - Optimal solution found" : Key.SolverStatusCodes.Optimal,
                        "Result - Stopped on time limit" : Key.SolverStatusCodes.TimeLimit,
                        "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible
-#                       "" : Key.SolverStatusCodes.MemoryLimit,
-#                       "" : Key.SolverStatusCodes.NodeLimit,
-#                       "" : Key.SolverStatusCodes.Interrupted
+                       #                       "" : Key.SolverStatusCodes.MemoryLimit,
+                       #                       "" : Key.SolverStatusCodes.NodeLimit,
+                       #                       "" : Key.SolverStatusCodes.Interrupted
                        }
 
     def __init__(self, **kw):
@@ -641,7 +643,7 @@ class CbcSolver(Solver):
         if "Integer solution of " in line:
             self.readBoundAndTime(line, 4, -2, timestripchars="(")
         return None
-        
+
 class XpressSolver(Solver):
 
     solverId = "XPRESS"
@@ -655,11 +657,11 @@ class XpressSolver(Solver):
     solverstatusmap = {r" \*\*\* Search completed \*\*\*" : Key.SolverStatusCodes.Optimal,
                        "Problem is integer infeasible" : Key.SolverStatusCodes.Infeasible,
                        "STOPPING - MAXTIME limit reached" : Key.SolverStatusCodes.TimeLimit,
-#                       "" : Key.SolverStatusCodes.MemoryLimit,
-#                       "" : Key.SolverStatusCodes.NodeLimit,
-#                       "" : Key.SolverStatusCodes.Interrupted
+                       #                       "" : Key.SolverStatusCodes.MemoryLimit,
+                       #                       "" : Key.SolverStatusCodes.NodeLimit,
+                       #                       "" : Key.SolverStatusCodes.Interrupted
                        }
-    
+
     # variables needed for primal bound history extraction
     xpresscutidx = -1
 
@@ -675,7 +677,7 @@ class XpressSolver(Solver):
             self.readBoundAndTime(line, -1, -1, cutidx=self.xpresscutidx)
         elif line.startswith(" \*\*\* Heuristic solution found: "):
             self.readBoundAndTime(line, -4, -2)
-    
+
 #class CouenneSolver(Solver):
 #
 #    # TODO fix regexes to contain groups which can extract numbers, test, etc

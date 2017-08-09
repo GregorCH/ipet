@@ -1219,10 +1219,12 @@ class IPETEvaluation(IpetNode):
             True if current defaultgroup is found, else False
         '''
         dg = self.getDefaultgroup()
+        if not dg is tuple:
+            dg = (dg,);
         for val in data[self.getColIndex()].values:
             if tuple(val) == dg:
                 return True
-        logging.info("No valid default group given.".format(self.defaultgroup))
+        logging.info("No valid default group given. (Was '{}')".format(self.defaultgroup))
         return False
 
     def tryGenerateIndexAndDefaultgroup(self, data):

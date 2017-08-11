@@ -31,7 +31,7 @@ class IpetNode(Editable):
 
         for d, message in self.deprecatedattrdir.items():
             if d in kw:
-                logging.warn("Warning : The attribute '{0}' is deprecated and will be ignored; {1}. ".format(d, message))
+                logging.warning("Warning : The attribute '{0}' is deprecated and will be ignored; {1}. ".format(d, message))
 
     def addChild(self, child):
         """

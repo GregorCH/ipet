@@ -699,7 +699,7 @@ class IPETEvaluation(IpetNode):
         self.setEvaluated(False)
 
     def set_index(self, index : list):
-        """Set index identifier list, optionally with level specification (0 for row index, 1 for column index)
+        """Set index identifier list
         """
         self.autoIndex = False
         self.index = index
@@ -707,11 +707,8 @@ class IPETEvaluation(IpetNode):
         logging.debug("Set index to '{}'".format(index))
         if index == "auto":
             self.autoIndex = True
-            self.defaultgroup = ""
-            self.defaultgrouptuple = None
             return
         self.set_indexsplit(self.indexsplit)
-        self.set_defaultgroup(self.defaultgroup)
         
     def getRowIndex(self) -> list:
         """Return (list of) keys to create row index 
@@ -728,21 +725,16 @@ class IPETEvaluation(IpetNode):
         """
         return self._index.getTuple()
 
-    def getDefaultgroup(self):
+    def getDefaultgroup(self, data):
         """Return tuple representation of defaultgroup
-        """
-        return self.defaultgrouptuple
-
-    def set_defaultgroup(self, dg : str):
-        """Set defaultgroup
         
-        Parameters
-        ----------
-        dg
-            the string representing the defaultgroup in format "val1:val2:val3"
+        Parameters:
+        data
+            data frame object with columns that match the specified column index
         """
-        self.defaultgroup = dg
-        dg = StrTuple.splitStringList(dg, ":")
+        
+        # split the default group on colons
+        dg = StrTuple.splitStringList(self.defaultgroup, ":")
         if dg is None:
             x = None
         else:
@@ -754,16 +746,42 @@ class IPETEvaluation(IpetNode):
                 except:
                     pass
 
-        self.defaultgrouptuple = None
+        defaultgroup = None
+        
+        # try to match the length of x to the length of the specified column index
         if x is not None: 
             if len(x) > len(self.getColIndex()):
                 x = x[:len(self.getColIndex())]
             if len(x) == 1:
-                self.defaultgrouptuple = x[0]
+                defaultgroup = x[0]
             else:
-                self.defaultgrouptuple = tuple(x)
+                defaultgroup = tuple(x)
+            #
+            # check if this group is contained
+            #
+            if self.defaultgroupIsContained(defaultgroup, data):
+                return defaultgroup
+    
+        #
+        # the default group is None or not contained
+        # -> use first element in the data frame
+        # 
+        if len(self.getColIndex()) == 1:
+            return data[self.getColIndex()].iloc[0,:].values[0]
+        else:
+            return tuple(data.iloc[0,self.getColIndex()].values)
+        
+    def set_defaultgroup(self, dg : str):
+        """Set defaultgroup
+        
+        Parameters
+        ----------
+        dg
+            string representation of the defaultgroup in format "val1:val2:val3", or None
+        """
+        self.defaultgroup = dg
+        logging.debug("Set defaultgroup to {}".format(self.defaultgroup))
         self.setEvaluated(False)
-        logging.debug("Set defaultgrouptuple to {} from defaultgroup {}".format(self.defaultgrouptuple, self.defaultgroup))
 
     def set_indexsplit(self, indexsplit):
         self.indexsplit = int(indexsplit)
@@ -810,13 +828,15 @@ class IPETEvaluation(IpetNode):
         if self.getColIndex() == []:
             return df
         usercolumns = []
+        
+        dg = self.getDefaultgroup(df)
 
         for col in self.toposortColumns(self.getActiveColumns()):
             # look if a comparison with the default group should be made
             if col.getCompareMethod() is not None:
 
                 grouped = df.groupby(self.getColIndex())[col.getName()]
-                compcol = dict(list(grouped))[self.getDefaultgroup()]
+                compcol = dict(list(grouped))[dg]
 
                 comparecolname = col.getCompareColName()
 
@@ -1217,52 +1237,48 @@ class IPETEvaluation(IpetNode):
     def getInstanceData(self):
         return self.rettab
 
-    def tryGenerateDefaultGroup(self, data, colindex):
+    def defaultgroupIsContained(self, group, data) -> bool:
         '''
-        Generate a defaultgroup based on the colindexkeys and data.
-        
-        Based on the total number of occurences 
-        the tuple with the most occurences is chosen to be the defaultgroup.
+        Check if the given group is contained in the data.
 
         Parameters
         ----------
-        data
-            raw DataFrame
-        colindex
-            keys of columnindex
-        '''
-        # only generate a defaultgroup if the user did not specify one themself
-        if self.getDefaultgroup() is not None and self.defaultgroupIsContained(data):
-            return
-
-        # count values of (tuples of) column index
-        tuples = [tuple(x) for x in data[colindex].values]
-        counts = pd.Series(tuples).value_counts()
-        max_key = counts.idxmax()
-
-        # take the tuple with the highest occurrence
-        self.defaultgroup = ":".join(max_key)
-        logging.info("Using '{}' as default group.".format(self.defaultgroup))
-
-    def defaultgroupIsContained(self, data):
-        '''
-        Check if the current defaultgroup is contained in the data.
-
-        Parameters
-        ----------
+        group
+            scalar or tuple representing a default group
         data
             raw DataFrame
         Returns
         -------
         bool
-            True if current defaultgroup is found, else False
+            True if the group is found, else False
         '''
-        dg = self.getDefaultgroup()
-        for val in data[self.getColIndex()].values:
-            if tuple(val) == dg:
-                return True
-        logging.info("No valid default group given.".format(self.defaultgroup))
-        return False
+        #
+        # check if the column index and the group have equal length
+        # (be careful about group being string)
+        #
+        cIndex = self.getColIndex()
+        if type(group) is tuple and len(group) != len(cIndex):
+            return False
+        elif type(group) is not tuple and len(cIndex) > 1:
+            return False
+             
+        #
+        # depending on the length of the column index, different methods apply
+        #
+        if len(cIndex) == 1:
+            #
+            # use scalar comparison
+            #
+            return numpy.any(data[self.getColIndex()] == group)
+        else:
+            #
+            # use conjunction of scalar comparisons (this is not fast)
+            #
+            result = True
+            for idx, l in enumerate(cIndex):
+                result = result & (data[l] == group[idx])
+            return numpy.any(result) 
+            
 
     def tryGenerateIndexAndDefaultgroup(self, data):
         '''
@@ -1282,8 +1298,6 @@ class IPETEvaluation(IpetNode):
         '''
         # do this only if the user requested an automatic index
         if not self.autoIndex:
-            self.tryGenerateDefaultGroup(data, list(self.getColIndex()))
-            self.set_defaultgroup(self.defaultgroup)
             return
 
         lowerbound = 1 # 1 or bigger
@@ -1308,7 +1322,6 @@ class IPETEvaluation(IpetNode):
 
         # set everything
         self.indexsplit = 1
-        self.tryGenerateDefaultGroup(data, [i[0] for i in second])
         self.set_index(" ".join([i[0] for i in [first] + second]))
         logging.info("Automatically set index to ({}, {})".format(self.getRowIndex(), self.getColIndex()))
         
@@ -1472,12 +1485,12 @@ class IPETEvaluation(IpetNode):
             # determine the row in the aggregated table corresponding to the default group
             logging.debug("Index of colaggpart:\n{}".format(colaggpart.index))
 
-            if (self.getDefaultgroup() is not None) and (self.getDefaultgroup() in colaggpart.index):
-                defaultrow = colaggpart.loc[self.getDefaultgroup(), :]
+            dg = self.getDefaultgroup(df)
+            if dg in colaggpart.index:
+                defaultrow = colaggpart.loc[dg, :]
             else:
                 # if there is no default setting, take the first group as default group
                 try:
-                    self.defaultgrouptuple = colaggpart.index[0]
                     defaultrow = colaggpart.iloc[0, :]
                 except:
                     defaultrow = numpy.nan
@@ -1514,14 +1527,15 @@ class IPETEvaluation(IpetNode):
         groupeddata = dict(list(df.groupby(self.getColIndex())))
         stats = []
         names = []
+        dg = self.getDefaultgroup(df)
         for col in self.getActiveColumns():
             if len(col.getStatsTests()) == 0:
                 continue
             defaultvalues = None
             try:
-                defaultvalues = groupeddata[self.getDefaultgroup()][col.getName()].reset_index(drop = True)
+                defaultvalues = groupeddata[dg][col.getName()].reset_index(drop = True)
             except KeyError:
-                logging.info("Sorry, cannot retrieve default values for column %s, key %s for applying statistical test)" % (col.getName(), self.getDefaultgroup()))
+                logging.info("Sorry, cannot retrieve default values for column %s, key %s for applying statistical test)" % (col.getName(), self.getDefaultgroup(df)))
                 continue
 
             # iterate through the stats tests associated with each column

@@ -166,8 +166,7 @@ class EvaluationTest(unittest.TestCase):
         modificationlist = [{},
                             {"sortlevel":1},
                             {"index":"foo bar"},
-                            {"defaultgroup":"bar"},
-                            {"evaluateoptauto":False}
+                            {"defaultgroup":"bar"}
                             ]
         for mod in modificationlist:
             evaluation = IPETEvaluation(**mod)

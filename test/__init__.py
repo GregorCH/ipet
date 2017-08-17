@@ -4,6 +4,7 @@ from .EvaluationTest import EvaluationTest
 from .SolverTest import SolverTest
 from .FormatTest import FormatTest
 from .PrimalDualBoundHistoryTest import PrimalDualBoundHistoryTest
+from .GurobiBoundHistoryTest import GurobiBoundHistoryTest
 import logging
 
 
@@ -12,6 +13,7 @@ test_cases = (EvaluationTest,
               SolverTest,
               FormatTest,
               PrimalDualBoundHistoryTest,
+              GurobiBoundHistoryTest
               )
 
 def load_tests(loader, tests, pattern):

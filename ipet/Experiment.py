@@ -286,6 +286,7 @@ class Experiment:
                 if processplotdata:
                     try:
                         testrun.addDataById(Key.DualIntegral, calcIntegralValue(processplotdata, pwlinear = True), problemid)
+                        logging.debug("Computed dual integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'DualIntegral'), problemid, repr(processplotdata)))
                     except AssertionError as e:
                         logging.error("Error for dual bound on problem %s, list: %s " % (problemid, processplotdata))
 

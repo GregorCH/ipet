@@ -155,6 +155,7 @@ class Solver():
                 history.append((time, bound))
             elif (key == Key.DualBoundHistory and history[-1][0] == time):
                 history.pop(-1)
+                history.append((time,bound))
 
     def readLine(self, line : str):
         """Read solver-specific data from that lin

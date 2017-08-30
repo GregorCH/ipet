@@ -1222,14 +1222,14 @@ class IPETEvaluation(IpetNode):
         if  not filtergroup.isActive():
             raise ValueError("Filter group %s is currently not active" % filtergroup.getName())
 
-        return self.filtered_agg[filtergroup.getName()]
+        return self.filtered_agg.get(filtergroup.getName(), DataFrame())
 
     def getInstanceGroupData(self, filtergroup):
         if not filtergroup in self.filtergroups:
-            raise ValueError("Filter group %s (name:%s) is not contained in evaluation filter groups" % filtergroup, filtergroup.getName())
+            raise ValueError("Filter group %s (name:%s) is not contained in evaluation filter groups" % (filtergroup, filtergroup.getName()))
         if  not filtergroup.isActive():
-            raise ValueError("Filter group %s is currently not active", filtergroup.getName())
-        return self.filtered_instancewise[filtergroup.getName()]
+            raise ValueError("Filter group %s is currently not active" % filtergroup.getName())
+        return self.filtered_instancewise.get(filtergroup.getName(), DataFrame())
 
     def getAggregatedData(self):
         return self.retagg

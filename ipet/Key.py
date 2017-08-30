@@ -50,9 +50,12 @@ DualIntegral = "DualIntegral"
 DualLpTime = "DualLpTime"
 ErrorCode = "ErrorCode"
 Gap = "Gap"
+GitHash = "GitHash"
 LogFileName = "LogFileName"
+LPSolver = "LPSolver"
 MetaData = "MetaData"
 MaximumDepth = "MaxDepth"
+Mode = "mode"
 Nodes = "Nodes"
 ObjectiveLimit = "Objlimit"
 ObjectiveSense = "Objsense"
@@ -88,6 +91,7 @@ class SolverStatusCodes:
     or it could have simply been cancelled by the user
     or worse, could have crashed.
     """
+    Readerror = -2
     Crashed = -1
     Optimal = 0
     Infeasible = 1
@@ -95,6 +99,7 @@ class SolverStatusCodes:
     MemoryLimit = 3
     NodeLimit = 4
     Interrupted = 5
+    Unbounded = 6
 
 class ProblemStatusCodes:
     """ Keeping track of how good the solution of a solver actually was.
@@ -113,6 +118,7 @@ class ProblemStatusCodes:
     FailSolOnInfeasibleInstance = "fail_solution_on_infeasible_instance"
     Fail = "fail"
     FailAbort = "fail_abort"
+    FailReaderror = "fail_readerror"
     TimeLimit = "timelimit"
     MemoryLimit = "memlimit"
     NodeLimit = "nodelimit"
@@ -131,6 +137,7 @@ class ProblemStatusCodes:
                         FailSolInfeasible :-1000,
                         FailSolOnInfeasibleInstance :-2000,
                         Fail :-3000,
+                        FailReaderror : -4000,
                         FailAbort :-10000}
 
     @staticmethod
@@ -149,10 +156,12 @@ solver2problemStatusCode = {
     SolverStatusCodes.Crashed : ProblemStatusCodes.FailAbort,
     SolverStatusCodes.Infeasible : ProblemStatusCodes.Ok,
     SolverStatusCodes.Optimal : ProblemStatusCodes.Ok,
+    SolverStatusCodes.Unbounded : ProblemStatusCodes.Ok,
     SolverStatusCodes.TimeLimit : ProblemStatusCodes.TimeLimit,
     SolverStatusCodes.MemoryLimit : ProblemStatusCodes.MemoryLimit,
     SolverStatusCodes.NodeLimit : ProblemStatusCodes.NodeLimit,
-    SolverStatusCodes.Interrupted : ProblemStatusCodes.Interrupted}
+    SolverStatusCodes.Interrupted : ProblemStatusCodes.Interrupted,
+    SolverStatusCodes.Readerror : ProblemStatusCodes.FailReaderror}
 
 def solverToProblemStatusCode(solverstatus : int) -> str:
     """Map the status of the solver to the corresponding problem status code
@@ -162,4 +171,4 @@ def solverToProblemStatusCode(solverstatus : int) -> str:
     solverstatus
         integer status code reported by the solver
     """
-    return solver2problemStatusCode.get(solverstatus, ProblemStatusCodes.Unknown)
+    return solver2problemStatusCode.get(solverstatus, ProblemStatusCodes.FailAbort)

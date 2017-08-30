@@ -22,6 +22,7 @@ import pickle
 import os
 import sys
 import logging
+from ipet.Key import SolverStatusCodes
 
 class Experiment:
     """
@@ -286,6 +287,7 @@ class Experiment:
                 if processplotdata:
                     try:
                         testrun.addDataById(Key.DualIntegral, calcIntegralValue(processplotdata, pwlinear = True), problemid)
+                        logging.debug("Computed dual integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'DualIntegral'), problemid, repr(processplotdata)))
                     except AssertionError as e:
                         logging.error("Error for dual bound on problem %s, list: %s " % (problemid, processplotdata))
 
@@ -525,7 +527,7 @@ class Experiment:
 
                 # an error code means that the instance aborted
                 if errcode is not None or testrun.getProblemDataById(problemid, Key.SolvingTime) is None:
-                    code = Key.ProblemStatusCodes.FailAbort
+                    code = Key.solverToProblemStatusCode(testrun.getProblemDataById(problemid, Key.SolverStatus))
 
                 # if the best solution was not feasible in the original problem, it's a fail
                 elif testrun.getProblemDataById(problemid, BestSolInfeasibleReader.datakey) == True:

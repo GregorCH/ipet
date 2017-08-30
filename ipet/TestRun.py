@@ -194,7 +194,7 @@ class TestRun:
     def getMetaData(self):
         """Return a data frame containing meta data
         """
-        return DataFrame(self.metadatadict)
+        return self.metadatadict
 
     def finalizeCurrentCollection(self, solver):
         """ Any data of the current problem is saved as a new row in datadict

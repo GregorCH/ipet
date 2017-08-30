@@ -174,7 +174,7 @@ class ReaderManager(Manager, IpetNode):
              MetaDataReader(),
              NodesReader(),
              ObjsenseReader(),
-             #PluginStatisticsReader(),
+             PluginStatisticsReader(),
              VariableReader(),
              RootNodeFixingsReader(),
              SettingsFileReader(),

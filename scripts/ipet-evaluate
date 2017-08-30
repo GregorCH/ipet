@@ -236,10 +236,11 @@ if __name__ == '__main__':
         prefixstr = arguments.prefix if arguments.prefix else ""
         for fg in theeval.getActiveFilterGroups():
             instancewisename = "%s/%s%s"%(path, prefixstr, fg.name)
-            theeval.streamDataFrame(theeval.filtered_instancewise[fg.name], instancewisename, extension)
+            
+            theeval.streamDataFrame(theeval.getInstanceGroupData(fg), instancewisename, extension)
             logging.info("Instance-wise data written to %s.%s" % (instancewisename, extension))
             aggname = instancewisename + "_agg"
-            theeval.streamDataFrame(theeval.filtered_agg[fg.name], aggname, extension)
+            theeval.streamDataFrame(theeval.getAggregatedGroupData(fg), aggname, extension)
             logging.info("aggregated data written to %s.%s" % (aggname, extension))
 
         filename = "%s/%s"%(path, "_".join((prefixstr, "inst_combined")) if prefixstr != "" else "inst_combined")

@@ -26,6 +26,7 @@ class Solver():
     dualbound_expr = None
     solvingtime_expr = None
     version_expr = None
+    nodes_expr = None
 
     solverstatusmap = {}
 
@@ -36,7 +37,8 @@ class Solver():
                  dualbound_pattern = None,
                  solvingtime_pattern = None,
                  version_pattern = None,
-                 solverstatusmap = None):
+                 solverstatusmap = None,
+                 nodes_pattern = None):
 
         if solverId is not None:
             self.solverId = solverId
@@ -51,6 +53,8 @@ class Solver():
             self.solvingtime_expr = re.compile(solvingtime_pattern)
         if not version_pattern is None:
             self.version_expr = re.compile(version_pattern)
+        if nodes_pattern is not None:
+            self.nodes_expr = re.compile(nodes_pattern)
 
         if solverstatusmap is not None:
             self.solverstatusmap = solverstatusmap
@@ -95,7 +99,12 @@ class Solver():
         """Read the primal bound (at the end of the solver-output)
         """
         self.extractByExpression(line, self.primalbound_expr, Key.PrimalBound)
-
+        
+    def extractNodes(self, line : str):
+        """Read the number of branch and bound nodes
+        """
+        self.extractByExpression(line, self.nodes_expr, Key.Nodes, int)
+        
     def extractByExpression(self, line : str, expr, key : str, datatype : type = float) -> None:
         """
         Search for regular expression 'expr' and store a possible match under the given 'key'.
@@ -180,6 +189,7 @@ class Solver():
         self.extractPrimalbound(line)
         self.extractDualbound(line)
         self.extractSolvingTime(line)
+        self.extractNodes(line)
         self.extractVersion(line)
         self.extractStatus(line)
         self.extractHistory(line)
@@ -318,6 +328,7 @@ class SCIPSolver(Solver):
     solvingtime_expr = re.compile("^Solving Time \(sec\) : (\S+)")
     version_expr = re.compile("SCIP version (\S+)")
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
+    nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
 
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
@@ -449,17 +460,20 @@ class GurobiSolver(Solver):
 
     solverId = "GUROBI"
     recognition_expr = re.compile("Gurobi Optimizer version")
-    primalbound_expr = re.compile("^Best objective (\S+), best bound (?:\S+),")
-    dualbound_expr = re.compile("^Best objective (?:\S+), best bound (\S+),")
-    solvingtime_expr = re.compile("Explored \d* nodes \(.*\) in (\S*) seconds")
+    primalbound_expr = re.compile("^(?:Best|Optimal) objective (\S+)")
+    dualbound_expr = re.compile("^(?:Best objective \S+, best bound|Optimal objective) ([^\s,]+),*")
+    solvingtime_expr = re.compile("^(?:Explored \d* nodes .* in|Solved in .* iterations and) (\S*) seconds")
     version_expr = re.compile("Gurobi Optimizer version (\S+)")
-
-    solverstatusmap = {"Optimal solution found" : Key.SolverStatusCodes.Optimal,
+    nodes_expr = re.compile("Explored (\d+) nodes")
+ 
+    solverstatusmap = {"(Optimal solution found|Solved with barrier)" : Key.SolverStatusCodes.Optimal,
                        "Model is infeasible" : Key.SolverStatusCodes.Infeasible,
-                       #                       "" : Key.SolverStatusCodes.TimeLimit,
-                       #                       "" : Key.SolverStatusCodes.MemoryLimit,
-                       #                       "" : Key.SolverStatusCodes.NodeLimit,
-                       #                       "" : Key.SolverStatusCodes.Interrupted
+                        "Time limit reached" : Key.SolverStatusCodes.TimeLimit,
+                        "^(ERROR 10001|Out of memory)" : Key.SolverStatusCodes.MemoryLimit,
+#                       "" : Key.SolverStatusCodes.NodeLimit,
+#                       "" : Key.SolverStatusCodes.Interrupted
+                        "^ERROR 10003" : Key.SolverStatusCodes.Readerror,
+                        "^Model is unbounded" : Key.SolverStatusCodes.Unbounded
                        }
 
     # variables needed for bound history

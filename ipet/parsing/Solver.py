@@ -120,6 +120,9 @@ class Solver():
         datatype
             data type for the datum, default : float
         """
+        if expr is None:
+            return
+
         m = expr.match(line)
         if m is not None:
             try:

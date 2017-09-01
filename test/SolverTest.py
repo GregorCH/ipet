@@ -243,6 +243,7 @@ class SolverTest(unittest.TestCase):
     def assertAlmost(self, filename, key):
         refbound = self.fileinfo.get(filename)[ALMOST].get(key)
         if refbound is not None:
+            self.assertIsNotNone(self.activeSolver.getData(key), "solver {} did not find a value {} in file {}".format(self.activeSolver.solverId, key, filename))
             self.assertAlmostEqual(refbound, self.activeSolver.getData(key), delta = 1e-1,
                                    msg = "{0} has {1} as {2}, should be {3}".format(filename, self.activeSolver.getData(key), key, refbound))
         else:

@@ -384,15 +384,26 @@ class IPETEvaluationColumn(IpetNode):
         """
         return IPETEvaluationColumn.getMethodByStr(self.reduction, [numpy, misc, Experiment, Key.ProblemStatusCodes])
     
-    def getReductionIndex(self, evalindexcols : list):
-        """Return this columns reduction index, which is a subset of the evaluation index columns 
+    def getReductionIndex(self, evalindexcols : list) -> tuple:
+        """Return this columns reduction index, which is a subset of the evaluation index columns
+        
+        Parameters
+        ----------
+        evalindexcols
+            list of evaluation index columns, may only contain a single element
+            
+        Returns
+        -------
+        tuple
+            a tuple representing the (sub)set of columns representing this columns individual
+            reduction index
         """
         if self._reductionindex is None:
             return evalindexcols
         if type(self._reductionindex) is int:
             reductionindex = min(self._reductionindex, len(evalindexcols))
             # negative indices are also allowed
-            reductionindex = max(self._reductionindex, -len(evalindexcols))
+            reductionindex = max(reductionindex, -len(evalindexcols))
             return tuple(evalindexcols[:reductionindex])
             
         else:# reduction index is a string tuple
@@ -428,7 +439,7 @@ class IPETEvaluationColumn(IpetNode):
                 except KeyError as e:
                     # print an error message and make a series with NaN's
                     print(e)
-                    logging.warn("Could not retrieve data %s" % self.origcolname)
+                    logging.warning("Could not retrieve data %s" % self.origcolname)
                     result = pd.Series(numpy.nan, index=df_long.index)
 
 
@@ -793,7 +804,7 @@ class IPETEvaluation(IpetNode):
         except:
             pass
         if indexsplitmod == 0:
-            logging.warn("Indexsplit 0 is not allowed, setting it to 1.")
+            logging.warning("Indexsplit 0 is not allowed, setting it to 1.")
             self.indexsplit = 1;
     
     def addColumn(self, col):
@@ -1044,7 +1055,7 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The reduced DataFrame.
         """
-        tmpcols = list(set(list(self.getIndex()) + ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']))
+        tmpcols = list(set(list(self.getIndex()) + self.countercolumns))
         horidf = df[tmpcols]
         grouped = horidf.groupby(by = self.getIndex())
 
@@ -1359,12 +1370,12 @@ class IPETEvaluation(IpetNode):
         #
         # create a target data frame that has the desired index
         #
-        columndata = self.reduceByIndex(data)
+        reduceddata = self.reduceByIndex(data)
 
-        columndata = self.reduceToColumns(data, columndata)
-        logging.debug("Result of reduceToColumns:\n{}\n".format(columndata))
+        reduceddata = self.reduceToColumns(data, reduceddata)
+        logging.debug("Result of reduceToColumns:\n{}\n".format(reduceddata))
 
-        columndata = self.addComparisonColumns(columndata)
+        reduceddata = self.addComparisonColumns(reduceddata)
 
         # show less info in long table
         columns = self.usercolumns + self.getColIndex() + self.getRowIndex()
@@ -1373,14 +1384,14 @@ class IPETEvaluation(IpetNode):
         # show more info in table
 
         # compile a results table containing all instances
-        ret = self.convertToHorizontalFormat(columndata[lcolumns])
+        ret = self.convertToHorizontalFormat(reduceddata[lcolumns])
         logging.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
 
         self.rettab = ret
         
         # TODO Where do we need these following three lines?
         self.instance_wise = ret
-        self.agg = self.aggregateToPivotTable(columndata)
+        self.agg = self.aggregateToPivotTable(reduceddata)
         logging.debug("Result of aggregateToPivotTable:\n{}\n".format(self.agg))
             
         self.filtered_agg = {}
@@ -1390,7 +1401,7 @@ class IPETEvaluation(IpetNode):
         nonemptyactivefiltergroups = activefiltergroups[:]
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
-            reduceddata = self.applyFilterGroup(columndata, fg, self.getRowIndex())
+            reduceddata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
             if (len(reduceddata) == 0):
                 nonemptyactivefiltergroups.remove(fg)
                 logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))

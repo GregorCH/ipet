@@ -505,14 +505,16 @@ class IPETEvaluationColumn(IpetNode):
             df_long[self.getName()] = result
             targetresult = df_long.groupby(by=reductionindex)[self.getName()].apply(self.getReductionFunction())
             df_long = df_long.join(targetresult, on=reductionindex, lsuffix="_old")
-            df_target = df_target.join(targetresult, on=reductionindex, lsuffix="_old")
+            if not self.getName() in df_target:
+                df_target = df_target.join(targetresult, on=reductionindex, lsuffix="_old")
         else:
             #
             # add scalar to both data frames
             #
             scalar = self.getReductionFunction()(result)
             df_long[self.getName()] = scalar
-            df_target[self.getName()] = scalar
+            if not self.getName() in df_target:
+                df_target[self.getName()] = scalar
         
         return df_long, df_target
 
@@ -1377,14 +1379,20 @@ class IPETEvaluation(IpetNode):
 
         reduceddata = self.addComparisonColumns(reduceddata)
 
-        # show less info in long table
-        columns = self.usercolumns + self.getColIndex() + self.getRowIndex()
-        diff = lambda l1, l2: [x for x in l1 if x not in l2]
-        lcolumns = diff(columns, self.countercolumns)
-        # show more info in table
+        # 
+        # restrict the columns to those that should appear in 
+        # the final table, but make sure that no columns 
+        # appear twice. Respect also the order of the columns
+        #
+        columns = []
+        colset = set()
+        for c in self.usercolumns + list(self.getIndex()):
+            if c not in colset and c not in self.countercolumns:
+                columns.append(c)
+                colset.add(c)
 
-        # compile a results table containing all instances
-        ret = self.convertToHorizontalFormat(reduceddata[lcolumns])
+        # compile a long table with the requested row and column indices 
+        ret = self.convertToHorizontalFormat(reduceddata[columns])
         logging.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
 
         self.rettab = ret
@@ -1401,14 +1409,14 @@ class IPETEvaluation(IpetNode):
         nonemptyactivefiltergroups = activefiltergroups[:]
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
-            reduceddata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
-            if (len(reduceddata) == 0):
+            filtergroupdata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
+            if (len(filtergroupdata) == 0):
                 nonemptyactivefiltergroups.remove(fg)
                 logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
-            logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), reduceddata))
-            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(reduceddata[lcolumns])
-            self.filtered_agg[fg.name] = self.aggregateToPivotTable(reduceddata)
+            logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), filtergroupdata))
+            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(filtergroupdata[columns])
+            self.filtered_agg[fg.name] = self.aggregateToPivotTable(filtergroupdata)
 
         if len(nonemptyactivefiltergroups) > 0:
             if self.getColIndex() == []:

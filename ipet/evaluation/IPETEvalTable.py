@@ -23,6 +23,7 @@ from ipet import Key
 from pandas.core.frame import DataFrame
 from numpy import isnan
 from ipet.evaluation.IPETFilter import IPETValue
+from ipet.misc.misc import meanOrConcat
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -896,9 +897,13 @@ class IPETEvaluation(IpetNode):
             df_long, df_target after processing the user columns
         """
         
-        # We are only interested in the columns that are active in the eval file
+        # We are only interested in the columns that are currently active
         usercolumns = [c.getName() for c in self.getActiveColumns()]
         evalindexcols = list(self.getIndex())
+        
+        #
+        # loop over a topological sorting of the active columns to compute
+        #
         for col in self.toposortColumns(self.getActiveColumns()):
             try:
                 df_long, df_target = col.getColumnData(df_long, df_target, evalindexcols)
@@ -909,18 +914,6 @@ class IPETEvaluation(IpetNode):
 
         newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
 
-        for x in self.getIndex():
-            if x not in newcols:
-                newcols.append(x)
-        neededcolumns = [col for col in newcols if col not in usercolumns]
-
-        additionalfiltercolumns = []
-        for fg in self.getActiveFilterGroups():
-            additionalfiltercolumns += fg.getNeededColumns(df_long)
-
-        additionalfiltercolumns = list(set(additionalfiltercolumns))
-        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(usercolumns + neededcolumns)]
-        result = df_long.loc[:, usercolumns + neededcolumns + additionalfiltercolumns + self.countercolumns]
         self.usercolumns = usercolumns
         
         return df_target
@@ -1057,32 +1050,38 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The reduced DataFrame.
         """
-        tmpcols = list(set(list(self.getIndex()) + self.countercolumns))
-        horidf = df[tmpcols]
-        grouped = horidf.groupby(by = self.getIndex())
+        grouped = df.groupby(by = self.getIndex())
 
         newcols = []
 
         reductionMap = {'_solved_' : numpy.all, '_count_' : numpy.max}
         for col in self.countercolumns:
             newcols.append(grouped[col].apply(reductionMap.get(col, numpy.any)))
+            
+        #
+        # compute additional, requested columns for filters
+        #
+        activecolumns = [c.getName() for c in self.getActiveColumns()]
+        additionalfiltercolumns = []
+        for fg in self.getActiveFilterGroups():
+            additionalfiltercolumns += fg.getNeededColumns(df)
 
-        #for col in self.getActiveColumns():
-        #    newcols.append(grouped[col.getName()].apply(col.getReductionFunction()))
+        additionalfiltercolumns = list(set(additionalfiltercolumns))
+        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(activecolumns)]
+        
+        for col in additionalfiltercolumns:
+            newcols.append(grouped[col].apply(meanOrConcat))
+       
 
-        # TODO Do we want this or do we want to change it? This concatenates Problemnames etc...
-        #missingcolumns = [c for c in tmpcols if c not in self.countercolumns + [col.getName() for col in self.getActiveColumns()]]
-        #for col in missingcolumns:
-        #    newcols.append(grouped[col].apply(IPETEvaluationColumn.getMethodByStr()))
-
-        horidf = pd.concat(newcols, axis = 1)
+        reduceddf = pd.concat(newcols, axis = 1)
         ind = self.getIndex()
-        index_uniq = [i for i in ind if i not in horidf.columns]
-        index_dupl = [i for i in ind if i in horidf.columns]
-        horidf = horidf.reset_index(index_uniq)
-        horidf = horidf.reset_index(index_dupl, drop = True)
-#        horidf = horidf.reset_index(self.index.getTuple())
-        return horidf
+        index_uniq = [i for i in ind if i not in reduceddf.columns]
+        index_dupl = [i for i in ind if i in reduceddf.columns]
+        
+        reduceddf = reduceddf.reset_index(index_uniq)
+        reduceddf = reduceddf.reset_index(index_dupl, drop = True)
+        
+        return reduceddf
 
     def convertToHorizontalFormat(self, df : DataFrame) -> DataFrame:
         """ Convert data to have an index given by indexkeys.

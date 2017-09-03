@@ -7,6 +7,7 @@ from .FormatTest import FormatTest
 from .PrimalDualBoundHistoryTest import PrimalDualBoundHistoryTest
 from .GurobiBoundHistoryTest import GurobiBoundHistoryTest
 from .IndexTest import IndexTest
+from .FilterDataTest import FilterDataTest
 import logging
 
 
@@ -18,7 +19,8 @@ test_cases = (EvaluationTest,
               PrimalDualBoundHistoryTest,
               ReductionIndexTest,
               GurobiBoundHistoryTest,
-              IndexTest
+              IndexTest,
+              FilterDataTest
               )
 
 def load_tests(loader, tests, pattern):

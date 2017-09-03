@@ -1102,7 +1102,19 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The converted DataFrame.
         """
-        df = df.set_index(list(self.getIndex())).sort_index(level = 0)
+                # 
+        # restrict the columns to those that should appear in 
+        # the final table, but make sure that no columns 
+        # appear twice. Respect also the order of the columns
+        #
+        columns = []
+        colset = set()
+        for c in self.usercolumns + list(self.getIndex()):
+            if c not in colset and c not in self.countercolumns:
+                columns.append(c)
+                colset.add(c)
+
+        df = df[columns].set_index(list(self.getIndex())).sort_index(level = 0)
         df = df.unstack(self.getColIndex())
         if len(self.getColIndex()) > 0 :
             df = df.swaplevel(0, len(self.getColIndex()), axis = 1)
@@ -1379,20 +1391,9 @@ class IPETEvaluation(IpetNode):
 
         reduceddata = self.addComparisonColumns(reduceddata)
 
-        # 
-        # restrict the columns to those that should appear in 
-        # the final table, but make sure that no columns 
-        # appear twice. Respect also the order of the columns
-        #
-        columns = []
-        colset = set()
-        for c in self.usercolumns + list(self.getIndex()):
-            if c not in colset and c not in self.countercolumns:
-                columns.append(c)
-                colset.add(c)
 
         # compile a long table with the requested row and column indices 
-        ret = self.convertToHorizontalFormat(reduceddata[columns])
+        ret = self.convertToHorizontalFormat(reduceddata)
         logging.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
 
         self.rettab = ret
@@ -1415,7 +1416,7 @@ class IPETEvaluation(IpetNode):
                 logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
             logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), filtergroupdata))
-            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(filtergroupdata[columns])
+            self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(filtergroupdata)
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(filtergroupdata)
 
         if len(nonemptyactivefiltergroups) > 0:

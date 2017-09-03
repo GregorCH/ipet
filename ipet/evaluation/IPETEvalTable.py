@@ -1067,7 +1067,7 @@ class IPETEvaluation(IpetNode):
             additionalfiltercolumns += fg.getNeededColumns(df)
 
         additionalfiltercolumns = list(set(additionalfiltercolumns))
-        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(activecolumns)]
+        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(activecolumns + self.countercolumns)]
         
         for col in additionalfiltercolumns:
             newcols.append(grouped[col].apply(meanOrConcat))
@@ -1080,6 +1080,12 @@ class IPETEvaluation(IpetNode):
         
         reduceddf = reduceddf.reset_index(index_uniq)
         reduceddf = reduceddf.reset_index(index_dupl, drop = True)
+        
+        #
+        # search for duplicate column names to avoid cryptic error messages later
+        #
+        if len(reduceddf.columns.get_duplicates()) > 0:
+            raise ValueError("Duplicate columns {} in reduced data frame, aborting".format(reduceddf.columns.get_duplicates()))
         
         return reduceddf
 

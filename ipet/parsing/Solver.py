@@ -143,7 +143,7 @@ class Solver():
         """
         self.data[key] = datum
 
-    def addHistoryData(self, key, timestr : str, boundstr : str, index : int = -1):
+    def addHistoryData(self, key, timestr : str, boundstr : str):
         """Add data to local historydata dictionary.
 
         Parameters
@@ -152,8 +152,6 @@ class Solver():
             string containing time
         boundstr
             string containing bound that should be saved
-        index 
-            int that represents the insertion index for primal bounds, -1 appends to the end
         """
         try:
             time = float(timestr)
@@ -161,28 +159,17 @@ class Solver():
         except:
             return
         history = self.data.setdefault(key, [])
-        
-        #
-        # simply append if 
-        #
-        if index != -1 and index > len(history):
-            index = -1
-                
         # only append newly found bounds
-        if history == [] or history[index][1] != bound:
+        
+        logging.debug("pointinTime %s, bound %s, key %s \n" % (timestr, boundstr, key))
+        if history == [] or history[-1][1] != bound:
             if(key == Key.PrimalBoundHistory):
-                if index == -1:
-                    history.append((time, bound))
-                else:
-                    history.insert(index, (time, bound))
-                    
+                history.append((time, bound))
             elif (key == Key.DualBoundHistory) and (history == [] or history[-1][0] != time):
                 history.append((time, bound))
             elif (key == Key.DualBoundHistory and history[-1][0] == time):
                 history.pop(-1)
                 history.append((time,bound))
-                
-    
 
     def readLine(self, line : str):
         """Read solver-specific data from that lin
@@ -347,6 +334,7 @@ class SCIPSolver(Solver):
     version_expr = re.compile("SCIP version (\S+)")
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
     nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
+    extrasol_expr = re.compile("^feasible solution found .* after (.*) seconds, objective value (\S*)")
 
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
@@ -386,12 +374,16 @@ class SCIPSolver(Solver):
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds  
         """
-        if self.firstsolexp.match(line):
-            matches = misc.numericExpression.findall(line)
-            PrimalBound = matches[0]
-            pointInTime = matches[3][:-1]
+        
+        #
+        # check if an additional line is printed for a feasible solution before presolving
+        #
+        extrasolmatch = self.extrasol_expr.match(line) 
+        if extrasolmatch:
+            pointInTime, PrimalBound = extrasolmatch.groups()
             # store newly found (time, primal bound) tuple if it differs from the last primal bound
-            self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound, 0)
+            self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
+            return
         elif not self.isTableLine(line):
             return 
         
@@ -411,7 +403,7 @@ class SCIPSolver(Solver):
             PrimalBound = allmatches[-1]
             # in the case of ugscip, we reacted on a disp char, so no problem at all.
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
-            logging.debug("pointinTime %s, primalbound %s \n" % (pointInTime, PrimalBound))
+            
 
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds  

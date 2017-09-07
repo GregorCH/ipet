@@ -160,6 +160,8 @@ class Solver():
             return
         history = self.data.setdefault(key, [])
         # only append newly found bounds
+        
+        logging.debug("pointinTime %s, bound %s, key %s \n" % (timestr, boundstr, key))
         if history == [] or history[-1][1] != bound:
             if(key == Key.PrimalBoundHistory):
                 history.append((time, bound))
@@ -332,6 +334,7 @@ class SCIPSolver(Solver):
     version_expr = re.compile("SCIP version (\S+)")
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
     nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
+    extrasol_expr = re.compile("^feasible solution found .* after (.*) seconds, objective value (\S*)")
 
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
@@ -371,12 +374,16 @@ class SCIPSolver(Solver):
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds  
         """
-        if self.firstsolexp.match(line):
-            matches = misc.numericExpression.findall(line)
-            PrimalBound = matches[0]
-            pointInTime = matches[3]
+        
+        #
+        # check if an additional line is printed for a feasible solution before presolving
+        #
+        extrasolmatch = self.extrasol_expr.match(line) 
+        if extrasolmatch:
+            pointInTime, PrimalBound = extrasolmatch.groups()
             # store newly found (time, primal bound) tuple if it differs from the last primal bound
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
+            return
         elif not self.isTableLine(line):
             return 
         
@@ -396,7 +403,7 @@ class SCIPSolver(Solver):
             PrimalBound = allmatches[-1]
             # in the case of ugscip, we reacted on a disp char, so no problem at all.
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
-            logging.debug("pointinTime %s, primalbound %s \n" % (pointInTime, PrimalBound))
+            
 
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds  

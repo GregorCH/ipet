@@ -32,11 +32,11 @@ class Experiment:
     DEFAULT_VALIDATEDUAL = False
 
     def __init__(self, files = [], listofreaders = [], gaptol = DEFAULT_GAPTOL, validatedual = DEFAULT_VALIDATEDUAL):
-        self.testrunmanager = Manager()
         self.datakeymanager = Manager()
 
         self.readermanager = ReaderManager()
         self.readermanager.registerDefaultReaders()
+        self.testruns = []
         self.solufiles = []
         self.externaldata = None
         self.basename2testrun = {}
@@ -71,8 +71,7 @@ class Experiment:
         For a list of allowed file extensions, see ipet.parsing.ReaderManager.
         """
 
-        filebasename = os.path.splitext(os.path.basename(filename))[0]
-        fileextension = os.path.splitext(filename)[-1]
+        filebasename, fileextension = os.path.splitext(filename)
 
         if not fileextension in [TestRun.FILE_EXTENSION] + self.readermanager.getFileExtensions():
             raise ValueError("Experiment cannot handle extension '%s' of file '%s'" % (fileextension, filename))
@@ -90,7 +89,7 @@ class Experiment:
             testrun.appendFilename(filename)
 
         if testrun not in self.getTestRuns():
-            self.testrunmanager.addAndActivate(testrun)
+            self.testruns.append(testrun)
 
         self.updateDatakeys()
 
@@ -100,7 +99,7 @@ class Experiment:
         # TODO how to handle misbehaving input?
         testrun = TestRun()
         testrun.setInputFromStdin()
-        self.testrunmanager.addAndActivate(testrun)
+        self.testruns.append(testrun)
         self.updateDatakeys()
 
     def addSoluFile(self, solufilename):
@@ -112,7 +111,7 @@ class Experiment:
     def removeTestrun(self, testrun):
         """ Remove a testrun object from the experiment
         """
-        self.testrunmanager.deleteManageable(testrun)
+        self.testruns.remove(testrun)
 
     def addReader(self, reader):
         """ Add a reader to the experiments reader manager
@@ -132,7 +131,7 @@ class Experiment:
     def getTestRuns(self):
         """ Returns all TestRuns
         """
-        return self.testrunmanager.getManageables()
+        return self.testruns
 
     def getReaderManager(self):
         """ Return the Readermanager
@@ -215,9 +214,6 @@ class Experiment:
 
         for testrun in testruns:
             testrun.setupAfterDataCollection()
-
-        for tr in testruns:
-            self.testrunmanager.reinsertManageable(tr)
 
         # post processing steps: things like primal integrals depend on several, independent data
         self.updateDatakeys()
@@ -548,7 +544,7 @@ class Experiment:
                 logging.debug("Problem %s in testrun %s solustatus %s, errorcode %s -> Status %s" % (problemid, testrun.getName(), repr(solustatus), repr(errcode), testrun.getProblemDataById(problemid, "Status")))
 
     def printToConsole(self, formatstr = "{idx} {d}"):
-        for tr in self.testrunmanager.getActiveSet():
+        for tr in self.testruns:
             tr.printToConsole(formatstr)
 
     def saveToFile(self, filename):

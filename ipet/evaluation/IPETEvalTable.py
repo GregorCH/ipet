@@ -141,6 +141,16 @@ class IPETEvaluationColumn(IpetNode):
             if self.reduction not in self.possiblereductions:
                 raise IpetNodeAttributeError("Attribute 'reduction' has illegal value '%s'"% self.reduction)
         return True
+    
+    def isRegex(self) -> bool:
+        """Is this a regular expression column
+        
+        Returns
+        -------
+        bool
+            True if this column will search the data keys with a regular expression
+        """
+        return (self.regex is not None)
 
     def addChild(self, child):
         if not self.acceptsAsChild(child):
@@ -427,7 +437,9 @@ class IPETEvaluationColumn(IpetNode):
             
         Returns
         tuple
-            (df_long, df_target) to which data has been appended
+            (df_long, df_target, result) 
+                - df_long and df_target to which columns may have been appended
+                - result is the column (or data frame) view in df_long
         
         """
         # if no children are associated with this column, it is either
@@ -443,9 +455,15 @@ class IPETEvaluationColumn(IpetNode):
                     logging.warning("Could not retrieve data %s" % self.origcolname)
                     result = pd.Series(numpy.nan, index=df_long.index)
 
-
+            #
+            # filter for columns that match the regular expression
+            #
             elif self.regex is not None:
                 result = df_long.filter(regex=self.regex)
+                
+            #
+            # store scalar constant
+            #                
             elif self.constant is not None:
                 df_long[self.getName()] = self.parseConstant()
                 result = df_long[self.getName()]
@@ -455,9 +473,12 @@ class IPETEvaluationColumn(IpetNode):
             transformfunc = self.getTransformationFunction()
 
             # concatenate the children data into a new data frame object
+            childframes = []
             for child in self.children:
-                df_long, df_target = child.getColumnData(df_long, df_target, evalindexcols)
-            argdf = df_long[[child.getName() for child in self.children if child.isActive()]]
+                df_long, df_target, childresult = child.getColumnData(df_long, df_target, evalindexcols)
+                childframes.append(childresult)
+            #argdf = df_long[[child.getName() for child in self.children if child.isActive()]]
+            argdf = pd.concat(childframes, axis = 1)
 
             applydict = dict(axis=1)
 
@@ -501,6 +522,12 @@ class IPETEvaluationColumn(IpetNode):
         
         reductionindex = self.getReductionIndex(evalindexcols)
         
+        #
+        # do not append frames with more than column. (They will be transformed at a higher level)
+        #
+        if len(result.shape) > 1:
+            return df_long, df_target, result
+        
         if len(reductionindex) > 0:
             # apply reduction and save the result by joining it into both data frames
             df_long[self.getName()] = result
@@ -517,7 +544,7 @@ class IPETEvaluationColumn(IpetNode):
             if not self.getName() in df_target:
                 df_target[self.getName()] = scalar
         
-        return df_long, df_target
+        return df_long, df_target, result
 
     def getStatsTests(self):
         return [agg.getStatsTest() for agg in self.aggregations if agg.getStatsTest() is not None]
@@ -906,7 +933,7 @@ class IPETEvaluation(IpetNode):
         #
         for col in self.toposortColumns(self.getActiveColumns()):
             try:
-                df_long, df_target = col.getColumnData(df_long, df_target, evalindexcols)
+                df_long, df_target, _ = col.getColumnData(df_long, df_target, evalindexcols)
             except Exception as e:
                 logging.warning("An error occurred for the column '{}':\n{}".format(col.getName(), col.attributesToStringDict()))
                 raise e
@@ -1245,6 +1272,8 @@ class IPETEvaluation(IpetNode):
                 col.checkAttributes()
             except Exception as e:
                 raise AttributeError("Error in column definition of column %s:\n   %s" % (col.getName(), e))
+            if col.isRegex():
+                raise AttributeError("Top level column {} must not specify a regular expression".format(col.getName()))
 
     def getAggregatedGroupData(self, filtergroup):
         if not filtergroup in self.filtergroups:

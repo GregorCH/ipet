@@ -437,7 +437,9 @@ class IPETEvaluationColumn(IpetNode):
             
         Returns
         tuple
-            (df_long, df_target) to which data has been appended
+            (df_long, df_target, result) 
+                - df_long and df_target to which columns may have been appended
+                - result is the column (or data frame) view in df_long
         
         """
         # if no children are associated with this column, it is either

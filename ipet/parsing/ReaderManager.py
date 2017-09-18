@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ElementTree
 from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, ListReader, \
     BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
-from .StatisticReader_PluginStatisticsReader import PluginStatisticsReader
+from .StatisticReader_TableReader import TableReader, CustomTableReader
 from .StatisticReader_VariableReader import VariableReader
 from .StatisticReader_SoluFileReader import SoluFileReader
 from .StatisticReader_CustomReader import CustomReader
@@ -34,7 +34,7 @@ class ReaderManager(Manager, IpetNode):
     """
     nodetag = "Readers"
 
-    xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader}
+    xmlfactorydict = {"ListReader":ListReader, "CustomReader":CustomReader, "CustomTableReader":CustomTableReader}
 
     context2string = {Key.CONTEXT_LOGFILE:"LogFile",
                       Key.CONTEXT_ERRFILE:"ErrFile"}
@@ -174,7 +174,7 @@ class ReaderManager(Manager, IpetNode):
              MetaDataReader(),
              NodesReader(),
              ObjsenseReader(),
-             PluginStatisticsReader(),
+             TableReader(),
              VariableReader(),
              RootNodeFixingsReader(),
              SettingsFileReader(),

@@ -12,10 +12,11 @@ please refer to README.md for how to cite IPET.
 import re
 from ipet.misc import misc
 from .StatisticReader import StatisticReader
+from ipet.concepts.IPETNode import IpetNodeAttributeError
 
-class PluginStatisticsReader(StatisticReader):
+class TableReader(StatisticReader):
     """
-    Reader which tries to read various data about plugin types arranged in table format -
+    Reader which tries to read various data arranged in table format -
     Format Foo: a     b
              1  : 0     5
              2  : 7     9
@@ -31,15 +32,15 @@ class PluginStatisticsReader(StatisticReader):
 
     and will store the corresponding values under Foo_a, and Foo_b
     """
-    name = 'PluginStatisticsReader'
-    plugintypes = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
+    name = 'TableReader'
+    tableids = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
                    'Separators', 'Branching Rules', 'Diving Statistics', 'LP', 'Branching Analysis', 'Primal Heuristics', 'Concurrent Solvers', 'Violation']
-    singlecolumnnames = ['Root Node', 'Total Time', 'B&B Tree']
+    columnids = ['Root Node', 'Total Time', 'B&B Tree']
     active = False
     spacesepcolumnnames = ['LP Iters']
     replacecolumnnames = [''.join(sscname.split()) for sscname in spacesepcolumnnames]
-    wrongplugintype = 'Wrong'
-    plugintype = wrongplugintype
+    wrongtableid = 'Wrong'
+    tableid = wrongtableid
 
 
     def convertToFloat(self, x):
@@ -60,9 +61,9 @@ class PluginStatisticsReader(StatisticReader):
             except:
                 #print(StatisticReader.problemname, line)
                 raise Exception()
-            plugintype = line[:colonidx].rstrip()
-            self.plugintype = ''.join(plugintype.split())
-            if plugintype in self.plugintypes:
+            tableid = line[:colonidx].rstrip()
+            self.tableid = ''.join(tableid.split())
+            if tableid in self.tableids:
 
                 preprocessedline = line[colonidx + 1:]
                 for expr, replacement in zip(self.spacesepcolumnnames, self.replacecolumnnames):
@@ -72,29 +73,29 @@ class PluginStatisticsReader(StatisticReader):
                 self.columns = preprocessedline.split()
 
                     # we are only parsing a single column
-            elif plugintype in self.singlecolumnnames:
+            elif tableid in self.columnids:
                 self.columns = []
             else:
-                self.plugintype = self.wrongplugintype
+                self.tableid = self.wrongtableid
 
-        elif self.active and self.plugintype != self.wrongplugintype:
+        elif self.active and self.tableid != self.wrongtableid:
             try:
                 colonidx = line.index(':')
             except:
-                self.plugintype = self.wrongplugintype
+                self.tableid = self.wrongtableid
                 return None
 
-            pluginname = ''.join(line[:colonidx].split())
+            rowname = ''.join(line[:colonidx].split())
 
-            # distinguish between vectors and
+            # distinguish between single columns and tables with multiple columns 
             if self.columns != []:
 
                 # treat tables (tables with at least two data columns)
-                datakeys = ['_'.join((self.plugintype, column, pluginname)) for column in self.columns]
+                datakeys = ['_'.join((self.tableid, column, rowname)) for column in self.columns]
                 data = list(map(self.convertToFloat, misc.numericExpression.findall(line[colonidx + 1:])))
             else:
                 # treat vectors (tables with only one data column)
-                datakeys = ['_'.join((self.plugintype, pluginname))]
+                datakeys = ['_'.join((self.tableid, rowname))]
                 # TODO This works, why is eclipse complaining?
                 data = [self.convertToFloat(misc.numericExpression.search(line, colonidx + 1).group(0))]
 
@@ -105,3 +106,44 @@ class PluginStatisticsReader(StatisticReader):
 
     def execEndOfProb(self):
         self.active = False
+
+class CustomTableReader(TableReader):
+    """customizable plugin statistics reader for user plugin data tables
+    """
+    
+    def __init__(self, name = "CustomTableReader", tableid = None, columnid = None):
+        """Constructs custom data table reader
+        
+        Parameters
+        ----------
+        tableid : string representing table identifier
+        
+        singlecolumname : string representing a column identifier
+        """
+        
+        if tableid is None and columnid is None:
+            raise Exception("Both tableid and singlecolumname are None")
+        self.set_tableid(tableid)
+        self.set_columnid(columnid)
+        self.name = name
+            
+    def set_tableid(self, tableid):
+        self.tableid = tableid
+        if tableid is not None:
+            self.tableids = [tableid]
+        else:
+            self.tableids = []
+            
+    def set_columnid(self, columnid):
+        self.columnid = columnid
+        if columnid is not None:
+            self.columnids = [columnid]
+        else:
+            self.columnids = []
+        
+        
+    def getEditableAttributes(self):
+        return TableReader.getEditableAttributes(self) + ["tableid", "singlecolumname"]
+        
+        
+    

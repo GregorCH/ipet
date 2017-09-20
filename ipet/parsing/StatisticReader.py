@@ -442,4 +442,3 @@ class ListReader(StatisticReader):
         data = self.getLineData(line)
         if data is not None:
             self.addData(data[0], data[1])
-

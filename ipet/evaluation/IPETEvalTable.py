@@ -810,8 +810,8 @@ class IPETEvaluation(IpetNode):
         if len(self.getColIndex()) == 1:
             return data[self.getColIndex()].iloc[0,:].values[0]
         else:
-            return tuple(data.iloc[0,self.getColIndex()].values)
-        
+            return tuple(data.iloc[0][self.getColIndex()])
+
     def set_defaultgroup(self, dg : str):
         """Set defaultgroup
         

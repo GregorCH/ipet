@@ -21,7 +21,8 @@ def loadAdditionalReaders(filenames = []):
     if filenames == []:
         filenames = os.listdir('./') 
         if readersDirExists():
-            filenames = filenames + os.listdir(getReadersDir())
+            readersdir = getReadersDir();
+            filenames = filenames + [readersdir + r for r in os.listdir(readersdir)]
     for _file in filenames:
         if _file.endswith(".xml") or _file.endswith(".ipr"):
             try:
@@ -59,9 +60,10 @@ def loadAdditionalSolufiles(filenames = []):
 
     if solufiles == []:
         if solufilesDirExists():
-            for _file in os.listdir(getSolufilesDir()):
+            solufilesdir = getSolufilesDir()
+            for _file in os.listdir(solufilesdir):
                 if _file.endswith(".solu"):
-                    solufiles.append(_file)
+                    solufiles.append(solufilesdir + "/" + _file)
     return solufiles
     
 def getIpetDir():

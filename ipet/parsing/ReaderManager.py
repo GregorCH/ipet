@@ -27,6 +27,7 @@ from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
+from ipet.Key import CONTEXT_ERRFILE
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -221,7 +222,7 @@ class ReaderManager(Manager, IpetNode):
             if filecontext == Key.CONTEXT_LOGFILE and not self.endOfProblemReached(line[1]):
                 logging.warning("Malformatted log output, probably a missing expression %s" % \
                                (self.problemendexpression))
-            self.testrun.finalizeCurrentCollection(self.activeSolver)
+            self.testrun.finalizeCurrentCollection(self.activeSolver, filecontext)
             self.activeSolver.reset()
 
     def updateProblemName(self, line, currentcontext, readers):
@@ -277,7 +278,11 @@ class ReaderManager(Manager, IpetNode):
             line = (0,"")
             for line in self.testrun:
                 if self.startOfProblemReached(line[1]):
+                    if context == CONTEXT_ERRFILE:
+                        # .errfiles do not contain problemdexpression ==ready==
+                        self.finishProblemParsing(line, context, readers)
                     self.updateProblemName(line, context, readers)
+
 
                 if self.endOfProblemReached(line[1]):
                     self.finishProblemParsing(line, context, readers)
@@ -290,7 +295,7 @@ class ReaderManager(Manager, IpetNode):
 
             # in case solver crashed, make sure that parsing is finished
             self.finishProblemParsing(line, context, readers)
-            self.testrun.finishedReadingFile(self.activeSolver)
+            self.testrun.finishedReadingFile(self.activeSolver, context = context)
 
         self.testrun.iterationCleanUp()
         return 1

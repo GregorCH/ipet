@@ -16,6 +16,7 @@ from ipet.parsing import StatisticReader
 import os, sys
 import logging
 import pandas as pd
+from ipet.Key import CONTEXT_LOGFILE
 #from lib2to3.fixes.fix_input import context
 #from matplotlib.tests import test_lines
 
@@ -68,6 +69,7 @@ class TestRun:
         
     def iterationNextFile(self):
         try:
+            self.currentproblemid = 0
             self.currentfile = next(self.currentfileiterator)
             return True
         except StopIteration:
@@ -196,12 +198,12 @@ class TestRun:
         """
         return self.metadatadict
 
-    def finalizeCurrentCollection(self, solver):
+    def finalizeCurrentCollection(self, solver, context = CONTEXT_LOGFILE):
         """ Any data of the current problem is saved as a new row in datadict
         """
         if self.currentproblemdata != {}:
             # Add data collected by solver into currentproblemdata, such as primal and dual bound,
-            self.addData(*solver.getData())
+            self.addData(*solver.getData(filecontext = context))
             for key in self.metadatadict.keys():
                 self.addData(key, self.metadatadict[key])
 
@@ -210,10 +212,10 @@ class TestRun:
             self.currentproblemdata = {}
             self.currentproblemid = self.currentproblemid + 1
 
-    def finishedReadingFile(self, solver):
+    def finishedReadingFile(self, solver, context = CONTEXT_LOGFILE):
         """ Save data of current problem
         """
-        self.finalizeCurrentCollection(solver)
+        self.finalizeCurrentCollection(solver, context)
 
     def setupForDataCollection(self):
         """ Save data in a python dictionary for easier data collection
@@ -242,12 +244,17 @@ class TestRun:
     def hasProblemId(self, problemid):
         """ Returns if there is already data collected for a problem with given id
         """
-        return problemid in range(self.currentproblemid)
+        return problemid in self.getProblemIds()
+
+    def getNumberOfProblems(self):
+        """ Return number of problemns
+        """
+        return max(len(self.datadict.get(Key.ProblemName, [])), len(self.data.keys()))
 
     def getProblemIds(self):
         """ Return a list of problemids
         """
-        return list(range(self.currentproblemid))
+        return list(range(self.getNumberOfProblems()))
 
     def getProblemNames(self):
         """ Return an (unsorted) list of problemnames

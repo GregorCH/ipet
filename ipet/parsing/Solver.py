@@ -30,6 +30,22 @@ class Solver():
 
     solverstatusmap = {}
 
+    contextkeys = {Key.CONTEXT_LOGFILE: [Key.Nodes,
+                                         Key.PrimalBound,
+                                         Key.DualBound,
+                                         Key.PrimalBoundHistory,
+                                         Key.DualBoundHistory,
+                                         Key.Solver,
+                                         Key.SolverStatus,
+                                         Key.SettingsPathAbsolute,
+                                         Key.Settings,
+                                         Key.Version,
+                                         Key.SolvingTime,
+                                         Key.GitHash,
+                                         Key.LPSolver,
+                                         Key.Mode],
+                   Key.CONTEXT_ERRFILE: []}
+
     def __init__(self,
                  solverId = None,
                  recognition_pattern = None,
@@ -273,11 +289,18 @@ class Solver():
         """
         return self.recognition_expr.match(line) != None
 
-    def getData(self, datakey = None):
+    def getData(self, datakey = None, filecontext = None):
         """Return data stored under datakey
 
         Or return collected data as a tuple of two generators
         """
+        if filecontext is not None:
+            if datakey in self.contextkeys[filecontext]:
+                return self.data.get(datakey)
+            else:
+                keys = [x for x in self.data.keys() if x in self.contextkeys[filecontext]]
+                return [keys, [self.data[k] for k in keys]]
+
         if datakey is None:
             return map(list, zip(*self.data.items()))
         else:

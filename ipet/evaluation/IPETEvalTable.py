@@ -876,9 +876,9 @@ class IPETEvaluation(IpetNode):
             # look if a comparison with the default group should be made
             if col.getCompareMethod() is not None:
 
-                grouped = df.groupby(self.getColIndex())[col.getName()]
+                df_bar = df.set_index(self.getRowIndex(), drop = True)
+                grouped = df_bar.groupby(self.getColIndex())[col.getName()]
                 compcol = dict(list(grouped))[dg]
-
                 comparecolname = col.getCompareColName()
 
                 # apply the correct comparison method to the original and the temporary column
@@ -886,13 +886,22 @@ class IPETEvaluation(IpetNode):
                 method = lambda x:compmethod(*x)
 
                 df[comparecolname] = 0
+                df.set_index(list(self.getIndex()), inplace = True)
                 for name, group in grouped:
-                    tmpgroup = DataFrame(group.reset_index(drop = True))
-                    tmpgroup["_tmpcol_"] = compcol.reset_index(drop = True)
+                    tmpgroup = DataFrame(group)
+                    tmpgroup["_tmpcol_"] = compcol
                     tmpgroup[comparecolname] = tmpgroup[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)#.set_index(group.index)
-                    df[comparecolname].update((tmpgroup.set_index(group.index))[comparecolname])
 
-#                print(df[comparecolname])
+                    for tmpcol in self.getColIndex():
+                        tmpgroup[tmpcol] = name
+                    tmpgroup.reset_index(drop = False, inplace = True)
+                    tmpgroup.set_index(list(self.getIndex()), inplace = True)
+
+                    newvals = tmpgroup[comparecolname]
+
+                    df[comparecolname].update(newvals)
+
+                df.reset_index(drop = False, inplace = True)
                 usercolumns.append(comparecolname)
 
         # TODO Sort usercolumns?

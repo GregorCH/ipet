@@ -48,13 +48,17 @@ class IPETValue(IpetNode):
     def getName(self):
         return self.name
 
-    def getValue(self):
-        for mytype in [int, float, str]:
-            try:
-                return mytype(self.name)
-            except ValueError:
-                continue
-        return None
+    def getValue(self, dtype=None):
+        if dtype is None:
+            for mytype in [int, float, str]:
+                try:
+                    return mytype(self.name)
+                except ValueError:
+                    continue
+        elif dtype != np.object:
+            return dtype.type(self.name)
+        
+        return self.name
 
     def toXMLElem(self):
         me = ElementTree.Element(IPETValue.getNodeTag(), self.attributesToStringDict())
@@ -213,13 +217,13 @@ class IPETFilter(IpetNode):
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2Options.get(attr, super(IPETFilter, self).getRequiredOptionsByAttribute(attr))
 
-    def checkAndUpdateValueSet(self):
+    def checkAndUpdateValueSet(self, dtype = None):
         """Update the value set of this filter if necessary
         """
         if not self._updatevalueset:
             return
 
-        self.valueset = set([x.getValue() for x in self.getActiveValues()])
+        self.valueset = set([x.getValue(dtype) for x in self.getActiveValues()])
         updateset = set()
 
         #
@@ -236,7 +240,10 @@ class IPETFilter(IpetNode):
         self._updatevalueset = False
 
     def applyValueOperator(self, df):
-        self.checkAndUpdateValueSet()
+        
+        dtype = df.dtypes[0]
+        
+        self.checkAndUpdateValueSet(dtype)
         contained = df.isin(self.valueset)
         logging.debug("Contained: {}\nData: {}".format(contained, df))
         if self.anytestrun:

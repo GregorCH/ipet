@@ -301,7 +301,7 @@ class NodesReader(StatisticReader):
 
 class ObjsenseReader(StatisticReader):
     name = 'ObjsenseReader'
-    regular_exp = re.compile("^  Objective sense  : (\w*)")
+    regular_exp = re.compile("^  Objective        : (\w*),")
     datakey = Key.ObjectiveSense
     minimize = 1
     maximize = -1

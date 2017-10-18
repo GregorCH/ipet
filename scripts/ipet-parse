@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # if globals().get("help") is not None:
     logger = logging.getLogger()
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    ch = logging.StreamHandler()
+    ch = logging.StreamHandler(sys.stdout)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 

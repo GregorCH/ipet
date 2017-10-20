@@ -892,8 +892,9 @@ class IPETEvaluation(IpetNode):
                     tmpgroup["_tmpcol_"] = compcol
                     tmpgroup[comparecolname] = tmpgroup[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)#.set_index(group.index)
 
-                    for tmpcol in self.getColIndex():
-                        tmpgroup[tmpcol] = name
+                    for n, i in zip(name, self.getColIndex()):
+                        tmpgroup[i] = n
+
                     tmpgroup.reset_index(drop = False, inplace = True)
                     tmpgroup.set_index(list(self.getIndex()), inplace = True)
 
@@ -1414,7 +1415,6 @@ class IPETEvaluation(IpetNode):
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData().copy()
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
-
         self.tryGenerateIndexAndDefaultgroup(data)
 
 #            possiblebasegroups = sorted(data[self.getColIndex()[0]].unique())

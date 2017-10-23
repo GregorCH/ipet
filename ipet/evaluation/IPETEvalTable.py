@@ -891,9 +891,13 @@ class IPETEvaluation(IpetNode):
                     tmpgroup = DataFrame(group)
                     tmpgroup["_tmpcol_"] = compcol
                     tmpgroup[comparecolname] = tmpgroup[[col.getName(), "_tmpcol_"]].apply(method, axis = 1)#.set_index(group.index)
-
-                    for n, i in zip(name, self.getColIndex()):
-                        tmpgroup[i] = n
+#
+                    colindex = self.getColIndex()
+                    if len(colindex) > 1:
+                        for n, i in zip(name, colindex):
+                            tmpgroup[i] = n
+                    else:
+                        tmpgroup[colindex[0]] = name
 
                     tmpgroup.reset_index(drop = False, inplace = True)
                     tmpgroup.set_index(list(self.getIndex()), inplace = True)

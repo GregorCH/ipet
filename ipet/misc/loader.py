@@ -22,7 +22,7 @@ def loadAdditionalReaders(filenames = []):
         filenames = os.listdir('./') 
         if readersDirExists():
             readersdir = getReadersDir();
-            filenames = filenames + [readersdir + r for r in os.listdir(readersdir)]
+            filenames = filenames + [readersdir + "/" + r for r in os.listdir(readersdir)]
     for _file in filenames:
         if _file.endswith(".xml") or _file.endswith(".ipr"):
             try:

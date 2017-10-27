@@ -1418,6 +1418,7 @@ class IPETEvaluation(IpetNode):
 
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData().copy()
+        
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
         self.tryGenerateIndexAndDefaultgroup(data)
 

@@ -27,7 +27,7 @@ from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
-from ipet.Key import CONTEXT_ERRFILE
+from ipet.Key import CONTEXT_ERRFILE, CONTEXT_LOGFILE
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -278,7 +278,7 @@ class ReaderManager(Manager, IpetNode):
             line = (0,"")
             for line in self.testrun:
                 if self.startOfProblemReached(line[1]):
-                    if context == CONTEXT_ERRFILE:
+                    if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:
                         # .errfiles do not contain problemdexpression ==ready==
                         self.finishProblemParsing(line, context, readers)
                     self.updateProblemName(line, context, readers)

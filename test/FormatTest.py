@@ -13,12 +13,11 @@ from _io import StringIO
 val = 0.00005
 status = "ok"
 class HelperExperiment():
-    d = pd.DataFrame([[val,"A", "B", True, status]], columns=["numeric", "stringA","stringB", "bool", "Status"])
-    
+    d = pd.DataFrame([[val, "A", "B", True, status]],
+            columns=["numeric", "stringA","stringB", "bool", "Status"])
+
     def getJoinedData(self):
         return self.d
-    
-        
 
 
 class FormatTest(unittest.TestCase):

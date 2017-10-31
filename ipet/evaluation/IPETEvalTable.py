@@ -1185,28 +1185,22 @@ class IPETEvaluation(IpetNode):
         expects a Multiindex column data frame df
         """
         formatters = {}
-        thelevel = 0
-
-        # temporary hack to test which level is the maximum level
-        try:
-            df.columns.get_level_values(1)
-            thelevel = 1
-        except IndexError:
-            pass
+        l = 0
+        if isinstance(df.columns[0], tuple):
+            l = len(df.columns[0])-1
 
         comptuples = []
         # loop over columns
         for col in self.getActiveColumns():
 
+            name = col.getName()
+            suffix = col.getCompareSuffix()
             # determine all possible comparison columns and append them to the list
             if col.getCompareMethod() is not None:
-                try:
-                    if thelevel == 1:
-                        comptuples += df.xs(col.getName() + col.getCompareSuffix(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
-                    else:
-                        comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and dfcol.endswith("Q")]
-                except:
-                    pass
+                if l == 0:
+                    comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(name) and dfcol.endswith(suffix)]
+                else:
+                    comptuples += [dfcol for dfcol in df.columns if dfcol[l].startswith(name) and dfcol[l].endswith(suffix)]
 
             # if the column has no formatstr attribute, continue
             if not col.getFormatString():
@@ -1214,15 +1208,13 @@ class IPETEvaluation(IpetNode):
 
             # retrieve all columns as tuples that contain the column name, ie. for column 'Time' and
             # settings 'default' and 'heuroff', the result should be [('default', 'Time'),('heuroff', 'Time')]
-            try:
-                if thelevel == 1:
-                    tuples = df.xs(col.getName(), axis=1, level=thelevel, drop_level=False).columns.values.tolist()
+            if suffix == "":
+                suffix = "ThisIsVeryUnlikelyTheSuffix"
 
-                else:
-                    tuples = [dfcol for dfcol in df.columns if dfcol.startswith(col.getName()) and not dfcol.endswith("Q") and not dfcol.endswith("p")]
-            except KeyError:
-                # the column name is not contained in the final df
-                continue
+            if l == 0:
+                tuples = [dfcol for dfcol in df.columns if dfcol.startswith(name) and not dfcol.endswith(suffix) and not dfcol.endswith("p")]
+            else:
+                tuples = [dfcol for dfcol in df.columns if dfcol[l].startswith(name) and not dfcol[l].endswith(suffix) and not dfcol[l].endswith("p")]
 
             # add new formatting function to the map of formatting functions
             for thetuple in tuples:

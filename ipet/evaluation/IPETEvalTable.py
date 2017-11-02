@@ -1025,19 +1025,23 @@ class IPETEvaluation(IpetNode):
                                                                       Key.ProblemStatusCodes.MemoryLimit,
                                                                       Key.ProblemStatusCodes.Interrupted
                                                                       ]))
-        df['_fail_'] = df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailDualBound,
+        df['_primfail_'] = df[Key.ProblemStatus].isin([
                                                     Key.ProblemStatusCodes.FailObjectiveValue,
                                                     Key.ProblemStatusCodes.FailSolInfeasible,
                                                     Key.ProblemStatusCodes.FailSolOnInfeasibleInstance,
-                                                    Key.ProblemStatusCodes.Fail
                                         ])
+        
+        df['_dualfail_'] = df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailDualBound])
+        
+        df['_fail_'] = df['_primfail_'] | df['_dualfail_'] | (df[Key.ProblemStatus] == Key.ProblemStatusCodes.Fail)
+        
         df['_abort_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.FailAbort)
 
         df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_'])
 
         df['_count_'] = 1
         df['_unkn_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.Unknown)
-        self.countercolumns = ['_time_', '_limit_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']
+        self.countercolumns = ['_time_', '_limit_', '_primfail_', '_dualfail_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']
         return df
 
     def toXMLElem(self):

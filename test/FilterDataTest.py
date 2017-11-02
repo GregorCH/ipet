@@ -58,7 +58,7 @@ class FilterDataTest(unittest.TestCase):
         # Test through the aggregated table that should contain
         # the TestGroup and therefore have exactly one row 
         #
-        expected_shape = (1, 7)
+        expected_shape = (1, 9)
         self.assertEqual(aggtable.shape, expected_shape,
                          "Expected shape {} in table, got {},n{}\n".format(expected_shape, aggtable.shape, aggtable) )         
 

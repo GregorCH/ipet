@@ -134,6 +134,7 @@ if __name__ == '__main__':
 
     for solver in loader.loadAdditionalSolvers():
         experiment.readermanager.addSolver(solver)
+        logging.info("Registered solver with name %s" % solver.getName())
 
     for solufile in loader.loadAdditionalSolufiles(arguments.solufiles):
         experiment.addSoluFile(solufile)

@@ -150,10 +150,10 @@ class ExperimentTest(unittest.TestCase):
         data = self.experiment.getTestRuns()[0].data
         
         for v in data["LineNumbers_BeginLogFile"]:
-            self.assertTrue(isinstance(v, np.int64))
+            self.assertTrue(isinstance(v, np.int))
 
         for v in data["LineNumbers_EndLogFile"]:
-            self.assertTrue(isinstance(v, np.int64))
+            self.assertTrue(isinstance(v, np.int))
 
     def test_trnfileextension(self):
         trn_file = os.path.join(DATADIR, ".testrun.trn")
@@ -264,5 +264,3 @@ def estimate_type(var):
 
 if __name__ == "__main__":
     unittest.main()
-    
-    

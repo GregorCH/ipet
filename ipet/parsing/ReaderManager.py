@@ -219,9 +219,6 @@ class ReaderManager(Manager, IpetNode):
             for reader in readers:
                 reader.execEndOfProb()
 
-            if filecontext == Key.CONTEXT_LOGFILE and not self.endOfProblemReached(line[1]):
-                logging.warning("Malformatted log output, probably a missing expression %s" % \
-                               (self.problemendexpression))
             self.testrun.finalizeCurrentCollection(self.activeSolver, filecontext)
             self.activeSolver.reset()
 

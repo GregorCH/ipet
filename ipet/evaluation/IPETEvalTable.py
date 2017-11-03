@@ -1612,7 +1612,7 @@ class IPETEvaluation(IpetNode):
                 stats.append(df[self.getColIndex() + [col.getName()]]
                              .pivot_table(index = self.getColIndex(),
                                           dropna = False,
-                                          aggfunc = lambda x:getWilcoxonQuotientSignificance(x.reset_index(drop = True),
+                                          aggfunc = lambda x:statstest(x.reset_index(drop = True),
                                                                        defaultvalues)))
                 names.append('_'.join((col.getName(), statstest.__name__)))
 

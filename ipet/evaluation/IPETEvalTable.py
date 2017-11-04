@@ -1518,7 +1518,9 @@ class IPETEvaluation(IpetNode):
         if self.getColIndex() == []:
             generalpart = df[indices].apply(sum)
         else:
-            generalpart = df[indices].pivot_table(index = self.getColIndex(), aggfunc = sum)
+            generalpart = df[indices].pivot_table(index = self.getColIndex(),
+                    dropna=False,
+                    aggfunc = sum)
 
         # test if there is any aggregation to be calculated
         activecolumns = self.getActiveColumns()
@@ -1539,7 +1541,9 @@ class IPETEvaluation(IpetNode):
 
             colaggpart = pd.DataFrame(pd.concat(tabs)).T
         else:
-            tabs = (df[[col.getName()] + self.getColIndex()].pivot_table(index = self.getColIndex(), aggfunc = agg.aggregate) for col, agg in colsandaggregations)
+            tabs = (df[[col.getName()] + self.getColIndex()].pivot_table(index = self.getColIndex(),
+                dropna = False,
+                aggfunc = agg.aggregate) for col, agg in colsandaggregations)
             colaggpart = pd.concat(tabs, axis = 1)
         # rename the column aggregations
         newnames = ['_'.join((col.getName(), agg.getName())) for col, agg in colsandaggregations]

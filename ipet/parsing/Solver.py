@@ -30,7 +30,8 @@ class Solver():
 
     solverstatusmap = {}
 
-    contextkeys = {Key.CONTEXT_LOGFILE: [Key.Nodes,
+    contextkeys = {Key.CONTEXT_LOGFILE: set(
+                                        [Key.Nodes,
                                          Key.PrimalBound,
                                          Key.DualBound,
                                          Key.PrimalBoundHistory,
@@ -43,7 +44,9 @@ class Solver():
                                          Key.SolvingTime,
                                          Key.GitHash,
                                          Key.LPSolver,
-                                         Key.Mode],
+                                         Key.Mode
+                                         ]
+                                         ),
                    Key.CONTEXT_ERRFILE: []}
 
     def __init__(self,
@@ -358,6 +361,7 @@ class SCIPSolver(Solver):
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
     nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
     extrasol_expr = re.compile("^feasible solution found .* after (.*) seconds, objective value (\S*)")
+    soplexgithash_expr = re.compile("^  SoPlex .+\[GitHash: (\S+)\]")
 
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
@@ -473,6 +477,9 @@ class SCIPSolver(Solver):
             data = re.search(r"SCIP.*\[%s: ([\w .-]+)\]" % keyword, line)
             if data:
                 self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
+        soplexhashmatch = self.soplexgithash_expr.match(line)
+        if soplexhashmatch:
+            self.addData("SpxGitHash", soplexhashmatch.groups()[0])
 
     def extractPath(self, line : str):
         """Extract the path info

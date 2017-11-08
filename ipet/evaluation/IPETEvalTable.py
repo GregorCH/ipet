@@ -1462,7 +1462,6 @@ class IPETEvaluation(IpetNode):
             filtergroupdata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
             if (len(filtergroupdata) == 0):
                 nonemptyactivefiltergroups.remove(fg)
-                fg.set_active(False)
                 logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
             logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), filtergroupdata))

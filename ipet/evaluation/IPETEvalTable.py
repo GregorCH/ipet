@@ -1188,6 +1188,8 @@ class IPETEvaluation(IpetNode):
 
         expects a Multiindex column data frame df
         """
+        if len(df.columns) == 0:
+            return {}
         formatters = {}
         l = 0
         if isinstance(df.columns[0], tuple):

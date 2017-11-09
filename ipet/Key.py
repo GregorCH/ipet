@@ -100,6 +100,7 @@ class SolverStatusCodes:
     NodeLimit = 4
     Interrupted = 5
     Unbounded = 6
+    GapLimit = 7
 
 class ProblemStatusCodes:
     """ Keeping track of how good the solution of a solver actually was.
@@ -153,6 +154,7 @@ class ProblemStatusCodes:
         return min(*args, key = lambda x : ProblemStatusCodes.statusToPriority.get(x, 0))
 
 solver2problemStatusCode = {
+    SolverStatusCodes.GapLimit : ProblemStatusCodes.Ok,
     SolverStatusCodes.Crashed : ProblemStatusCodes.FailAbort,
     SolverStatusCodes.Infeasible : ProblemStatusCodes.Ok,
     SolverStatusCodes.Optimal : ProblemStatusCodes.Ok,

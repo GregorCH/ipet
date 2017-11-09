@@ -98,9 +98,9 @@ class SolverStatusCodes:
     TimeLimit = 2
     MemoryLimit = 3
     NodeLimit = 4
+    GapLimit = 4.5
     Interrupted = 5
     Unbounded = 6
-    GapLimit = 7
 
 class ProblemStatusCodes:
     """ Keeping track of how good the solution of a solver actually was.

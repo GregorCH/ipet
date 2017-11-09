@@ -357,8 +357,8 @@ class SCIPSolver(Solver):
         "SCIP Status        : solving was interrupted \[time limit reached\]" : Key.SolverStatusCodes.TimeLimit,
         "SCIP Status        : solving was interrupted \[memory limit reached\]" : Key.SolverStatusCodes.MemoryLimit,
         "SCIP Status        : solving was interrupted \[node limit reached\]" : Key.SolverStatusCodes.NodeLimit,
+        "SCIP Status        : solving was interrupted \[gap limit reached\]" : Key.SolverStatusCodes.GapLimit,
         "SCIP Status        : solving was interrupted" : Key.SolverStatusCodes.Interrupted,
-        "SCIP Status        : solving was interrupted \[gap limit reached\]" : Key.SolverStatusCodes.GapLimit
     }
 
     def __init__(self, **kw):

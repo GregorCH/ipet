@@ -30,22 +30,6 @@ class Solver():
 
     solverstatusmap = {}
 
-    contextkeys = {Key.CONTEXT_LOGFILE: [Key.Nodes,
-                                         Key.PrimalBound,
-                                         Key.DualBound,
-                                         Key.PrimalBoundHistory,
-                                         Key.DualBoundHistory,
-                                         Key.Solver,
-                                         Key.SolverStatus,
-                                         Key.SettingsPathAbsolute,
-                                         Key.Settings,
-                                         Key.Version,
-                                         Key.SolvingTime,
-                                         Key.GitHash,
-                                         Key.LPSolver,
-                                         Key.Mode],
-                   Key.CONTEXT_ERRFILE: []}
-
     def __init__(self,
                  solverId = None,
                  recognition_pattern = None,
@@ -289,18 +273,11 @@ class Solver():
         """
         return self.recognition_expr.match(line) != None
 
-    def getData(self, datakey = None, filecontext = None):
+    def getData(self, datakey = None):
         """Return data stored under datakey
 
         Or return collected data as a tuple of two generators
         """
-        if filecontext is not None:
-            if datakey in self.contextkeys[filecontext]:
-                return self.data.get(datakey)
-            else:
-                keys = [x for x in self.data.keys() if x in self.contextkeys[filecontext]]
-                return [keys, [self.data[k] for k in keys]]
-
         if datakey is None:
             return map(list, zip(*self.data.items()))
         else:
@@ -358,6 +335,7 @@ class SCIPSolver(Solver):
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
     nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
     extrasol_expr = re.compile("^feasible solution found .* after (.*) seconds, objective value (\S*)")
+    soplexgithash_expr = re.compile("^  SoPlex .+\[GitHash: (\S+)\]")
 
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
@@ -474,6 +452,9 @@ class SCIPSolver(Solver):
             data = re.search(r"SCIP.*\[%s: ([\w .-]+)\]" % keyword, line)
             if data:
                 self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
+        soplexhashmatch = self.soplexgithash_expr.match(line)
+        if soplexhashmatch:
+            self.addData("SpxGitHash", soplexhashmatch.groups()[0])
 
     def extractPath(self, line : str):
         """Extract the path info

@@ -149,12 +149,6 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.collectData()
         data = self.experiment.getTestRuns()[0].data
         
-        for v in data["LineNumbers_BeginLogFile"]:
-            self.assertTrue(isinstance(v, np.int64))
-
-        for v in data["LineNumbers_EndLogFile"]:
-            self.assertTrue(isinstance(v, np.int64))
-
     def test_trnfileextension(self):
         trn_file = os.path.join(DATADIR, ".testrun.trn")
         self.experiment.addOutputFile(trn_file)

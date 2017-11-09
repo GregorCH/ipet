@@ -203,7 +203,8 @@ class TestRun:
         """
         if self.currentproblemdata != {}:
             # Add data collected by solver into currentproblemdata, such as primal and dual bound,
-            self.addData(*solver.getData(filecontext = context))
+            if context == CONTEXT_LOGFILE:
+                self.addData(*solver.getData())
             for key in self.metadatadict.keys():
                 self.addData(key, self.metadatadict[key])
 

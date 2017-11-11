@@ -48,7 +48,7 @@ filtergroups = [{"filtertype":"intersection", "name":"all"},
                 {"name":"hard"}]
 
 filters = [None,
-           {"anytestrun":"any", "expression1":"Time", "expression2":"100", "operator":"ge"}]
+           {"anytestrun":"one", "expression1":"Time", "expression2":"100", "operator":"ge"}]
 
 test_out = os.path.join(DATADIR, 'check.MMM.scip-hashing.linux.x86_64.gnu.dbg.cpx.mip-dbg.heuraggr.out')
 

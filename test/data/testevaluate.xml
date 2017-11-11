@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Evaluation groupkey="Settings" defaultgroup="default">
+<Evaluation index="ProblemName Settings" defaultgroup="default">
 	<Column name="SolvingTime" origcolname="TotalTime_solving">
 		<Aggregation name="shmean">
 			<shiftby type="float" val="10.0"/>

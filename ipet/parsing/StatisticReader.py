@@ -227,7 +227,7 @@ class SettingsFileReader(StatisticReader):
     nodeselection/bfs/stdpriority = 1000000
     """
     name = "SettingsFileReader"
-    regular_exp_name = re.compile("^([\w/]+) = (.+)")
+    regular_exp_name = re.compile("^([\w/]+) = (\S+)")
     regular_exp_type = re.compile("^# \[type: (\w+),.*default: ([^\]]+)\]")
     context = Key.CONTEXT_SETFILE
 

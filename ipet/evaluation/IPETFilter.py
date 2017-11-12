@@ -152,6 +152,9 @@ class IPETFilter(IpetNode):
             raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty value set".format(self.operator))
         if self.operator in self.valueoperators and self.datakey is None or self.datakey == "":
             raise IpetNodeAttributeError("datakey", "Trying to use a filter with operator '{}' and unspecified data key '{}'".format(self.operator, self.datakey))
+        
+        if self.anytestrun not in self.attribute2Options["anytestrun"]:
+            raise IpetNodeAttributeError("anytestrun", "Wrong attribute {} passed as 'anytestrun' property. Should be in {}".format(self.anytestrun, self.attribute2Options["anytestrun"]))
         return True
         
         
@@ -246,17 +249,11 @@ class IPETFilter(IpetNode):
         self.checkAndUpdateValueSet(dtype)
         contained = df.isin(self.valueset)
         logging.debug("Contained: {}\nData: {}".format(contained, df))
-        if self.anytestrun:
-            contained = contained.any().bool()
+        if self.operator == "keep":
+            return contained
         else:
-            contained = contained.all().bool()
-
-        if contained and self.operator == "keep":
-            return True
-        elif self.operator == "drop":
-            return (not contained)
-
-        return False
+            return ~contained
+        
 
     def filterProblem(self, probname, testruns=[]):
         """
@@ -303,17 +300,17 @@ class IPETFilter(IpetNode):
         booleanseries = self.comparison.compare(x, y)
         return booleanseries
 
-    def filterDataFrame(self, df):
-        if self.operator in self.valueoperators:
-            return self.applyValueOperator(df[[self.datakey]])
-
-        x = self.evaluateValueDataFrame(df, self.expression1)
-        y = self.evaluateValueDataFrame(df, self.expression2)
-        booleanseries = self.comparison.compare(x, y)
-        mymethod = np.any
-        if self.anytestrun == 'all':
-            mymethod = np.all
-        return mymethod(booleanseries)
+#     def filterDataFrame(self, df):
+#         if self.operator in self.valueoperators:
+#             return self.applyValueOperator(df[[self.datakey]])
+# 
+#         x = self.evaluateValueDataFrame(df, self.expression1)
+#         y = self.evaluateValueDataFrame(df, self.expression2)
+#         booleanseries = self.comparison.compare(x, y)
+#         mymethod = np.any
+#         if self.anytestrun == 'all':
+#             mymethod = np.all
+#         return mymethod(booleanseries)
 
     def getNeededColumns(self, df):
         return [exp for exp in [self.expression1, self.expression2] if exp in df.columns]
@@ -435,17 +432,58 @@ class IPETFilterGroup(IpetNode):
         """
         filters a data frame object as the intersection of all values that match the criteria defined by the filters
         """
-        groups = df.groupby(index)
-        # first, get the highest number of problem occurrences. This number must be matched to keep the problem
-        if self.filtertype == "intersection":
-            instancecount = groups.apply(len).max()
-            intersectionfunction = lambda x:len(x) == instancecount
-        elif self.filtertype == "union":
-            intersectionfunction = lambda x:len(x) >= 1
-
+        
+        
         activefilters = self.getActiveFilters()
-        # return a filtered data frame as intersection of all values that match all filter criteria and appear in every test run
-        return groups.filter(lambda x:intersectionfunction(x) and np.all([filter_.filterDataFrame(x) for filter_ in activefilters]))
+        
+        # treat the special case to keep everything quickly
+        if len(activefilters) == 0 and self.filtertype == "union":
+            return df
+        
+        dfindex = df.set_index(index).index
+        
+        # first, get the highest number of index occurrences. This number must be matched to keep the problem
+        if self.filtertype == "intersection":
+            groups = df.groupby(index)
+            instancecount = groups.apply(len).max()
+            interrows = groups.apply(lambda x:len(x) == instancecount)
+            
+            index_series = [interrows.reindex(dfindex)]
+        elif self.filtertype == "union":
+            index_series = []
+
+        
+        renaming = {i:"{}_filter".format(i) for i in index}
+        
+        for f_ in activefilters:
+            # apply the filter to the data frame rowwise and store the result in a temporary boolean column
+            filtercol = f_.applyFilter(df)
+            filtercol = filtercol.rename(renaming, axis = 1)
+            
+            filtercol.index = dfindex
+            # group the filter by the specified data frame index columns.
+            if f_.anytestrun == "one":
+                func = np.any
+            elif f_.anytestrun == "all":
+                func = np.all 
+            
+            fcol_index = filtercol.groupby(filtercol.index).apply(func)
+            #
+            # reshape the column to match the original data frame rows
+            #
+            fcol = fcol_index.reindex(index = df.set_index(index).index, axis = 0)
+            index_series.append(fcol)
+        
+        #
+        # aggregate the single, elementwise filters into a single intersection
+        # series with one row per index element
+        # 
+        intersection_index = pd.concat(index_series, axis = 1).apply(np.all, axis = 1)
+         
+        lvalues = intersection_index.values
+            
+        return df[lvalues]    
+    
 
     def filterProblem(self, probname, testruns=[]):
         for filter_ in self.getActiveFilters():

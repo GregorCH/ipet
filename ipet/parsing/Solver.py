@@ -340,13 +340,10 @@ class SCIPSolver(Solver):
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
     heurdispcharexp = re.compile('^[^ \d]')
-    heurdispcharexpugmode = re.compile('^\*')
     """ all lines starting with a non-whitespace and non-digit character """
 
     shorttablecheckexp = re.compile('s\|')
     firstsolexp = re.compile('^  First Solution   :')
-    ugtableexp = re.compile('^\s+Time\s+Nodes')
-    ugmode = False
 
     # variables needed for dual bound history
     regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
@@ -390,13 +387,9 @@ class SCIPSolver(Solver):
             return 
         
         # history reader should be in a table. check if a display char indicates a new primal bound
-        if self.heurdispcharexp.match(line) and not self.ugmode or \
-            self.heurdispcharexpugmode.match(line) and self.ugmode:
+        if self.heurdispcharexp.match(line):
 
-            if not self.ugmode:
-                allmatches = misc.numericExpression.findall(line[:line.rindex("|")])
-            else:
-                allmatches = misc.numericExpression.findall(line)[:5]
+            allmatches = misc.numericExpression.findall(line[:line.rindex("|")])
 
             if len(allmatches) == 0:
                 return
@@ -436,12 +429,8 @@ class SCIPSolver(Solver):
         if self.primalboundhistory_exp.match(line):
             columnheaders = list(map(str.strip, line.split('|')))
             self.dualboundindex = columnheaders.index('dualbound')
-            self.ugmode = False
             return True
         elif self.shorttablecheckexp.search(line):
-            return True
-        elif line.startswith("     Time          Nodes        Left   Solvers     Best Integer        Best Node"):
-            self.ugmode = True
             return True
         return False
 
@@ -470,6 +459,65 @@ class SCIPSolver(Solver):
         """
         self.extractPath(line)
         self.extractMoreData(line)
+        
+class FiberSCIPSolver(SCIPSolver):
+    """Reads data from FiberSCIP output, that ressembles SCIP output a lot, except for the table.
+    """
+    solverId = "FiberSCIP"
+    recognition_expr = re.compile("^The following solver is parallelized by UG")
+    primalbound_expr = re.compile("^  Primal Bound     : (\S+)")
+    dualbound_expr = re.compile("^  Dual Bound       : (\S+)")
+    solvingtime_expr = re.compile("^Total Time         : (\S+)")
+    version_expr = re.compile("^The following solver is parallelized by UG version (\S+)")
+    nodes_expr = re.compile("  nodes \(total\)    : *(\d+)")
+
+    # variables needed for primal bound history
+    heurdispcharexp = re.compile('^\* ')
+    """ all lines starting with a single (!!!) asterisk. UG sometimes prints double asterisks """
+
+    ugtableexp = re.compile('^\s+Time\s+Nodes')
+
+    solverstatusmap = {
+        "SCIP Status        : problem is solved" : Key.SolverStatusCodes.Optimal,
+        "SCIP Status        : solving was interrupted \[ hard time limit reached \]" : Key.SolverStatusCodes.TimeLimit,
+    }
+    
+    def __init__(self, **kw):
+        super(FiberSCIPSolver, self).__init__(**kw)
+        
+        
+    def isTableLine(self, line : str) -> bool:   
+        if self.ugtableexp.match(line):
+            return True
+        elif self.heurdispcharexp.match(line):
+            return True
+        return False 
+        
+    def extractPrimalboundHistory(self, line : str):
+        """ Extract the sequence of primal bounds  
+        """
+        
+        if not self.isTableLine(line):
+            return 
+        
+        # history reader should be in a table. check if a display char indicates a new primal bound
+        if self.heurdispcharexp.match(line):
+            allmatches = misc.numericExpression.findall(line)[:5]
+
+            if len(allmatches) == 0:
+                return
+
+            pointInTime = allmatches[0]
+            PrimalBound = allmatches[-1]
+            # in the case of ugscip, we reacted on a disp char, so no problem at all.
+            self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
+            
+    def extractDualboundHistory(self, line : str):
+        """Do not read a dual bound history, override method in SCIP solver
+        
+        There is no simple way to distinguish UG table lines from other output unless the primal bound changes. 
+        """
+        pass
 
 class GurobiSolver(Solver):
 

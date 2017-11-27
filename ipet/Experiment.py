@@ -481,8 +481,8 @@ class Experiment:
         if solverstatus:
             code = Key.solverToProblemStatusCode(solverstatus)
 
-            if pb is not None:
-                code = Key.ProblemStatusCodes.Better
+        elif pb is not None:
+            code = Key.ProblemStatusCodes.Better
         elif misc.getGap(pb, db) < self.gaptol:
             code = Key.ProblemStatusCodes.SolvedNotVerified
         else:

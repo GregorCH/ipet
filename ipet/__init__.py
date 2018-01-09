@@ -13,6 +13,8 @@ please refer to README.md for how to cite IPET.
 from .Experiment import Experiment
 from .TestRun import TestRun
 from .version import __version__
+from .IPETError import IPETInconsistencyError
+
 __all__ = [ "concepts",
             "evaluation",
             "misc",

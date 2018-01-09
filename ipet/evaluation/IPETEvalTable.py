@@ -1020,7 +1020,7 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The original DataFrame with the extra columns appended.
         """
-        df['_time_'] = (df[Key.ProblemStatus].isin((Key.ProblemStatusCodes.Better, Key.ProblemStatusCodes.TimeLimit)))
+        df['_time_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.TimeLimit)
         df['_limit_'] = ((df['_time_']) | df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.NodeLimit,
                                                                       Key.ProblemStatusCodes.MemoryLimit,
                                                                       Key.ProblemStatusCodes.Interrupted

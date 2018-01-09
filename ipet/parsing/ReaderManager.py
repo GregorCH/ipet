@@ -27,6 +27,7 @@ from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
+from ipet.IPETError import IPETInconsistencyError
 from ipet.Key import CONTEXT_ERRFILE, CONTEXT_LOGFILE
 
 class ReaderManager(Manager, IpetNode):
@@ -226,12 +227,21 @@ class ReaderManager(Manager, IpetNode):
         """
         sets up data structures for a new problem if necessary
         """
+        self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
+
         problemname, problempath = self.getProblemName(line[1])
+        if line[1].split()[2] == "==MISSING==":
+            oldname = self.testrun.getProblemDataById(self.testrun.currentproblemid, Key.ProblemName)
+            if (oldname is not None) and (oldname not in line[1]):
+                raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} not equal to {}.".format(problemname, oldname))
+            return
+        oldname = self.testrun.getProblemDataById(self.testrun.currentproblemid, Key.ProblemName)
+        if (oldname is not None) and (problemname != oldname):
+            raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} not equal to {}.".format(problemname, oldname))
 
         self.testrun.addData(Key.ProblemName, problemname)
         self.testrun.addData(Key.LogFileName, self.testrun.getCurrentLogfilename())
         self.testrun.addData(Key.Path, problempath)
-        self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
     def endOfProblemReached(self, line):
         """
@@ -273,22 +283,23 @@ class ReaderManager(Manager, IpetNode):
             readers = [r for r in self.getManageables(True) if r.supportsContext(context)]
 
             line = (0,"")
-            for line in self.testrun:
-                if self.startOfProblemReached(line[1]):
-                    if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:
-                        # .errfiles do not contain problemdexpression ==ready==
+            try:
+                for line in self.testrun:
+                    if self.startOfProblemReached(line[1]):
+                        if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:
+                            # .errfiles do not contain problemdexpression ==ready==
+                            self.finishProblemParsing(line, context, readers)
+                        self.updateProblemName(line, context, readers)
+
+                    if self.endOfProblemReached(line[1]):
                         self.finishProblemParsing(line, context, readers)
-                    self.updateProblemName(line, context, readers)
-
-
-                if self.endOfProblemReached(line[1]):
-                    self.finishProblemParsing(line, context, readers)
-
-                else:
-                    if context == CONTEXT_LOGFILE:
-                        self.activeSolver.readLine(line[1])
-                    for reader in readers:
-                        reader.operateOnLine(line[1])
+                    else:
+                        if context == CONTEXT_LOGFILE:
+                            self.activeSolver.readLine(line[1])
+                        for reader in readers:
+                            reader.operateOnLine(line[1])
+            except IPETInconsistencyError as e:
+                logging.warn(e.msg)
 
             # in case solver crashed, make sure that parsing is finished
             self.finishProblemParsing(line, context, readers)

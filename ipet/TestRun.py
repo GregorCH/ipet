@@ -70,6 +70,7 @@ class TestRun:
     def iterationNextFile(self):
         try:
             self.currentproblemid = 0
+            # order: .meta, .out, .err, .set, .solu, trace
             self.currentfile = next(self.currentfileiterator)
             return True
         except StopIteration:

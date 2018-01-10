@@ -234,8 +234,8 @@ class ReaderManager(Manager, IpetNode):
         # if oldname is not None then the .out file was already parsed
         # and we are currently parsing the .err file. Check if the problemname
         # is contained in the line.
-        if (oldname is not None) and (oldname not in line[1]):
-            raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} not equal to {}.".format(problemname, oldname))
+        if (oldname is not None) and ("_{}.".format(oldname) not in line[1]):
+            raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} does not correspond to {}.".format(problemname, oldname))
 
         self.testrun.addData(Key.ProblemName, problemname)
         self.testrun.addData(Key.LogFileName, self.testrun.getCurrentLogfilename())
@@ -290,10 +290,10 @@ class ReaderManager(Manager, IpetNode):
                     try:
                         self.updateProblemName(line, context, readers)
                     except IPETInconsistencyError as e:
-                        logging.warn(e.msg)
+                        logging.warning(e.msg)
                         if context == CONTEXT_ERRFILE:
-                            logging.warn("Skipping parsing of the rest of the .err file.")
-                            continue
+                            logging.warning("Skipping parsing of the rest of the .err file.")
+                            break
 
                 if self.endOfProblemReached(line[1]):
                     self.finishProblemParsing(line, context, readers)

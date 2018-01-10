@@ -230,13 +230,11 @@ class ReaderManager(Manager, IpetNode):
         self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
         problemname, problempath = self.getProblemName(line[1])
-        if line[1].split()[2] == "==MISSING==":
-            oldname = self.testrun.getProblemDataById(self.testrun.currentproblemid, Key.ProblemName)
-            if (oldname is not None) and (oldname not in line[1]):
-                raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} not equal to {}.".format(problemname, oldname))
-            return
         oldname = self.testrun.getProblemDataById(self.testrun.currentproblemid, Key.ProblemName)
-        if (oldname is not None) and (problemname != oldname):
+        # if oldname is not None then the .out file was already parsed
+        # and we are currently parsing the .err file. Check if the problemname
+        # is contained in the line.
+        if (oldname is not None) and (oldname not in line[1]):
             raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} not equal to {}.".format(problemname, oldname))
 
         self.testrun.addData(Key.ProblemName, problemname)
@@ -283,23 +281,27 @@ class ReaderManager(Manager, IpetNode):
             readers = [r for r in self.getManageables(True) if r.supportsContext(context)]
 
             line = (0,"")
-            try:
-                for line in self.testrun:
-                    if self.startOfProblemReached(line[1]):
-                        if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:
-                            # .errfiles do not contain problemdexpression ==ready==
-                            self.finishProblemParsing(line, context, readers)
-                        self.updateProblemName(line, context, readers)
-
-                    if self.endOfProblemReached(line[1]):
+            for line in self.testrun:
+                if self.startOfProblemReached(line[1]):
+                    if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:
+                        # .errfiles do not contain problemdexpression ==ready==
                         self.finishProblemParsing(line, context, readers)
-                    else:
-                        if context == CONTEXT_LOGFILE:
-                            self.activeSolver.readLine(line[1])
-                        for reader in readers:
-                            reader.operateOnLine(line[1])
-            except IPETInconsistencyError as e:
-                logging.warn(e.msg)
+
+                    try:
+                        self.updateProblemName(line, context, readers)
+                    except IPETInconsistencyError as e:
+                        logging.warn(e.msg)
+                        if context == CONTEXT_ERRFILE:
+                            logging.warn("Skipping parsing of the rest of the .err file.")
+                            continue
+
+                if self.endOfProblemReached(line[1]):
+                    self.finishProblemParsing(line, context, readers)
+                else:
+                    if context == CONTEXT_LOGFILE:
+                        self.activeSolver.readLine(line[1])
+                    for reader in readers:
+                        reader.operateOnLine(line[1])
 
             # in case solver crashed, make sure that parsing is finished
             self.finishProblemParsing(line, context, readers)

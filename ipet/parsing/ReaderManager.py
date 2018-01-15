@@ -27,6 +27,7 @@ from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
+from ipet.IPETError import IPETInconsistencyError
 from ipet.Key import CONTEXT_ERRFILE, CONTEXT_LOGFILE
 
 class ReaderManager(Manager, IpetNode):
@@ -226,12 +227,19 @@ class ReaderManager(Manager, IpetNode):
         """
         sets up data structures for a new problem if necessary
         """
+        self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
+
         problemname, problempath = self.getProblemName(line[1])
+        oldname = self.testrun.getProblemDataById(self.testrun.currentproblemid, Key.ProblemName)
+        # if oldname is not None then the .out file was already parsed
+        # and we are currently parsing the .err file. Check if the problemname
+        # is contained in the line.
+        if (oldname is not None) and ("_{}.".format(oldname) not in line[1]):
+            raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} does not correspond to {}.".format(problemname, oldname))
 
         self.testrun.addData(Key.ProblemName, problemname)
         self.testrun.addData(Key.LogFileName, self.testrun.getCurrentLogfilename())
         self.testrun.addData(Key.Path, problempath)
-        self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
     def endOfProblemReached(self, line):
         """
@@ -278,12 +286,17 @@ class ReaderManager(Manager, IpetNode):
                     if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:
                         # .errfiles do not contain problemdexpression ==ready==
                         self.finishProblemParsing(line, context, readers)
-                    self.updateProblemName(line, context, readers)
 
+                    try:
+                        self.updateProblemName(line, context, readers)
+                    except IPETInconsistencyError as e:
+                        logging.warning(e.msg)
+                        if context == CONTEXT_ERRFILE:
+                            logging.warning("Skipping parsing of the rest of the .err file.")
+                            break
 
                 if self.endOfProblemReached(line[1]):
                     self.finishProblemParsing(line, context, readers)
-
                 else:
                     if context == CONTEXT_LOGFILE:
                         self.activeSolver.readLine(line[1])

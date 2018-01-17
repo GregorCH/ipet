@@ -234,7 +234,7 @@ class ReaderManager(Manager, IpetNode):
         # if oldname is not None then the .out file was already parsed
         # and we are currently parsing the .err file. Check if the problemname
         # is contained in the line.
-        if (oldname is not None) and ("_{}.".format(oldname) not in line[1]):
+        if (oldname is not None) and ("_{}.".format(oldname) not in line[1]) and not (oldname == problemname):
             raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} does not correspond to {}.".format(problemname, oldname))
 
         self.testrun.addData(Key.ProblemName, problemname)

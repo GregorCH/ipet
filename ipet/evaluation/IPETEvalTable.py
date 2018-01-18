@@ -1220,9 +1220,9 @@ class IPETEvaluation(IpetNode):
                 suffix = "ThisIsVeryUnlikelyTheSuffix"
 
             if l == 0:
-                tuples = [dfcol for dfcol in df.columns if dfcol.startswith(name) and not dfcol.endswith(suffix) and not dfcol.endswith("p")]
+                tuples = [dfcol for dfcol in df.columns if dfcol.startswith(name) and not dfcol.endswith(suffix) and not dfcol.endswith(")p")]
             else:
-                tuples = [dfcol for dfcol in df.columns if dfcol[l].startswith(name) and not dfcol[l].endswith(suffix) and not dfcol[l].endswith("p")]
+                tuples = [dfcol for dfcol in df.columns if dfcol[l].startswith(name) and not dfcol[l].endswith(suffix) and not dfcol[l].endswith(")p")]
 
             # add new formatting function to the map of formatting functions
             for thetuple in tuples:

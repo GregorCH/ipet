@@ -174,3 +174,10 @@ def solverToProblemStatusCode(solverstatus : int) -> str:
         integer status code reported by the solver
     """
     return solver2problemStatusCode.get(solverstatus, ProblemStatusCodes.FailAbort)
+
+
+class ObjectiveSenseCode:
+    """Minimization or maximization
+    """
+    MINIMIZE = 1
+    MAXIMIZE = -1

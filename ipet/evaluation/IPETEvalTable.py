@@ -24,6 +24,7 @@ from pandas.core.frame import DataFrame
 from numpy import isnan
 from ipet.evaluation.IPETFilter import IPETValue
 from ipet.misc.misc import meanOrConcat
+from ipet.evaluation.Validation import Validation
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -635,14 +636,17 @@ class IPETEvaluation(IpetNode):
     DEFAULT_INDEX = " ".join([Key.ProblemName, Key.LogFileName])
     DEFAULT_INDEXSPLIT= -1
     ALLTOGETHER = "_alltogether_"
+    
 
-    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit"]
+    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit", "validate"]
     attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
 
     deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'", 
                          "evaluateoptauto" : "Optimal auto settings are no longer available, use reductions instead"}
     def __init__(self, defaultgroup = None,
-                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT, index = DEFAULT_INDEX, indexsplit=DEFAULT_INDEXSPLIT, **kw):
+                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT, 
+                 index = DEFAULT_INDEX, indexsplit=DEFAULT_INDEXSPLIT, 
+                 validate = None, **kw):
         """
         constructs an Ipet-Evaluation
 
@@ -654,6 +658,7 @@ class IPETEvaluation(IpetNode):
         comparecolformat : format string for comparison columns
         index : (string or list or None) single or multiple column names that serve as (row) and column index levels, if 'auto' an index is generated.
         indexsplit : (int) position to split index into row and column levels, negative to count from the end.
+        validate : (string) for the relative or absolute location of a solu file for validation.
         """
 
         # construct super class first, Evaluation is currently always active
@@ -668,6 +673,10 @@ class IPETEvaluation(IpetNode):
         self.defaultgroup = defaultgroup
         self.set_indexsplit(indexsplit)
         self.set_index(index)
+                
+                
+        self.set_validate(validate)
+        
         
     def getName(self):
         return self.nodetag
@@ -1003,6 +1012,63 @@ class IPETEvaluation(IpetNode):
             for key, val in newdeps.items():
                 adj.setdefault(key, set()).update(val)
         return adj
+    
+    def getValidate(self):
+        """this evaluations validation attribute
+        
+        Returns
+        -------
+        string
+            either the current validation file as a string, or None if unspecified.
+        """
+        return self.validate
+    
+    def set_validate(self, validate):
+        """sets this evaluation's validation attribute
+        
+        Parameters
+        ----------
+        
+        validate : str or None
+            new value for the source of validation information for this evaluation
+        """
+        self.validate = validate
+    
+    
+    
+    def validateData(self, df : DataFrame) -> DataFrame:
+        """validate data based on external solution information
+        """
+            
+        if not self.validate:
+            
+            logging.info("No validation information specified")
+            file_exists = False
+        else:
+            try:
+                f = open(self.validate, "r")
+                f.close()
+                file_exists = True
+                logging.info("Validation information provided: '{}'".format(self.validate))
+            except:
+                file_exists = False
+                logging.warning("Could not open solu file '{}' for validation".format(self.validate))
+                
+        if file_exists:
+            v = Validation(self.validate)
+        else:
+            v = Validation(None)
+        
+        
+        result =  df.apply(v.validateSeries, axis = 1)
+        
+        logging.info("Validation resulted in the following status codes:\n\n{}\n".format(
+            result.value_counts()))
+        
+        df[Key.ProblemStatus] = result
+        
+        return df
+        
     
     def calculateNeededData(self, df : DataFrame) -> DataFrame:
         """ Add the status columns.

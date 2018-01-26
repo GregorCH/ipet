@@ -1506,6 +1506,8 @@ class IPETEvaluation(IpetNode):
 #            self.defaultgrouptuple = possiblebasegroups[0]
 #            logging.info(" Using value <%s> as base group" % (self.getDefaultgroup()))
 
+        data = self.validateData(data)
+
         data = self.calculateNeededData(data)
         logging.debug("Result of calculateNeededData:\n{}\n".format(data))
         #

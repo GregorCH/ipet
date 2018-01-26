@@ -87,6 +87,7 @@ class Validation:
             self.solufiledict = {}
             
         self.tol = tol
+        self.inconsistentset = set()
             
         
     def readSoluFile(self, solufilename:str) -> dict:
@@ -145,6 +146,22 @@ class Validation:
             db = -np.infty if objsense == ObjectiveSenseCode.MINIMIZE else np.infty
         return db
     
+    
+    def isInconsistent(self, problemname : str) -> bool:
+        """are there inconsistent results for this problem
+        
+        Parameters
+        ----------
+        
+        problemname : str
+            name of a problem
+            
+        Returns
+        -------
+        bool
+            True if inconsistent results were detected for this instance, False otherwise
+        """
+    
     def validateSeries(self, x : pd.Series) -> ProblemStatusCodes:
         """
         validate the results of a problem
@@ -168,6 +185,8 @@ class Validation:
         reference = self.solufiledict.get(problemname, (None, None))
         
         if self.isUnkn(reference):
+            if self.isInconsistent(problemname):
+                return Key.ProblemStatusCodes.FailInconsistent
             return Key.solverToProblemStatusCode(sstatus)
 
         elif self.isInf(reference):
@@ -237,6 +256,52 @@ class Validation:
             return True
         else:
             return False
+        
+    def collectInconsistencies(self, df: pd.DataFrame):
+        """collect individual results for primal and dual bounds and collect inconsistencies.
+        
+        Parameters
+        ----------
+        
+        df : DataFrame
+            joined data of an experiment with several test runs
+        """
+        
+        # problems with inconsistent primal and dual bounds
+        self.inconsistentset = set()
+        self.bestpb = dict()
+        self.bestdb = dict()
+        
+        df.apply(self.updateInconsistency, axis = 1)
+        
+    def updateInconsistency(self, x : pd.Series):
+        """
+        method that is applied to every row of a data frame to update inconsistency information
+        """
+        problemname = x.loc[Key.ProblemName]
+        pb = x.loc[Key.PrimalBound]
+        db = x.loc[Key.DualBound]
+        obs = ObjectiveSenseCode.MINIMIZE
+        
+        pb = self.getPbValue(pb, obs)
+        db = self.getDbValue(db, obs)
+        
+        bestpb = self.bestpb.get(problemname, np.inf if obs == ObjectiveSenseCode.MINIMIZE else -np.inf)
+        bestpb = min(bestpb, pb) if obs == ObjectiveSenseCode.MINIMIZE else max(bestpb, pb)
+        
+        bestdb = self.bestdb.get(problemname, -np.inf if obs == ObjectiveSenseCode.MINIMIZE else np.inf)
+        bestdb = max(bestdb, db) if obs == ObjectiveSenseCode.MINIMIZE else min(bestdb, db)
+        
+        if obs == ObjectiveSenseCode.MINIMIZE:
+            if bestdb > bestpb + self.tol * max(1.0, abs(bestpb)):
+                self.inconsistentset.add(problemname)
+        else:
+            if bestdb < bestpb - self.tol * max(1.0, abs(bestpb)):
+                self.inconsistentset.add(problemname)
+        
+        
+        self.bestdb[problemname] = bestdb
+        self.bestpb[problemname] = bestpb
         
         
         

@@ -12,6 +12,27 @@ import numpy
 import pandas as pd
 from ipet.Key import SolverStatusCodes as ssc
 from ipet.Key import ProblemStatusCodes as psc
+
+# infeasible instances
+inf_good = "inf_good"
+inf_bad = "inf_bad"
+inf_time = "inf_time"
+
+# feasible instances (it is bad to state infeasible)
+feas_good = "feas_good"
+feas_bad = "feas_bad"
+
+# instances for which an optimal solution is known
+opt_good = "opt_good"
+opt_tol = "opt_tol"
+opt_bad = "opt_bad"
+
+# best instances for which also a dual bound is known
+best_good = "best_good"
+best_pbad = "best_pbad"
+best_dbad = "best_dbad"
+
+
 class ValidationTest(unittest.TestCase):
 
 
@@ -59,25 +80,6 @@ class ValidationTest(unittest.TestCase):
         test some fake instances
         """
         
-        # infeasible instances
-        inf_good = "inf_good"
-        inf_bad = "inf_bad"
-        inf_time = "inf_time"
-        
-        # feasible instances (it is bad to state infeasible)
-        feas_good = "feas_good"
-        feas_bad = "feas_bad"
-        
-        # instances for which an optimal solution is known
-        opt_good = "opt_good"
-        opt_tol = "opt_tol"
-        opt_bad = "opt_bad"
-        
-        # best instances for which also a dual bound is known
-        best_good = "best_good"
-        best_pbad = "best_pbad"
-        best_dbad = "best_dbad"
-        
         d = pd.DataFrame(
         [#  ProblemName PrimalBound DualBound     Objsense           SolverStatus       Status
                 (inf_good,     None,     None,osc.MINIMIZE,    ssc.Infeasible,          psc.Ok),
@@ -118,6 +120,29 @@ class ValidationTest(unittest.TestCase):
                            "\nData:\n"
                            "{}".format(vstatus[vstatus != d.Status], d[vstatus != d.Status])
                         )
+        
+        
+    def testInconsistencydetection(self):
+        """test if inconsistent primal and dual bounds are detected well.
+        """
+        
+        d = pd.DataFrame(
+            [
+                (opt_good, 100, 90, osc.MINIMIZE, ssc.TimeLimit),
+                (opt_good,  95, 85, osc.MINIMIZE, ssc.TimeLimit),
+                (opt_bad,  100, 90, osc.MINIMIZE, ssc.TimeLimit),
+                (opt_bad,   89, 89, osc.MINIMIZE, ssc.Optimal)
+                ],
+            columns=[Key.ProblemName, Key.PrimalBound, Key.DualBound, Key.ObjectiveSense, Key.SolverStatus])
+        
+        print(d)
+        
+        v = Validation()
+        
+        v.collectInconsistencies(d)
+        
+        self.assertNotIn(opt_good, v.inconsistentset, "{} wrongly appears as inconsistent".format(opt_good))
+        self.assertIn(opt_bad, v.inconsistentset, "{} should be inconsistent".format(opt_bad))
         
         
 

@@ -1499,6 +1499,7 @@ class IPETEvaluation(IpetNode):
         data = exp.getJoinedData().copy()
         
         logging.debug("Result of getJoinedData:\n{}\n".format(data))
+        
         self.tryGenerateIndexAndDefaultgroup(data)
 
 #            possiblebasegroups = sorted(data[self.getColIndex()[0]].unique())

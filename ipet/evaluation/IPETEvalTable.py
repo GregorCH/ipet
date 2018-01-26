@@ -1060,7 +1060,7 @@ class IPETEvaluation(IpetNode):
             v = Validation(None)
         
         
-        result =  df.apply(v.validateSeries, axis = 1)
+        result =  v.validate(df)
         
         logging.info("Validation resulted in the following status codes:\n\n{}\n".format(
             result.value_counts()))

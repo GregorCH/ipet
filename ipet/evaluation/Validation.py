@@ -304,6 +304,29 @@ class Validation:
         self.bestpb[problemname] = bestpb
         
         
+    def validate(self, d : pd.DataFrame):
+        """validates the solutions against external information and inconsistencies
+        
+            Validation scans data twice:
+            
+            1) Collection of inconsistencies (contradicting primal and dual bounds)
+            2) Comparison against external validation information from solu file
+            
+        Parameters
+        d : DataFrame
+            joined data from an experiment.
+        """
+        
+        #
+        # 1) collect inconsistencies
+        #
+        self.collectInconsistencies(d)
+        
+        #
+        # 2) validate everything considering inconsistencies and validation info from solu file.
+        #
+        return d.apply(self.validateSeries, axis = 1)
+        
         
         
         

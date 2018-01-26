@@ -120,6 +120,7 @@ class ProblemStatusCodes:
     Fail = "fail"
     FailAbort = "fail_abort"
     FailReaderror = "fail_readerror"
+    FailInconsistent = "fail_inconsistent"
     TimeLimit = "timelimit"
     MemoryLimit = "memlimit"
     NodeLimit = "nodelimit"
@@ -133,6 +134,7 @@ class ProblemStatusCodes:
                         TimeLimit : 200,
                         MemoryLimit : 150,
                         Unknown : 100,
+                        FailInconsistent : -200,
                         FailDualBound :-250,
                         FailObjectiveValue :-500,
                         FailSolInfeasible :-1000,

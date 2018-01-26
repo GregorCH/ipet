@@ -1320,18 +1320,26 @@ class IPETEvaluation(IpetNode):
         print("%s:" % filebasename)
         print(df.to_string(formatters=formatters))
 
-    def streamDataFrame_tex(self, df, filebasename, formatters={}):
+    def streamDataFrame_tex(self, df : DataFrame, filebasename, formatters={}):
         """
         write tex output
         """
         with open("%s.tex" % filebasename, "w") as texfile:
             texfile.write(df.to_latex(formatters=formatters))
 
-    def streamDataFrame_csv(self, df, filebasename, formatters={}):
+    def streamDataFrame_csv(self, df : DataFrame, filebasename, formatters={}):
         with open("%s.csv" % filebasename, "w") as csvfile:
-            df.to_csv(csvfile, formatters=formatters)
+            #
+            # obviously, the support for custom csv formatters was dropped
+            # at some pandas update. This is not terrible as
+            # usually, a csv file is an intermediate product, anyway,
+            # and the tool that gets the csv as input can handle
+            # the final formatting.
+            #
+            logging.warn("Warning. Custom formatting ignored for csv output")
+            df.to_csv(csvfile)
 
-    def streamDataFrame_txt(self, df, filebasename, formatters={}):
+    def streamDataFrame_txt(self, df : DataFrame, filebasename, formatters={}):
         """
         write txt output
         """

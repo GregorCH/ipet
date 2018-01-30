@@ -20,9 +20,9 @@ class SolufileMarkers:
     UNKN = "=unkn="
     BESTDUAL = "=bestdual="
     FEAS = "=feas="
-    
+
 class Interval:
-    
+
     def __init__(self, intervaltuple, tol=DEFAULT_RELTOL):
         """
         creates an interval object of an unordered value tuple  
@@ -31,10 +31,10 @@ class Interval:
             raise ValueError("Expected a tuple as 'intervaltuple', got {}".format(intervaltuple))
         if len(intervaltuple) != 2:
             raise ValueError("Expected exactly two elements as 'intervaltuple', got {}".format(len(intervaltuple)))
-        
+
         a = min(intervaltuple)
         b = max(intervaltuple)
-        
+
         if abs(a) != np.inf:
             tol_a = a - tol * max(abs(a), 1.0)
         else:
@@ -43,12 +43,12 @@ class Interval:
             tol_b = b + tol * max(abs(b), 1.0)
         else:
             tol_b = b
-        
+
         self.a = a
         self.b = b
         self.tol_a = tol_a
         self.tol_b = tol_b
-        
+
     def intersects(self, other) -> bool:
         """test for intersection with another interval
         
@@ -63,7 +63,7 @@ class Interval:
             True if the two intervals intersect, False otherwise
         """
         return self.tol_a <= other.tol_b and self.tol_b >= other.tol_a
-        
+
     def __str__(self):
         return "[{},{}] [{},{}]".format(self.a, self.b, self.tol_a, self.tol_b)
 
@@ -77,7 +77,7 @@ class Validation:
     __infeas__ = 1e100
 
 
-    def __init__(self, solufilename : str = None, tol=DEFAULT_RELTOL):
+    def __init__(self, solufilename : str=None, tol=DEFAULT_RELTOL):
         '''
         Validation Constructor
         '''
@@ -85,11 +85,11 @@ class Validation:
             self.solufiledict = self.readSoluFile(solufilename)
         else:
             self.solufiledict = {}
-            
+
         self.tol = tol
         self.inconsistentset = set()
-            
-        
+
+
     def readSoluFile(self, solufilename:str) -> dict:
         """parse entire solu file into a dictionary with problem names as keys
         
@@ -104,49 +104,49 @@ class Validation:
         dict
             dictionary with problem names as keys and best known primal and dual bounds for validation as entries.
         """
-        
+
         soludict = dict()
         with open(solufilename, "r") as solufile:
             for line in solufile:
                 spline = line.split()
                 marker = spline[0]
                 problemname = spline[1]
-                
+
                 infotuple = list(soludict.get(problemname, (None, None)))
                 if marker == SolufileMarkers.OPT:
                     infotuple[self.__primalidx__] = infotuple[self.__dualidx__] = float(spline[2])
-                    
+
                 elif marker == SolufileMarkers.BEST:
                     infotuple[self.__primalidx__] = float(spline[2])
-                    
+
                 elif marker == SolufileMarkers.BESTDUAL:
                     infotuple[self.__dualidx__] = float(spline[2])
-                    
+
                 elif marker == SolufileMarkers.FEAS:
                     infotuple[self.__primalidx__] = self.__feas__
-                    
+
                 elif marker == SolufileMarkers.INF:
                     infotuple[self.__primalidx__] = self.__infeas__
-                    
-                        
+
+
                 soludict[problemname] = tuple(infotuple)
         return soludict
-    
+
     def getPbValue(self, pb : float, objsense : int) -> float:
         """returns a floating point value computed from a given primal bound
         """
         if pd.isnull(pb):
             pb = np.infty if objsense == ObjectiveSenseCode.MINIMIZE else -np.infty
         return pb
-    
+
     def getDbValue(self, db : float, objsense : int) -> float :
         """returns a floating point value computed from a given primal bound
         """
         if pd.isnull(db):
             db = -np.infty if objsense == ObjectiveSenseCode.MINIMIZE else np.infty
         return db
-    
-    
+
+
     def isInconsistent(self, problemname : str) -> bool:
         """are there inconsistent results for this problem
         
@@ -161,8 +161,11 @@ class Validation:
         bool
             True if inconsistent results were detected for this instance, False otherwise
         """
-    
-    def validateSeries(self, x : pd.Series) -> ProblemStatusCodes:
+        return problemname in self.inconsistentset
+
+
+
+    def validateSeries(self, x : pd.Series) -> str:
         """
         validate the results of a problem
         
@@ -172,36 +175,27 @@ class Validation:
             Data series that represents problem information parsed by a solver
         
         """
-        #print("{x.ProblemName} {x.PrimalBound} {x.DualBound} {x.SolverStatus}".format(x=x))
-        problemname = x.loc[Key.ProblemName]
-        pb = x.loc[Key.PrimalBound]
-        db = x.loc[Key.DualBound]
-        sstatus = x.loc[Key.SolverStatus]
-        objsense = ObjectiveSenseCode.MINIMIZE
-        
+        # print("{x.ProblemName} {x.PrimalBound} {x.DualBound} {x.SolverStatus}".format(x=x))
+        problemname = x.get(Key.ProblemName)
+
+        sstatus = x.get(Key.SolverStatus)
+
+        if not problemname:
+            return ProblemStatusCodes.Ok
+
         if pd.isnull(sstatus):
             return ProblemStatusCodes.FailAbort
-        
-        reference = self.solufiledict.get(problemname, (None, None))
-        
-        if self.isUnkn(reference):
-            if self.isInconsistent(problemname):
-                return Key.ProblemStatusCodes.FailInconsistent
-            return Key.solverToProblemStatusCode(sstatus)
 
-        elif self.isInf(reference):
-            if sstatus != SolverStatusCodes.Infeasible and not pd.isnull(pb):
-                return ProblemStatusCodes.FailSolOnInfeasibleInstance
-            
-        elif self.isFeas(reference):
-            if sstatus == SolverStatusCodes.Infeasible:
-                return ProblemStatusCodes.FailDualBound
-        
-        elif not self.validateBounds(pb, db, sstatus, objsense, reference):
-            return ProblemStatusCodes.FailObjectiveValue
-            
+        else:
+            psc = self.isSoluConsistent(x)
+
+            if psc != ProblemStatusCodes.Ok:
+                return psc
+            elif self.isInconsistent(problemname):
+                return ProblemStatusCodes.FailInconsistent
+
         return Key.solverToProblemStatusCode(sstatus)
-        
+
     def isInf(self, referencetuple : tuple) -> bool:
         """is this an infeasible reference?
         
@@ -217,7 +211,7 @@ class Validation:
             True if reference bound is infeasible, False otherwise
         """
         return referencetuple[self.__primalidx__] == self.__infeas__
-        
+
     def isFeas(self, referencetuple):
         """is this a feasible reference?
         
@@ -232,32 +226,14 @@ class Validation:
         bool
             True if reference bound is feasible, False otherwise
         """
-        return referencetuple[self.__primalidx__] == self.__feas__ 
-    
+        return referencetuple[self.__primalidx__] == self.__feas__
+
     def isUnkn(self, referencetuple):
         """is this a reference tuple of an unknown instance?
         """
         return referencetuple[self.__primalidx__] is None and referencetuple[self.__dualidx__] is None
-    
-    def validateBounds(self, solverpb, solverdb, solverstatus, objsense, referencetuple) -> bool: 
-        """
-        compares bounds against a reference tuple within tolerance
-        """
-        pb = self.getPbValue(solverpb, objsense)
-        db = self.getDbValue(solverdb, objsense)
-        
-        solverinterval = Interval((pb, db), self.tol)
-        referencepb = self.getPbValue(referencetuple[self.__primalidx__], objsense)
-        referencedb = self.getDbValue(referencetuple[self.__dualidx__], objsense)
-        
-        referenceinterval = Interval((referencedb, referencepb), self.tol)
-        
-        if solverinterval.intersects(referenceinterval):
-            return True
-        else:
-            return False
-        
-    def collectInconsistencies(self, df: pd.DataFrame):
+
+    def collectInconsistencies(self, df : pd.DataFrame):
         """collect individual results for primal and dual bounds and collect inconsistencies.
         
         Parameters
@@ -266,44 +242,127 @@ class Validation:
         df : DataFrame
             joined data of an experiment with several test runs
         """
-        
+
         # problems with inconsistent primal and dual bounds
         self.inconsistentset = set()
         self.bestpb = dict()
         self.bestdb = dict()
-        
-        df.apply(self.updateInconsistency, axis = 1)
-        
+
+        df.apply(self.updateInconsistency, axis=1)
+
+    def isPbSoluConsistent(self, pb : float, referencedb : float, objsense : int) -> bool:
+        """compare primal bound consistency against reference bound
+
+        Returns
+        -------
+
+        bool
+            True if the primal bound value is consistent with the reference dual bound
+        """
+        if objsense == ObjectiveSenseCode.MINIMIZE:
+            if not self.isLE(referencedb, pb):
+                return False
+        else:
+            if not self.isGE(referencedb, pb):
+                return False
+        return True
+
+    def isDbSoluConsistent(self, db : float, referencepb : float, objsense : int) -> bool:
+        """compare dual bound consistency against reference bound
+
+        Returns
+        -------
+
+        bool
+            True if the dual bound value is consistent with the reference primal bound
+        """
+        if objsense == ObjectiveSenseCode.MINIMIZE:
+            if not self.isGE(referencepb, db):
+                return False
+        else:
+            if not self.isLE(referencepb, db):
+                return False
+        return True
+
+
+
+    def isSoluConsistent(self, x : pd.Series) -> str :
+        """Check consistency with solution information
+        """
+
+        problemname = x.get(Key.ProblemName)
+        pb = x.get(Key.PrimalBound)
+        db = x.get(Key.DualBound)
+        obs = x.get(Key.ObjectiveSense, ObjectiveSenseCode.MINIMIZE)
+        sstatus = x.get(Key.SolverStatus)
+
+        reference = self.solufiledict.get(problemname, (None, None))
+
+        referencepb = self.getPbValue(reference[self.__primalidx__], obs)
+        referencedb = self.getDbValue(reference[self.__dualidx__], obs)
+
+        if self.isUnkn(reference):
+            return ProblemStatusCodes.Ok
+
+        elif self.isInf(reference):
+            if sstatus != SolverStatusCodes.Infeasible and not pd.isnull(pb):
+                return ProblemStatusCodes.FailSolOnInfeasibleInstance
+
+        elif self.isFeas(reference):
+            if sstatus == SolverStatusCodes.Infeasible:
+                return ProblemStatusCodes.FailDualBound
+
+        else:
+
+            pb = self.getPbValue(pb, obs)
+            db = self.getDbValue(db, obs)
+            if not self.isPbSoluConsistent(pb, referencedb, obs):
+                return ProblemStatusCodes.FailObjectiveValue
+            if not self.isDbSoluConsistent(db, referencepb, obs):
+                return ProblemStatusCodes.FailDualBound
+
+        return ProblemStatusCodes.Ok
+
     def updateInconsistency(self, x : pd.Series):
         """
         method that is applied to every row of a data frame to update inconsistency information
         """
-        problemname = x.loc[Key.ProblemName]
-        pb = x.loc[Key.PrimalBound]
-        db = x.loc[Key.DualBound]
-        obs = ObjectiveSenseCode.MINIMIZE
-        
+        problemname = x.get(Key.ProblemName)
+        pb = x.get(Key.PrimalBound)
+        db = x.get(Key.DualBound)
+        obs = x.get(Key.ObjectiveSense, ObjectiveSenseCode.MINIMIZE)
+
+        if not problemname:
+            return
+
         pb = self.getPbValue(pb, obs)
         db = self.getDbValue(db, obs)
-        
+
+        #
+        # for inconsistency checks, we only consider problems that are consistent
+        # with the solu file.
+        #
+        if self.isSoluConsistent(x) != ProblemStatusCodes.Ok:
+            return
+
         bestpb = self.bestpb.get(problemname, np.inf if obs == ObjectiveSenseCode.MINIMIZE else -np.inf)
         bestpb = min(bestpb, pb) if obs == ObjectiveSenseCode.MINIMIZE else max(bestpb, pb)
-        
+
         bestdb = self.bestdb.get(problemname, -np.inf if obs == ObjectiveSenseCode.MINIMIZE else np.inf)
         bestdb = max(bestdb, db) if obs == ObjectiveSenseCode.MINIMIZE else min(bestdb, db)
-        
+
         if obs == ObjectiveSenseCode.MINIMIZE:
-            if bestdb > bestpb + self.tol * max(1.0, abs(bestpb)):
+            if not self.isLE(bestdb, bestpb):
                 self.inconsistentset.add(problemname)
         else:
-            if bestdb < bestpb - self.tol * max(1.0, abs(bestpb)):
+            if not self.isGE(bestdb, bestpb):
                 self.inconsistentset.add(problemname)
-        
-        
+
+
         self.bestdb[problemname] = bestdb
         self.bestpb[problemname] = bestpb
-        
-        
+
+
     def validate(self, d : pd.DataFrame):
         """validates the solutions against external information and inconsistencies
         
@@ -316,56 +375,27 @@ class Validation:
         d : DataFrame
             joined data from an experiment.
         """
-        
+
         #
         # 1) collect inconsistencies
         #
         self.collectInconsistencies(d)
-        
+
         #
         # 2) validate everything considering inconsistencies and validation info from solu file.
         #
-        return d.apply(self.validateSeries, axis = 1)
-        
-        
-        
-        
-        
-        
-        
-if __name__ == "__main__":
-    Validation(None)
-    v = Validation("/home/gregor/workspace/scip/check/testset/short.solu")
-    ex = Experiment()
-    ex.addOutputFile("/home/gregor/projects/ipet-github/test/data/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.trn")
-    
-    d = ex.getJoinedData()
-    assert type(d) is pd.DataFrame
+        return d.apply(self.validateSeries, axis=1)
 
-    val = d.apply(v.validateSeries, axis = 1)
-    print(val)
 
-    i13 = Interval((1,3))
-    i24 = Interval((2,4))
-    i35 = Interval((3,5))
-    i46 = Interval((4,6)) 
-    i64 = Interval((6,4))
-    # test trivial intersections:
-    print(i13.intersects(i24))
-    print(i24)
-    print(i13.intersects(i46))
-    print(i13.intersects(i35))
-    print(i24.intersects(i64))
-    print(i64)
-    tol_0 = Interval((100,100),tol=0)
-    print(tol_0)
-    tol_0_2 = Interval((100+1e-8, 100+1e-8), tol=0)
-    tol_normal = Interval((100+1e-8, 100+1e-8), tol=1e-6)
-    print(tol_0_2)
-    print(tol_0.intersects(tol_0_2))
-    
-    print(tol_normal.intersects(tol_0))
-    
-    
-    
-    
+    def isGE(self, a : float, b : float) -> bool:
+        """tolerance comparison of a >= b
+        """
+        return a >= b - self.tol * max(abs(a), abs(b), 1.0)
+
+    def isLE(self, a : float, b : float) -> bool:
+        """tolerance comparison of a <= b
+        """
+        return self.isGE(b, a)
+
+
+

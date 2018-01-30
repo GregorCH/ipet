@@ -149,6 +149,8 @@ if __name__ == '__main__':
                 theeval.set_validate(validate)
                 logging.info("No validation information specified, using '{}' from working directory".format(validate))
                 break
+    elif arguments.validate:
+        theeval.set_validate(arguments.validate)
 
     if arguments.experimentfile is not None:
         experiment = Experiment.loadFromFile(arguments.experimentfile)

@@ -4,7 +4,6 @@ Created on 25.01.2018
 @author: gregor
 '''
 import unittest
-from ipet.evaluation.Validation import Interval as I
 from ipet.evaluation import Validation
 from ipet.Key import ObjectiveSenseCode as osc
 from ipet import Key
@@ -12,6 +11,7 @@ import numpy
 import pandas as pd
 from ipet.Key import SolverStatusCodes as ssc
 from ipet.Key import ProblemStatusCodes as psc
+from ipet.misc import getInfinity as infty
 
 # infeasible instances
 inf_good = "inf_good"
@@ -32,34 +32,15 @@ best_good = "best_good"
 best_pbad = "best_pbad"
 best_dbad = "best_dbad"
 
+# instances that crashed
+opt_abort = "opt_abort"
+opt_readerror = "opt_readerror"
+
 # an instance that is partially inconsistent
 part_inconsistent = "part_inconsistent"
 
 
 class ValidationTest(unittest.TestCase):
-
-
-    def testIntervals(self):
-        intersecting_intervals = [
-            [I((1, 3)), I((2, 3))],  # simple intervals
-            [I((1, 2)), I((2, 3))],  # intersect in a point
-            [I((2, 2)), I((2, 3))],  # point and interval
-            [I((2, 2), 0), I((2, 3), 0)],  # point and interval with zero tolerance
-            [I((1e9, 1e9), tol=1e-1), I((0.99 * 1e9, 0.99 * 1e9))],  # larger tolerance
-            [I((0, 1e6)), I((1e6 + 1, 2 * 1e6)) ]  # nonintersecting intervals at larger scales
-            ]
-
-        nonintersecting_intervals = [
-            [I((2, 3)), I((4, 5))],  # points with small values that are far apart
-            [I((0, 0.9999), tol=1e-6), I((0.99991, 1), tol=0)],  # close together, small tolerance
-            [I((-2 * 1e-3, -1e-3)), I((1e-3, 2 * 1e-3))],  # values close to 0.0
-            ]
-
-        for i1, i2 in intersecting_intervals:
-            self.assertTrue(i1.intersects(i2), "Intervals {} and {} should intersect".format(i1, i2))
-
-        for i1, i2 in nonintersecting_intervals:
-            self.assertFalse(i1.intersects(i2), "Intervals {} and {} should not intersect".format(i1, i2))
 
 
     def testBoundReplacement(self):
@@ -72,13 +53,13 @@ class ValidationTest(unittest.TestCase):
         neginftys = [(v.getDbValue, osc.MINIMIZE),
                   (v.getPbValue, osc.MAXIMIZE)]
         for m, s in inftys:
-            self.assertEqual(m(None, s), numpy.inf, "Should be inf")
+            self.assertEqual(m(None, s), infty(), "Should be inf")
 
         for m, s in neginftys:
-            self.assertEqual(m(None, s), -numpy.inf, "Should be negative inf")
+            self.assertEqual(m(None, s), -infty(), "Should be negative inf")
 
     def compareValidationStatus(self, d : pd.DataFrame, v : Validation):
-        vstatus = d.apply(v.validateSeries, axis=1)
+        vstatus = d.apply(v.validateSeries, axis = 1)
 
         # compare validation status to expected status codes
         self.assertTrue(numpy.all(vstatus == d.Status),
@@ -107,11 +88,13 @@ class ValidationTest(unittest.TestCase):
                 (best_good, 105, 85, osc.MINIMIZE, ssc.NodeLimit, psc.NodeLimit),
                 (best_dbad, 105, 103, osc.MINIMIZE, ssc.NodeLimit, psc.FailDualBound),
                 (best_pbad, 85, 85, osc.MINIMIZE, ssc.Optimal, psc.FailObjectiveValue),
+                (opt_abort, None, None, osc.MINIMIZE, ssc.Crashed, psc.FailAbort),
+                (opt_readerror, None, None, osc.MINIMIZE, ssc.Readerror, psc.FailReaderror),
                 ],
-               columns=[Key.ProblemName, Key.PrimalBound, Key.DualBound, Key.ObjectiveSense, Key.SolverStatus, "Status"])
+               columns = [Key.ProblemName, Key.PrimalBound, Key.DualBound, Key.ObjectiveSense, Key.SolverStatus, "Status"])
 
         v = Validation()
-        v.solufiledict = {
+        v.referencedict = {
             inf_good : (Validation.__infeas__, None),
             inf_bad : (Validation.__infeas__, None),
             inf_time : (Validation.__infeas__, None),
@@ -122,7 +105,9 @@ class ValidationTest(unittest.TestCase):
             opt_tol : (10, 10),
             best_good : (100, 90),
             best_pbad : (100, 90),
-            best_dbad : (100, 90)
+            best_dbad : (100, 90),
+            opt_abort : (1, 1),
+            opt_readerror : (1, 1)
             }
 
 
@@ -143,11 +128,11 @@ class ValidationTest(unittest.TestCase):
                 (part_inconsistent, 10, 10, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent),
                 (part_inconsistent, 9, 9, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent)
                 ],
-            columns=[Key.ProblemName, Key.PrimalBound, Key.DualBound, Key.ObjectiveSense, Key.SolverStatus, "Status"])
+            columns = [Key.ProblemName, Key.PrimalBound, Key.DualBound, Key.ObjectiveSense, Key.SolverStatus, "Status"])
 
         v = Validation()
 
-        v.solufiledict = { part_inconsistent :  (10, 0) }
+        v.referencedict = { part_inconsistent :  (10, 0) }
 
         v.collectInconsistencies(d)
 
@@ -156,9 +141,6 @@ class ValidationTest(unittest.TestCase):
         self.assertIn(part_inconsistent, v.inconsistentset, "{} should be inconsistent".format(part_inconsistent))
 
         self.compareValidationStatus(d, v)
-
-
-
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

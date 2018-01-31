@@ -8,6 +8,8 @@ import pandas as pd
 from ipet.Key import ProblemStatusCodes, SolverStatusCodes, ObjectiveSenseCode
 from ipet.Experiment import Experiment
 from ipet import Key
+from ipet.misc import getInfinity as infty
+from ipet.misc import isInfinite as isInf
 import numpy as np
 import logging
 
@@ -21,52 +23,6 @@ class SolufileMarkers:
     BESTDUAL = "=bestdual="
     FEAS = "=feas="
 
-class Interval:
-
-    def __init__(self, intervaltuple, tol=DEFAULT_RELTOL):
-        """
-        creates an interval object of an unordered value tuple  
-        """
-        if type(intervaltuple) is not tuple:
-            raise ValueError("Expected a tuple as 'intervaltuple', got {}".format(intervaltuple))
-        if len(intervaltuple) != 2:
-            raise ValueError("Expected exactly two elements as 'intervaltuple', got {}".format(len(intervaltuple)))
-
-        a = min(intervaltuple)
-        b = max(intervaltuple)
-
-        if abs(a) != np.inf:
-            tol_a = a - tol * max(abs(a), 1.0)
-        else:
-            tol_a = np.inf
-        if abs(b) != np.inf:
-            tol_b = b + tol * max(abs(b), 1.0)
-        else:
-            tol_b = b
-
-        self.a = a
-        self.b = b
-        self.tol_a = tol_a
-        self.tol_b = tol_b
-
-    def intersects(self, other) -> bool:
-        """test for intersection with another interval
-        
-        Parameters:
-        -----------
-        other : Interval
-            a different interval to test
-            
-        Return:
-        -------
-        bool 
-            True if the two intervals intersect, False otherwise
-        """
-        return self.tol_a <= other.tol_b and self.tol_b >= other.tol_a
-
-    def __str__(self):
-        return "[{},{}] [{},{}]".format(self.a, self.b, self.tol_a, self.tol_b)
-
 class Validation:
     '''
     Validation of experiments by using external solution information
@@ -77,20 +33,20 @@ class Validation:
     __infeas__ = 1e100
 
 
-    def __init__(self, solufilename : str=None, tol=DEFAULT_RELTOL):
+    def __init__(self, solufilename : str = None, tol = DEFAULT_RELTOL):
         '''
-        Validation Constructor
+        Validation constructor
         '''
         if solufilename:
-            self.solufiledict = self.readSoluFile(solufilename)
+            self.referencedict = self.readSoluFile(solufilename)
         else:
-            self.solufiledict = {}
+            self.referencedict = {}
 
         self.tol = tol
         self.inconsistentset = set()
 
 
-    def readSoluFile(self, solufilename:str) -> dict:
+    def readSoluFile(self, solufilename : str) -> dict:
         """parse entire solu file into a dictionary with problem names as keys
         
         Parameters:
@@ -136,14 +92,14 @@ class Validation:
         """returns a floating point value computed from a given primal bound
         """
         if pd.isnull(pb):
-            pb = np.infty if objsense == ObjectiveSenseCode.MINIMIZE else -np.infty
+            pb = infty() if objsense == ObjectiveSenseCode.MINIMIZE else -infty()
         return pb
 
     def getDbValue(self, db : float, objsense : int) -> float :
         """returns a floating point value computed from a given primal bound
         """
         if pd.isnull(db):
-            db = -np.infty if objsense == ObjectiveSenseCode.MINIMIZE else np.infty
+            db = -infty() if objsense == ObjectiveSenseCode.MINIMIZE else infty()
         return db
 
 
@@ -187,7 +143,7 @@ class Validation:
             return ProblemStatusCodes.FailAbort
 
         else:
-            psc = self.isSoluConsistent(x)
+            psc = self.isReferenceConsistent(x)
 
             if psc != ProblemStatusCodes.Ok:
                 return psc
@@ -248,9 +204,9 @@ class Validation:
         self.bestpb = dict()
         self.bestdb = dict()
 
-        df.apply(self.updateInconsistency, axis=1)
+        df.apply(self.updateInconsistency, axis = 1)
 
-    def isPbSoluConsistent(self, pb : float, referencedb : float, objsense : int) -> bool:
+    def isPbReferenceConsistent(self, pb : float, referencedb : float, objsense : int) -> bool:
         """compare primal bound consistency against reference bound
 
         Returns
@@ -267,7 +223,7 @@ class Validation:
                 return False
         return True
 
-    def isDbSoluConsistent(self, db : float, referencepb : float, objsense : int) -> bool:
+    def isDbReferenceConsistent(self, db : float, referencepb : float, objsense : int) -> bool:
         """compare dual bound consistency against reference bound
 
         Returns
@@ -286,7 +242,7 @@ class Validation:
 
 
 
-    def isSoluConsistent(self, x : pd.Series) -> str :
+    def isReferenceConsistent(self, x : pd.Series) -> str :
         """Check consistency with solution information
         """
 
@@ -296,7 +252,7 @@ class Validation:
         obs = x.get(Key.ObjectiveSense, ObjectiveSenseCode.MINIMIZE)
         sstatus = x.get(Key.SolverStatus)
 
-        reference = self.solufiledict.get(problemname, (None, None))
+        reference = self.referencedict.get(problemname, (None, None))
 
         referencepb = self.getPbValue(reference[self.__primalidx__], obs)
         referencedb = self.getDbValue(reference[self.__dualidx__], obs)
@@ -305,7 +261,7 @@ class Validation:
             return ProblemStatusCodes.Ok
 
         elif self.isInf(reference):
-            if sstatus != SolverStatusCodes.Infeasible and not pd.isnull(pb):
+            if sstatus != SolverStatusCodes.Infeasible and not pd.isnull(pb) and not isInf(pb):
                 return ProblemStatusCodes.FailSolOnInfeasibleInstance
 
         elif self.isFeas(reference):
@@ -316,9 +272,10 @@ class Validation:
 
             pb = self.getPbValue(pb, obs)
             db = self.getDbValue(db, obs)
-            if not self.isPbSoluConsistent(pb, referencedb, obs):
+            if not self.isPbReferenceConsistent(pb, referencedb, obs):
                 return ProblemStatusCodes.FailObjectiveValue
-            if not self.isDbSoluConsistent(db, referencepb, obs):
+            if not self.isDbReferenceConsistent(db, referencepb, obs):
+                print("{} {}".format(db, referencepb))
                 return ProblemStatusCodes.FailDualBound
 
         return ProblemStatusCodes.Ok
@@ -342,7 +299,7 @@ class Validation:
         # for inconsistency checks, we only consider problems that are consistent
         # with the solu file.
         #
-        if self.isSoluConsistent(x) != ProblemStatusCodes.Ok:
+        if self.isReferenceConsistent(x) != ProblemStatusCodes.Ok:
             return
 
         bestpb = self.bestpb.get(problemname, np.inf if obs == ObjectiveSenseCode.MINIMIZE else -np.inf)
@@ -384,7 +341,7 @@ class Validation:
         #
         # 2) validate everything considering inconsistencies and validation info from solu file.
         #
-        return d.apply(self.validateSeries, axis=1)
+        return d.apply(self.validateSeries, axis = 1)
 
 
     def isGE(self, a : float, b : float) -> bool:

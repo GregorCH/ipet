@@ -6,7 +6,6 @@ Created on 24.01.2018
 from math import inf
 import pandas as pd
 from ipet.Key import ProblemStatusCodes, SolverStatusCodes, ObjectiveSenseCode
-from ipet.Experiment import Experiment
 from ipet import Key
 from ipet.misc import getInfinity as infty
 from ipet.misc import isInfinite as isInf
@@ -14,6 +13,7 @@ import numpy as np
 import logging
 
 DEFAULT_RELTOL = 1e-4
+DEFAULT_FEASTOL = 1e-6
 
 class SolufileMarkers:
     OPT = "=opt="
@@ -33,9 +33,20 @@ class Validation:
     __infeas__ = 1e100
 
 
-    def __init__(self, solufilename : str = None, tol = DEFAULT_RELTOL):
+    def __init__(self, solufilename : str = None, tol : float = DEFAULT_RELTOL, feastol : float = DEFAULT_FEASTOL):
         '''
         Validation constructor
+        
+        Parameters
+        ----------
+        solufilename : str
+            string with absolute or relative path to a solu file with reference information
+            
+        tol : float
+            relative objective tolerance
+            
+        feastol : float
+            relative feasibility tolerance
         '''
         if solufilename:
             self.referencedict = self.readSoluFile(solufilename)
@@ -44,6 +55,8 @@ class Validation:
 
         self.tol = tol
         self.inconsistentset = set()
+
+        self.feastol = feastol
 
 
     def readSoluFile(self, solufilename : str) -> dict:
@@ -120,6 +133,63 @@ class Validation:
         return problemname in self.inconsistentset
 
 
+    def isSolFeasible(self, x : pd.Series):
+        """check if the solution is feasible within tolerances
+        
+        Parameters
+        ----------
+        
+        x : Series or dict
+            series or dictionary representing single instance information
+        """
+
+        # compute the maximum violation of constraints, LP rows, bounds, and integrality
+        maxviol = max((x.get(key, 0.0) for key in [Key.ViolationBds, Key.ViolationCons, Key.ViolationInt, Key.ViolationLP]))
+
+        return maxviol <= self.feastol
+
+
+    def getReferencePb(self, problemname : str) -> float:
+        """get the reference primal bound for this instance
+
+        Parameters
+        ----------
+        problemname : str
+            base name of a problem to access the reference data
+
+        Returns
+        -------
+        float or None
+            either a finite floating point value, or None 
+        """
+        reference = self.referencedict.get(problemname, (None, None))
+
+        if self.isUnkn(reference) or self.isInf(reference) or self.isFeas(reference):
+            return None
+        else:
+            return reference[self.__primalidx__]
+
+    def getReferenceDb(self, problemname : str) -> float:
+        """get the reference primal bound for this instance
+
+        Parameters
+        ----------
+        problemname : str
+            base name of a problem to access the reference data
+
+        Returns
+        -------
+        float or None
+            either a finite floating point value, or None 
+        """
+        reference = self.referencedict.get(problemname, (None, None))
+
+        if self.isUnkn(reference) or self.isInf(reference) or self.isFeas(reference):
+            return None
+        else:
+            return reference[self.__dualidx__]
+
+
 
     def validateSeries(self, x : pd.Series) -> str:
         """
@@ -137,16 +207,30 @@ class Validation:
         sstatus = x.get(Key.SolverStatus)
 
         if not problemname:
-            return ProblemStatusCodes.Ok
+            return ProblemStatusCodes.Unknown
 
         if pd.isnull(sstatus):
             return ProblemStatusCodes.FailAbort
 
+
         else:
+            #
+            # check feasibility
+            #
+            if not self.isSolFeasible(x):
+                return ProblemStatusCodes.FailSolInfeasible
+
+            #
+            # check reference consistency
+            #
             psc = self.isReferenceConsistent(x)
 
             if psc != ProblemStatusCodes.Ok:
                 return psc
+
+            #
+            # report inconsistency among solvers.
+            #
             elif self.isInconsistent(problemname):
                 return ProblemStatusCodes.FailInconsistent
 
@@ -275,7 +359,6 @@ class Validation:
             if not self.isPbReferenceConsistent(pb, referencedb, obs):
                 return ProblemStatusCodes.FailObjectiveValue
             if not self.isDbReferenceConsistent(db, referencepb, obs):
-                print("{} {}".format(db, referencepb))
                 return ProblemStatusCodes.FailDualBound
 
         return ProblemStatusCodes.Ok

@@ -27,7 +27,7 @@ fileextension2context = {
                          ".solu": CONTEXT_SOLUFILE,
                          ".trc" : CONTEXT_TRACEFILE,
                          ".meta" : CONTEXT_METAFILE,
-                         "" : CONTEXT_LOGFILE # workaround for input from stdin
+                         "" : CONTEXT_LOGFILE  # workaround for input from stdin
                          }
 """map for file extensions to the file contexts to specify the relevant readers"""
 
@@ -77,6 +77,11 @@ TimeToBestSolution = "TimeToBest"
 TimeToFirstSolution = "TimeToFirst"
 TimeLimit = "TimeLimit"
 Version = "Version"
+ViolationCons = "Viol_Cons"
+ViolationBds = "Viol_Bounds"
+ViolationInt = "Viol_Int"
+ViolationLP = "Viol_LP"
+
 
 class SolverStatusCodes:
     """ The reason why a solver stopped its calculation.
@@ -134,13 +139,13 @@ class ProblemStatusCodes:
                         TimeLimit : 200,
                         MemoryLimit : 150,
                         Unknown : 100,
-                        FailInconsistent : -200,
+                        FailInconsistent :-200,
                         FailDualBound :-250,
                         FailObjectiveValue :-500,
                         FailSolInfeasible :-1000,
                         FailSolOnInfeasibleInstance :-2000,
                         Fail :-3000,
-                        FailReaderror : -4000,
+                        FailReaderror :-4000,
                         FailAbort :-10000}
 
     @staticmethod

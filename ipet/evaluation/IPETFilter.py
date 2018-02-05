@@ -11,7 +11,6 @@ please refer to README.md for how to cite IPET.
 """
 import xml.etree.ElementTree as ElementTree
 import numpy as np
-from ipet import Experiment
 from ipet.concepts import IpetNode, IpetNodeAttributeError
 import logging
 import pandas as pd
@@ -542,35 +541,3 @@ class IPETFilterGroup(IpetNode):
         """
         tree = ElementTree.parse(xmlfilename)
         return IPETFilterGroup.processXMLElem(tree.getroot())
-
-
-if __name__ == '__main__':
-    comp = Experiment(files = ['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
-    comp.addSoluFile('../test/short.solu')
-    comp.collectData()
-    operator = 'ge'
-    expression1 = 'Nodes'
-    expression2 = '2'
-    filter1 = IPETFilter(expression1, expression2, operator, anytestrun = "all")
-    filter2 = IPETFilter(expression1, expression2, operator, anytestrun = "one")
-    print(filter1.getName())
-    print(len(comp.getProblemNames()))
-
-
-    group = IPETFilterGroup('new')
-    filter1 = IPETFilter('SolvingTime', '10', 'ge', True)
-    filter2 = IPETFilter('SolvingTime', '10', 'le', True)
-    group.addFilter(filter1)
-    group.addFilter(filter2)
-    group2 = IPETFilterGroup('another')
-    group2.addFilter(filter1)
-    group.addFilter(group2)
-    xml = group.toXMLElem()
-    from xml.dom.minidom import parseString
-    dom = parseString(ElementTree.tostring(xml))
-    with open("myfile.xml", 'w') as myfile:
-        myfile.write(dom.toprettyxml())
-    group3 = IPETFilterGroup.fromXMLFile('myfile.xml')
-    xml = group3.toXMLElem()
-    dom = parseString(ElementTree.tostring(xml))
-    print(dom.toprettyxml())

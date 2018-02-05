@@ -40,38 +40,77 @@ epilog = \
 
     The simplest way to invoke the script is to specify the name of a parsed log file and the name of a valid evaluation file, e.g.,
 
-       python evaluate.py -t sometestrun.trn -e evaluation.xml
+       ipet-evaluate -t sometestrun.trn -e evaluation.xml
 
     A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily available data like the number of solving nodes and the solving time in seconds.
 
 
     Key Search
-    ==========
+    ----------
 
 
-
+    
 
     '''
 
+validation_doc = """
+    Validation
+    ----------
+    
+    IPET can use external problem information to validate collected solver output. External problem information
+    should be contained in a solu-file and can be passed by the -v, --validate command line option.
+    
+    Example
+    
+    
+        >>> ipet-evaluate -t mytestrun.trn -e myevaluation.xml -v subdir/solutions.solu
+    
+    specifies the solution information 'subdir/solutions.solu' as solution information.
+    It is possible to store this information as attribute for 'myevaluation.xml'.
+    
+    If the working directory contains solu file reference information , and
+    no validation is explicitly specified, ipet-evaluate recognizes and uses
+    the solu file from the working directory.
+"""
+
+output_doc = """
+
+    Output control
+    --------------
+    
+    By default, ipet-evaluate displays aggregated results for every filter group specified
+    in an evaluation file. The following command line options can be used
+    to control the verbosity of the output:
+    
+    - -l, --long : Show the 'long' table, with one row for every index element.
+    --displaygroup : Specify the name of the filter group (as declared in the evaluation)
+        for which the long table
+        should be printed. Only useful in combination with '--long'.
+    - -q, --quiet : Suppress all output
+    - -D, --debug : enable debugging output
+"""
+
 # possible arguments in the form name,default,short,description #
 clarguments = [('--experimentfile', None, '-x', "An experiment file name (must have .ipx file extension) in ipx-format to read"),
-               ('--evalfile', None,'-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
-               ('--externaldata', None,'-E', "Should external data such as additional instance information be used?"),
-               ('--defaultgroup', None,'-d', "overwrites the default group specified in the evaluation"),
-               ('--fileextension', None,'-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
-               ('--compformatstring', None,'-C', "a format string like %%.5f for compare columns (those ending with ...'Q')"),
-               #('--groupkey', None,'-g', "overwrites the group key as, e.g., 'Settings' specified in the evaluation by something else"),
-               ('--prefix', None,'-p', "a prefix string for every file written, only useful combined with --filextension"),
-               ('--keysearch', None,'-k', "a string containing a regular expression to search all columns that match this expression")]
+               ('--evalfile', None, '-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
+               ('--externaldata', None, '-E', "Should external data such as additional instance information be used?"),
+               ('--defaultgroup', None, '-d', "overwrites the default group specified in the evaluation"),
+               ('--fileextension', None, '-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
+               ('--compformatstring', None, '-C', "a format string like %%.5f for compare columns (those ending with ...'Q')"),
+               # ('--groupkey', None,'-g', "overwrites the group key as, e.g., 'Settings' specified in the evaluation by something else"),
+               ('--prefix', None, '-p', "a prefix string for every file written, only useful combined with --filextension"),
+               ('--keysearch', None, '-k', "a string containing a regular expression to search all columns that match this expression")]
 
-argparser = argparse.ArgumentParser(prog="IPET command line evaluation", \
-                                 description=description,
-                                 epilog = textwrap.dedent(epilog),
+argparser = argparse.ArgumentParser(prog = "IPET command line evaluation", \
+                                 description = description,
+                                 epilog = textwrap.dedent(epilog
+                                                          + validation_doc
+                                                          + output_doc),
                                  formatter_class = argparse.RawDescriptionHelpFormatter)
 for name, default, short, description in clarguments:
-    argparser.add_argument(short, name, default=default,help=description)
+    argparser.add_argument(short, name, default = default, help = description)
 
-argparser.add_argument('-t', '--testrunfiles', nargs='*', default=[], help="list of .trn files that should used for the evaluation")
+argparser.add_argument('-t', '--testrunfiles', nargs = '*', default = [], help = "list of .trn files that should used for the evaluation")
 
 argparser.add_argument("-A", "--showapp", action = "store_true", default = False, help = "Display the Evaluation Editor app to modify the evaluation")
 argparser.add_argument("-l", "--long", action = "store_true", default = False, help = "use for long output (instancewise and aggregated results)")
@@ -93,7 +132,7 @@ if __name__ == '__main__':
             print("Wrong Usage, use --help for more information.")
         exit()
 
-    #if globals().get("help") is not None:
+    # if globals().get("help") is not None:
     logger = logging.getLogger()
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     ch = logging.StreamHandler(sys.stdout)
@@ -130,17 +169,17 @@ if __name__ == '__main__':
                 logging.info("No eval-file specified, and standard evaluation %s could not be loaded -- Stopping" % evalfile)
                 sys.exit(0)
             logging.info("No eval-file specified, using standard evaluation %s" % evalfile)
-    else: 
+    else:
         evalfile = arguments.evalfile
-        
-    
-        
+
+
+
 
     if arguments.experimentfile is None and arguments.testrunfiles == []:
         print("Please provide either an experimentfile or (multiple, if needed) .trn testrun files")
         sys.exit(0)
     theeval = IPETEvaluation.fromXMLFile(evalfile)
-    
+
     # override unspecified validation
     if not arguments.validate and not theeval.getValidate():
         for _file in os.listdir("./"):
@@ -164,7 +203,7 @@ if __name__ == '__main__':
         logging.info("Recollecting data")
         experiment.collectData()
         # TODO What was it about the validation?
-        #if arguments.recheckTestrun:
+        # if arguments.recheckTestrun:
         #    experiment.checkProblemStatus()
 
     if arguments.saveexperiment is not False:
@@ -177,11 +216,11 @@ if __name__ == '__main__':
         theeval.set_index(arguments.index)
 
     if arguments.defaultgroup is not None:
-        #theeval.setDefaultGroup(arguments.defaultgroup)
+        # theeval.setDefaultGroup(arguments.defaultgroup)
         #
         # this will only work from our test directory using the following command
         #
-        #ipet-evaluate -t results/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.gamma_*_beta_0*.trn -e eval-test.xml -l -n -d 0.01 -D
+        # ipet-evaluate -t results/check.MMMc.scip-lns.linux.x86_64.gnu.opt.cpx.none.M610.gamma_*_beta_0*.trn -e eval-test.xml -l -n -d 0.01 -D
 #        theeval.setDefaultGroup((0.10, 0.05))
         theeval.set_defaultgroup(arguments.defaultgroup)
 
@@ -209,7 +248,7 @@ if __name__ == '__main__':
     if arguments.showapp:
         from ipetgui import IpetEvaluationEditorApp, ExperimentManagement
         from PyQt4.Qt import QApplication
-        
+
         application = QApplication(sys.argv)
         application.setApplicationName("Evaluation editor")
         mainwindow = IpetEvaluationEditorApp()
@@ -239,30 +278,30 @@ if __name__ == '__main__':
 
         theeval.streamDataFrame(retagg, "Aggregated Results", "stdout")
 
-    #for tr in comp.testrunmanager.getManageables():
-        #for col in tr.data.columns:
-            #print col
+    # for tr in comp.testrunmanager.getManageables():
+        # for col in tr.data.columns:
+            # print col
 
     if arguments.fileextension is not None:
         path = "."
         extension = arguments.fileextension
         prefixstr = arguments.prefix if arguments.prefix else ""
         for fg in theeval.getActiveFilterGroups():
-            instancewisename = "%s/%s%s"%(path, prefixstr, fg.name)
-            
+            instancewisename = "%s/%s%s" % (path, prefixstr, fg.name)
+
             theeval.streamDataFrame(theeval.getInstanceGroupData(fg), instancewisename, extension)
             logging.info("Instance-wise data written to %s.%s" % (instancewisename, extension))
             aggname = instancewisename + "_agg"
             theeval.streamDataFrame(theeval.getAggregatedGroupData(fg), aggname, extension)
             logging.info("aggregated data written to %s.%s" % (aggname, extension))
 
-        filename = "%s/%s"%(path, "_".join((prefixstr, "inst_combined")) if prefixstr != "" else "inst_combined")
+        filename = "%s/%s" % (path, "_".join((prefixstr, "inst_combined")) if prefixstr != "" else "inst_combined")
         theeval.streamDataFrame(rettab, filename, extension)
         logging.info("combined instance data written to %s.%s" % (filename, extension))
         # print the combined aggregated data if there are multiple filter groups present
-        filename = "%s/%s"%(path, "_".join((prefixstr, "agg_combined")) if prefixstr != "" else "agg_combined")
+        filename = "%s/%s" % (path, "_".join((prefixstr, "agg_combined")) if prefixstr != "" else "agg_combined")
         theeval.streamDataFrame(retagg, filename, extension)
         logging.info("combined aggregated data written to %s.%s" % (filename, extension))
 
-    #print pd.concat([rettab, theeval.levelonedf], axis=1)
+    # print pd.concat([rettab, theeval.levelonedf], axis=1)
 

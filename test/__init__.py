@@ -9,12 +9,15 @@ from .GurobiBoundHistoryTest import GurobiBoundHistoryTest
 from .IndexTest import IndexTest
 from .FilterDataTest import FilterDataTest
 from .ValidationTest import ValidationTest
+from .DiffAndEqualTest import DiffAndEqualTest
 import logging
 
 
 
-test_cases = (EvaluationTest, 
-              ExperimentTest, 
+test_cases = (
+              DiffAndEqualTest,
+              EvaluationTest,
+              ExperimentTest,
               SolverTest,
               FormatTest,
               PrimalDualBoundHistoryTest,
@@ -26,7 +29,7 @@ test_cases = (EvaluationTest,
               )
 
 def load_tests(loader, tests, pattern):
-    logger=logging.getLogger()
+    logger = logging.getLogger()
     logger.setLevel(logging.ERROR)
     suite = TestSuite()
     for test_class in test_cases:

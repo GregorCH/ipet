@@ -113,9 +113,12 @@ class IPETFilter(IpetNode):
     Filters are used for selecting subsets of problems to analyze.
     """
     valueoperators = ["keep", "drop"]
+    listoperators = ["diff", "equal"]
     attribute2Options = {
                          "anytestrun":["one", "all"],
-                         "operator":list(IPETComparison.comparisondict.keys()) + valueoperators}
+                         "operator":list(IPETComparison.comparisondict.keys())
+                         + valueoperators
+                         + listoperators}
     nodetag = "Filter"
     DEFAULT_ANYTESTRUN = 'all'
 
@@ -254,6 +257,71 @@ class IPETFilter(IpetNode):
             return ~contained
 
 
+    def isAllDiff(self, x):
+        valueset = set()
+        for x_i in x:
+            if x_i in valueset:
+                return False
+            valueset.add(x_i)
+        return True
+
+    def isOneEqual(self, x):
+        return not self.isAllDiff(x)
+
+    def isAllEqual(self, x):
+        first_x = x.iloc[0]
+        for x_i in x:
+            if first_x != x_i:
+                return False
+        return True
+
+    def isOneDiff(self, x):
+        return not self.isAllEqual(x)
+
+
+
+    def applyListOperator(self, df, groupindex):
+        """
+        Apply list operators 'diff' and 'equal' to the datakey.
+        
+        In combination with the 'anytestrun' attribute, there are 
+        four possibilities in total:
+        
+        | anytestrun | operator | result |
+        |------------|----------|--------|
+        | one        |diff      |True, if there are at least 2 different values in a group |
+        | all        |diff      |True, if all values are different in this group |
+        | one        |equal     |True, if at least one value occurs twice in a group |
+        | all        |equal     |True, if there is only a single value for this group |
+        """
+
+        #
+        # 1. chose the right list function
+        #
+        if self.operator == "diff":
+            if self.anytestrun == "one":
+                fun = self.isOneDiff
+            else:
+                fun = self.isAllDiff
+        if self.operator == "equal":
+            if self.anytestrun == "one":
+                fun = self.isOneEqual
+            else:
+                fun = self.isAllEqual
+        #
+        # 2. store the original index
+        #
+        dfindex = df.set_index(groupindex).index
+        #
+        # 3. group by the index and apply the list list function
+        #
+        f_by_group = df.groupby(groupindex)[self.datakey].apply(fun)
+        #
+        # 4. reindex the result to match the original data frame row count
+        #
+        return f_by_group.reindex(index = dfindex, axis = 0)
+
+
     def filterProblem(self, probname, testruns = []):
         """
         return True or False depending on the evaluation of the filter operator comparison
@@ -276,8 +344,20 @@ class IPETFilter(IpetNode):
             return False
         return True
 
-    def applyFilter(self, df):
+    def applyFilter(self, df, groupindex = None):
         """Apply the filter to a data frame rowwise
+        
+        Parameters
+        ----------
+        
+        df : DataFrame
+            data frame object containing columns 'expression1' and 'expression2' or 'datakey'
+            depending on the selected operator
+            
+        groupindex : list or None
+            either a list of columns that should be used for groupby operations 
+            (only needed for list operators 'equal' and 'diff')
+            
 
            Returns
            -------
@@ -285,6 +365,9 @@ class IPETFilter(IpetNode):
         """
         if self.operator in self.valueoperators:
             return self.applyValueOperator(df[[self.datakey]])
+
+        elif self.operator in self.listoperators:
+            return self.applyListOperator(df, groupindex)
 
         x = self.evaluateValueDataFrame(df, self.expression1)
         y = self.evaluateValueDataFrame(df, self.expression2)
@@ -456,7 +539,7 @@ class IPETFilterGroup(IpetNode):
 
         for f_ in activefilters:
             # apply the filter to the data frame rowwise and store the result in a temporary boolean column
-            filtercol = f_.applyFilter(df)
+            filtercol = f_.applyFilter(df, index)
             filtercol = filtercol.rename(renaming, axis = 1)
 
             filtercol.index = dfindex
@@ -470,7 +553,7 @@ class IPETFilterGroup(IpetNode):
             #
             # reshape the column to match the original data frame rows
             #
-            fcol = fcol_index.reindex(index = df.set_index(index).index, axis = 0)
+            fcol = fcol_index.reindex(index = dfindex, axis = 0)
             index_series.append(fcol)
 
         #

@@ -3,7 +3,6 @@ Created on 24.01.2018
 
 @author: gregor
 '''
-from math import inf
 import pandas as pd
 from ipet.Key import ProblemStatusCodes, SolverStatusCodes, ObjectiveSenseCode
 from ipet import Key

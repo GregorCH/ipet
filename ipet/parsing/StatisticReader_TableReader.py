@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -10,7 +10,7 @@ please refer to README.md for how to cite IPET.
 @author: Gregor Hendel
 """
 import re
-from ipet.misc import misc
+from ipet import misc
 from .StatisticReader import StatisticReader
 from ipet.concepts.IPETNode import IpetNodeAttributeError
 
@@ -59,7 +59,7 @@ class TableReader(StatisticReader):
             try:
                 colonidx = line.index(':')
             except:
-                #print(StatisticReader.problemname, line)
+                # print(StatisticReader.problemname, line)
                 raise Exception()
             tableid = line[:colonidx].rstrip()
             self.tableid = ''.join(tableid.split())
@@ -87,7 +87,7 @@ class TableReader(StatisticReader):
 
             rowname = ''.join(line[:colonidx].split())
 
-            # distinguish between single columns and tables with multiple columns 
+            # distinguish between single columns and tables with multiple columns
             if self.columns != []:
 
                 # treat tables (tables with at least two data columns)
@@ -110,7 +110,7 @@ class TableReader(StatisticReader):
 class CustomTableReader(TableReader):
     """customizable plugin statistics reader for user plugin data tables
     """
-    
+
     def __init__(self, name = "CustomTableReader", tableid = None, columnid = None):
         """Constructs custom data table reader
         
@@ -120,30 +120,29 @@ class CustomTableReader(TableReader):
         
         singlecolumname : string representing a column identifier
         """
-        
+
         if tableid is None and columnid is None:
             raise Exception("Both tableid and singlecolumname are None")
         self.set_tableid(tableid)
         self.set_columnid(columnid)
         self.name = name
-            
+
     def set_tableid(self, tableid):
         self.tableid = tableid
         if tableid is not None:
             self.tableids = [tableid]
         else:
             self.tableids = []
-            
+
     def set_columnid(self, columnid):
         self.columnid = columnid
         if columnid is not None:
             self.columnids = [columnid]
         else:
             self.columnids = []
-        
-        
+
+
     def getEditableAttributes(self):
         return TableReader.getEditableAttributes(self) + ["tableid", "singlecolumname"]
-        
-        
-    
+
+

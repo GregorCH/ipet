@@ -6,7 +6,6 @@
 CONTEXT_LOGFILE = 1  # the log file of a solver which most readers are reading from
 CONTEXT_ERRFILE = 2  # the error file of a solver
 CONTEXT_SETFILE = 3  # the settings file used for solving
-CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every problem
 CONTEXT_TRACEFILE = 5
 CONTEXT_METAFILE = 0  # the metadata
 
@@ -14,7 +13,6 @@ contextname2contexts = {
         "log" : CONTEXT_LOGFILE,
         "err" : CONTEXT_ERRFILE,
         "set" : CONTEXT_SETFILE,
-        "solu" : CONTEXT_SOLUFILE,
         "trace" : CONTEXT_TRACEFILE,
         "meta" : CONTEXT_METAFILE,
         "" : CONTEXT_LOGFILE
@@ -24,7 +22,6 @@ fileextension2context = {
                          ".err" : CONTEXT_ERRFILE,
                          ".out" : CONTEXT_LOGFILE,
                          ".set" : CONTEXT_SETFILE,
-                         ".solu": CONTEXT_SOLUFILE,
                          ".trc" : CONTEXT_TRACEFILE,
                          ".meta" : CONTEXT_METAFILE,
                          "" : CONTEXT_LOGFILE  # workaround for input from stdin
@@ -35,7 +32,6 @@ context2Sortkey = {
                    CONTEXT_ERRFILE : 2,
                    CONTEXT_LOGFILE : 1,
                    CONTEXT_SETFILE : 3,
-                   CONTEXT_SOLUFILE : 4,
                    CONTEXT_TRACEFILE : 5,
                    CONTEXT_METAFILE : 0
                    }

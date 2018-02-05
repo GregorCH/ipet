@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -17,7 +17,6 @@ from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, ListRe
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
 from .StatisticReader_TableReader import TableReader, CustomTableReader
 from .StatisticReader_VariableReader import VariableReader
-from .StatisticReader_SoluFileReader import SoluFileReader
 from .StatisticReader_CustomReader import CustomReader
 from .TraceFileReader import TraceFileReader
 from ipet.concepts.Manager import Manager
@@ -180,7 +179,6 @@ class ReaderManager(Manager, IpetNode):
              VariableReader(),
              RootNodeFixingsReader(),
              SettingsFileReader(),
-             SoluFileReader(),
              TimeLimitReader(),
              TimeToFirstReader(),
              TimeToBestReader(),
@@ -258,7 +256,7 @@ class ReaderManager(Manager, IpetNode):
         check the solver type for a given log file
         """
         lines = []
-        for i,line in self.testrun:
+        for i, line in self.testrun:
             lines.append(line)
             for solver in self.solvers:
                 if solver.recognizeOutput(line):
@@ -280,7 +278,7 @@ class ReaderManager(Manager, IpetNode):
             context = misc.filenameGetContext(self.testrun.iterationGetCurrentFile())
             readers = [r for r in self.getManageables(True) if r.supportsContext(context)]
 
-            line = (0,"")
+            line = (0, "")
             for line in self.testrun:
                 if self.startOfProblemReached(line[1]):
                     if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:

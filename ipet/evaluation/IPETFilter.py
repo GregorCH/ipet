@@ -176,6 +176,8 @@ class IPETFilter(IpetNode):
         prefix = self.anytestrun
         if self.operator in self.valueoperators:
             return "{} value filter (key: {})".format(self.operator, self.datakey)
+        elif self.operator in self.listoperators:
+            return "{}-{} list filter (key: {})".format(self.anytestrun, self.operator, self.datakey)
         else:
             return " ".join((prefix, self.expression1, self.operator, self.expression2))
 
@@ -319,7 +321,7 @@ class IPETFilter(IpetNode):
         #
         # 4. reindex the result to match the original data frame row count
         #
-        return f_by_group.reindex(index = dfindex, axis = 0)
+        return pd.DataFrame(f_by_group.reindex(index = dfindex, axis = 0))
 
 
     def filterProblem(self, probname, testruns = []):

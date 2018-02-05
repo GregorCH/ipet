@@ -4,7 +4,7 @@ Created on 25.01.2018
 @author: gregor
 '''
 import unittest
-from ipet.evaluation import Validation
+from ipet.validation import Validation
 from ipet.Key import ObjectiveSenseCode as osc
 from ipet import Key
 import numpy

@@ -17,7 +17,7 @@ import os, sys
 import logging
 import pandas as pd
 from ipet.Key import CONTEXT_LOGFILE
-from ipet.evaluation import Validation
+from ipet.validation import Validation
 # from lib2to3.fixes.fix_input import context
 # from matplotlib.tests import test_lines
 

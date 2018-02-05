@@ -10,8 +10,6 @@ please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
 """
-from .Aggregation import Aggregation
-from .IPETEvalTable import IPETEvaluation, IPETEvaluationColumn
-from .IPETFilter import IPETFilter, IPETFilterGroup, IPETValue
+from .Validation import Validation
 
 __all__ = ["TestSets"]

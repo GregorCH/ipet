@@ -23,7 +23,7 @@ import os
 import sys
 import logging
 from ipet.Key import SolverStatusCodes
-from ipet.evaluation import Validation
+from ipet.validation import Validation
 
 class Experiment:
     """

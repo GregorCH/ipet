@@ -315,14 +315,20 @@ class IPETFilter(IpetNode):
         #
         dfindex = df.set_index(groupindex).index
         #
-        # 3. group by the index and apply the list list function
+        # 3. group by the index and apply the list function
         #
         f_by_group = df.groupby(groupindex)[self.datakey].apply(fun)
         #
         # 4. reindex the result to match the original data frame row count
         #
-        return pd.DataFrame(f_by_group.reindex(index = dfindex, axis = 0))
+        f_by_group_as_frame = pd.DataFrame(f_by_group.reindex(index = dfindex, axis = 0))
 
+        #
+        # 5. set the index of the frame to match the original frame's index
+        #
+        f_by_group_as_frame.set_index(df.index, inplace = True)
+
+        return f_by_group_as_frame
 
     def filterProblem(self, probname, testruns = []):
         """

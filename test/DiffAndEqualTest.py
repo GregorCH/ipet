@@ -49,9 +49,9 @@ class DiffAndEqualTest(unittest.TestCase):
             f = IPETFilter(operator = op, anytestrun = any, datakey = "Val")
             f_result = f.applyListOperator(testdf, ["Var"])
 
-            self.assertTrue(np.all(f_result.values == testdf[combi].values),
+
+            self.assertTrue(np.all(f_result["Val"] == testdf[combi]),
                             "Wrong list operator result for combination {}:\n{}\n!=\n{}\n".format(combi, f_result, testdf[combi]))
-            print()
 
 
 if __name__ == "__main__":

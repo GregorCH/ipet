@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -23,6 +23,7 @@ import os
 import sys
 import logging
 from ipet.Key import SolverStatusCodes
+from ipet.validation import Validation
 
 class Experiment:
     """
@@ -37,10 +38,10 @@ class Experiment:
         self.readermanager = ReaderManager()
         self.readermanager.registerDefaultReaders()
         self.testruns = []
-        self.solufiles = []
         self.externaldata = None
         self.basename2testrun = {}
         self.probnamelist = []
+        self.validation = Validation(solufilename = None, tol = gaptol)
 
         for filename in files:
             self.addOutputFile(filename)
@@ -59,7 +60,7 @@ class Experiment:
         """
         self.validatedual = validatedual
 
-    #def addOutputFile(self, filename, testrun = None): # testrun parameter is unused
+    # def addOutputFile(self, filename, testrun = None): # testrun parameter is unused
     def addOutputFile(self, filename):
         """ Add an output file for a testrun or create a new testrun object with the specified filename
 
@@ -82,7 +83,7 @@ class Experiment:
             except IOError as e:
                 sys.stderr.write(" Loading testrun from file %s caused an exception\n%s\n" % (filename, e))
                 return
-        else: #if testrun is None:
+        else:  # if testrun is None:
             testrun = self.basename2testrun.setdefault(filebasename, TestRun())
 
         if fileextension != TestRun.FILE_EXTENSION:
@@ -105,8 +106,7 @@ class Experiment:
     def addSoluFile(self, solufilename):
         """ Associate a solu file with all testruns
         """
-        if solufilename not in self.solufiles:
-            self.solufiles.append(solufilename)
+        self.validation = Validation(solufilename, self.gaptol)
 
     def removeTestrun(self, testrun):
         """ Remove a testrun object from the experiment
@@ -166,20 +166,6 @@ class Experiment:
                 problemset.add(problem)
         self.probnamelist = sorted(list(problemset))
 
-    def getManager(self, managedclass):
-        """ Get a specific manager of the experiment manager set. if managedclass is 'Testrun' or 'testrun',
-        this will return the testrun manager object of this experiment
-        """
-        lowerclass = managedclass.lower()
-        if hasattr(self, lowerclass + 'manager'):
-            return getattr(self, lowerclass + 'manager')
-
-    def getManagers(self):
-        """ Return a dictionary of all managers of this experiment object
-        """
-        managernames = [name for name in dir(self) if name.endswith('manager')]
-        return {name:getattr(self, name) for name in managernames}
-
     def addExternalDataFile(self, filename):
         """ Add a filename pointing to an external file, eg a solu file with additional information
         """
@@ -194,23 +180,18 @@ class Experiment:
     def collectData(self):
         """ Iterate over log files and solu file and collect data via installed readers
         """
-        # add solu file to testrun if it's not yet done
         testruns = self.getTestRuns()
-        for testrun in testruns:
-            for solufilename in self.solufiles:
-                testrun.appendFilename(solufilename)
 
         for testrun in testruns:
             self.readermanager.setTestRun(testrun)
             testrun.setupForDataCollection()
+            testrun.setValidation(self.validation)
             self.readermanager.collectData()
 
         # TODO Is this calculated only for validation?
         self.makeProbNameList()
         self.calculateGaps()
         self.calculateIntegrals()
-
-        self.checkProblemStatus()
 
         for testrun in testruns:
             testrun.setupAfterDataCollection()
@@ -229,10 +210,15 @@ class Experiment:
     def calculateGaps(self):
         """ Calculate and store primal and dual gap
         """
+
+        # use validation reference bounds for storing primal and dual gaps
+        if self.validation is None:
+            return
+
         for testrun in self.getTestRuns():
             for problemid in testrun.getProblemIds():
-            
-                optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
+
+                optval = self.validation.getReferencePb(testrun.getProblemDataById(problemid, Key.ProblemName))
                 if optval is not None:
                     for key in [Key.PrimalBound, Key.DualBound]:
                         val = testrun.getProblemDataById(problemid, key)
@@ -264,284 +250,35 @@ class Experiment:
         ... for every problem under 'PrimalIntegral' and 'DualIntegral'
         """
         dualargs = dict(historytouse = Key.DualBoundHistory, boundkey = Key.DualBound)
+
+        if self.validation is None:
+            return
+
         for testrun in self.getTestRuns():
 
             # go through problems and calculate both primal and dual integrals
             for problemid in testrun.getProblemIds():
-                processplotdata = getProcessPlotData(testrun, problemid)
+                problemname = testrun.getProblemDataById(problemid, Key.ProblemName)
+                processplotdata = getProcessPlotData(testrun, problemid, reference = self.validation.getReferencePb(problemname))
 
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     try:
                         testrun.addDataById(Key.PrimalIntegral, calcIntegralValue(processplotdata), problemid)
                         logging.debug("Computed primal integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'PrimalIntegral'), problemid, repr(processplotdata)))
-                    except AssertionError as e:
+                    except AssertionError:
                         logging.error("Error for primal bound on problem %s, list: %s" % (problemid, processplotdata))
 
-                processplotdata = getProcessPlotData(testrun, problemid, **dualargs)
+                processplotdata = getProcessPlotData(testrun, problemid, reference = self.validation.getReferenceDb(problemname), **dualargs)
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     try:
                         testrun.addDataById(Key.DualIntegral, calcIntegralValue(processplotdata, pwlinear = True), problemid)
                         logging.debug("Computed dual integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'DualIntegral'), problemid, repr(processplotdata)))
-                    except AssertionError as e:
+                    except AssertionError:
                         logging.error("Error for dual bound on problem %s, list: %s " % (problemid, processplotdata))
 
-    def writeSolufile(self):
-        """ Write a solu file based on the parsed results
-        """
-        # ## collect data
-        solufiledata = {}
-        for testrun in self.getTestRuns():
-            for probname in testrun.getProblemIds():
-                pb = testrun.getProblemDataById(probname, Key.PrimalBound)
-                db = testrun.getProblemDataById(probname, Key.DualBound)
-                if pb is None or db is None:
-                    continue
-                status = '=unkn='
-                infinite = (pb >= misc.FLOAT_INFINITY or pb <= -misc.FLOAT_INFINITY)
-                sense = 0
-                if pb < db:
-                    sense = 1
-                else: sense = -1
 
-                if not infinite and misc.getGap(pb, db, True) <= self.gaptol:
-                    status = '=opt='
-                elif not infinite:
-                    status = '=best='
-                elif pb == db:
-                    status = '=inf='
-
-                currentsolufileentry = solufiledata.get(probname)
-                if currentsolufileentry == None:
-                    solufiledata[probname] = (status, pb)
-                else:
-                    solustatus, solupb = currentsolufileentry
-                    if solustatus == '=best=':
-                        assert sense != 0
-                        if not infinite and sense * (solupb - pb) < 0 or status == '=opt=':
-                            solufiledata[probname] = (status, pb)
-                    elif solustatus == '=unkn=':
-                        solufiledata[probname] = (status, pb)
-
-        # # write solufiledata to file
-        newsolufilename = 'newsolufile.solu'
-        f = open(newsolufilename, 'w')
-        for prob in sorted(list(solufiledata.keys()), reverse = False):
-            solustatus, solupb = solufiledata.get(prob)
-            f.write("%s %s" % (solustatus, prob))
-            if solustatus in ['=best=', '=opt=']:
-                f.write(" %g" % solupb)
-            f.write("\n")
-
-        f.close()
-
-    def testrunGetProbGapToOpt(self, testrun, problemid):
-        """ Return the gap between found an solufile-solution
-        """
-        optsol = testrun.problemGetOptimalSolution(problemid)
-        status = testrun.problemGetSoluFileStatus(problemid)
-        pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-        if status == 'opt' or status == 'best':
-            return misc.getGap(float(pb), float(optsol))
-        else:
-            return misc.FLOAT_INFINITY
-#
-#    def checkForFails(self):
-#        """ All testruns and instances go through fail check.
-#
-#        returns a dictionary to contain all instances which failed
-#        """
-#        faildict = {}
-#        for testrun in self.getTestRuns():
-#            for probname in self.probnamelist:
-#                if testrun.problemCheckFail(probname) > 0:
-#                    faildict.setdefault(testrun.getIdentification(), []).append(probname)
-#        return faildict
-
-    def isPrimalBoundBetter(self, testrun, problemid):
-        """ Return True if the primal bound for the given problem exceeds the best known solution value
-        """
-        pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-        objsense = testrun.getProblemDataById(problemid, Key.ObjectiveSense)
-        optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
-
-        if pb is None:
-            return False
-
-        reltol = self.gaptol * max(abs(pb), 1.0)
-
-        if objsense == ObjsenseReader.minimize and optval - pb > reltol:
-            return True
-        elif objsense == ObjsenseReader.maximize and pb - optval > reltol:
-            return True
-        return False
-
-    def isDualBoundBetter(self, testrun, problemid):
-        """ Return True if the dual bound for the given problem exceeds the best known solution value
-        """
-        db = testrun.getProblemDataById(problemid, Key.DualBound)
-        pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-
-        if db is None:
-            return False
-
-        objsense = testrun.getProblemDataById(problemid, Key.ObjectiveSense)
-        optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
-
-        if pb is not None:
-            reltol = self.gaptol * max(abs(pb), 1.0)
-        else:
-            reltol = self.gaptol * max(abs(optval), 1.0)
-
-        if objsense == ObjsenseReader.minimize and db - optval > reltol:
-            return True
-        elif objsense == ObjsenseReader.maximize and optval - db > reltol:
-            return True
-        return False
-
-
-    def validateDual(self, pb, db):
-        """validate the relative gap between the primal and dual bound if dual validation is enabled
-        """
-        if self.validatedual:
-            return misc.getGap(pb, db) < self.gaptol
-        return True
-
-    def determineStatusForOptProblem(self, testrun, problemid):
-        """ Determine status for a problem for which we know the optimal solution value
-        """
-        pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-        db = testrun.getProblemDataById(problemid, Key.DualBound)
-        solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
-        # TODO What is this "objectiveLimit", where is it set and what does it imply?
-        objlimitreached = (solverstatus == "objectiveLimit")
-        optval = testrun.getProblemDataById(problemid, Key.OptimalValue)
-        objsense = testrun.getProblemDataById(problemid, Key.ObjectiveSense)
-        solfound = True if pb is not None and not misc.isInfinite(pb) else False
-
-        # the run failed because the primal or dual bound were better than the known optimal solution value
-        if solfound and (self.isPrimalBoundBetter(testrun, problemid) or self.isDualBoundBetter(testrun, problemid)):
-            code = Key.ProblemStatusCodes.FailObjectiveValue
-        # the run finished correctly if an objective limit was given and the solver reported infeasibility
-        elif not solfound and objlimitreached:
-            objlimit = testrun.getProblemDataById(problemid, ObjlimitReader.datakey)
-            reltol = self.gaptol * max(abs(optval), 1.0)
-
-            if (objsense == ObjsenseReader.minimize and optval - objlimit >= -reltol) or \
-                  (objsense == ObjsenseReader.maximize and objlimit - optval >= -reltol):
-                code = Key.ProblemStatusCodes.Ok
-            else:
-                code = Key.ProblemStatusCodes.FailObjectiveValue
-        # the solver reached a limit
-        elif solverstatus in [Key.SolverStatusCodes.MemoryLimit, Key.SolverStatusCodes.TimeLimit, Key.SolverStatusCodes.NodeLimit]:
-            code = Key.solverToProblemStatusCode(solverstatus)
-
-        # the solver reached
-        elif (db is None or self.validateDual(pb, db)) and not self.isPrimalBoundBetter(testrun, problemid):
-            code = Key.ProblemStatusCodes.Ok
-        else:
-            code = Key.ProblemStatusCodes.Fail
-
-        return code
-
-    def determineStatusForBestProblem(self, testrun, problemid):
-        """ Determine status for a problem for which we only know a best solution value
-        """
-        pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-        db = testrun.getProblemDataById(problemid, Key.DualBound)
-        solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
-
-        # we failed because dual bound is higher than the known value of a primal bound
-        if self.isDualBoundBetter(testrun, problemid):
-            code = Key.ProblemStatusCodes.FailDualBound
-
-        # solving reached a limit
-        elif solverstatus in [Key.SolverStatusCodes.MemoryLimit, Key.SolverStatusCodes.TimeLimit, Key.SolverStatusCodes.NodeLimit]:
-            code = Key.solverToProblemStatusCode(solverstatus)
-
-            if self.isPrimalBoundBetter(testrun, problemid):
-                code = Key.ProblemStatusCodes.Better
-
-        # primal and dual bound converged
-        elif self.validateDual(pb, db):
-            code = Key.ProblemStatusCodes.SolvedNotVerified
-        else:
-            code = Key.ProblemStatusCodes.Fail
-
-        return code
-
-    def determineStatusForUnknProblem(self, testrun, problemid):
-        """ Determine status for a problem for which we don't know anything about the feasibility or optimality
-        """
-        pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-        db = testrun.getProblemDataById(problemid, Key.DualBound)
-        solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
-
-        if solverstatus:
-            code = Key.solverToProblemStatusCode(solverstatus)
-
-        elif pb is not None:
-            code = Key.ProblemStatusCodes.Better
-        elif misc.getGap(pb, db) < self.gaptol:
-            code = Key.ProblemStatusCodes.SolvedNotVerified
-        else:
-            code = Key.ProblemStatusCodes.Unknown
-
-        return code
-
-    def determineStatusForInfProblem(self, testrun, problemid):
-        """ Determine status for a problem for which we know it's infeasible
-        """
-        pb = testrun.getProblemDataById(problemid, Key.PrimalBound)
-        solfound = True if pb is not None and not misc.isInfinite(pb) else False
-
-        # no solution was found
-        if not solfound:
-            solverstatus = testrun.getProblemDataById(problemid, Key.SolverStatus)
-            # calc was inconclusive
-            if solverstatus in [Key.SolverStatusCodes.TimeLimit, Key.SolverStatusCodes.MemoryLimit, Key.SolverStatusCodes.NodeLimit]:
-                code = Key.solverToProblemStatusCode(solverstatus)
-            else:
-                code = Key.ProblemStatusCodes.Ok
-        # a solution was found, that's not good
-        else:
-            code = Key.ProblemStatusCodes.FailSolOnInfeasibleInstance
-
-        return code
-
-    def checkProblemStatus(self):
-        """ Check a problem solving status
-
-        Check whether the solver's return status matches the information about the instances
-        """
-        logging.debug('Checking problem status')
-        for testrun in self.getTestRuns():
-            for problemid in testrun.getProblemIds():
-                solustatus = testrun.problemGetSoluFileStatus(problemid)
-                errcode = testrun.getProblemDataById(problemid, ErrorFileReader.datakey)
-
-                # an error code means that the instance aborted
-                if errcode is not None or testrun.getProblemDataById(problemid, Key.SolvingTime) is None:
-                    code = Key.solverToProblemStatusCode(testrun.getProblemDataById(problemid, Key.SolverStatus))
-
-                # if the best solution was not feasible in the original problem, it's a fail
-                elif testrun.getProblemDataById(problemid, BestSolInfeasibleReader.datakey) == True:
-                    code = Key.ProblemStatusCodes.FailSolInfeasible
-
-                # go through the possible solution statuses and determine the Status of the run accordingly
-                elif solustatus == 'opt':
-                    code = self.determineStatusForOptProblem(testrun, problemid)
-                elif solustatus == "best":
-                    code = self.determineStatusForBestProblem(testrun, problemid)
-                elif solustatus == "inf":
-                    code = self.determineStatusForInfProblem(testrun, problemid)
-                else:
-                    code = self.determineStatusForUnknProblem(testrun, problemid)
-
-                testrun.addDataById(Key.ProblemStatus, code, problemid)
-
-                logging.debug("Problem %s in testrun %s solustatus %s, errorcode %s -> Status %s" % (problemid, testrun.getName(), repr(solustatus), repr(errcode), testrun.getProblemDataById(problemid, "Status")))
 
     def printToConsole(self, formatstr = "{idx} {d}"):
         for tr in self.testruns:

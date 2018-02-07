@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -11,7 +11,6 @@ please refer to README.md for how to cite IPET.
 """
 import xml.etree.ElementTree as ElementTree
 import numpy as np
-from ipet import Experiment
 from ipet.concepts import IpetNode, IpetNodeAttributeError
 import logging
 import pandas as pd
@@ -19,8 +18,8 @@ from ipet.evaluation import TestSets
 
 class IPETValue(IpetNode):
     nodetag = "Value"
-    
-    def __init__(self, name=None, active=True):
+
+    def __init__(self, name = None, active = True):
         """
         constructs an Ipet Instance
         
@@ -32,23 +31,23 @@ class IPETValue(IpetNode):
         """
         super(IPETValue, self).__init__(active)
         self.name = name
-        
+
     def checkAttributes(self):
         if self.name is None:
             raise IpetNodeAttributeError("name", "No name specified")
         return True
-        
+
     def getEditableAttributes(self):
         return ["name"] + super(IPETValue, self).getEditableAttributes()
-    
+
     @staticmethod
     def getNodeTag():
         return IPETValue.nodetag
-    
+
     def getName(self):
         return self.name
 
-    def getValue(self, dtype=None):
+    def getValue(self, dtype = None):
         if dtype is None:
             for mytype in [int, float, str]:
                 try:
@@ -57,7 +56,7 @@ class IPETValue(IpetNode):
                     continue
         elif dtype != np.object:
             return dtype.type(self.name)
-        
+
         return self.name
 
     def toXMLElem(self):
@@ -114,12 +113,15 @@ class IPETFilter(IpetNode):
     Filters are used for selecting subsets of problems to analyze.
     """
     valueoperators = ["keep", "drop"]
+    listoperators = ["diff", "equal"]
     attribute2Options = {
                          "anytestrun":["one", "all"],
-                         "operator":list(IPETComparison.comparisondict.keys()) + valueoperators}
+                         "operator":list(IPETComparison.comparisondict.keys())
+                         + valueoperators
+                         + listoperators}
     nodetag = "Filter"
     DEFAULT_ANYTESTRUN = 'all'
-    
+
 
     def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = DEFAULT_ANYTESTRUN, active = True, datakey = None):
         """
@@ -143,21 +145,21 @@ class IPETFilter(IpetNode):
         self.anytestrun = anytestrun
         self.values = []
         self._updatevalueset = False
-        
+
         self.set_operator(operator)
         self.datakey = datakey
-        
+
     def checkAttributes(self):
         if self.operator in self.valueoperators and self.values == []:
             raise IpetNodeAttributeError("operator", "Trying to use a filter with operator {0} and empty value set".format(self.operator))
         if self.operator in self.valueoperators and self.datakey is None or self.datakey == "":
             raise IpetNodeAttributeError("datakey", "Trying to use a filter with operator '{}' and unspecified data key '{}'".format(self.operator, self.datakey))
-        
+
         if self.anytestrun not in self.attribute2Options["anytestrun"]:
             raise IpetNodeAttributeError("anytestrun", "Wrong attribute {} passed as 'anytestrun' property. Should be in {}".format(self.anytestrun, self.attribute2Options["anytestrun"]))
         return True
-        
-        
+
+
     @staticmethod
     def fromDict(attrdict):
         expression1 = attrdict.get('expression1')
@@ -174,6 +176,8 @@ class IPETFilter(IpetNode):
         prefix = self.anytestrun
         if self.operator in self.valueoperators:
             return "{} value filter (key: {})".format(self.operator, self.datakey)
+        elif self.operator in self.listoperators:
+            return "{}-{} list filter (key: {})".format(self.anytestrun, self.operator, self.datakey)
         else:
             return " ".join((prefix, self.expression1, self.operator, self.expression2))
 
@@ -195,28 +199,28 @@ class IPETFilter(IpetNode):
             return parenteditables + ['operator', 'anytestrun', 'expression1', 'expression2']
         else:
             return parenteditables + ['operator', 'anytestrun', 'datakey']
-    
+
     @staticmethod
     def getNodeTag():
         return IPETFilter.nodetag
-    
+
     def getChildren(self):
         return self.values
-        
+
     def acceptsAsChild(self, child):
         return child.__class__ is IPETValue
-    
+
     def addChild(self, child):
         self.values.append(child)
         self._updatevalueset = True
-        
+
     def removeChild(self, child):
         self.values.remove(child)
         self._updatevalueset = True
 
     def getActiveValues(self):
         return [x for x in self.values if x.isActive()]
-            
+
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2Options.get(attr, super(IPETFilter, self).getRequiredOptionsByAttribute(attr))
 
@@ -243,9 +247,9 @@ class IPETFilter(IpetNode):
         self._updatevalueset = False
 
     def applyValueOperator(self, df):
-        
+
         dtype = df.dtypes[0]
-        
+
         self.checkAndUpdateValueSet(dtype)
         contained = df.isin(self.valueset)
         logging.debug("Contained: {}\nData: {}".format(contained, df))
@@ -253,9 +257,80 @@ class IPETFilter(IpetNode):
             return contained
         else:
             return ~contained
-        
 
-    def filterProblem(self, probname, testruns=[]):
+
+    def isAllDiff(self, x):
+        valueset = set()
+        for x_i in x:
+            if x_i in valueset:
+                return False
+            valueset.add(x_i)
+        return True
+
+    def isOneEqual(self, x):
+        return not self.isAllDiff(x)
+
+    def isAllEqual(self, x):
+        first_x = x.iloc[0]
+        for x_i in x:
+            if first_x != x_i:
+                return False
+        return True
+
+    def isOneDiff(self, x):
+        return not self.isAllEqual(x)
+
+
+
+    def applyListOperator(self, df, groupindex):
+        """
+        Apply list operators 'diff' and 'equal' to the datakey.
+        
+        In combination with the 'anytestrun' attribute, there are 
+        four possibilities in total:
+        
+        | anytestrun | operator | result |
+        |------------|----------|--------|
+        | one        |diff      |True, if there are at least 2 different values in a group |
+        | all        |diff      |True, if all values are different in this group |
+        | one        |equal     |True, if at least one value occurs twice in a group |
+        | all        |equal     |True, if there is only a single value for this group |
+        """
+
+        #
+        # 1. chose the right list function
+        #
+        if self.operator == "diff":
+            if self.anytestrun == "one":
+                fun = self.isOneDiff
+            else:
+                fun = self.isAllDiff
+        if self.operator == "equal":
+            if self.anytestrun == "one":
+                fun = self.isOneEqual
+            else:
+                fun = self.isAllEqual
+        #
+        # 2. store the original index
+        #
+        dfindex = df.set_index(groupindex).index
+        #
+        # 3. group by the index and apply the list function
+        #
+        f_by_group = df.groupby(groupindex)[self.datakey].apply(fun)
+        #
+        # 4. reindex the result to match the original data frame row count
+        #
+        f_by_group_as_frame = pd.DataFrame(f_by_group.reindex(index = dfindex, axis = 0))
+
+        #
+        # 5. set the index of the frame to match the original frame's index
+        #
+        f_by_group_as_frame.set_index(df.index, inplace = True)
+
+        return f_by_group_as_frame
+
+    def filterProblem(self, probname, testruns = []):
         """
         return True or False depending on the evaluation of the filter operator comparison
         """
@@ -277,8 +352,20 @@ class IPETFilter(IpetNode):
             return False
         return True
 
-    def applyFilter(self, df):
+    def applyFilter(self, df, groupindex = None):
         """Apply the filter to a data frame rowwise
+        
+        Parameters
+        ----------
+        
+        df : DataFrame
+            data frame object containing columns 'expression1' and 'expression2' or 'datakey'
+            depending on the selected operator
+            
+        groupindex : list or None
+            either a list of columns that should be used for groupby operations 
+            (only needed for list operators 'equal' and 'diff')
+            
 
            Returns
            -------
@@ -286,6 +373,9 @@ class IPETFilter(IpetNode):
         """
         if self.operator in self.valueoperators:
             return self.applyValueOperator(df[[self.datakey]])
+
+        elif self.operator in self.listoperators:
+            return self.applyListOperator(df, groupindex)
 
         x = self.evaluateValueDataFrame(df, self.expression1)
         y = self.evaluateValueDataFrame(df, self.expression2)
@@ -303,7 +393,7 @@ class IPETFilter(IpetNode):
 #     def filterDataFrame(self, df):
 #         if self.operator in self.valueoperators:
 #             return self.applyValueOperator(df[[self.datakey]])
-# 
+#
 #         x = self.evaluateValueDataFrame(df, self.expression1)
 #         y = self.evaluateValueDataFrame(df, self.expression2)
 #         booleanseries = self.comparison.compare(x, y)
@@ -337,10 +427,10 @@ class IPETFilter(IpetNode):
                     pass
         return value
 
-    def filterProblems(self, probnames, testruns=[]):
+    def filterProblems(self, probnames, testruns = []):
         return [self.filterProblem(probname, testruns) for probname in probnames]
 
-    def getFilteredList(self, probnames, testruns=[]):
+    def getFilteredList(self, probnames, testruns = []):
         return [probname for probname in probnames if self.filterProblem(probname, testruns)]
 
     def toXMLElem(self):
@@ -368,10 +458,10 @@ class IPETFilterGroup(IpetNode):
     """
     nodetag = "FilterGroup"
     attribute2options = {"filtertype":["union", "intersection"]}
-    
+
     editableAttributes = ["name", "filtertype"]
 
-    def __init__(self, name=None, filtertype="intersection", active=True):
+    def __init__(self, name = None, filtertype = "intersection", active = True):
         """
         constructor for a filter group
 
@@ -389,26 +479,26 @@ class IPETFilterGroup(IpetNode):
             raise ValueError("Error: filtertype <%s> must be either 'intersection' or 'union'" % filtertype)
 
         self.filtertype = filtertype
-        
+
     def getEditableAttributes(self):
         return super(IPETFilterGroup, self).getEditableAttributes() + self.editableAttributes
-    
+
     def getChildren(self):
         return self.filters
-    
+
     def addChild(self, child):
         self.addFilter(child)
 
     def acceptsAsChild(self, child):
         return child.__class__ is IPETFilter
-    
+
     def removeChild(self, child):
         self.filters.remove(child)
-    
+
     @staticmethod
     def getNodeTag():
         return IPETFilterGroup.nodetag
-    
+
     def getRequiredOptionsByAttribute(self, attr):
         return self.attribute2options.get(attr, super(IPETFilterGroup, self).getRequiredOptionsByAttribute(attr))
 
@@ -432,60 +522,60 @@ class IPETFilterGroup(IpetNode):
         """
         filters a data frame object as the intersection of all values that match the criteria defined by the filters
         """
-        
-        
+
+
         activefilters = self.getActiveFilters()
-        
+
         # treat the special case to keep everything quickly
         if len(activefilters) == 0 and self.filtertype == "union":
             return df
-        
+
         dfindex = df.set_index(index).index
-        
+
         # first, get the highest number of index occurrences. This number must be matched to keep the problem
         if self.filtertype == "intersection":
             groups = df.groupby(index)
             instancecount = groups.apply(len).max()
             interrows = groups.apply(lambda x:len(x) == instancecount)
-            
+
             index_series = [interrows.reindex(dfindex)]
         elif self.filtertype == "union":
             index_series = []
 
-        
+
         renaming = {i:"{}_filter".format(i) for i in index}
-        
+
         for f_ in activefilters:
             # apply the filter to the data frame rowwise and store the result in a temporary boolean column
-            filtercol = f_.applyFilter(df)
+            filtercol = f_.applyFilter(df, index)
             filtercol = filtercol.rename(renaming, axis = 1)
-            
+
             filtercol.index = dfindex
             # group the filter by the specified data frame index columns.
             if f_.anytestrun == "one":
                 func = np.any
             elif f_.anytestrun == "all":
-                func = np.all 
-            
+                func = np.all
+
             fcol_index = filtercol.groupby(filtercol.index).apply(func)
             #
             # reshape the column to match the original data frame rows
             #
-            fcol = fcol_index.reindex(index = df.set_index(index).index, axis = 0)
+            fcol = fcol_index.reindex(index = dfindex, axis = 0)
             index_series.append(fcol)
-        
+
         #
         # aggregate the single, elementwise filters into a single intersection
         # series with one row per index element
-        # 
+        #
         intersection_index = pd.concat(index_series, axis = 1).apply(np.all, axis = 1)
-         
-        lvalues = intersection_index.values
-            
-        return df[lvalues]    
-    
 
-    def filterProblem(self, probname, testruns=[]):
+        lvalues = intersection_index.values
+
+        return df[lvalues]
+
+
+    def filterProblem(self, probname, testruns = []):
         for filter_ in self.getActiveFilters():
             if not filter_.filterProblem(probname, testruns):
                 return False
@@ -542,37 +632,3 @@ class IPETFilterGroup(IpetNode):
         """
         tree = ElementTree.parse(xmlfilename)
         return IPETFilterGroup.processXMLElem(tree.getroot())
-
-
-if __name__ == '__main__':
-    comp = Experiment(files=['../test/check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out'])
-    comp.addSoluFile('../test/short.solu')
-    comp.collectData()
-    operator = 'ge'
-    expression1 = 'Nodes'
-    expression2 = '2'
-    filter1 = IPETFilter(expression1, expression2, operator, anytestrun="all")
-    filter2 = IPETFilter(expression1, expression2, operator, anytestrun="one")
-    print(filter1.getName())
-    print(len(comp.getProblemNames()))
-    print(len(filter1.getFilteredList(comp.getProblemNames(), comp.getManager('testrun').getManageables())))
-    print(len(filter2.getFilteredList(comp.getProblemNames(), comp.getManager('testrun').getManageables())))
-
-
-    group = IPETFilterGroup('new')
-    filter1 = IPETFilter('SolvingTime', '10', 'ge', True)
-    filter2 = IPETFilter('SolvingTime', '10', 'le', True)
-    group.addFilter(filter1)
-    group.addFilter(filter2)
-    group2 = IPETFilterGroup('another')
-    group2.addFilter(filter1)
-    group.addFilter(group2)
-    xml = group.toXMLElem()
-    from xml.dom.minidom import parseString
-    dom = parseString(ElementTree.tostring(xml))
-    with open("myfile.xml", 'w') as myfile:
-        myfile.write(dom.toprettyxml())
-    group3 = IPETFilterGroup.fromXMLFile('myfile.xml')
-    xml = group3.toXMLElem()
-    dom = parseString(ElementTree.tostring(xml))
-    print(dom.toprettyxml())

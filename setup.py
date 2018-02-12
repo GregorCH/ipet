@@ -19,7 +19,7 @@ try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
 except(IOError, ImportError):
-    long_description = open('README').read()
+    long_description = "Interactive Performance Evaluation tools, see README.md"
 
 try:
     from PyQt4.Qt import PYQT_VERSION_STR

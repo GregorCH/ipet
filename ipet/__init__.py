@@ -18,5 +18,6 @@ from .IPETError import IPETInconsistencyError
 __all__ = [ "concepts",
             "evaluation",
             "misc",
-            "parsing"
+            "parsing",
+            "validation"
 ]

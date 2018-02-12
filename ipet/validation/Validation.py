@@ -370,6 +370,8 @@ class Validation:
         pb = x.get(Key.PrimalBound)
         db = x.get(Key.DualBound)
         obs = x.get(Key.ObjectiveSense, ObjectiveSenseCode.MINIMIZE)
+        if pd.isnull(obs):
+            obs = ObjectiveSenseCode.MINIMIZE
 
         if not problemname:
             return

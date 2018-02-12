@@ -324,6 +324,15 @@ class Solver():
 ##################### DERIVED Classes #########################
 ###############################################################
 
+class SCIPOrientationKeys():
+    Start = 0
+    Header = 1
+    Optimizing = 2
+    Status = 3
+    DispStatistics = 4
+    OriginalProblem = 5
+    PresolvedProblem = 6
+
 class SCIPSolver(Solver):
 
     solverId = "SCIP"
@@ -336,6 +345,7 @@ class SCIPSolver(Solver):
     nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
     extrasol_expr = re.compile("^feasible solution found .* after (.*) seconds, objective value (\S*)")
     soplexgithash_expr = re.compile("^  SoPlex .+\[GitHash: (\S+)\]")
+    objsense_expr = re.compile("^  Objective        : (\w*),")
 
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')
@@ -367,13 +377,13 @@ class SCIPSolver(Solver):
         Solver.reset(self)
         # variables needed for dual bound history
         self.lastdualbound = misc.FLOAT_INFINITY
-        self.lasttime = -1
         self.dualboundindex = -1
+        self.orientation = SCIPOrientationKeys.Start
 
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds  
         """
-        
+
         #
         # check if an additional line is printed for a feasible solution before presolving
         #
@@ -385,7 +395,7 @@ class SCIPSolver(Solver):
             return
         elif not self.isTableLine(line):
             return 
-        
+
         # history reader should be in a table. check if a display char indicates a new primal bound
         if self.heurdispcharexp.match(line):
 
@@ -398,7 +408,7 @@ class SCIPSolver(Solver):
             PrimalBound = allmatches[-1]
             # in the case of ugscip, we reacted on a disp char, so no problem at all.
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
-            
+
 
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds  
@@ -434,16 +444,18 @@ class SCIPSolver(Solver):
             return True
         return False
 
-    def extractMoreData(self, line : str):
+    def extractHeaderData(self, line : str):
         """Handle more than just the version
         """
-        for keyword in ["mode", "LP solver", "GitHash"]:
-            data = re.search(r"SCIP.*\[%s: ([\w .-]+)\]" % keyword, line)
-            if data:
-                self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
-        soplexhashmatch = self.soplexgithash_expr.match(line)
-        if soplexhashmatch:
-            self.addData("SpxGitHash", soplexhashmatch.groups()[0])
+        if line.startswith("SCIP version"):
+            for keyword in ["mode", "LP solver", "GitHash"]:
+                data = re.search(r"SCIP.*\[%s: ([\w .-]+)\]" % keyword, line)
+                if data:
+                    self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
+        if line.startswith("  SoPlex"):
+            soplexhashmatch = self.soplexgithash_expr.match(line)
+            if soplexhashmatch:
+                self.addData("SpxGitHash", soplexhashmatch.groups()[0])
 
     def extractPath(self, line : str):
         """Extract the path info
@@ -454,11 +466,58 @@ class SCIPSolver(Solver):
             settings = os.path.basename(absolutesettingspath)
             settings = os.path.splitext(settings)[0]
 
-    def extractOptionalInformation(self, line : str):
-        """Extract the path info
+    def extractGap(self, line):
+        if line.startswith('Gap                :'):
+            gapasword = misc.getWordAtIndex(line, 2)
+            # if the gap is infinite, no data is passed to the test run
+            if gapasword != "infinite":
+                gap = misc.turnIntoFloat(gapasword)
+                self.addData(Key.Gap, gap)
+
+    def extractObjSense(self, line):
+        match = self.objsense_expr.match(line)
+        if match:
+            objsense = Key.ObjectiveSenseCode.MINIMIZE
+            if match.groups()[0] == "maximize":
+                objsense = Key.ObjectiveSenseCode.MAXIMIZE
+            self.addData(Key.ObjectiveSense, objsense)
+
+    def extractElementaryInformation(self, line : str):
+        """Extract information based on location in logfile
         """
-        self.extractPath(line)
-        self.extractMoreData(line)
+        self.setOrientation(line)
+        if self.orientation == SCIPOrientationKeys.Header:
+            self.extractPath(line)
+            self.extractHeaderData(line)
+            self.extractVersion(line)
+        elif self.orientation == SCIPOrientationKeys.Optimizing:
+            self.extractHistory(line)
+        elif self.orientation == SCIPOrientationKeys.Status:
+            self.extractHistory(line)
+            self.extractPrimalbound(line)
+            self.extractDualbound(line)
+            self.extractSolvingTime(line)
+            self.extractGap(line)
+        elif self.orientation == SCIPOrientationKeys.DispStatistics:
+            self.extractStatus(line)
+        elif self.orientation == SCIPOrientationKeys.OriginalProblem:
+            self.extractObjSense(line)
+        elif self.orientation == SCIPOrientationKeys.PresolvedProblem:
+            self.extractNodes(line)
+
+    def setOrientation(self, line : str):
+        if self.orientation == SCIPOrientationKeys.Start and line.startswith("SCIP version"):
+            self.orientation = SCIPOrientationKeys.Header
+        elif self.orientation == SCIPOrientationKeys.Header and (line.startswith("SCIP> opt") or line.startswith("solve problem")):
+            self.orientation = SCIPOrientationKeys.Optimizing
+        elif self.orientation == SCIPOrientationKeys.Optimizing and (line.startswith("SCIP Status") or line.startswith("Statistics")):
+            self.orientation = SCIPOrientationKeys.Status
+        elif self.orientation == SCIPOrientationKeys.Status and line.startswith("SCIP> display statistics"):
+            self.orientation = SCIPOrientationKeys.DispStatistics
+        elif self.orientation == SCIPOrientationKeys.DispStatistics and line.startswith("Original Problem"):
+            self.orientation = SCIPOrientationKeys.OriginalProblem
+        elif self.orientation == SCIPOrientationKeys.OriginalProblem and line.startswith("Presolved Problem"):
+            self.orientation = SCIPOrientationKeys.PresolvedProblem
         
 class FiberSCIPSolver(SCIPSolver):
     """Reads data from FiberSCIP output, that ressembles SCIP output a lot, except for the table.

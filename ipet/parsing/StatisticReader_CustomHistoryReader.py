@@ -70,7 +70,7 @@ class CustomHistoryReader(StatisticReader):
             if len(listofnumbersintable) > 4:
                 try:
                     # parse values from the table
-                    numberlist = [self.turnIntoFloat(listofnumbersintable[idx]) for idx in self.listofindices]
+                    numberlist = [misc.turnIntoFloat(listofnumbersintable[idx]) for idx in self.listofindices]
                     if self.collectheuristics >= 0:
                         heurdispchar = ''
                         if self.heuristicdispcharexp.match(line):

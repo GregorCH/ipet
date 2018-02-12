@@ -35,8 +35,6 @@ class StatisticReader(IpetNode):
     sleepAfterReturn = True
     sleep = False
 
-    multipliers = dict(k=1000, M=1e6, G=1e9)
-
     # the reader might behave differently depending on the solver type, due to the different output
     SOLVERTYPE_SCIP = "SCIP"
     SOLVERTYPE_GUROBI = "GUROBI"
@@ -117,19 +115,6 @@ class StatisticReader(IpetNode):
     def addData(self, datakey, data):
         logging.debug("Reader %s adds data" % (self.getName()))
         self.testrun.addData(datakey, data)
-
-    def turnIntoFloat(self, astring):
-        """
-        parses strings to floats, keeps track of trailing caracters signifying magnitudes
-
-        Special attention is put to strings of the form, e.g., '900k' where
-        the tailing 'k'-character signifies multiplication by 1000.
-        """
-
-        lastelem = astring[-1]
-        multiplier = StatisticReader.multipliers.get(lastelem, 1.0)
-
-        return float(astring.rstrip('kMG')) * multiplier
 
 ######################################################################################
 # DERIVED Classes
@@ -260,25 +245,6 @@ class SettingsFileReader(StatisticReader):
                     self.testrun.addParameterValue(name, value)
                     self.testrun.addDefaultParameterValue(name, self.default)
 
-class GapReader(StatisticReader):
-    """
-    reads the primal dual gap at the end of the solving
-    """
-    name = 'GapReader'
-    regular_exp = re.compile('^Gap                :')
-    datakey = Key.Gap
-    datatype = float
-    lineindex = 2
-
-    def extractStatistic(self, line):
-        if self.regular_exp.match(line):
-            gapasword = misc.getWordAtIndex(line, self.lineindex)
-
-            # if the gap is infinite, no data is passed to the test run
-            if gapasword != "infinite":
-                gap = self.turnIntoFloat(gapasword)
-                self.addData(self.datakey, gap)
-
 class MaxDepthReader(StatisticReader):
     """
     reads the maximum depth
@@ -298,23 +264,6 @@ class NodesReader(StatisticReader):
     datakey = Key.Nodes
     datatype = int
     lineindex = 3
-
-class ObjsenseReader(StatisticReader):
-    name = 'ObjsenseReader'
-    regular_exp = re.compile("^  Objective        : (\w*),")
-    datakey = Key.ObjectiveSense
-    minimize = 1
-    maximize = -1
-
-    def extractStatistic(self, line):
-        match = self.regular_exp.match(line)
-
-        if match:
-            objsense = self.minimize
-            if match.groups()[0] == "maximize":
-                objsense = self.maximize
-
-            self.addData(self.datakey, objsense)
 
 class ObjlimitReader(StatisticReader):
     name = "ObjlimitReader"

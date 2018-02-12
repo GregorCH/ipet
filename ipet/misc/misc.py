@@ -37,6 +37,21 @@ def sortingKeyContext(context):
     except IndexError:
         raise IndexError("Unknown context %d" % context)
 
+def turnIntoFloat(astring):
+    """
+    parses strings to floats, keeps track of trailing caracters signifying magnitudes
+
+    Special attention is put to strings of the form, e.g., '900k' where
+    the tailing 'k'-character signifies multiplication by 1000.
+    """
+
+    multipliers = dict(k = 1000, M = 1e6, G = 1e9)
+
+    lastelem = astring[-1]
+    multiplier = multipliers.get(lastelem, 1.0)
+
+    return float(astring.rstrip('kMG')) * multiplier
+
 def filenameGetContext(filename):
     """
     get filecontext via fileextension

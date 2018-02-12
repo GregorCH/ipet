@@ -13,7 +13,7 @@ from ipet import misc, Key
 from .TestRun import TestRun
 from ipet.concepts.Manager import Manager
 from ipet.misc.integrals import calcIntegralValue, getProcessPlotData
-from ipet.parsing import ErrorFileReader, BestSolInfeasibleReader, ObjlimitReader, ObjsenseReader
+from ipet.parsing import ErrorFileReader, BestSolInfeasibleReader, ObjlimitReader
 from ipet.parsing.ReaderManager import ReaderManager
 from pandas import Panel
 

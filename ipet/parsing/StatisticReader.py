@@ -305,11 +305,20 @@ class ObjsenseReader(StatisticReader):
     datakey = Key.ObjectiveSense
     minimize = 1
     maximize = -1
+    orig_prob_state = False
+    orig_prob_expr = re.compile('^Original Problem   :')
+    pres_prob_expr = re.compile('^Presolved Problem  :')
 
     def extractStatistic(self, line):
-        match = self.regular_exp.match(line)
+        if self.orig_prob_expr.match(line):
+            self.orig_prob_state = True
+            return
+        if self.pres_prob_expr.match(line):
+            self.orig_prob_state = False
+            return
 
-        if match:
+        match = self.regular_exp.match(line)
+        if self.orig_prob_state and match:
             objsense = self.minimize
             if match.groups()[0] == "maximize":
                 objsense = self.maximize

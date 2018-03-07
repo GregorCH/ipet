@@ -403,7 +403,7 @@ class IPETFilter(IpetNode):
 #         return mymethod(booleanseries)
 
     def getNeededColumns(self, df):
-        return [exp for exp in [self.expression1, self.expression2] if exp in df.columns]
+        return [exp for exp in [self.expression1, self.expression2, self.datakey] if exp in df.columns]
 
     def evaluateValueDataFrame(self, df, value):
         if value in df.columns:

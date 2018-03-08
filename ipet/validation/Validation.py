@@ -10,6 +10,8 @@ from ipet.misc import getInfinity as infty
 from ipet.misc import isInfinite as isInf
 import numpy as np
 import logging
+import sqlite3
+from pandas.core.series import Series
 
 DEFAULT_RELTOL = 1e-4
 DEFAULT_FEASTOL = 1e-6
@@ -21,6 +23,11 @@ class SolufileMarkers:
     UNKN = "=unkn="
     BESTDUAL = "=bestdual="
     FEAS = "=feas="
+
+class DataBaseMarkers:
+    OPT = "opt"
+    INF = "inf"
+    BEST = "best"
 
 class Validation:
     '''
@@ -47,15 +54,56 @@ class Validation:
         feastol : float
             relative feasibility tolerance
         '''
+
         if solufilename:
-            self.referencedict = self.readSoluFile(solufilename)
+            if solufilename.endswith(".solu"):
+                self.referencedict = self.readSoluFile(solufilename)
+                self.objsensedict = {}
+            else:
+                self.referencedict, self.objsensedict = self.connectToDataBase(solufilename)
         else:
-            self.referencedict = {}
+            self.referencedict, self.objsensedict = {}, {}
 
         self.tol = tol
         self.inconsistentset = set()
 
         self.feastol = feastol
+
+    def connectToDataBase(self, databasefilename):
+        """connects this validation to a data base
+        """
+
+        soludict = {}
+        objsensedict = {}
+        with sqlite3.connect(databasefilename) as conn:
+            c = conn.cursor()
+
+            c.execute('SELECT DISTINCT name, objsense,primbound,dualbound,status FROM instances')
+
+            for name, objsense, primbound, dualbound, status in c:
+
+                if name in soludict:
+                    logging.warn("Warning: Duplicate name {} with different data in data base".format(name))
+
+                infotuple = [None, None]
+                if status == DataBaseMarkers.OPT:
+                    infotuple[self.__primalidx__] = infotuple[self.__dualidx__] = primbound
+
+                elif status == DataBaseMarkers.BEST:
+                    if primbound:
+                        infotuple[self.__primalidx__] = primbound
+                    if dualbound:
+                        infotuple[self.__dualidx__] = dualbound
+
+                elif status == DataBaseMarkers.INF:
+                    infotuple[self.__primalidx__] = self.__infeas__
+
+                objsensedict[name] = ObjectiveSenseCode.MAXIMIZE if objsense == "max" else ObjectiveSenseCode.MINIMIZE
+
+                soludict[name] = tuple(infotuple)
+
+        return soludict, objsensedict
+
 
 
     def readSoluFile(self, solufilename : str) -> dict:
@@ -188,7 +236,16 @@ class Validation:
         else:
             return reference[self.__dualidx__]
 
-
+    def getObjSense(self, problemname : str, x : pd.Series):
+        """get the objective sense of a problem 
+        """
+        if problemname in self.objsensedict:
+            return self.objsensedict[problemname]
+        elif not pd.isnull(x.get(Key.ObjectiveSense, None)):
+            return x.get(Key.ObjectiveSense)
+        else:
+            logging.warn("No objective sense for {}, assuming minimization".format(problemname))
+            return ObjectiveSenseCode.MINIMIZE
 
     def validateSeries(self, x : pd.Series) -> str:
         """
@@ -332,7 +389,7 @@ class Validation:
         problemname = x.get(Key.ProblemName)
         pb = x.get(Key.PrimalBound)
         db = x.get(Key.DualBound)
-        obs = x.get(Key.ObjectiveSense, ObjectiveSenseCode.MINIMIZE)
+        obs = self.getObjSense(problemname, x)
         sstatus = x.get(Key.SolverStatus)
 
         reference = self.referencedict.get(problemname, (None, None))
@@ -369,7 +426,9 @@ class Validation:
         problemname = x.get(Key.ProblemName)
         pb = x.get(Key.PrimalBound)
         db = x.get(Key.DualBound)
-        obs = x.get(Key.ObjectiveSense, ObjectiveSenseCode.MINIMIZE)
+
+        obs = self.getObjSense(problemname, x)
+
         if pd.isnull(obs):
             obs = ObjectiveSenseCode.MINIMIZE
 

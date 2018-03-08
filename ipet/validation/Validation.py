@@ -61,6 +61,8 @@ class Validation:
                 self.objsensedict = {}
             else:
                 self.referencedict, self.objsensedict = self.connectToDataBase(solufilename)
+        else:
+            self.referencedict, self.objsensedict = {}, {}
 
         self.tol = tol
         self.inconsistentset = set()

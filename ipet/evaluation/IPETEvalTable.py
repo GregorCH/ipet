@@ -1180,7 +1180,7 @@ class IPETEvaluation(IpetNode):
             additionalfiltercolumns += fg.getNeededColumns(df)
 
         additionalfiltercolumns = list(set(additionalfiltercolumns))
-        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(activecolumns + self.countercolumns)]
+        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(activecolumns + self.countercolumns + list(self.getIndex()))]
 
         for col in additionalfiltercolumns:
             newcols.append(grouped[col].apply(meanOrConcat))

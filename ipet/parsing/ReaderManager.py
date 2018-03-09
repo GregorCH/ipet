@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -17,16 +17,16 @@ from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, ListRe
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader
 from .StatisticReader_TableReader import TableReader, CustomTableReader
 from .StatisticReader_VariableReader import VariableReader
-from .StatisticReader_SoluFileReader import SoluFileReader
 from .StatisticReader_CustomReader import CustomReader
 from .TraceFileReader import TraceFileReader
 from ipet.concepts.Manager import Manager
 from ipet.concepts.IPETNode import IpetNode
-from ipet.parsing.Solver import Solver, SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, CplexSolver
+from ipet.parsing.Solver import Solver, SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, CplexSolver, FiberSCIPSolver
 from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
 from ipet import Key
+from ipet.IPETError import IPETInconsistencyError
 from ipet.Key import CONTEXT_ERRFILE, CONTEXT_LOGFILE
 
 class ReaderManager(Manager, IpetNode):
@@ -65,7 +65,7 @@ class ReaderManager(Manager, IpetNode):
         return ["problemexpression", "problemendexpression"]
 
     def addSolvers(self):
-        for s in [SCIPSolver(), CbcSolver(), XpressSolver(), GurobiSolver(), CplexSolver()]:
+        for s in [SCIPSolver(), CbcSolver(), XpressSolver(), GurobiSolver(), CplexSolver(), FiberSCIPSolver()]:
             self.addSolver(s)
 
     def addSolver(self, solver):
@@ -179,7 +179,6 @@ class ReaderManager(Manager, IpetNode):
              VariableReader(),
              RootNodeFixingsReader(),
              SettingsFileReader(),
-             SoluFileReader(),
              TimeLimitReader(),
              TimeToFirstReader(),
              TimeToBestReader(),
@@ -226,12 +225,19 @@ class ReaderManager(Manager, IpetNode):
         """
         sets up data structures for a new problem if necessary
         """
+        self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
+
         problemname, problempath = self.getProblemName(line[1])
+        oldname = self.testrun.getProblemDataById(self.testrun.currentproblemid, Key.ProblemName)
+        # if oldname is not None then the .out file was already parsed
+        # and we are currently parsing the .err file. Check if the problemname
+        # is contained in the line.
+        if (oldname is not None) and ("_{}.".format(oldname) not in line[1]) and not (oldname == problemname):
+            raise IPETInconsistencyError("Inconsistency in order of instances in .out and .err file: {} does not correspond to {}.".format(problemname, oldname))
 
         self.testrun.addData(Key.ProblemName, problemname)
         self.testrun.addData(Key.LogFileName, self.testrun.getCurrentLogfilename())
         self.testrun.addData(Key.Path, problempath)
-        self.updateLineNumberData(line[0], currentcontext, "LineNumbers_Begin")
 
     def endOfProblemReached(self, line):
         """
@@ -250,7 +256,7 @@ class ReaderManager(Manager, IpetNode):
         check the solver type for a given log file
         """
         lines = []
-        for i,line in self.testrun:
+        for i, line in self.testrun:
             lines.append(line)
             for solver in self.solvers:
                 if solver.recognizeOutput(line):
@@ -272,18 +278,23 @@ class ReaderManager(Manager, IpetNode):
             context = misc.filenameGetContext(self.testrun.iterationGetCurrentFile())
             readers = [r for r in self.getManageables(True) if r.supportsContext(context)]
 
-            line = (0,"")
+            line = (0, "")
             for line in self.testrun:
                 if self.startOfProblemReached(line[1]):
                     if context in [CONTEXT_ERRFILE, CONTEXT_LOGFILE]:
                         # .errfiles do not contain problemdexpression ==ready==
                         self.finishProblemParsing(line, context, readers)
-                    self.updateProblemName(line, context, readers)
 
+                    try:
+                        self.updateProblemName(line, context, readers)
+                    except IPETInconsistencyError as e:
+                        logging.warning(e.msg)
+                        if context == CONTEXT_ERRFILE:
+                            logging.warning("Skipping parsing of the rest of the .err file.")
+                            break
 
                 if self.endOfProblemReached(line[1]):
                     self.finishProblemParsing(line, context, readers)
-
                 else:
                     if context == CONTEXT_LOGFILE:
                         self.activeSolver.readLine(line[1])

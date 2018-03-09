@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -17,8 +17,9 @@ import os, sys
 import logging
 import pandas as pd
 from ipet.Key import CONTEXT_LOGFILE
-#from lib2to3.fixes.fix_input import context
-#from matplotlib.tests import test_lines
+from ipet.validation import Validation
+# from lib2to3.fixes.fix_input import context
+# from matplotlib.tests import test_lines
 
 try:
     import pickle as pickle
@@ -47,7 +48,8 @@ class TestRun:
         self.parametervalues = {}
         self.defaultparametervalues = {}
         self.keyset = set()
-        
+        self.validation = None
+
         self.currentfileiterator = None
         self.currentfile = None
         self.consumedStdinput = []
@@ -57,7 +59,7 @@ class TestRun:
             with open(self.currentfile, "r") as f:
                 for line in enumerate(f):
                     yield line
-        else: 
+        else:
             for line in enumerate(self.consumedStdinput):
                 yield line
             for line in enumerate(sys.stdin, len(self.consumedStdinput)):
@@ -66,28 +68,34 @@ class TestRun:
     def iterationPrepare(self):
         filenames = sorted(self.filenames, key = lambda x:misc.sortingKeyContext(misc.filenameGetContext(x)))
         self.currentfileiterator = iter(filenames)
-        
+
     def iterationNextFile(self):
         try:
             self.currentproblemid = 0
+            # order: .meta, .out, .err, .set, .solu, trace
             self.currentfile = next(self.currentfileiterator)
             return True
         except StopIteration:
             return False
-    
+
     def iterationAddConsumedStdinput(self, consumedlines):
         if self.currentfile == "":
             for line in consumedlines:
                 self.consumedStdinput.append(line)
-    
+
     def iterationCleanUp(self):
         self.currentfileiterator = None
-        
+
     def iterationGetCurrentFile(self):
         return self.currentfile
 
     def setInputFromStdin(self):
         self.filenames.append("")
+
+    def setValidation(self, validation : Validation):
+        """set validation object of test run
+        """
+        self.validation = validation
 
     def appendFilename(self, filename):
         # TODO test this
@@ -98,14 +106,14 @@ class TestRun:
             self.filenames.append(filename)
         else:
             return
-        
+
         extension = misc.filenameGetContext(filename)
         if extension in [Key.CONTEXT_ERRFILE, Key.CONTEXT_LOGFILE]:
-            metafile = os.path.splitext(filename)[0]+".meta"
+            metafile = os.path.splitext(filename)[0] + ".meta"
 
             if os.path.isfile(metafile) and (metafile not in self.filenames):
                 self.filenames.append(metafile)
-        
+
     def addDataByName(self, datakeys, data, problem):
         """Add the current data under the specified dataname
 
@@ -205,8 +213,14 @@ class TestRun:
             # Add data collected by solver into currentproblemdata, such as primal and dual bound,
             if context == CONTEXT_LOGFILE:
                 self.addData(*solver.getData())
+
+                problemstatus = self.validation.validateSeries(self.currentproblemdata)
+                self.addData(Key.ProblemStatus, problemstatus)
+
             for key in self.metadatadict.keys():
                 self.addData(key, self.metadatadict[key])
+
+
 
             for key in self.currentproblemdata.keys():
                 self.datadict.setdefault(key, {})[self.currentproblemid] = self.currentproblemdata[key]
@@ -245,7 +259,7 @@ class TestRun:
     def hasProblemId(self, problemid):
         """ Returns if there is already data collected for a problem with given id
         """
-        return problemid in self.getProblemIds()
+        return problemid < self.getNumberOfProblems()
 
     def getNumberOfProblems(self):
         """ Return number of problemns
@@ -374,11 +388,11 @@ class TestRun:
         f.close()
         return testrun
 
-    def getData(self, datakey = None):
+    def getData(self):
         """Return a data frame object of the acquired data
         """
         return self.data
-            
+
     def getCurrentLogfilename(self):
         """ Return the name of the current logfile 
         """
@@ -402,27 +416,4 @@ class TestRun:
         """
         # TODO Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
-    
-    def problemGetOptimalSolution(self, problemid):
-        """ Return objective of an optimal or a best known solution
-
-        ... from solu file, or None, if no such data has been acquired
-        """
-        try:
-            return self.getProblemDataById(problemid, 'OptVal')
-        except KeyError:
-#            print(self.getIdentification() + " has no solu file value for ", problemid)
-            return None
-
-    def problemGetSoluFileStatus(self, problemid):
-        """ Return 'unkn', 'inf', 'best', 'opt'
-
-        ... as solu file status, or None, if no solu file status
-        exists for this problem
-        """
-        try:
-            return self.getProblemDataById(problemid, 'SoluFileStatus')
-        except KeyError:
-#            print(self.getIdentification() + " has no solu file status for ", problemid)
-            return None
 

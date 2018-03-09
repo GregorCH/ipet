@@ -6,7 +6,6 @@
 CONTEXT_LOGFILE = 1  # the log file of a solver which most readers are reading from
 CONTEXT_ERRFILE = 2  # the error file of a solver
 CONTEXT_SETFILE = 3  # the settings file used for solving
-CONTEXT_SOLUFILE = 4  # the solution file that contains the statuses and optimal objective values for every problem
 CONTEXT_TRACEFILE = 5
 CONTEXT_METAFILE = 0  # the metadata
 
@@ -14,7 +13,6 @@ contextname2contexts = {
         "log" : CONTEXT_LOGFILE,
         "err" : CONTEXT_ERRFILE,
         "set" : CONTEXT_SETFILE,
-        "solu" : CONTEXT_SOLUFILE,
         "trace" : CONTEXT_TRACEFILE,
         "meta" : CONTEXT_METAFILE,
         "" : CONTEXT_LOGFILE
@@ -24,10 +22,9 @@ fileextension2context = {
                          ".err" : CONTEXT_ERRFILE,
                          ".out" : CONTEXT_LOGFILE,
                          ".set" : CONTEXT_SETFILE,
-                         ".solu": CONTEXT_SOLUFILE,
                          ".trc" : CONTEXT_TRACEFILE,
                          ".meta" : CONTEXT_METAFILE,
-                         "" : CONTEXT_LOGFILE # workaround for input from stdin
+                         "" : CONTEXT_LOGFILE  # workaround for input from stdin
                          }
 """map for file extensions to the file contexts to specify the relevant readers"""
 
@@ -35,7 +32,6 @@ context2Sortkey = {
                    CONTEXT_ERRFILE : 2,
                    CONTEXT_LOGFILE : 1,
                    CONTEXT_SETFILE : 3,
-                   CONTEXT_SOLUFILE : 4,
                    CONTEXT_TRACEFILE : 5,
                    CONTEXT_METAFILE : 0
                    }
@@ -77,6 +73,11 @@ TimeToBestSolution = "TimeToBest"
 TimeToFirstSolution = "TimeToFirst"
 TimeLimit = "TimeLimit"
 Version = "Version"
+ViolationCons = "Viol_Cons"
+ViolationBds = "Viol_Bounds"
+ViolationInt = "Viol_Int"
+ViolationLP = "Viol_LP"
+
 
 class SolverStatusCodes:
     """ The reason why a solver stopped its calculation.
@@ -98,8 +99,9 @@ class SolverStatusCodes:
     TimeLimit = 2
     MemoryLimit = 3
     NodeLimit = 4
-    Interrupted = 5
-    Unbounded = 6
+    GapLimit = 5
+    Interrupted = 100
+    Unbounded = 110
 
 class ProblemStatusCodes:
     """ Keeping track of how good the solution of a solver actually was.
@@ -119,6 +121,7 @@ class ProblemStatusCodes:
     Fail = "fail"
     FailAbort = "fail_abort"
     FailReaderror = "fail_readerror"
+    FailInconsistent = "fail_inconsistent"
     TimeLimit = "timelimit"
     MemoryLimit = "memlimit"
     NodeLimit = "nodelimit"
@@ -132,12 +135,13 @@ class ProblemStatusCodes:
                         TimeLimit : 200,
                         MemoryLimit : 150,
                         Unknown : 100,
+                        FailInconsistent :-200,
                         FailDualBound :-250,
                         FailObjectiveValue :-500,
                         FailSolInfeasible :-1000,
                         FailSolOnInfeasibleInstance :-2000,
                         Fail :-3000,
-                        FailReaderror : -4000,
+                        FailReaderror :-4000,
                         FailAbort :-10000}
 
     @staticmethod
@@ -153,6 +157,7 @@ class ProblemStatusCodes:
         return min(*args, key = lambda x : ProblemStatusCodes.statusToPriority.get(x, 0))
 
 solver2problemStatusCode = {
+    SolverStatusCodes.GapLimit : ProblemStatusCodes.Ok,
     SolverStatusCodes.Crashed : ProblemStatusCodes.FailAbort,
     SolverStatusCodes.Infeasible : ProblemStatusCodes.Ok,
     SolverStatusCodes.Optimal : ProblemStatusCodes.Ok,
@@ -172,3 +177,10 @@ def solverToProblemStatusCode(solverstatus : int) -> str:
         integer status code reported by the solver
     """
     return solver2problemStatusCode.get(solverstatus, ProblemStatusCodes.FailAbort)
+
+
+class ObjectiveSenseCode:
+    """Minimization or maximization
+    """
+    MINIMIZE = 1
+    MAXIMIZE = -1

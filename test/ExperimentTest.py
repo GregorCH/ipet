@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -17,7 +17,7 @@ import shutil
 import sys
 import numpy as np
 from pandas.util.testing import assert_frame_equal
-from ipet.Experiment import Experiment
+from ipet import Experiment
 from ipet.TestRun import TestRun
 from ipet.parsing import ListReader
 from ipet.parsing import ReaderManager
@@ -38,16 +38,16 @@ class ExperimentTest(unittest.TestCase):
 #         ("j301_2", "LineNumbers_EndLogFile", 575),
 #     ]
     datasamples = [
-        #(26, 'Datetime_Start', convertTimeStamp(1406905030)),
-        #(12, 'Settings', 'testmode'),
-        #(14, "Datetime_End", convertTimeStamp(1406904997)),
+        # (26, 'Datetime_Start', convertTimeStamp(1406905030)),
+        # (12, 'Settings', 'testmode'),
+        # (14, "Datetime_End", convertTimeStamp(1406904997)),
         (39, "Nodes", 8),
         (0, "LineNumbers_BeginLogFile", 4),
         (1, "LineNumbers_BeginLogFile", 276),
         (1, "LineNumbers_EndLogFile", 575),
     ]
-    
-    checkColumns=['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
+
+    checkColumns = ['SolvingTime', 'Nodes', 'Datetime_Start', 'GitHash']
 
     def setUp(self):
         try:
@@ -58,7 +58,7 @@ class ExperimentTest(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(TMPDIR)
-        
+
     def test_datacollection(self):
         fname = "check.short.scip-3.1.0.1.linux.x86_64.gnu.dbg.spx.opt85.testmode.out"
         out_file = os.path.join(DATADIR, fname)
@@ -79,7 +79,7 @@ class ExperimentTest(unittest.TestCase):
         out_file = os.path.join(DATADIR, fname)
         with open(out_file, "r") as f:
             sys.stdin = f
-             
+
             self.experiment.addStdinput()
             self.experiment.collectData()
             sys.stdin = sys.__stdin__
@@ -87,10 +87,10 @@ class ExperimentTest(unittest.TestCase):
         experimentFromFile = Experiment()
         experimentFromFile.addOutputFile(out_file)
         experimentFromFile.collectData()
-        
+
         trstdin = self.experiment.getTestRuns()[0]
         trfile = experimentFromFile.getTestRuns()[0]
-        
+
         columns = ["PrimalBound", "DualBound", "SolvingTime"]
 
         self.checkTestrunsEqual(trstdin, trfile, columns)
@@ -106,7 +106,7 @@ class ExperimentTest(unittest.TestCase):
         # ensure that the correct number of problems are properly parsed
         self.assertEqual(len(data), 411)
 
-    def checkTestrunsEqual(self, tr, tr2, columns=checkColumns):
+    def checkTestrunsEqual(self, tr, tr2, columns = checkColumns):
         msg = "Testruns do not have exactly same column data."
         return self.assertIsNone(assert_frame_equal(tr.getData()[columns], tr2.getData()[columns]), msg)
 
@@ -148,7 +148,7 @@ class ExperimentTest(unittest.TestCase):
         self.experiment.addSoluFile(solu_file)
         self.experiment.collectData()
         data = self.experiment.getTestRuns()[0].data
-        
+
     def test_trnfileextension(self):
         trn_file = os.path.join(DATADIR, ".testrun.trn")
         self.experiment.addOutputFile(trn_file)
@@ -210,15 +210,15 @@ class ExperimentTest(unittest.TestCase):
     def testStatusComparisons(self):
         goodStatusList = [Key.ProblemStatusCodes.Ok, Key.ProblemStatusCodes.Better, Key.ProblemStatusCodes.SolvedNotVerified]
         badStatusList = [Key.ProblemStatusCodes.FailAbort, Key.ProblemStatusCodes.FailObjectiveValue, Key.ProblemStatusCodes.Fail]
-        
+
         msg = "Returned status {0} is not the expected {1}"
         for status, expected in [(Key.ProblemStatusCodes.getBestStatus(goodStatusList + badStatusList), Key.ProblemStatusCodes.Ok),
                      (Key.ProblemStatusCodes.getBestStatus(*(goodStatusList + badStatusList)), Key.ProblemStatusCodes.Ok),
                      (Key.ProblemStatusCodes.getWorstStatus(goodStatusList + badStatusList), Key.ProblemStatusCodes.FailAbort),
                      (Key.ProblemStatusCodes.getBestStatus(badStatusList + ["dummy"]), "dummy"),
                      (Key.ProblemStatusCodes.getWorstStatus(goodStatusList + ["timelimit"]), "timelimit")]:
-            self.assertEqual(status, expected, msg.format(status, expected)) 
-            
+            self.assertEqual(status, expected, msg.format(status, expected))
+
 def collect_settings(path):
     """
     A crappy settings file parser

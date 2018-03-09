@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 The MIT License (MIT)
 
@@ -9,12 +8,13 @@ with this software. If you find the library useful for your purpose,
 please refer to README.md for how to cite IPET.
 
 @author: Gregor Hendel
+@author: Franziska Schlösser
 """
-from .Editable import Editable, EditableAttributeError
-from .IPETNode import IpetNode, IpetNodeAttributeError
-from .Manager import Manager
-from .Observer import Observable
-from .IPETMessageStream import Message
-__all__ = [
-          "Observer",
-]
+
+
+class IPETInconsistencyError(BaseException):
+
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return repr(self.msg)

@@ -66,12 +66,11 @@ The script will ask you to carefully read and accept the license agreement for u
 
 3. Execute the command (note that it does no longer require to mention python3 because we are running inside the virtual environment)
 
-        pip install -r requirements.txt
-        python setup.py install
+        pip install .
 
 4. As a developer, it might be useful to call the following command instead:
 
-        python setup.py develop
+        pip install -e .
    This creates symlinks to the IPET source files in the site-packages of the virtual environment library,
    and allows for more rapid testing and development.
 

@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -21,7 +21,6 @@ from ipet import Key
 """
 FLOAT_INFINITY = 1e20
 FLOAT_LARGE = 1e15
-INT_INFINITY = 1e09
 DEFAULT_MIN_GEOM_MEAN = 1.0
 numericExpression = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+)")
 numericExpressionOrInf = re.compile("([+\-]*[\d]+[.\d]*(?:e[+-])?-*[\d]*[kMG]{0,1}|[\-]+|inf)")
@@ -114,7 +113,7 @@ def getTexName(name):
 def getCplexGap(value, referencevalue):
     return getGap(value, referencevalue, True)
 
-def getGap(value : float, referencevalue : float, useCplexGap : bool = False) -> float:
+def getGap(value : float, referencevalue : float, useCplexGap : bool=False) -> float:
     """ Calculate the gap between two values in percent. 
     
     Gap is calculated w.r.t the referencevalue, 
@@ -221,6 +220,27 @@ def isInfinite(value : float) -> bool:
     """Return if absolute value is larger than float infinity
     """
     return abs(value) >= FLOAT_INFINITY
+
+def getInfinity() -> float:
+    """returns the positive value considered as infinity
+    
+    Returns
+    -------
+    
+    float 
+        positive infinity value
+    """
+    return FLOAT_INFINITY
+
+def setInfinity(infinity : float):
+    """set a new positive value as infinity
+    
+    Parameters
+    ----------
+    infinity : float
+        positive value considered as infinity
+    """
+    FLOAT_INFINITY = infinity
 
 def cutString(string, char='_', maxlength=-1):
     iscuttable = True

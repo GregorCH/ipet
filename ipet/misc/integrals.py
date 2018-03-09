@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
+Copyright (c) 2018 Zuse Institute Berlin, www.zib.de
 
 Permissions are granted as stated in the license file you have obtained
 with this software. If you find the library useful for your purpose,
@@ -21,7 +21,7 @@ DEFAULT_XLIMITKEY = Key.TimeLimit
 DEFAULT_CUTOFFGAP = 100
 DEFAULT_BOUNDKEY = Key.PrimalBound
 
-def calcIntegralValue(thedatalist, pwlinear=False):
+def calcIntegralValue(thedatalist, pwlinear = False):
     """
     calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
 
@@ -44,8 +44,8 @@ def calcIntegralValue(thedatalist, pwlinear=False):
     else:
         gaps = gaps[:-1]
     return np.sum((times[1:] - times[:-1]) * gaps)
-    
-def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
+
+def getProcessPlotData(testrun, probid, normalize = True, access = "id", reference = None, **kw):
     """
     get process plot data for a selected history (X_i,Y_i)
     
@@ -63,22 +63,20 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
         getmethod = testrun.getProblemDataByName
     historytouse = kw.get('historytouse', DEFAULT_HISTORYTOUSE)
     history = getmethod(probid, historytouse)
-    
+
     xaftersolvekey = kw.get('xaftersolvekey', DEFAULT_XAFTERSOLVEKEY)
     xaftersolve = getmethod(probid, xaftersolvekey)
-    
+
     xlimitkey = kw.get('xlimitkey', DEFAULT_XLIMITKEY)
     xlim = getmethod(probid, xlimitkey)
-    
+
     cutoffgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
-    
-    optimum = getmethod(probid, 'OptVal')
-    
+
     if xlim is None and xaftersolve is None:
         return None
     if history is None:
         history = []
-    
+
     try:
         lastbound = history[-1][1]
     except:
@@ -102,9 +100,9 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", **kw):
         x.append(xaftersolve)
         y.append(lastbound)
 
-    # depending on the normalization parameter, the normfunction used is either the CPlex gap, or the identity  
+    # depending on the normalization parameter, the normfunction used is either the CPlex gap, or the identity
     if normalize:
-        normfunction = lambda z : min(cutoffgap, misc.getGap(z, optimum, True))
+        normfunction = lambda z : min(cutoffgap, misc.getGap(z, reference, True))
     else:
         normfunction = lambda z : z
 
@@ -154,5 +152,5 @@ def getMeanIntegral(testrun, problemlist, access = "id", **kw):
 
     # divide integral by problem number
     gapvals = np.true_divide(gapvals, len(problemlist))
-    
+
     return xvals, gapvals

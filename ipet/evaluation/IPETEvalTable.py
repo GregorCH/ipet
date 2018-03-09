@@ -524,7 +524,7 @@ class IPETEvaluationColumn(IpetNode):
                 if type(maxval) in [int, float]:
                     result = numpy.minimum(result, maxval)
                 else:
-                    result = numpy.minimum(result, maxval.astype(result.dtype))
+                    comp = maxval.astype(result.dtype)
                     try:
                         result = numpy.minimum(result, comp)
                     except:

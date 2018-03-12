@@ -512,15 +512,24 @@ class IPETEvaluationColumn(IpetNode):
                 if type(minval) in [int, float]:
                     result = numpy.maximum(result, minval)
                 else:
-                    result = numpy.maximum(result, minval.astype(result.dtype))
+                    comp = minval.astype(result.dtype)
+                    try:
+                        result = numpy.maximum(result, comp)
+                    except:
+                        logging.warning("When filling in the minimum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
+                        result = pd.concat([result, comp], axis=1).max(axis=1)
         if self.maxval is not None:
             maxval = self.parseValue(self.maxval, df_long)
             if maxval is not None:
                 if type(maxval) in [int, float]:
                     result = numpy.minimum(result, maxval)
                 else:
-                    result = numpy.minimum(result, maxval.astype(result.dtype))
-
+                    comp = maxval.astype(result.dtype)
+                    try:
+                        result = numpy.minimum(result, comp)
+                    except:
+                        logging.warning("When filling in the maximum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
+                        result = pd.concat([result, comp], axis=1).min(axis=1)
         reductionindex = self.getReductionIndex(evalindexcols)
 
         #

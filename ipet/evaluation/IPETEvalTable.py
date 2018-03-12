@@ -530,7 +530,6 @@ class IPETEvaluationColumn(IpetNode):
                     except:
                         logging.warning("When filling in the maximum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
                         result = pd.concat([result, comp], axis=1).min(axis=1)
-b
         reductionindex = self.getReductionIndex(evalindexcols)
 
         #

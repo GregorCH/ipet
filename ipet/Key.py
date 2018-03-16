@@ -73,10 +73,10 @@ TimeToBestSolution = "TimeToBest"
 TimeToFirstSolution = "TimeToFirst"
 TimeLimit = "TimeLimit"
 Version = "Version"
-ViolationCons = "Viol_Cons"
 ViolationBds = "Viol_Bounds"
 ViolationInt = "Viol_Int"
 ViolationLP = "Viol_LP"
+ViolationCons = "Viol_Cons"
 
 
 class SolverStatusCodes:

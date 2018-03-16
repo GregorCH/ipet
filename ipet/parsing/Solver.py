@@ -27,6 +27,10 @@ class Solver():
     solvingtime_expr = None
     version_expr = None
     nodes_expr = None
+    violbound_expr = None
+    violint_expr = None
+    viollp_expr = None
+    violcons_expr = None
 
     solverstatusmap = {}
 
@@ -38,7 +42,11 @@ class Solver():
                  solvingtime_pattern = None,
                  version_pattern = None,
                  solverstatusmap = None,
-                 nodes_pattern = None):
+                 nodes_pattern = None,
+                 violbound_pattern = None,
+                 violint_pattern = None,
+                 viollp_pattern = None,
+                 violcons_pattern = None):
 
         if solverId is not None:
             self.solverId = solverId
@@ -55,6 +63,14 @@ class Solver():
             self.version_expr = re.compile(version_pattern)
         if nodes_pattern is not None:
             self.nodes_expr = re.compile(nodes_pattern)
+        if violbound_pattern is not None:
+            self.violbound_expr = re.compile(violbound_pattern)
+        if violint_pattern is not None:
+            self.violint_expr = re.compile(violint_pattern)
+        if viollp_pattern is not None:
+            self.viollp_expr = re.compile(viollp_pattern)
+        if violcons_pattern is not None:
+            self.violcons_expr = re.compile(violcons_pattern)
 
         if solverstatusmap is not None:
             self.solverstatusmap = solverstatusmap
@@ -99,6 +115,26 @@ class Solver():
         """Read the primal bound (at the end of the solver-output)
         """
         self.extractByExpression(line, self.primalbound_expr, Key.PrimalBound)
+        
+    def extractViolbound(self, line : str):
+        """Read the bound violation (at the end of the solver-output)
+        """
+        self.extractByExpression(line, self.violbound_expr, Key.ViolationBds)
+        
+    def extractViolint(self, line : str):
+        """Read the integrality violation (at the end of the solver-output)
+        """
+        self.extractByExpression(line, self.violint_expr, Key.ViolationInt)
+        
+    def extractViollp(self, line : str):
+        """Read the LP violation (at the end of the solver-output)
+        """
+        self.extractByExpression(line, self.viollp_expr, Key.ViolationLP)
+        
+    def extractViolcons(self, line : str):
+        """Read the constraint violation (at the end of the solver-output)
+        """
+        self.extractByExpression(line, self.violcons_expr, Key.ViolationCons)
         
     def extractNodes(self, line : str):
         """Read the number of branch and bound nodes
@@ -195,6 +231,10 @@ class Solver():
         self.extractDualbound(line)
         self.extractSolvingTime(line)
         self.extractNodes(line)
+        self.extractViolbound(line)
+        self.extractViolint(line)
+        self.extractViollp(line)
+        self.extractViolcons(line)
         self.extractVersion(line)
         self.extractStatus(line)
         self.extractHistory(line)
@@ -336,6 +376,10 @@ class SCIPSolver(Solver):
     nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
     extrasol_expr = re.compile("^feasible solution found .* after (.*) seconds, objective value (\S*)")
     soplexgithash_expr = re.compile("^  SoPlex .+\[GitHash: (\S+)\]")
+    violbound_expr = re.compile("^  bounds           : \S+ (\S+)$")
+    violint_expr = re.compile("^  integrality      : (\S+)")
+    viollp_expr = re.compile("^  LP rows          : \S+ (\S+)$")
+    violcons_expr = re.compile("^  constraints      : \S+ (\S+)$")
 
     # variables needed for primal bound history
     primalboundhistory_exp = re.compile('^\s+time\s+\| .* \|\s+primalbound\s+\|\s+gap')

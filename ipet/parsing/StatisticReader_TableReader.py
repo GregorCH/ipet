@@ -34,7 +34,7 @@ class TableReader(StatisticReader):
     """
     name = 'TableReader'
     tableids = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
-                   'Separators', 'Branching Rules', 'Diving Statistics', 'LP', 'Branching Analysis', 'Primal Heuristics', 'Concurrent Solvers', 'Violation']
+                   'Separators', 'Branching Rules', 'Diving Statistics', 'LP', 'Branching Analysis', 'Primal Heuristics', 'Concurrent Solvers']
     columnids = ['Root Node', 'Total Time', 'B&B Tree']
     active = False
     spacesepcolumnnames = ['LP Iters']

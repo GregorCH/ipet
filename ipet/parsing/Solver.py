@@ -76,6 +76,9 @@ class Solver():
             self.solverstatusmap = solverstatusmap
         self.solverstatusses = sorted(self.solverstatusmap.items(), key = itemgetter(1))
 
+        # compile the solver status patterns
+        self.solverstatusses = [(re.compile(pattern), status) for pattern, status in self.solverstatusses]
+
 
         self.data = {}
         self.reset()
@@ -85,9 +88,8 @@ class Solver():
         
         If the one of the patterns matches, the data will be added data as Key.SolverStatus.
         """
-        for pattern, status in self.solverstatusses:
-            if re.compile(pattern).match(line):
-
+        for expr, status in self.solverstatusses:
+            if expr.match(line):
                 self.addData(Key.SolverStatus, status)
                 # break in order to prevent parsing a weaker status
                 break
@@ -768,6 +770,8 @@ class XpressSolver(Solver):
     dualbound_expr = re.compile("Best bound is\s*(\S*)")
     solvingtime_expr = re.compile(" \*\*\* Search.*\*\*\*\s*Time:\s*(\S*)")
     version_expr = re.compile("FICO Xpress-Optimizer \S* v(\S*)")
+    nodes_expr = re.compile("^Nodes explored = (.*)$")
+
 
     # TODO does this work? Benchmarks seem to be broken
     solverstatusmap = {r" \*\*\* Search completed \*\*\*" : Key.SolverStatusCodes.Optimal,
@@ -775,7 +779,8 @@ class XpressSolver(Solver):
                        "STOPPING - MAXTIME limit reached" : Key.SolverStatusCodes.TimeLimit,
                        #                       "" : Key.SolverStatusCodes.MemoryLimit,
                        #                       "" : Key.SolverStatusCodes.NodeLimit,
-                       #                       "" : Key.SolverStatusCodes.Interrupted
+                      r" \*\*\* Search unfinished \*\*\*" : Key.SolverStatusCodes.Interrupted,
+                      r"\?66 Error: Unable to open file" : Key.SolverStatusCodes.Readerror
                        }
 
     # variables needed for primal bound history extraction

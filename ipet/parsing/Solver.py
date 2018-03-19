@@ -713,7 +713,6 @@ class CplexSolver(Solver):
                     self.cpxprimals.append((nnodes, primalbound))
                 self.lastnnodes = nnodes
             elif self.elapsedtime_expr.match(line):
-                print(line)
                 thetime = float(line.split()[3])
                 self.processCpxprimals(thetime)
 

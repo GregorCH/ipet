@@ -180,7 +180,7 @@ class Validation:
         return problemname in self.inconsistentset
 
 
-    def isSolFeasible(self, x : pd.Series):
+    def isSolInfeasible(self, x : pd.Series):
         """check if the solution is feasible within tolerances
         
         Parameters
@@ -193,7 +193,11 @@ class Validation:
         # compute the maximum violation of constraints, LP rows, bounds, and integrality
         maxviol = max((x.get(key, 0.0) for key in [Key.ViolationBds, Key.ViolationCons, Key.ViolationInt, Key.ViolationLP]))
 
-        return maxviol <= self.feastol
+        # if no violations have been recorded, no solution was found, and the solution is not infeasible.
+        if pd.isnull(maxviol):
+            return False
+
+        return maxviol > self.feastol
 
 
     def getReferencePb(self, problemname : str) -> float:
@@ -273,7 +277,7 @@ class Validation:
             #
             # check feasibility
             #
-            if not self.isSolFeasible(x):
+            if self.isSolInfeasible(x):
                 return ProblemStatusCodes.FailSolInfeasible
 
             #
@@ -482,7 +486,7 @@ class Validation:
         self.collectInconsistencies(d)
 
         #
-        # 2) validate everything considering inconsistencies and validation info from solu file.
+        # 2) validate everything considering inconsistencies and validation info from reference information.
         #
         return d.apply(self.validateSeries, axis = 1)
 

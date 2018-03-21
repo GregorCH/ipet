@@ -121,6 +121,8 @@ class IPETFilter(IpetNode):
                          + listoperators}
     nodetag = "Filter"
     DEFAULT_ANYTESTRUN = 'all'
+    _storedcol_ = None
+    _storeddf_ = None
 
 
     def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = DEFAULT_ANYTESTRUN, active = True, datakey = None):
@@ -179,7 +181,7 @@ class IPETFilter(IpetNode):
         elif self.operator in self.listoperators:
             return "{}-{} list filter (key: {})".format(self.anytestrun, self.operator, self.datakey)
         else:
-            return " ".join((prefix, self.expression1, self.operator, self.expression2))
+            return " ".join(map(str, (prefix, self.expression1, self.operator, self.expression2)))
 
     def set_operator(self, operator):
         self.operator = operator
@@ -352,6 +354,20 @@ class IPETFilter(IpetNode):
             return False
         return True
 
+    def storeResult(self, df : pd.DataFrame, filtercol : pd.Series):
+        """store a filter result for future reuse
+        """
+        self._storeddf_ = df
+        self._storedcol_ = filtercol
+
+    def getStoredResult(self, df : pd.DataFrame):
+        """return the already stored result for this data frame 
+        """
+        if self._storeddf_ is df:
+            return self._storedcol_
+        else:
+            return None
+
     def applyFilter(self, df, groupindex = None):
         """Apply the filter to a data frame rowwise
         
@@ -371,36 +387,48 @@ class IPETFilter(IpetNode):
            -------
            booleanseries :
         """
-        if self.operator in self.valueoperators:
-            return self.applyValueOperator(df[[self.datakey]])
+        if self.operator in self.listoperators:
+            filtercol = self.applyListOperator(df, groupindex)
+        elif self.operator in self.valueoperators:
+            filtercol = self.applyValueOperator(df[[self.datakey]])
 
-        elif self.operator in self.listoperators:
-            return self.applyListOperator(df, groupindex)
+        else:
+            x = self.evaluateValueDataFrame(df, self.expression1)
+            y = self.evaluateValueDataFrame(df, self.expression2)
+            try:
+                x.columns = ["comp"]
+            except:
+                pass
+            try:
+                y.columns = ["comp"]
+            except:
+                pass
+            filtercol = self.comparison.compare(x, y)
 
-        x = self.evaluateValueDataFrame(df, self.expression1)
-        y = self.evaluateValueDataFrame(df, self.expression2)
-        try:
-            x.columns = ["comp"]
-        except:
-            pass
-        try:
-            y.columns = ["comp"]
-        except:
-            pass
-        booleanseries = self.comparison.compare(x, y)
-        return booleanseries
+        if groupindex is None:
+            return filtercol
 
-#     def filterDataFrame(self, df):
-#         if self.operator in self.valueoperators:
-#             return self.applyValueOperator(df[[self.datakey]])
-#
-#         x = self.evaluateValueDataFrame(df, self.expression1)
-#         y = self.evaluateValueDataFrame(df, self.expression2)
-#         booleanseries = self.comparison.compare(x, y)
-#         mymethod = np.any
-#         if self.anytestrun == 'all':
-#             mymethod = np.all
-#         return mymethod(booleanseries)
+        dfindex = df.set_index(groupindex).index
+
+        renaming = {i:"{}_filter".format(i) for i in groupindex}
+
+        filtercol = filtercol.rename(renaming, axis = 1)
+
+        filtercol.index = dfindex
+        # group the filter by the specified data frame index columns.
+        if self.anytestrun == "one":
+            func = np.any
+        elif self.anytestrun == "all":
+            func = np.all
+
+        fcol_index = filtercol.groupby(filtercol.index).apply(func)
+        #
+        # reshape the column to match the original data frame rows
+        #
+        fcol = fcol_index.reindex(index = dfindex, axis = 0)
+
+        return fcol
+
 
     def getNeededColumns(self, df):
         return [exp for exp in [self.expression1, self.expression2, self.datakey] if exp in df.columns]
@@ -450,6 +478,23 @@ class IPETFilter(IpetNode):
             return value
         return None
 
+    def equals(self, other):
+        """Compare this and another filter for equality
+        """
+        if not IpetNode.equals(self, other):
+            return False
+
+        if self.operator == other.operator:
+            if self.operator not in IPETFilter.valueoperators:
+                return True
+            if len(self.values) != len(other.values):
+                return False
+            for v1, v2 in zip(self.values, other.values):
+                if not v1.equals(v2):
+                    return False
+
+        return True
+
 class IPETFilterGroup(IpetNode):
     """
     represents a list of filters, has a name attribute for quick tabular representation
@@ -460,6 +505,12 @@ class IPETFilterGroup(IpetNode):
     attribute2options = {"filtertype":["union", "intersection"]}
 
     editableAttributes = ["name", "filtertype"]
+
+    # global data frame and index that are reused for several filter groups
+    _glbdf_ = None
+    _glbindex_ = None
+    _glbinterrows_ = None
+
 
     def __init__(self, name = None, filtertype = "intersection", active = True):
         """
@@ -518,6 +569,33 @@ class IPETFilterGroup(IpetNode):
     def getActiveFilters(self):
         return [f for f in self.filters if f.isActive()]
 
+    @staticmethod
+    def setGlobalDataFrameAndIndex(df : pd.DataFrame, index):
+        """Set global data frame and index for filtering, that will be reused by each filter group
+        """
+
+
+        IPETFilterGroup._glbdf_ = df
+        IPETFilterGroup._glbindex_ = index
+
+        IPETFilterGroup._glbinterrows_ = IPETFilterGroup.computeIntersectionRows(df, index)
+
+    @staticmethod
+    def computeIntersectionRows(df : pd.DataFrame, index):
+        """Compute intersection rows of a given data frame and index
+        """
+
+        logging.info("Computing rows for intersection groups")
+
+        dfindex = df.set_index(index).index
+
+        groups = df.groupby(index)
+        instancecount = groups.apply(len).max()
+        interrows = groups.apply(lambda x:len(x) == instancecount)
+
+
+        return interrows.reindex(dfindex)
+
     def filterDataFrame(self, df, index):
         """
         filters a data frame object as the intersection of all values that match the criteria defined by the filters
@@ -530,38 +608,26 @@ class IPETFilterGroup(IpetNode):
         if len(activefilters) == 0 and self.filtertype == "union":
             return df
 
-        dfindex = df.set_index(index).index
-
         # first, get the highest number of index occurrences. This number must be matched to keep the problem
         if self.filtertype == "intersection":
-            groups = df.groupby(index)
-            instancecount = groups.apply(len).max()
-            interrows = groups.apply(lambda x:len(x) == instancecount)
+            if df is IPETFilterGroup._glbdf_:
+                intersection_index = IPETFilterGroup._glbinterrows_
+            else:
 
-            intersection_index = interrows.reindex(dfindex)
+                intersection_index = IPETFilterGroup.computeIntersectionRows(df, index)
+
         elif self.filtertype == "union":
             intersection_index = None
 
-
-        renaming = {i:"{}_filter".format(i) for i in index}
-
         for f_ in activefilters:
-            # apply the filter to the data frame rowwise and store the result in a temporary boolean column
-            filtercol = f_.applyFilter(df, index)
-            filtercol = filtercol.rename(renaming, axis = 1)
 
-            filtercol.index = dfindex
-            # group the filter by the specified data frame index columns.
-            if f_.anytestrun == "one":
-                func = np.any
-            elif f_.anytestrun == "all":
-                func = np.all
-
-            fcol_index = filtercol.groupby(filtercol.index).apply(func)
-            #
-            # reshape the column to match the original data frame rows
-            #
-            fcol = fcol_index.reindex(index = dfindex, axis = 0)
+            # check first if the column has already been stored
+            storedcol = f_.getStoredResult(df)
+            if storedcol is not None:
+                fcol = storedcol
+            else:
+                # apply the filter to the data frame rowwise and store the result in a temporary boolean column
+                fcol = f_.applyFilter(df, index)
 
             if intersection_index is not None:
                 intersection_index = intersection_index & fcol

@@ -1547,6 +1547,13 @@ class IPETEvaluation(IpetNode):
         # filter column data and group by group key
         activefiltergroups = self.getActiveFilterGroups()
         nonemptyactivefiltergroups = activefiltergroups[:]
+
+        #
+        # set global data frame for filter groups to speed up the computations
+        #
+        IPETFilterGroup.setGlobalDataFrameAndIndex(reduceddata, self.getRowIndex())
+        self.computeFilterResults(reduceddata)
+
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
             filtergroupdata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
@@ -1732,6 +1739,37 @@ class IPETEvaluation(IpetNode):
                     results[partialcol][agg.getName()] = agg.aggregate(df[partialcol])
 
         return pd.DataFrame(results)[columnorder]
+
+    def computeFilterResults(self, df : pd.DataFrame):
+        """Compute filter results once and spread them across filters that are equal.
+        """
+        activefilters = [f for g in self.getActiveFilterGroups() for f in g.getActiveFilters()]
+
+        # sort by name, which is a good proxy for equality
+        activefilters = sorted(activefilters, key = lambda x:x.getName())
+        for idx, f in enumerate(activefilters):
+            if idx > 0:
+                previous_f = activefilters[idx - 1]
+
+                #
+                # try to skip the computation of the filter column if an equal
+                # filter already has a stored result
+                #
+                stored_result = previous_f.getStoredResult(df)
+
+                if f.equals(previous_f) and stored_result is not None:
+                    logging.debug("Reusing previously stored result for filter {}".format(f.getName()))
+                    fcol = stored_result
+                else:
+                    fcol = f.applyFilter(df, self.getRowIndex())
+                #
+                # store the result (either by applying the filter, or by copying)
+                #
+                f.storeResult(df, fcol)
+
+
+
+
 
 if __name__ == '__main__':
     pass

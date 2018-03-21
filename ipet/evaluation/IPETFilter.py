@@ -538,9 +538,9 @@ class IPETFilterGroup(IpetNode):
             instancecount = groups.apply(len).max()
             interrows = groups.apply(lambda x:len(x) == instancecount)
 
-            index_series = [interrows.reindex(dfindex)]
+            intersection_index = interrows.reindex(dfindex)
         elif self.filtertype == "union":
-            index_series = []
+            intersection_index = None
 
 
         renaming = {i:"{}_filter".format(i) for i in index}
@@ -562,13 +562,17 @@ class IPETFilterGroup(IpetNode):
             # reshape the column to match the original data frame rows
             #
             fcol = fcol_index.reindex(index = dfindex, axis = 0)
-            index_series.append(fcol)
+
+            if intersection_index is not None:
+                intersection_index = intersection_index & fcol
+            else:
+                intersection_index = fcol
 
         #
         # aggregate the single, elementwise filters into a single intersection
         # series with one row per index element
         #
-        intersection_index = pd.concat(index_series, axis = 1).apply(np.all, axis = 1)
+        # intersection_index = pd.concat(index_series, axis = 1).apply(np.all, axis = 1)
 
         lvalues = intersection_index.values
 

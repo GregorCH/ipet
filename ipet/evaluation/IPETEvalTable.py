@@ -517,7 +517,7 @@ class IPETEvaluationColumn(IpetNode):
                         result = numpy.maximum(result, comp)
                     except:
                         logging.warning("When filling in the minimum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
-                        result = pd.concat([result, comp], axis=1).max(axis=1)
+                        result = pd.concat([result, comp], axis = 1).max(axis = 1)
         if self.maxval is not None:
             maxval = self.parseValue(self.maxval, df_long)
             if maxval is not None:
@@ -529,7 +529,7 @@ class IPETEvaluationColumn(IpetNode):
                         result = numpy.minimum(result, comp)
                     except:
                         logging.warning("When filling in the maximum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
-                        result = pd.concat([result, comp], axis=1).min(axis=1)
+                        result = pd.concat([result, comp], axis = 1).min(axis = 1)
         reductionindex = self.getReductionIndex(evalindexcols)
 
         #
@@ -1305,8 +1305,8 @@ class IPETEvaluation(IpetNode):
 
         # display countercolumns as integer
         counting_columns = [dfcol for dfcol in df.columns if dfcol[l].startswith("_") and dfcol[l].endswith("_")]
-        for cctup in counting_columns:
-            formatters.update({cctup:FormatFunc("%d").beautify})
+        # for cctup in counting_columns:
+        #   formatters.update({cctup:FormatFunc("%d").beautify})
 
         for comptuple in comptuples:
             formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})

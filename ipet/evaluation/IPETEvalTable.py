@@ -1305,8 +1305,8 @@ class IPETEvaluation(IpetNode):
 
         # display countercolumns as integer
         counting_columns = [dfcol for dfcol in df.columns if dfcol[l].startswith("_") and dfcol[l].endswith("_")]
-        # for cctup in counting_columns:
-        #   formatters.update({cctup:FormatFunc("%d").beautify})
+        for cctup in counting_columns:
+            formatters.update({cctup:FormatFunc("%d").beautify})
 
         for comptuple in comptuples:
             formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})
@@ -1750,22 +1750,25 @@ class IPETEvaluation(IpetNode):
         for idx, f in enumerate(activefilters):
             if idx > 0:
                 previous_f = activefilters[idx - 1]
-
-                #
-                # try to skip the computation of the filter column if an equal
-                # filter already has a stored result
-                #
                 stored_result = previous_f.getStoredResult(df)
 
-                if f.equals(previous_f) and stored_result is not None:
-                    logging.debug("Reusing previously stored result for filter {}".format(f.getName()))
-                    fcol = stored_result
-                else:
-                    fcol = f.applyFilter(df, self.getRowIndex())
-                #
-                # store the result (either by applying the filter, or by copying)
-                #
-                f.storeResult(df, fcol)
+            else:
+                previous_f = None
+                stored_result = None
+
+            #
+            # try to skip the computation of the filter column if an equal
+            # filter already has a stored result
+            #
+            if f.equals(previous_f) and stored_result is not None:
+                logging.debug("Reusing previously stored result for filter {}".format(f.getName()))
+                fcol = stored_result
+            else:
+                fcol = f.applyFilter(df, self.getRowIndex())
+            #
+            # store the result (either by applying the filter, or by copying)
+            #
+            f.storeResult(df, fcol)
 
 
 

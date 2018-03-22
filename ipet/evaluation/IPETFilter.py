@@ -509,6 +509,8 @@ class IPETFilterGroup(IpetNode):
     # global data frame and index that are reused for several filter groups
     _glbdf_ = None
     _glbindex_ = None
+
+    # intersection row index which can be shared across all filter groups of type "intersection"
     _glbinterrows_ = None
 
 
@@ -583,6 +585,11 @@ class IPETFilterGroup(IpetNode):
     @staticmethod
     def computeIntersectionRows(df : pd.DataFrame, index):
         """Compute intersection rows of a given data frame and index
+
+        Intersection rows denote a boolean index to define the subset of rows of the input frame
+        considered as "intersection" for filter groups that have the "intersection" type (which is the default).
+        The intersection row computation is slow and is reused across all
+        filter groups with the intersection type.
         """
 
         logging.info("Computing rows for intersection groups")

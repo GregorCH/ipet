@@ -11,6 +11,9 @@ from ipet.evaluation.IPETFilter import IPETValue
 
 class FilterMethodsTest(unittest.TestCase):
 
+    def assertionMessage(self, f1, f2):
+        return "Filter comparison fails for the filters {} and {}".format(f1.getName(), f2.getName())
+
     def testFilterComparison(self):
 
         # test if different operators are correctly distinguished
@@ -20,7 +23,8 @@ class FilterMethodsTest(unittest.TestCase):
                 f1 = IPETFilter("A", "B", operator1)
                 f2 = IPETFilter("A", "B", operator2)
                 eq = f1.equals(f2)
-                self.assertEqual(eq, operator1 == operator2, "Bla")
+                self.assertEqual(eq, operator1 == operator2,
+                                 self.assertionMessage(f1, f2))
 
     def testAnyAll(self):
         # test if filters that have all attributes equal except for the anytestrun attribute are distinguished
@@ -33,7 +37,7 @@ class FilterMethodsTest(unittest.TestCase):
                 f2 = IPETFilter(anytestrun = any2, **commonattributes)
 
                 eq = f1.equals(f2)
-                self.assertEqual(eq, any1 == any2, "Bla")
+                self.assertEqual(eq, any1 == any2, self.assertionMessage(f1, f2))
 
     def testListOperators(self):
         attributes = IPETFilter.listoperators
@@ -44,7 +48,7 @@ class FilterMethodsTest(unittest.TestCase):
                 f2 = IPETFilter(operator = op2, **commonattributes)
 
                 eq = f1.equals(f2)
-                self.assertEqual(eq, op1 == op2, "Bla")
+                self.assertEqual(eq, op1 == op2, self.assertionMessage(f1, f2))
 
 
     def testValueLists(self):
@@ -75,7 +79,7 @@ class FilterMethodsTest(unittest.TestCase):
             eq = f1.equals(f2)
             shouldbeequal = (op == operator2) and len(v1list) == len(v2list)
 
-            self.assertEqual(eq, shouldbeequal, "bla")
+            self.assertEqual(eq, shouldbeequal, self.assertionMessage(f1, f2))
 
 
 if __name__ == "__main__":

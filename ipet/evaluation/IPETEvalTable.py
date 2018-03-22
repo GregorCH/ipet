@@ -540,9 +540,36 @@ class IPETEvaluationColumn(IpetNode):
 
         if len(reductionindex) > 0:
             # apply reduction and save the result by joining it into both data frames
+            nrows_long = df_long.shape[0]
+            nrows_target = df_target.shape[0]
+
             df_long[self.getName()] = result
-            targetresult = df_long.groupby(by = reductionindex)[self.getName()].apply(self.getReductionFunction())
-            df_long = df_long.join(targetresult, on = reductionindex, lsuffix = "_old")
+            # the number of rows in the long and the target data frame is equal
+            # computations are faster in this case because the target result
+            # is simply a permutation of the result
+            #
+            if nrows_long == nrows_target and reductionindex == evalindexcols:
+
+                # ## set index for the join operation
+                targetresult = result.copy()
+                targetresult.index = df_long.set_index(evalindexcols).index
+                targetresult = targetresult.rename(self.getName())
+
+            else:
+                #
+                # reduction index is smaller than the evalindex, perform a reduction
+                # based on the defined reduction index
+                targetresult = df_long.groupby(by = reductionindex)[self.getName()].apply(self.getReductionFunction())
+
+                #
+                # The join operations resamples the possibly reduced result based on the reduction index
+                #
+                df_long = df_long.join(targetresult, on = reductionindex, lsuffix = "_old")
+
+            #
+            # this column should usually not appear in the target, yet. A join operation is necessary
+            # because the index of this frame is a permuted version of the original data frame
+            #
             if not self.getName() in df_target:
                 df_target = df_target.join(targetresult, on = reductionindex, lsuffix = "_old")
         else:

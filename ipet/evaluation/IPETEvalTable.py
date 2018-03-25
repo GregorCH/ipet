@@ -517,7 +517,7 @@ class IPETEvaluationColumn(IpetNode):
                         result = numpy.maximum(result, comp)
                     except:
                         logging.warning("When filling in the minimum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
-                        result = pd.concat([result, comp], axis=1).max(axis=1)
+                        result = pd.concat([result, comp], axis = 1).max(axis = 1)
         if self.maxval is not None:
             maxval = self.parseValue(self.maxval, df_long)
             if maxval is not None:
@@ -529,7 +529,7 @@ class IPETEvaluationColumn(IpetNode):
                         result = numpy.minimum(result, comp)
                     except:
                         logging.warning("When filling in the maximum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
-                        result = pd.concat([result, comp], axis=1).min(axis=1)
+                        result = pd.concat([result, comp], axis = 1).min(axis = 1)
         reductionindex = self.getReductionIndex(evalindexcols)
 
         #
@@ -540,9 +540,36 @@ class IPETEvaluationColumn(IpetNode):
 
         if len(reductionindex) > 0:
             # apply reduction and save the result by joining it into both data frames
+            nrows_long = df_long.shape[0]
+            nrows_target = df_target.shape[0]
+
             df_long[self.getName()] = result
-            targetresult = df_long.groupby(by = reductionindex)[self.getName()].apply(self.getReductionFunction())
-            df_long = df_long.join(targetresult, on = reductionindex, lsuffix = "_old")
+            # the number of rows in the long and the target data frame is equal
+            # computations are faster in this case because the target result
+            # is simply a permutation of the result
+            #
+            if nrows_long == nrows_target and reductionindex == evalindexcols:
+
+                # ## set index for the join operation
+                targetresult = result.copy()
+                targetresult.index = df_long.set_index(evalindexcols).index
+                targetresult = targetresult.rename(self.getName())
+
+            else:
+                #
+                # reduction index is smaller than the evalindex, perform a reduction
+                # based on the defined reduction index
+                targetresult = df_long.groupby(by = reductionindex)[self.getName()].apply(self.getReductionFunction())
+
+                #
+                # The join operations resamples the possibly reduced result based on the reduction index
+                #
+                df_long = df_long.join(targetresult, on = reductionindex, lsuffix = "_old")
+
+            #
+            # this column should usually not appear in the target, yet. A join operation is necessary
+            # because the index of this frame is a permuted version of the original data frame
+            #
             if not self.getName() in df_target:
                 df_target = df_target.join(targetresult, on = reductionindex, lsuffix = "_old")
         else:
@@ -1547,6 +1574,13 @@ class IPETEvaluation(IpetNode):
         # filter column data and group by group key
         activefiltergroups = self.getActiveFilterGroups()
         nonemptyactivefiltergroups = activefiltergroups[:]
+
+        #
+        # set global data frame for filter groups to speed up the computations
+        #
+        IPETFilterGroup.setGlobalDataFrameAndIndex(reduceddata, self.getRowIndex())
+        self.computeFilterResults(reduceddata)
+
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
             filtergroupdata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
@@ -1732,6 +1766,40 @@ class IPETEvaluation(IpetNode):
                     results[partialcol][agg.getName()] = agg.aggregate(df[partialcol])
 
         return pd.DataFrame(results)[columnorder]
+
+    def computeFilterResults(self, df : pd.DataFrame):
+        """Compute filter results once and spread them across filters that are equal.
+        """
+        activefilters = [f for g in self.getActiveFilterGroups() for f in g.getActiveFilters()]
+
+        # sort by name, which is a good proxy for equality
+        activefilters = sorted(activefilters, key = lambda x:x.getName())
+        for idx, f in enumerate(activefilters):
+            if idx > 0:
+                previous_f = activefilters[idx - 1]
+                stored_result = previous_f.getStoredResult(df)
+
+            else:
+                previous_f = None
+                stored_result = None
+
+            #
+            # try to skip the computation of the filter column if an equal
+            # filter already has a stored result
+            #
+            if f.equals(previous_f) and stored_result is not None:
+                logging.debug("Reusing previously stored result for filter {}".format(f.getName()))
+                fcol = stored_result
+            else:
+                fcol = f.applyFilter(df, self.getRowIndex())
+            #
+            # store the result (either by applying the filter, or by copying)
+            #
+            f.storeResult(df, fcol)
+
+
+
+
 
 if __name__ == '__main__':
     pass

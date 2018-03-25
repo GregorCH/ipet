@@ -18,7 +18,7 @@ PRECISE = 0
 ALMOST = 1
 
 class SolverTest(unittest.TestCase):
-    
+
     fileinfo = {
                 "cbc-app1-2" : [ {
                     Key.Solver: "CBC",
@@ -26,7 +26,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.SolvingTime: 7132.49,
                     Key.PrimalBound: None,
-                    Key.DualBound: -96.111} ],
+                    Key.DualBound:-96.111} ],
                 "cbc-ash608gpia-3col" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
@@ -39,8 +39,8 @@ class SolverTest(unittest.TestCase):
                     Key.Version: "2.9.8",
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.SolvingTime: 7194.79,
-                    Key.PrimalBound: -104286.921,
-                    Key.DualBound: -111273.306} ],
+                    Key.PrimalBound:-104286.921,
+                    Key.DualBound:-111273.306} ],
                 "cbc-dfn-gwin-UUM" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
@@ -60,20 +60,20 @@ class SolverTest(unittest.TestCase):
                     Key.Version: "2.9.8",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.SolvingTime: 4511.76,
-                    Key.PrimalBound: -5,
-                    Key.DualBound: -5} ],
+                    Key.PrimalBound:-5,
+                    Key.DualBound:-5} ],
                 "cplex-app1-2" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -41,
-                    Key.DualBound: -41} ],
+                    Key.PrimalBound:-41,
+                    Key.DualBound:-41} ],
                 "cplex-bab5" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -106411.84,
-                    Key.DualBound: -106411.84} ],
+                    Key.PrimalBound:-106411.84,
+                    Key.DualBound:-106411.84} ],
                 "cplex-dfn-gwin-UUM" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
@@ -90,20 +90,20 @@ class SolverTest(unittest.TestCase):
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -5,
-                    Key.DualBound: -5} ],
+                    Key.PrimalBound:-5,
+                    Key.DualBound:-5} ],
                 "gurobi-app1-2" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -41 ,
-                    Key.DualBound: -41} ],
+                    Key.PrimalBound:-41 ,
+                    Key.DualBound:-41} ],
                 "gurobi-bab5" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -106411.84 ,
-                    Key.DualBound: -106411.84} ],
+                    Key.PrimalBound:-106411.84 ,
+                    Key.DualBound:-106411.84} ],
                 "gurobi-dfn-gwin-UUM" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
@@ -120,19 +120,19 @@ class SolverTest(unittest.TestCase):
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -5 ,
-                    Key.DualBound: -5} ],
+                    Key.PrimalBound:-5 ,
+                    Key.DualBound:-5} ],
                 "xpress-app1-2" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -41,
-                    Key.DualBound: -41} ],
+                    Key.PrimalBound:-41,
+                    Key.DualBound:-41} ],
                 "xpress-bab5" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
-                    Key.PrimalBound: -106411.84,
+                    Key.PrimalBound:-106411.84,
                     Key.DualBound:-106701.8161} ],
                 "xpress-dfn-gwin-UUM" : [ {
                     Key.Solver: "XPRESS",
@@ -150,8 +150,8 @@ class SolverTest(unittest.TestCase):
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: -5 ,
-                    Key.DualBound: -5} ],
+                    Key.PrimalBound:-5 ,
+                    Key.DualBound:-5} ],
                 "mipcl-app1-2" : [ {
                     Key.Solver: "MIPCL",
                     Key.Version: "1.3.1",
@@ -185,32 +185,32 @@ class SolverTest(unittest.TestCase):
                 "scip-infeasible" : [ {
                     Key.Solver: "SCIP",
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
-                    Key.PrimalBound: +1.00000000000000e+20,
-                    Key.DualBound: +1.00000000000000e+20} ],
+                    Key.PrimalBound:+1.00000000000000e+20,
+                    Key.DualBound:+1.00000000000000e+20} ],
                 "scip-memorylimit" : [ {
                     Key.Solver: "SCIP",
                     Key.SolverStatus: Key.SolverStatusCodes.MemoryLimit }, {
-                    Key.PrimalBound: +1.49321500000000e+06,
-                    Key.DualBound: +1.49059347656250e+06} ],
+                    Key.PrimalBound:+1.49321500000000e+06,
+                    Key.DualBound:+1.49059347656250e+06} ],
                 "scip-optimal" : [ {
                     Key.Solver: "SCIP",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
-                    Key.PrimalBound: +3.36000000000000e+03,
-                    Key.DualBound: +3.36000000000000e+03} ],
+                    Key.PrimalBound:+3.36000000000000e+03,
+                    Key.DualBound:+3.36000000000000e+03} ],
                 "scip-timelimit" : [ {
                     Key.Solver: "SCIP",
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
-                    Key.PrimalBound: +1.16800000000000e+03,
-                    Key.DualBound: +1.13970859166290e+03} ],
+                    Key.PrimalBound:+1.16800000000000e+03,
+                    Key.DualBound:+1.13970859166290e+03} ],
                 "scip-crashed" : [ {
                     Key.Solver: "SCIP",
                     Key.SolverStatus: Key.SolverStatusCodes.Crashed }, {
                     Key.PrimalBound: None,
                     Key.DualBound: None} ]
                 }
-    
+
     solvers = []
-    
+
     def setUp(self):
         self.solvers.append([SCIPSolver(), "SCIP"])
         self.solvers.append([GurobiSolver(), "GUROBI"])
@@ -238,7 +238,7 @@ class SolverTest(unittest.TestCase):
 
     def assertPrecise(self, filename, key):
         refvalue = self.fileinfo.get(filename)[PRECISE].get(key)
-        self.assertEqual(refvalue, self.activeSolver.getData(key))
+        self.assertEqual(refvalue, self.activeSolver.getData(key), "Wrong key value {}:{} parsed by solver {} from file {}".format(key, self.activeSolver.getData(key), self.activeSolver.getName(), filename))
 
     def assertAlmost(self, filename, key):
         refbound = self.fileinfo.get(filename)[ALMOST].get(key)
@@ -263,12 +263,12 @@ class SolverTest(unittest.TestCase):
                     if solver.recognizeOutput(line):
                         self.activeSolver = solver
                         return
-                
+
     def getFileName(self, basename):
         return os.path.join(DATADIR, "{}.{}".format(basename, "out"))
 
 if __name__ == "__main__":
     unittest.main()
-    
-    
-    
+
+
+

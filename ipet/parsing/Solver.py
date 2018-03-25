@@ -779,7 +779,7 @@ class XpressSolver(Solver):
                        "STOPPING - MAXTIME limit reached" : Key.SolverStatusCodes.TimeLimit,
                        #                       "" : Key.SolverStatusCodes.MemoryLimit,
                        #                       "" : Key.SolverStatusCodes.NodeLimit,
-                      r" \*\*\* Search unfinished \*\*\*" : Key.SolverStatusCodes.Interrupted,
+                       # r" \*\*\* Search unfinished \*\*\*" : Key.SolverStatusCodes.Interrupted,
                       r"\?66 Error: Unable to open file" : Key.SolverStatusCodes.Readerror
                        }
 

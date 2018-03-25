@@ -83,7 +83,7 @@ class Validation:
             for name, objsense, primbound, dualbound, status in c:
 
                 if name in soludict:
-                    logging.warn("Warning: Duplicate name {} with different data in data base".format(name))
+                    logging.warning("Warning: Duplicate name {} with different data in data base".format(name))
 
                 infotuple = [None, None]
                 if status == DataBaseMarkers.OPT:
@@ -248,7 +248,7 @@ class Validation:
         elif not pd.isnull(x.get(Key.ObjectiveSense, None)):
             return x.get(Key.ObjectiveSense)
         else:
-            logging.warn("No objective sense for {}, assuming minimization".format(problemname))
+            logging.warning("No objective sense for {}, assuming minimization".format(problemname))
             return ObjectiveSenseCode.MINIMIZE
 
     def validateSeries(self, x : pd.Series) -> str:

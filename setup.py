@@ -46,7 +46,7 @@ for r in requirementslist:
 kwargs = {
     "name": "ipet",
     "version": str(__version__),
-    "packages": ['ipet', 'ipetgui', 'ipet.concepts', 'ipet.evaluation', 'ipet.misc', 'ipet.parsing'],
+    "packages": ['ipet', 'ipetgui', 'ipet.concepts', 'ipet.evaluation', 'ipet.misc', 'ipet.parsing', 'ipet.validation'],
     "package_data": dict(ipet = ["../images/*.png"]),
     "description": "Interactive Performance Evaluation Tools",
     "long_description": long_description,

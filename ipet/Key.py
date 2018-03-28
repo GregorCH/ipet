@@ -102,6 +102,7 @@ class SolverStatusCodes:
     GapLimit = 5
     Interrupted = 100
     Unbounded = 110
+    InfOrUnbounded = 120
 
 class ProblemStatusCodes:
     """ Keeping track of how good the solution of a solver actually was.
@@ -162,6 +163,7 @@ solver2problemStatusCode = {
     SolverStatusCodes.Infeasible : ProblemStatusCodes.Ok,
     SolverStatusCodes.Optimal : ProblemStatusCodes.Ok,
     SolverStatusCodes.Unbounded : ProblemStatusCodes.Ok,
+    SolverStatusCodes.InfOrUnbounded : ProblemStatusCodes.Ok,
     SolverStatusCodes.TimeLimit : ProblemStatusCodes.TimeLimit,
     SolverStatusCodes.MemoryLimit : ProblemStatusCodes.MemoryLimit,
     SolverStatusCodes.NodeLimit : ProblemStatusCodes.NodeLimit,

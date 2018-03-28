@@ -395,8 +395,10 @@ class SCIPSolver(Solver):
     regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
 
     solverstatusmap = {
+        "no problem exists" : Key.SolverStatusCodes.Readerror,
         "SCIP Status        : problem is solved \[optimal solution found\]":Key.SolverStatusCodes.Optimal,
         "SCIP Status        : problem is solved \[infeasible\]": Key.SolverStatusCodes.Infeasible,
+        "SCIP Status        : problem is solved \[infeasible or unbounded\]": Key.SolverStatusCodes.InfOrUnbounded,
         "SCIP Status        : solving was interrupted \[time limit reached\]" : Key.SolverStatusCodes.TimeLimit,
         "SCIP Status        : solving was interrupted \[memory limit reached\]" : Key.SolverStatusCodes.MemoryLimit,
         "SCIP Status        : solving was interrupted \[node limit reached\]" : Key.SolverStatusCodes.NodeLimit,

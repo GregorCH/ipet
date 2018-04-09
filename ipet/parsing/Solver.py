@@ -745,10 +745,12 @@ class CbcSolver(Solver):
     dualbound_expr = re.compile("^(?:Lower bound\s*|Objective value\s*):\s*(\S*)")
     solvingtime_expr = re.compile("Total time \(CPU seconds\):\s*(\S*)")
     version_expr = re.compile("^Version: (\S+)")
+    nodes_expr = re.compile("^Enumerated nodes: *(\S+)")
 
     solverstatusmap = {"Result - Optimal solution found" : Key.SolverStatusCodes.Optimal,
                        "Result - Stopped on time limit" : Key.SolverStatusCodes.TimeLimit,
-                       "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible
+                       "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "\*\* Current model not valid" : Key.SolverStatusCodes.Readerror
                        #                       "" : Key.SolverStatusCodes.MemoryLimit,
                        #                       "" : Key.SolverStatusCodes.NodeLimit,
                        #                       "" : Key.SolverStatusCodes.Interrupted

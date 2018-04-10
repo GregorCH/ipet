@@ -150,7 +150,7 @@ class Solver():
         Parameters
         ----------
         line
-            a line of solver output that the information shall be read from
+            a line of solver output
         expr
             regular expression with (at least) one group
         key
@@ -650,13 +650,18 @@ class CplexSolver(Solver):
     dualbound_expr = re.compile("^(?:Current MIP best bound|^MIP - Integer optimal solution:  Objective) =\s*(\S+)")
     solvingtime_expr = re.compile("Solution time =\s*(\S+)")
     version_expr = re.compile("^Welcome to IBM\(R\) ILOG\(R\) CPLEX\(R\) Interactive Optimizer (\S+)")
+    nodes_expr = re.compile("Solution time = .* sec\.  Iterations = \d+  Nodes = (\S+)")
+
 
     elapsedtime_expr = re.compile("^Elapsed time = .+ sec. \(.* ticks, tree = .* MB, solutions = \d+\)")
 
-    solverstatusmap = {"MIP - Integer optimal solution" : Key.SolverStatusCodes.Optimal,
+    solverstatusmap = {"MIP - Integer optimal" : Key.SolverStatusCodes.Optimal,
                        "MIP - Integer infeasible." : Key.SolverStatusCodes.Infeasible,
-                       #                       "" : Key.SolverStatusCodes.TimeLimit,
-                       #                       "" : Key.SolverStatusCodes.MemoryLimit,
+                       "MIP - Time limit exceeded" : Key.SolverStatusCodes.TimeLimit,
+                       "MIP - Integer unbounded" : Key.SolverStatusCodes.Unbounded,
+                       "CPLEX Error  1001: Out of memory\." : Key.SolverStatusCodes.MemoryLimit,
+                       "No file read\." : Key.SolverStatusCodes.Readerror,
+
                        #                       "" : Key.SolverStatusCodes.NodeLimit,
                        #                       "" : Key.SolverStatusCodes.Interrupted
                        }

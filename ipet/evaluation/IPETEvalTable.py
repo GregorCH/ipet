@@ -1137,7 +1137,9 @@ class IPETEvaluation(IpetNode):
 
         df['_dualfail_'] = df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailDualBound])
 
-        df['_fail_'] = df['_primfail_'] | df['_dualfail_'] | (df[Key.ProblemStatus] == Key.ProblemStatusCodes.Fail)
+        df['_fail_'] = df['_primfail_'] | \
+            df['_dualfail_'] | \
+            df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailReaderror, Key.ProblemStatusCodes.Fail])
 
         df['_abort_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.FailAbort)
 

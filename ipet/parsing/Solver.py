@@ -836,3 +836,24 @@ class XpressSolver(Solver):
 #            self.readBoundAndTime(line, 4, -2, timestripchars="(")
 #        return None
 
+
+class MatlabSolver(Solver):
+    solverId = "Matlab"
+    recognition_expr = re.compile(" *< M A T L A B \(R\) >")
+    primalbound_expr = re.compile("PrimalBound (\S*)")
+    dualbound_expr = re.compile("DualBound (\S*)")
+    solvingtime_expr = re.compile("Total time \(CPU seconds\):\s*(\S*)")
+    nodes_expr = re.compile("^BBnodes (\S+)")
+
+    solverstatusmap = {"Intlinprog stopped.* because the objective value is within" : Key.SolverStatusCodes.Optimal,
+                       "Intlinprog stopped because it exceeded the time limit" : Key.SolverStatusCodes.TimeLimit,
+                       "Intlinprog stopped because the root LP problem is unbounded" : Key.SolverStatusCodes.Unbounded,
+                       "Intlinprog stopped because no [a-z]* point" : Key.SolverStatusCodes.Infeasible,
+                       "Intlinprog stopped because it exceeded its allocated memory" : Key.SolverStatusCodes.MemoryLimit,
+                       "Intlinprog stopped because it reached the maximum number of nodes" : Key.SolverStatusCodes.NodeLimit,
+                       "MPSREAD stopped because it encountered an invalid MPS format" : Key.SolverStatusCodes.Readerror,
+                       "Intlinprog stopped" : Key.SolverStatusCodes.Interrupted
+                       }
+
+    def __init__(self, **kw):
+        super(MatlabSolver, self).__init__(**kw)

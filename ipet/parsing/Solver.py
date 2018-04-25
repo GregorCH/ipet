@@ -181,6 +181,13 @@ class Solver():
         """
         self.data[key] = datum
 
+    def deleteData(self, key : str):
+        """Delete data from local data dictionary
+        """
+        if key in self.data:
+            del self.data[key]
+
+
     def addHistoryData(self, key, timestr : str, boundstr : str):
         """Add data to local historydata dictionary.
 
@@ -937,4 +944,57 @@ class MipclSolver(Solver):
             self.inTable = False
             return False
         return self.inTable
+
+class NuoptSolver(Solver):
+
+    solverId = "Nuopt"
+    recognition_expr = re.compile("^MSI Numerical Optimizer")
+    primalbound_expr = re.compile("^VALUE_OF_OBJECTIVE *(\S+)")
+    dualbound_expr = re.compile("^(?:Lower bound\s*|Objective value\s*):\s*(\S*)")
+    solvingtime_expr = re.compile("^ELAPSED_TIME\(sec\.\) \s*(\S+)")
+    version_expr = re.compile("^^MSI Numerical Optimizer (\S+)")
+    nodes_expr = re.compile("^PARTIAL_PROBLEM_COUNT \s*(\S+)")
+    gap_expr = re.compile("^GAP *(\S+)")
+    no_feasible_sol_expr = re.compile("^\(NUOPT 2[02]\) .* \(no feas\.sol\.\)")
+    viol_expr = re.compile("^\(NUOPT (14|34|36)\)")
+
+    solverstatusmap = {"^STATUS *OPTIMAL" : Key.SolverStatusCodes.Optimal,
+                       "^STATUS *NON_OPTIMAL" : Key.SolverStatusCodes.TimeLimit,
+                       # "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "^__STDIN__:\d+: \(MPS FILE \d+\)" : Key.SolverStatusCodes.Readerror,
+                       "^(\<preprocess begin\>\.+)*\(NUOPT 12\)" : Key.SolverStatusCodes.MemoryLimit,
+                       #                       "" : Key.SolverStatusCodes.NodeLimit,
+                       #                       "" : Key.SolverStatusCodes.Interrupted
+                       }
+
+    def __init__(self, **kw):
+        super(NuoptSolver, self).__init__(**kw)
+
+    def extractDualbound(self, line : str):
+        """
+        Nuopt only reports the gap, but not the actual dual bound.
+        """
+        gap_match = self.gap_expr.match(line)
+
+        if gap_match:
+            gap = float(gap_match.groups()[0])
+
+            #
+            #  A gap of -1 is reported if no solution was found
+            #
+            if gap >= 0:
+                self.addData(Key.DualBound, self.getData(Key.PrimalBound) - gap)
+        elif self.solvingtime_expr.match(line) and self.getData(Key.SolverStatus) == Key.SolverStatusCodes.Optimal:
+            self.addData(Key.DualBound, self.getData(Key.PrimalBound))
+
+    def extractPrimalbound(self, line : str):
+        self.extractByExpression(line, self.primalbound_expr, Key.PrimalBound, float)
+
+        # ## remove primal bound if no feasible solution has been found
+        #
+        # Nuopt reports 0 in this case
+        #
+        if self.no_feasible_sol_expr.match(line) or self.viol_expr.match(line):
+            self.deleteData(Key.PrimalBound)
+            self.deleteData(Key.DualBound)
 

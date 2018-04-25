@@ -998,3 +998,26 @@ class NuoptSolver(Solver):
             self.deleteData(Key.PrimalBound)
             self.deleteData(Key.DualBound)
 
+
+class SasSolver(Solver):
+    '''Solver class for Sas
+    '''
+
+    solverId = "SAS"
+    recognition_expr = re.compile("^NOTE: SAS \(r\) Proprietary Software")
+    version_expr = re.compile("^NOTE: SAS \(r\) Proprietary Software (\S+)")
+    solvingtime_expr = re.compile("^ *Solution Time *(\S+)$")
+    primalbound_expr = re.compile("^ *Objective Value *(\S+)$")
+    dualbound_expr = re.compile("^ *Best Bound *(\S+)$")
+    nodes_expr = re.compile("^ *Nodes *(\S+)$")
+
+    solverstatusmap = {"^ *Solution Status *(Conditionally)* (Optimal|Failed)" : Key.SolverStatusCodes.Optimal,
+                       "^ *Solution Status *Infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "^ *Solution Status *Time Limit Reached" : Key.SolverStatusCodes.TimeLimit,
+                       "^ *Solution Status *Infeasible or Unbounded" : Key.SolverStatusCodes.InfOrUnbounded,
+                       "^ERROR: The MPS file is incomplete\." : Key.SolverStatusCodes.Readerror,
+                       "^ *Solution Status *Out of Memory" : Key.SolverStatusCodes.MemoryLimit
+                       }
+
+    def __init__(self, **kw):
+        super(SasSolver, self).__init__(**kw)

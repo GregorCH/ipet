@@ -22,7 +22,7 @@ from .TraceFileReader import TraceFileReader
 from ipet.concepts.Manager import Manager
 from ipet.concepts.IPETNode import IpetNode
 from ipet.parsing.Solver import Solver, SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, \
-    CplexSolver, FiberSCIPSolver, MatlabSolver, MosekSolver, MipclSolver, NuoptSolver
+    CplexSolver, FiberSCIPSolver, MatlabSolver, MosekSolver, MipclSolver, NuoptSolver, SasSolver
 from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
 #     XpressSolver, GurobiSolver, CplexSolver
@@ -75,7 +75,8 @@ class ReaderManager(Manager, IpetNode):
                   MatlabSolver(),
                   MosekSolver(),
                   MipclSolver(),
-                  NuoptSolver()
+                  NuoptSolver(),
+                  SasSolver()
                   ]:
             self.addSolver(s)
 

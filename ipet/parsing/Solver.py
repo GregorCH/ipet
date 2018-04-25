@@ -34,6 +34,8 @@ class Solver():
 
     solverstatusmap = {}
 
+    objsensemap = {}
+
     def __init__(self,
                  solverId = None,
                  recognition_pattern = None,
@@ -46,7 +48,8 @@ class Solver():
                  violbound_pattern = None,
                  violint_pattern = None,
                  viollp_pattern = None,
-                 violcons_pattern = None):
+                 violcons_pattern = None,
+                 objsensemap = None):
 
         if solverId is not None:
             self.solverId = solverId
@@ -71,6 +74,9 @@ class Solver():
             self.viollp_expr = re.compile(viollp_pattern)
         if violcons_pattern is not None:
             self.violcons_expr = re.compile(violcons_pattern)
+        if objsensemap is not None:
+            self.objsensemap = objsensemap
+
 
         if solverstatusmap is not None:
             self.solverstatusmap = solverstatusmap
@@ -142,6 +148,13 @@ class Solver():
         """Read the number of branch and bound nodes
         """
         self.extractByExpression(line, self.nodes_expr, Key.Nodes, int)
+
+    def extractObjsense(self, line : str):
+        """Read objective sense of the problem as understood by the solver
+        """
+        for pattern, sense in self.objsensemap.items():
+            if re.match(pattern, line):
+                self.addData(Key.ObjectiveSense, sense)
 
     def extractByExpression(self, line : str, expr, key : str, datatype : type = float) -> None:
         """
@@ -247,6 +260,7 @@ class Solver():
         self.extractVersion(line)
         self.extractStatus(line)
         self.extractHistory(line)
+        self.extractObjsense(line)
 
     def extractHistory(self, line):
         """ Extract the sequence of primal and dual bounds.
@@ -673,6 +687,11 @@ class CplexSolver(Solver):
                        #                       "" : Key.SolverStatusCodes.Interrupted
                        }
 
+    objsensemap = {
+        "^CPLEX> Problem is a minimization problem" : Key.ObjectiveSenseCode.MINIMIZE,
+        "^CPLEX> Problem is a maximization problem" : Key.ObjectiveSenseCode.MAXIMIZE,
+        }
+
     # variables needed for primal bound history extraction
     easyCPLEX = False
     lastelapsedtime = 0.0
@@ -782,8 +801,8 @@ class XpressSolver(Solver):
 
     solverId = "XPRESS"
     recognition_expr = re.compile("FICO Xpress-Optimizer")
-    primalbound_expr = re.compile("Best integer solution found is\s*(\S*)")
-    dualbound_expr = re.compile("Best bound is\s*(\S*)")
+    primalbound_expr = re.compile("Objective value =\s*(\S*)")
+    dualbound_expr = re.compile("Best Bound =\s*(\S*)")
     solvingtime_expr = re.compile(" \*\*\* Search.*\*\*\*\s*Time:\s*(\S*)")
     version_expr = re.compile("FICO Xpress-Optimizer \S* v(\S*)")
     nodes_expr = re.compile("^Nodes explored = (.*)$")
@@ -793,11 +812,16 @@ class XpressSolver(Solver):
     solverstatusmap = {r" \*\*\* Search completed \*\*\*" : Key.SolverStatusCodes.Optimal,
                        "Problem is integer infeasible" : Key.SolverStatusCodes.Infeasible,
                        "STOPPING - MAXTIME limit reached" : Key.SolverStatusCodes.TimeLimit,
-                       #                       "" : Key.SolverStatusCodes.MemoryLimit,
+                       "\?(45|20)" : Key.SolverStatusCodes.MemoryLimit,
                        #                       "" : Key.SolverStatusCodes.NodeLimit,
-                       # r" \*\*\* Search unfinished \*\*\*" : Key.SolverStatusCodes.Interrupted,
-                      r"\?66 Error: Unable to open file" : Key.SolverStatusCodes.Readerror
+                       r" \*\*\* Search unfinished \*\*\*" : Key.SolverStatusCodes.Interrupted,
+                      r"\?(66|1038|1039)" : Key.SolverStatusCodes.Readerror
                        }
+
+    objsensemap = {
+            "^Minimizing MILP" : Key.ObjectiveSenseCode.MINIMIZE,
+            "^Maximizing MILP" : Key.ObjectiveSenseCode.MAXIMIZE,
+        }
 
     # variables needed for primal bound history extraction
     xpresscutidx = -1
@@ -814,6 +838,10 @@ class XpressSolver(Solver):
             self.readBoundAndTime(line, -1, -1, cutidx = self.xpresscutidx)
         elif line.startswith(" \*\*\* Heuristic solution found: "):
             self.readBoundAndTime(line, -4, -2)
+
+    def extractStatus(self, line:str):
+        if self.getData(Key.SolverStatus) == SolverStatusCodes.Crashed:
+            Solver.extractStatus(self, line)
 
 # class CouenneSolver(Solver):
 #
@@ -917,7 +945,7 @@ class MipclSolver(Solver):
         super(MipclSolver, self).__init__(**kw)
 
 
-    def extracHistory(self, line : str):
+    def extractHistory(self, line : str):
         """ Extract the sequence of primal bounds  
         """
         if not self.isTableLine(line):

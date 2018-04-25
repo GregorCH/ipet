@@ -838,11 +838,12 @@ class XpressSolver(Solver):
 
 
 class MatlabSolver(Solver):
+    '''Solver class for the Matlab Intlinprog solver
+    '''
     solverId = "Matlab"
     recognition_expr = re.compile(" *< M A T L A B \(R\) >")
     primalbound_expr = re.compile("PrimalBound (\S*)")
     dualbound_expr = re.compile("DualBound (\S*)")
-    solvingtime_expr = re.compile("Total time \(CPU seconds\):\s*(\S*)")
     nodes_expr = re.compile("^BBnodes (\S+)")
 
     solverstatusmap = {"Intlinprog stopped.* because the objective value is within" : Key.SolverStatusCodes.Optimal,
@@ -857,3 +858,83 @@ class MatlabSolver(Solver):
 
     def __init__(self, **kw):
         super(MatlabSolver, self).__init__(**kw)
+
+class MosekSolver(Solver):
+    '''Solver class for Mosek
+    '''
+
+    solverId = "Mosek"
+    recognition_expr = re.compile("MOSEK")
+    version_expr = re.compile("MOSEK Version (.*)$")
+    solvingtime_expr = re.compile("Optimizer terminated\. Time: (.*)$")
+    primalbound_expr = re.compile("^Objective of best integer solution : (.*)$")
+    dualbound_expr = re.compile("^Best objective bound               : (.*)$")
+    nodes_expr = re.compile("^Number of branches                 : (.*)$")
+
+    solverstatusmap = {"^  Solution status : .*OPTIMAL" : Key.SolverStatusCodes.Optimal,
+                       "^  Problem status  : PRIMAL_INFEASIBLE" : Key.SolverStatusCodes.Infeasible,
+                       "^(  Problem status  : UNKNOWN|  Solution status : PRIMAL_FEASIBLE)" : Key.SolverStatusCodes.TimeLimit,
+                       "^  Problem status  : PRIMAL_INFEASIBLE_OR_UNBOUNDED" : Key.SolverStatusCodes.InfOrUnbounded,
+                       "^mosek.Error: \(1101\)" : Key.SolverStatusCodes.Readerror,
+                       "^mosek.Error: \(1051\)" : Key.SolverStatusCodes.MemoryLimit
+                       }
+
+    def __init__(self, **kw):
+        super(MosekSolver, self).__init__(**kw)
+
+class MipclSolver(Solver):
+    '''Solver class for the MIPCL solver
+    '''
+
+    solverId = "MIPCL"
+    recognition_expr = re.compile("^MIPCL")
+    version_expr = re.compile("^MIPCL version (.*)$")
+    solvingtime_expr = re.compile("^Solution time: (.*)$")
+    dualbound_expr = re.compile("^     lower-bound: (.*)$")
+    primalbound_expr = re.compile("^Objective value: (\S+)")
+    nodes_expr = re.compile("Branch-and-Cut nodes: (.*)$")
+
+
+
+    solverstatusmap = {"^Objective value: .* - optimality proven" : Key.SolverStatusCodes.Optimal,
+                       "^This problem is infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "^Time limit reached" : Key.SolverStatusCodes.TimeLimit
+                       }
+
+    # members needed for primal bound history
+    inTable = False
+    primalboundhistory_exp = re.compile("^      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound     Gap%")
+    endtable = re.compile('^===========================================')
+
+    def __init__(self, **kw):
+        super(MipclSolver, self).__init__(**kw)
+
+
+    def extracHistory(self, line : str):
+        """ Extract the sequence of primal bounds  
+        """
+        if not self.isTableLine(line):
+            return
+
+        # history reader should be in a table. check if a display char indicates a new primal bound
+        if self.inTable:
+            allmatches = misc.numericExpressionOrInf.findall(line)
+            if len(allmatches) == 0:
+                return
+
+            pointInTime = allmatches[0]
+            pb = allmatches[4]
+            db = allmatches[5]
+            # in the case of ugscip, we reacted on a disp char, so no problem at all.
+            self.addHistoryData(Key.PrimalBoundHistory, pointInTime, pb)
+            self.addHistoryData(Key.DualBoundHistory, pointInTime, db)
+
+    def isTableLine(self, line):
+        if self.primalboundhistory_exp.match(line):
+            self.inTable = True
+            return False
+        elif self.inTable and self.endtable.match(line):
+            self.inTable = False
+            return False
+        return self.inTable
+

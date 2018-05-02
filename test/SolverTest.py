@@ -5,9 +5,8 @@ Created on 04.05.2017
 '''
 import unittest
 import os
-from ipet.parsing.Solver import SCIPSolver, GurobiSolver, CplexSolver, CbcSolver, XpressSolver
+from ipet.parsing.Solver import SCIPSolver, GurobiSolver, CplexSolver, CbcSolver, XpressSolver, MipclSolver
 from ipet import Key
-from ipet.parsing.MIPCLSolver import MIPCLSolver
 
 DATADIR = os.path.join(os.path.dirname(__file__), "data")
 TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")
@@ -144,7 +143,7 @@ class SolverTest(unittest.TestCase):
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
-                    Key.PrimalBound: None,
+                    Key.PrimalBound: 1e+40,
                     Key.DualBound: 1e+40} ],
                 "xpress-satellites1-25" : [ {
                     Key.Solver: "XPRESS",
@@ -217,7 +216,7 @@ class SolverTest(unittest.TestCase):
         self.solvers.append([CplexSolver(), "CPLEX"])
         self.solvers.append([CbcSolver(), "CBC"])
         self.solvers.append([XpressSolver(), "XPRESS"])
-        self.solvers.append([MIPCLSolver(), "MIPCL"])
+        self.solvers.append([MipclSolver(), "MIPCL"])
         self.activeSolver = self.solvers[0][SOLVER]
 
     def tearDown(self):

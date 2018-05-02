@@ -11,9 +11,8 @@ please refer to README.md for how to cite IPET.
 """
 import unittest
 import os
-from ipet.parsing.Solver import GurobiSolver
+from ipet.parsing.Solver import GurobiSolver, MipclSolver
 from ipet import Key
-from ipet.parsing.MIPCLSolver import MIPCLSolver
 
 DATADIR = os.path.join(os.path.dirname(__file__), "data")
 TMPDIR = os.path.join(os.path.dirname(__file__), ".tmp")

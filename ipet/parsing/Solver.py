@@ -10,12 +10,12 @@ from numpy import char
 
 class Solver():
     """ The solver-class acts as Reader for solver-specific data.
-    
-    After being fed the out-file line by line to readLine(line) 
+
+    After being fed the out-file line by line to readLine(line)
     the solver can return the collected data via getData().
     When reading multiple runs, the solver has to be reset via reset().
-    
-    This class has to be inherited by a SpecificSolver-class and 
+
+    This class has to be inherited by a SpecificSolver-class and
     should not be used as it is.
     """
 
@@ -91,7 +91,7 @@ class Solver():
 
     def extractStatus(self, line : str):
         """ Check if the line matches one of the solverstatusmap patterns.
-        
+
         If the one of the patterns matches, the data will be added data as Key.SolverStatus.
         """
         for expr, status in self.solverstatusses:
@@ -102,14 +102,14 @@ class Solver():
 
     def extractVersion(self, line : str):
         """ Extract the version of the solver-software.
-        
+
         If the versionpattern matches, the version will be added to data as Key.Version.
         """
         self.extractByExpression(line, self.version_expr, Key.Version, str)
 
     def extractSolvingTime(self, line : str):
         """ Read the overall solving time given by the solver.
-        
+
         If the solvingpatterns matches, the version will be added to data as Key.SolvingTime.
         """
         self.extractByExpression(line, self.solvingtime_expr, Key.SolvingTime)
@@ -440,7 +440,7 @@ class SCIPSolver(Solver):
         self.dualboundindex = -1
 
     def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds
         """
 
         #
@@ -470,7 +470,7 @@ class SCIPSolver(Solver):
 
 
     def extractDualboundHistory(self, line : str):
-        """ Extract the sequence of dual bounds  
+        """ Extract the sequence of dual bounds
         """
         timeindex = 0
 
@@ -563,7 +563,7 @@ class FiberSCIPSolver(SCIPSolver):
         return False
 
     def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds
         """
 
         if not self.isTableLine(line):
@@ -583,8 +583,8 @@ class FiberSCIPSolver(SCIPSolver):
 
     def extractDualboundHistory(self, line : str):
         """Do not read a dual bound history, override method in SCIP solver
-        
-        There is no simple way to distinguish UG table lines from other output unless the primal bound changes. 
+
+        There is no simple way to distinguish UG table lines from other output unless the primal bound changes.
         """
         pass
 
@@ -616,7 +616,7 @@ class GurobiSolver(Solver):
         super(GurobiSolver, self).__init__(**kw)
 
     def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds
         """
         if "Found heuristic solution" in line:
             self.gurobiextralist.append(line.split()[-1])
@@ -640,7 +640,7 @@ class GurobiSolver(Solver):
         return None
 
     def extractDualboundHistory(self, line : str):
-        """ Extract the sequence of dual bounds  
+        """ Extract the sequence of dual bounds
         """
         if "Expl Unexpl |  Obj  Depth" in line:
             self.inTable = True
@@ -716,7 +716,7 @@ class CplexSolver(Solver):
 
     # TODO DualBoundHistory
     def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds
         """
         if self.easyCPLEX and "Found incumbent of value" in line:
             splitline = line.split()
@@ -791,7 +791,7 @@ class CbcSolver(Solver):
         super(CbcSolver, self).__init__(**kw)
 
     def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds
         """
         if "Integer solution of " in line:
             self.readBoundAndTime(line, 4, -2, timestripchars = "(")
@@ -809,7 +809,7 @@ class XpressSolver(Solver):
 
 
     # TODO does this work? Benchmarks seem to be broken
-    solverstatusmap = {r" \*\*\* Search completed \*\*\*" : Key.SolverStatusCodes.Optimal,
+    solverstatusmap = {r"Best integer solution found" : Key.SolverStatusCodes.Optimal,
                        "Problem is integer infeasible" : Key.SolverStatusCodes.Infeasible,
                        "STOPPING - MAXTIME limit reached" : Key.SolverStatusCodes.TimeLimit,
                        "\?(45|20)" : Key.SolverStatusCodes.MemoryLimit,
@@ -830,7 +830,7 @@ class XpressSolver(Solver):
         super(XpressSolver, self).__init__(**kw)
 
     def extractPrimalboundHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds
         """
         if "BestSoln" in line:
             self.xpresscutidx = line.index("BestSoln") + len("BestSoln")
@@ -840,7 +840,7 @@ class XpressSolver(Solver):
             self.readBoundAndTime(line, -4, -2)
 
     def extractStatus(self, line:str):
-        if self.getData(Key.SolverStatus) == SolverStatusCodes.Crashed:
+        if self.getData(Key.SolverStatus) == Key.SolverStatusCodes.Crashed:
             Solver.extractStatus(self, line)
 
 # class CouenneSolver(Solver):
@@ -925,7 +925,8 @@ class MipclSolver(Solver):
     recognition_expr = re.compile("^MIPCL")
     version_expr = re.compile("^MIPCL version (.*)$")
     solvingtime_expr = re.compile("^Solution time: (.*)$")
-    dualbound_expr = re.compile("^     lower-bound: (.*)$")
+    #dualbound_expr = re.compile("^     lower-bound: (.*)$")
+    dualbound_expr = re.compile("^Objective value: (.*) - optimality proven")
     primalbound_expr = re.compile("^Objective value: (\S+)")
     nodes_expr = re.compile("Branch-and-Cut nodes: (.*)$")
 
@@ -946,7 +947,7 @@ class MipclSolver(Solver):
 
 
     def extractHistory(self, line : str):
-        """ Extract the sequence of primal bounds  
+        """ Extract the sequence of primal bounds
         """
         if not self.isTableLine(line):
             return

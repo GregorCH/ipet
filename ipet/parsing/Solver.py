@@ -840,7 +840,7 @@ class XpressSolver(Solver):
             self.readBoundAndTime(line, -4, -2)
 
     def extractStatus(self, line:str):
-        if self.getData(Key.SolverStatus) == Key.SolverStatusCodes.Crashed:
+        if self.getData(Key.SolverStatus) in [Key.SolverStatusCodes.Crashed, Key.SolverStatusCodes.Optimal]:
             Solver.extractStatus(self, line)
 
 # class CouenneSolver(Solver):
@@ -925,8 +925,8 @@ class MipclSolver(Solver):
     recognition_expr = re.compile("^MIPCL")
     version_expr = re.compile("^MIPCL version (.*)$")
     solvingtime_expr = re.compile("^Solution time: (.*)$")
-    #dualbound_expr = re.compile("^     lower-bound: (.*)$")
-    dualbound_expr = re.compile("^Objective value: (.*) - optimality proven")
+    dualbound_expr = re.compile("^     lower-bound: (.*)$")
+    #dualbound_expr = re.compile("^Objective value: (.*) - optimality proven")
     primalbound_expr = re.compile("^Objective value: (\S+)")
     nodes_expr = re.compile("Branch-and-Cut nodes: (.*)$")
 
@@ -946,9 +946,20 @@ class MipclSolver(Solver):
         super(MipclSolver, self).__init__(**kw)
 
 
+    def extractDualbound(self, line : str):
+        Solver.extractDualbound(self, line)
+        # Mipcl only reports a primal bound in case it solved to completion
+        if self.primalbound_expr.match(line) and re.search("optimality proven$", line):
+            self.extractByExpression(line, self.primalbound_expr, Key.DualBound)
+
+
+
     def extractHistory(self, line : str):
         """ Extract the sequence of primal bounds
         """
+
+        return
+
         if not self.isTableLine(line):
             return
 
@@ -989,7 +1000,7 @@ class NuoptSolver(Solver):
 
     solverstatusmap = {"^STATUS *OPTIMAL" : Key.SolverStatusCodes.Optimal,
                        "^STATUS *NON_OPTIMAL" : Key.SolverStatusCodes.TimeLimit,
-                       # "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "^\(NUOPT 16\) Infeasible MIP" : Key.SolverStatusCodes.Infeasible,
                        "^__STDIN__:\d+: \(MPS FILE \d+\)" : Key.SolverStatusCodes.Readerror,
                        "^(\<preprocess begin\>\.+)*\(NUOPT 12\)" : Key.SolverStatusCodes.MemoryLimit,
                        #                       "" : Key.SolverStatusCodes.NodeLimit,

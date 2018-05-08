@@ -1139,7 +1139,9 @@ class IPETEvaluation(IpetNode):
 
         df['_fail_'] = df['_primfail_'] | \
             df['_dualfail_'] | \
-            df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailReaderror, Key.ProblemStatusCodes.Fail])
+            df[Key.ProblemStatus].isin([Key.ProblemStatusCodes.FailReaderror,
+                                         Key.ProblemStatusCodes.FailInconsistent,
+                                         Key.ProblemStatusCodes.Fail])
 
         df['_abort_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.FailAbort)
 
@@ -1382,7 +1384,7 @@ class IPETEvaluation(IpetNode):
         write txt output
         """
         with open("%s.txt" % filebasename, "w") as txtfile:
-            df.to_string(txtfile, formatters = formatters, index_names = False)
+            df.to_string(txtfile, formatters = formatters, index_names = False, sparsify = False)
 
     def findStatus(self, statuscol):
         uniques = set(statuscol.unique())

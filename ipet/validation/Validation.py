@@ -69,6 +69,29 @@ class Validation:
 
         self.feastol = feastol
 
+    def set_tol(self, tol : float):
+        """sets this validation's tol attribute
+
+        Parameters
+        ----------
+
+        tol : float
+            new value for the tol for this validation
+        """
+        self.tol = tol
+
+    def set_feastol(self, feastol : float):
+        """sets this validation's feastol attribute
+
+        Parameters
+        ----------
+
+        feastol : float
+            new value for the feastol for this validation
+        """
+        self.feastol = feastol
+
+
     def connectToDataBase(self, databasefilename):
         """connects this validation to a data base
         """

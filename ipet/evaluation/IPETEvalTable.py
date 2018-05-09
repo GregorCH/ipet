@@ -705,11 +705,12 @@ class IPETEvaluation(IpetNode):
         self.columns = []
         self.sortlevel = int(sortlevel)
         self.evaluated = False
+        self.feastol = None
+        self.gaptol = None
 
         self.defaultgroup = defaultgroup
         self.set_indexsplit(indexsplit)
         self.set_index(index)
-
 
         self.set_validate(validate)
 
@@ -1070,6 +1071,27 @@ class IPETEvaluation(IpetNode):
         """
         self.validate = validate
 
+    def set_gaptol(self, gaptol):
+        """sets this evaluation's gaptol attribute
+
+        Parameters
+        ----------
+
+        gaptol : str or float
+            new value for the gaptol for this evaluation
+        """
+        self.gaptol = gaptol
+
+    def set_feastol(self, feastol):
+        """sets this evaluation's feastol attribute
+
+        Parameters
+        ----------
+
+        feastol : str or float
+            new value for the feastol for this evaluation
+        """
+        self.feastol = feastol
 
 
     def validateData(self, df : DataFrame) -> DataFrame:
@@ -1094,6 +1116,16 @@ class IPETEvaluation(IpetNode):
             v = Validation(self.validate)
         else:
             v = Validation(None)
+        if self.feastol:
+            try:
+                v.set_feastol(float(self.feastol))
+            except:
+                pass
+        if self.gaptol:
+            try:
+                v.set_tol(float(self.gaptol))
+            except:
+                pass
 
 
         result = v.validate(df)

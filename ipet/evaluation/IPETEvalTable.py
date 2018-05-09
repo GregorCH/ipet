@@ -1077,7 +1077,7 @@ class IPETEvaluation(IpetNode):
         Parameters
         ----------
 
-        gaptol : float
+        gaptol : str or float
             new value for the gaptol for this evaluation
         """
         self.gaptol = gaptol
@@ -1088,7 +1088,7 @@ class IPETEvaluation(IpetNode):
         Parameters
         ----------
 
-        feastol : float
+        feastol : str or float
             new value for the feastol for this evaluation
         """
         self.feastol = feastol
@@ -1117,9 +1117,15 @@ class IPETEvaluation(IpetNode):
         else:
             v = Validation(None)
         if self.feastol:
-            v.set_feastol(self.feastol)
+            try:
+                v.set_feastol(float(self.feastol))
+            except:
+                pass
         if self.gaptol:
-            v.set_tol(self.gaptol)
+            try:
+                v.set_tol(float(self.gaptol))
+            except:
+                pass
 
 
         result = v.validate(df)

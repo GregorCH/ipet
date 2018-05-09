@@ -69,7 +69,7 @@ class Validation:
 
         self.feastol = feastol
 
-    def set_tol(self, tol):
+    def set_tol(self, tol : float):
         """sets this validation's tol attribute
 
         Parameters
@@ -80,7 +80,7 @@ class Validation:
         """
         self.tol = tol
 
-    def set_feastol(self, feastol):
+    def set_feastol(self, feastol : float):
         """sets this validation's feastol attribute
 
         Parameters

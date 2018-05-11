@@ -492,16 +492,17 @@ class Validation:
 
     def validate(self, d : pd.DataFrame):
         """validates the solutions against external information and inconsistencies
-        
+
             Validation scans data twice:
-            
+
             1) Collection of inconsistencies (contradicting primal and dual bounds)
             2) Comparison against external validation information from solu file
-            
+
         Parameters
         d : DataFrame
             joined data from an experiment.
         """
+        logging.info("Validating with a (gap) tolerance of {} and a feasibility tolerance of {}.".format(self.tol, self.feastol))
 
         #
         # 1) collect inconsistencies

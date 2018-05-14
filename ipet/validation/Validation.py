@@ -147,6 +147,9 @@ class Validation:
         soludict = dict()
         with open(solufilename, "r") as solufile:
             for line in solufile:
+                if line.strip() == "":
+                    continue
+
                 spline = line.split()
                 marker = spline[0]
                 problemname = spline[1]

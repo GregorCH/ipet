@@ -507,7 +507,7 @@ class SCIPSolver(Solver):
         """Handle more than just the version
         """
         for keyword in ["mode", "LP solver", "GitHash"]:
-            data = re.search(r"SCIP.*\[%s: ([\w .-]+)\]" % keyword, line)
+            data = re.search(r'SCIP.*\[%s: ([^]]*)\]' % keyword, line)
             if data:
                 self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
         soplexhashmatch = self.soplexgithash_expr.match(line)

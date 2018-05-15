@@ -7,6 +7,17 @@ grapical interface that can later be loaded and reused on other
 data. Additional readers and evaluations are stored in
 xml-format which can be plugged into the evaluation method.
 
+If you find IPET useful for your work, it would be nice if you
+cite it using the following bibtex item:
+
+```
+@Misc{ipet,
+  Title                    = {{IPET} Interactive Performance Evaluation Tools},
+  Author                   = {Gregor Hendel},
+  HowPublished             = {\url{https://github.com/GregorCH/ipet}}
+}
+```
+
 # How to get IPET
 
 In the following installation instructions, we will assume that you clone the IPET repository by

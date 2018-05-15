@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
     # if globals().get("help") is not None:
     logger = logging.getLogger()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)7s - %(name)s - %(message)s')
     ch = logging.StreamHandler(sys.stdout)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
@@ -154,7 +154,7 @@ if __name__ == '__main__':
                 try:
                     _ = IPETEvaluation.fromXMLFile(_file)
                     evalfile = _file
-                    logging.info("No eval-file specified, using evaluation %s from current directory" % evalfile)
+                    logger.info("No eval-file specified, using evaluation %s from current directory" % evalfile)
                     break
                 except Exception as e:
                     print(e)
@@ -166,9 +166,9 @@ if __name__ == '__main__':
                 _ = IPETEvaluation.fromXMLFile(evalfile)
             except Exception as e:
                 print(e)
-                logging.info("No eval-file specified, and standard evaluation %s could not be loaded -- Stopping" % evalfile)
+                logger.info("No eval-file specified, and standard evaluation %s could not be loaded -- Stopping" % evalfile)
                 sys.exit(0)
-            logging.info("No eval-file specified, using standard evaluation %s" % evalfile)
+            logger.info("No eval-file specified, using standard evaluation %s" % evalfile)
     else:
         evalfile = arguments.evalfile
 
@@ -186,7 +186,7 @@ if __name__ == '__main__':
             if _file.endswith(".solu"):
                 validate = _file
                 theeval.set_validate(validate)
-                logging.info("No validation information specified, using '{}' from working directory".format(validate))
+                logger.info("No validation information specified, using '{}' from working directory".format(validate))
                 break
     elif arguments.validate:
         theeval.set_validate(arguments.validate)
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         experiment.addOutputFile(trfile)
 
     if arguments.recollect is not False:
-        logging.info("Recollecting data")
+        logger.info("Recollecting data")
         experiment.collectData()
         # TODO What was it about the validation?
         # if arguments.recheckTestrun:
@@ -229,20 +229,20 @@ if __name__ == '__main__':
 
     if arguments.externaldata is not None:
         experiment.addExternalDataFile(arguments.externaldata)
-        logging.info("Added external data file %s" % arguments.externaldata)
+        logger.info("Added external data file %s" % arguments.externaldata)
     else:
-        logging.info("No external data file")
+        logger.info("No external data file")
         experiment.externaldata = None
 
     if arguments.compformatstring is not None:
         theeval.setCompareColFormat(arguments.compformatstring)
 
     if arguments.keysearch is not None:
-        logging.info("Starting key enumeration")
+        logger.info("Starting key enumeration")
         for key in experiment.getDatakeys():
             if re.search(arguments.keysearch, key):
-                logging.info("    " + key)
-        logging.info("End key enumeration")
+                logger.info("    " + key)
+        logger.info("End key enumeration")
         exit(0)
 
     if arguments.showapp:
@@ -290,18 +290,18 @@ if __name__ == '__main__':
             instancewisename = "%s/%s%s" % (path, prefixstr, fg.name)
 
             theeval.streamDataFrame(theeval.getInstanceGroupData(fg), instancewisename, extension)
-            logging.info("Instance-wise data written to %s.%s" % (instancewisename, extension))
+            logger.info("Instance-wise data written to %s.%s" % (instancewisename, extension))
             aggname = instancewisename + "_agg"
             theeval.streamDataFrame(theeval.getAggregatedGroupData(fg), aggname, extension)
-            logging.info("aggregated data written to %s.%s" % (aggname, extension))
+            logger.info("aggregated data written to %s.%s" % (aggname, extension))
 
         filename = "%s/%s" % (path, "_".join((prefixstr, "inst_combined")) if prefixstr != "" else "inst_combined")
         theeval.streamDataFrame(rettab, filename, extension)
-        logging.info("combined instance data written to %s.%s" % (filename, extension))
+        logger.info("combined instance data written to %s.%s" % (filename, extension))
         # print the combined aggregated data if there are multiple filter groups present
         filename = "%s/%s" % (path, "_".join((prefixstr, "agg_combined")) if prefixstr != "" else "agg_combined")
         theeval.streamDataFrame(retagg, filename, extension)
-        logging.info("combined aggregated data written to %s.%s" % (filename, extension))
+        logger.info("combined aggregated data written to %s.%s" % (filename, extension))
 
     # print pd.concat([rettab, theeval.levelonedf], axis=1)
 

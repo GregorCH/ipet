@@ -21,7 +21,7 @@ from .StatisticReader_CustomReader import CustomReader
 from .TraceFileReader import TraceFileReader
 from ipet.concepts.Manager import Manager
 from ipet.concepts.IPETNode import IpetNode
-from ipet.parsing.Solver import Solver, SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, \
+from ipet.parsing.Solver import SCIPSolver, CbcSolver, XpressSolver, GurobiSolver, \
     CplexSolver, FiberSCIPSolver, MatlabSolver, MosekSolver, MipclSolver, NuoptSolver, SasSolver
 from ipet.misc import misc
 # CbcSolver, CouenneSolver, \
@@ -29,6 +29,8 @@ from ipet.misc import misc
 from ipet import Key
 from ipet.IPETError import IPETInconsistencyError
 from ipet.Key import CONTEXT_ERRFILE, CONTEXT_LOGFILE
+
+logger = logging.getLogger(__name__)
 
 class ReaderManager(Manager, IpetNode):
     """
@@ -82,7 +84,7 @@ class ReaderManager(Manager, IpetNode):
 
     def addSolver(self, solver):
         self.solvers.append(solver)
-        logging.debug("Added a solver: {}".format(solver.getName()))
+        logger.debug("Added a solver: {}".format(solver.getName()))
 
     def getName(self):
         """
@@ -124,7 +126,7 @@ class ReaderManager(Manager, IpetNode):
         """
         changes the testrun for reading to the new testrun
         """
-        logging.debug("Setting testrun to %s" % testrun.getName())
+        logger.debug("Setting testrun to %s" % testrun.getName())
         self.testrun = testrun
         for reader in self.getManageables():
             reader.setTestRun(testrun)
@@ -300,9 +302,9 @@ class ReaderManager(Manager, IpetNode):
                     try:
                         self.updateProblemName(line, context, readers)
                     except IPETInconsistencyError as e:
-                        logging.warning(e.msg)
+                        logger.warning(e.msg)
                         if context == CONTEXT_ERRFILE:
-                            logging.warning("Skipping parsing of the rest of the .err file.")
+                            logger.warning("Skipping parsing of the rest of the .err file.")
                             break
 
                 if self.endOfProblemReached(line[1]):

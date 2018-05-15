@@ -14,6 +14,8 @@ from ipet.misc import FLOAT_INFINITY
 from ipet import Key
 import logging
 
+logger = logging.getLogger(__name__)
+
 class TraceFileReader(StatisticReader):
     """
     classdocs
@@ -51,7 +53,7 @@ class TraceFileReader(StatisticReader):
             probname = splitline[0]
             datavalues = list(map(self.prepareData, splitline[1:]))
 
-            logging.debug("Trace File Reader adds data for problem %s", probname)
+            logger.debug("Trace File Reader adds data for problem %s", probname)
             self.testrun.addDataByName(self.datakeys, datavalues, probname)
 
 

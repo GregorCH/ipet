@@ -16,6 +16,8 @@ import logging
 import pandas as pd
 from ipet.evaluation import TestSets
 
+logger = logging.getLogger(__name__)
+
 class IPETValue(IpetNode):
     nodetag = "Value"
 
@@ -92,7 +94,7 @@ class IPETComparison:
         try:
             return method(x, y)
         except TypeError as t:
-            logging.error("Got type error %s comparing elements x:%s and y:%s" % (t, x, y))
+            logger.error("Got type error %s comparing elements x:%s and y:%s" % (t, x, y))
             return 0
 
     def method_le(self, x, y):
@@ -241,10 +243,10 @@ class IPETFilter(IpetNode):
         for i in self.valueset:
 
             if i in TestSets.getTestSets():
-                logging.debug("Adding test set {} to value set".format(i))
+                logger.debug("Adding test set {} to value set".format(i))
                 updateset = updateset.union(set(TestSets.getTestSetByName(i)))
         self.valueset = self.valueset.union(updateset)
-        logging.debug("Complete value set of filter {}:\n{}".format(self.getName(), self.valueset))
+        logger.debug("Complete value set of filter {}:\n{}".format(self.getName(), self.valueset))
 
         self._updatevalueset = False
 
@@ -254,7 +256,7 @@ class IPETFilter(IpetNode):
 
         self.checkAndUpdateValueSet(dtype)
         contained = df.isin(self.valueset)
-        logging.debug("Contained: {}\nData: {}".format(contained, df))
+        logger.debug("Contained: {}\nData: {}".format(contained, df))
         if self.operator == "keep":
             return contained
         else:
@@ -592,7 +594,7 @@ class IPETFilterGroup(IpetNode):
         filter groups with the intersection type.
         """
 
-        logging.info("Computing rows for intersection groups")
+        logger.info("Computing rows for intersection groups")
 
         dfindex = df.set_index(index).index
 

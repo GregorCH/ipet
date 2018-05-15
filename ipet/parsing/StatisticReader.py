@@ -16,6 +16,8 @@ from ipet.misc import misc
 from ipet import Key
 import logging
 
+logger = logging.getLogger(__name__)
+
 class StatisticReader(IpetNode):
     """
     base class for all statistic readers - readers should always inherit from this base class for minimal implementation
@@ -115,7 +117,7 @@ class StatisticReader(IpetNode):
         self.extractStatistic(line)
 
     def addData(self, datakey, data):
-        logging.debug("Reader %s adds data" % (self.getName()))
+        logger.debug("Reader %s adds data" % (self.getName()))
         self.testrun.addData(datakey, data)
 
     def turnIntoFloat(self, astring):

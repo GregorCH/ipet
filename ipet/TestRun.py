@@ -12,14 +12,14 @@ please refer to README.md for how to cite IPET.
 from ipet import Key
 from ipet import misc
 from pandas import DataFrame, notnull
-from ipet.parsing import StatisticReader
 import os, sys
 import logging
-import pandas as pd
 from ipet.Key import CONTEXT_LOGFILE
 from ipet.validation import Validation
 # from lib2to3.fixes.fix_input import context
 # from matplotlib.tests import test_lines
+
+logger = logging.getLogger(__name__)
 
 try:
     import pickle as pickle
@@ -132,7 +132,7 @@ class TestRun:
         readers can use this method to add data, either as a single datakey, or as list,
         where in the latter case it is required that datakeys and data are both lists of the same length
         """
-        logging.debug("TestRun %s receives data Datakey %s, %s" % (self.getName(), repr(datakey), repr(data)))
+        logger.debug("TestRun %s receives data Datakey %s, %s" % (self.getName(), repr(datakey), repr(data)))
 
         if type(datakey) is list and type(data) is list:
             for key, datum in zip(datakey, data):
@@ -157,7 +157,7 @@ class TestRun:
         after data was added, the method getProblemDataById() can be used for access if a problemid was given
         """
         # check for the right dictionary to store the data
-        logging.debug("TestRun %s receives data Datakey %s, %s to problem %s" % (self.getName(), repr(datakeys), repr(data), problemid))
+        logger.debug("TestRun %s receives data Datakey %s, %s to problem %s" % (self.getName(), repr(datakeys), repr(data), problemid))
 
         if type(datakeys) is list and type(data) is list:
             for key, datum in zip(datakeys, data):

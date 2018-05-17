@@ -11,6 +11,9 @@ please refer to README.md for how to cite IPET.
 """
 from ipet.concepts.Editable import Editable, EditableAttributeError
 import logging
+
+logger = logging.getLogger(__name__)
+
 class IpetNode(Editable):
     """
     A Node is an interface to an XML-like ancestor-structure
@@ -31,7 +34,7 @@ class IpetNode(Editable):
 
         for d, message in self.deprecatedattrdir.items():
             if d in kw:
-                logging.warning("Warning : The attribute '{0}' is deprecated and will be ignored; {1}. ".format(d, message))
+                logger.warning("Warning : The attribute '{0}' is deprecated and will be ignored; {1}. ".format(d, message))
 
     def addChild(self, child):
         """

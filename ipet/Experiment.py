@@ -13,7 +13,6 @@ from ipet import misc, Key
 from .TestRun import TestRun
 from ipet.concepts.Manager import Manager
 from ipet.misc.integrals import calcIntegralValue, getProcessPlotData
-from ipet.parsing import ErrorFileReader, BestSolInfeasibleReader, ObjlimitReader, ObjsenseReader
 from ipet.parsing.ReaderManager import ReaderManager
 from pandas import Panel
 
@@ -22,8 +21,9 @@ import pickle
 import os
 import sys
 import logging
-from ipet.Key import SolverStatusCodes
 from ipet.validation import Validation
+
+logger = logging.getLogger(__name__)
 
 class Experiment:
     """
@@ -172,8 +172,8 @@ class Experiment:
         try:
             self.externaldata = pd.read_table(filename, sep = " *", engine = 'python', header = 1, skipinitialspace = True)
             self.updateDatakeys()
-            logging.debug("Experiment read external data file %s" % filename)
-            logging.debug("%s" % self.externaldata.head(5))
+            logger.debug("Experiment read external data file %s" % filename)
+            logger.debug("%s" % self.externaldata.head(5))
         except:
             raise ValueError("Error reading file name %s" % filename)
 
@@ -265,18 +265,18 @@ class Experiment:
                 if processplotdata:
                     try:
                         testrun.addDataById(Key.PrimalIntegral, calcIntegralValue(processplotdata), problemid)
-                        logging.debug("Computed primal integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'PrimalIntegral'), problemid, repr(processplotdata)))
+                        logger.debug("Computed primal integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'PrimalIntegral'), problemid, repr(processplotdata)))
                     except AssertionError:
-                        logging.error("Error for primal bound on problem %s, list: %s" % (problemid, processplotdata))
+                        logger.error("Error for primal bound on problem %s, list: %s" % (problemid, processplotdata))
 
                 processplotdata = getProcessPlotData(testrun, problemid, reference = self.validation.getReferenceDb(problemname), **dualargs)
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     try:
                         testrun.addDataById(Key.DualIntegral, calcIntegralValue(processplotdata, pwlinear = True), problemid)
-                        logging.debug("Computed dual integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'DualIntegral'), problemid, repr(processplotdata)))
+                        logger.debug("Computed dual integral %.1f for problem %s, data %s" % (testrun.getProblemDataById(problemid, 'DualIntegral'), problemid, repr(processplotdata)))
                     except AssertionError:
-                        logging.error("Error for dual bound on problem %s, list: %s " % (problemid, processplotdata))
+                        logger.error("Error for dual bound on problem %s, list: %s " % (problemid, processplotdata))
 
 
 

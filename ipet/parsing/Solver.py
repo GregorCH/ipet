@@ -8,6 +8,8 @@ from builtins import int, str
 import logging
 from numpy import char
 
+logger = logging.getLogger(__name__)
+
 class Solver():
     """ The solver-class acts as Reader for solver-specific data.
 
@@ -219,7 +221,7 @@ class Solver():
         history = self.data.setdefault(key, [])
         # only append newly found bounds
 
-        logging.debug("pointinTime %s, bound %s, key %s \n" % (timestr, boundstr, key))
+        logger.debug("pointinTime %s, bound %s, key %s \n" % (timestr, boundstr, key))
         if history == [] or history[-1][1] != bound:
             if(key == Key.PrimalBoundHistory):
                 history.append((time, bound))

@@ -11,7 +11,8 @@ from ipet.misc import isInfinite as isInf
 import numpy as np
 import logging
 import sqlite3
-from pandas.core.series import Series
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_RELTOL = 1e-4
 DEFAULT_FEASTOL = 1e-6
@@ -106,7 +107,7 @@ class Validation:
             for name, objsense, primbound, dualbound, status in c:
 
                 if name in soludict:
-                    logging.warning("Warning: Duplicate name {} with different data in data base".format(name))
+                    logger.warning("Warning: Duplicate name {} with different data in data base".format(name))
 
                 infotuple = [None, None]
                 if status == DataBaseMarkers.OPT:
@@ -274,7 +275,7 @@ class Validation:
         elif not pd.isnull(x.get(Key.ObjectiveSense, None)):
             return x.get(Key.ObjectiveSense)
         else:
-            logging.warning("No objective sense for {}, assuming minimization".format(problemname))
+            logger.warning("No objective sense for {}, assuming minimization".format(problemname))
             return ObjectiveSenseCode.MINIMIZE
 
     def validateSeries(self, x : pd.Series) -> str:
@@ -505,7 +506,7 @@ class Validation:
         d : DataFrame
             joined data from an experiment.
         """
-        logging.info("Validating with a (gap) tolerance of {} and a feasibility tolerance of {}.".format(self.tol, self.feastol))
+        logger.info("Validating with a (gap) tolerance of {} and a feasibility tolerance of {}.".format(self.tol, self.feastol))
 
         #
         # 1) collect inconsistencies

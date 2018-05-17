@@ -25,6 +25,9 @@ from numpy import isnan
 from ipet.evaluation.IPETFilter import IPETValue
 from ipet.misc.misc import meanOrConcat
 from ipet.validation import Validation
+import sys
+
+logger = logging.getLogger(__name__)
 
 class IPETEvaluationColumn(IpetNode):
 
@@ -452,8 +455,7 @@ class IPETEvaluationColumn(IpetNode):
                     result = df_long[self.origcolname]
                 except KeyError as e:
                     # print an error message and make a series with NaN's
-                    print(e)
-                    logging.warning("Could not retrieve data %s" % self.origcolname)
+                    logger.warning("Could not retrieve data %s" % self.origcolname)
                     result = pd.Series(numpy.nan, index = df_long.index)
 
             #
@@ -516,7 +518,7 @@ class IPETEvaluationColumn(IpetNode):
                     try:
                         result = numpy.maximum(result, comp)
                     except:
-                        logging.warning("When filling in the minimum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
+                        logger.warning("When filling in the minimum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
                         result = pd.concat([result, comp], axis = 1).max(axis = 1)
         if self.maxval is not None:
             maxval = self.parseValue(self.maxval, df_long)
@@ -528,7 +530,7 @@ class IPETEvaluationColumn(IpetNode):
                     try:
                         result = numpy.minimum(result, comp)
                     except:
-                        logging.warning("When filling in the maximum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
+                        logger.warning("When filling in the maximum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
                         result = pd.concat([result, comp], axis = 1).min(axis = 1)
         reductionindex = self.getReductionIndex(evalindexcols)
 
@@ -791,7 +793,7 @@ class IPETEvaluation(IpetNode):
         self.autoIndex = False
         self.index = index
         self._index = StrTuple(index)
-        logging.debug("Set index to '{}'".format(index))
+        logger.debug("Set index to '{}'".format(index))
         if index == "auto":
             self.autoIndex = True
             return
@@ -867,7 +869,7 @@ class IPETEvaluation(IpetNode):
             string representation of the defaultgroup in format "val1:val2:val3", or None
         """
         self.defaultgroup = dg
-        logging.debug("Set defaultgroup to {}".format(self.defaultgroup))
+        logger.debug("Set defaultgroup to {}".format(self.defaultgroup))
         self.setEvaluated(False)
 
     def set_indexsplit(self, indexsplit):
@@ -880,7 +882,7 @@ class IPETEvaluation(IpetNode):
         except:
             pass
         if indexsplitmod == 0:
-            logging.warning("Indexsplit 0 is not allowed, setting it to 1.")
+            logger.warning("Indexsplit 0 is not allowed, setting it to 1.")
             self.indexsplit = 1;
 
     def addColumn(self, col):
@@ -995,9 +997,9 @@ class IPETEvaluation(IpetNode):
             try:
                 df_long, df_target, _ = col.getColumnData(df_long, df_target, evalindexcols)
             except Exception as e:
-                logging.warning("An error occurred for the column '{}':\n{}".format(col.getName(), col.attributesToStringDict()))
+                logger.warning("An error occurred for the column '{}':\n{}".format(col.getName(), col.attributesToStringDict()))
                 raise e
-            logging.debug("Target data frame : \n{}\n".format(df_target))
+            logger.debug("Target data frame : \n{}\n".format(df_target))
 
         newcols = [Key.ProblemStatus, Key.SolvingTime, Key.TimeLimit, Key.ProblemName]
 
@@ -1021,7 +1023,7 @@ class IPETEvaluation(IpetNode):
         adj = self.getDependencies(columns)
 
         toposorted = list(toposort(adj))
-        logging.debug("TOPOSORT:\nDependency List: {},\nTopological Ordering: {}".format(adj, toposorted))
+        logger.debug("TOPOSORT:\nDependency List: {},\nTopological Ordering: {}".format(adj, toposorted))
         def getIndex(name, toposorted):
             for idx, topo in enumerate(toposorted):
                 if name in topo: return idx
@@ -1100,17 +1102,17 @@ class IPETEvaluation(IpetNode):
 
         if not self.validate:
 
-            logging.info("No validation information specified")
+            logger.info("No validation information specified")
             file_exists = False
         else:
             try:
                 f = open(self.validate, "r")
                 f.close()
                 file_exists = True
-                logging.info("Validation information provided: '{}'".format(self.validate))
+                logger.info("Validation information provided: '{}'".format(self.validate))
             except:
                 file_exists = False
-                logging.warning("Could not open solu file '{}' for validation".format(self.validate))
+                logger.warning("Could not open solu file '{}' for validation".format(self.validate))
 
         if file_exists:
             v = Validation(self.validate)
@@ -1130,8 +1132,8 @@ class IPETEvaluation(IpetNode):
 
         result = v.validate(df)
 
-        logging.info("Validation resulted in the following status codes:\n\n{}\n".format(
-            result.value_counts()))
+        logger.info("Validation resulted in the following status codes: [{}]".format(
+            "|".join([" {}: {} ".format(k, v) for k, v in result.value_counts().items()])))
 
         df[Key.ProblemStatus] = result
 
@@ -1206,7 +1208,7 @@ class IPETEvaluation(IpetNode):
     @staticmethod
     def processXMLElem(elem):
         if elem.tag == IPETEvaluation.getNodeTag():
-            logging.debug("Construct IPET Evaluation with attributes : \n{}".format(elem.attrib))
+            logger.debug("Construct IPET Evaluation with attributes : \n{}".format(elem.attrib))
             ev = IPETEvaluation(**elem.attrib)
 
         for child in elem:
@@ -1408,7 +1410,7 @@ class IPETEvaluation(IpetNode):
             # and the tool that gets the csv as input can handle
             # the final formatting.
             #
-            logging.warn("Warning. Custom formatting ignored for csv output")
+            logger.warn("Warning. Custom formatting ignored for csv output")
             df.to_csv(csvfile)
 
     def streamDataFrame_txt(self, df : DataFrame, filebasename, formatters = {}):
@@ -1547,7 +1549,7 @@ class IPETEvaluation(IpetNode):
         # set everything
         self.indexsplit = 1
         self.set_index(" ".join([i[0] for i in [first] + second]))
-        logging.info("Automatically set index to ({}, {})".format(self.getRowIndex(), self.getColIndex()))
+        logger.info("Automatically set index to ({}, {})".format(self.getRowIndex(), self.getColIndex()))
 
     def evaluate(self, exp : Experiment):
         """
@@ -1570,40 +1572,40 @@ class IPETEvaluation(IpetNode):
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData().copy()
 
-        logging.debug("Result of getJoinedData:\n{}\n".format(data))
+        logger.debug("Result of getJoinedData:\n{}\n".format(data))
 
         self.tryGenerateIndexAndDefaultgroup(data)
 
 #            possiblebasegroups = sorted(data[self.getColIndex()[0]].unique())
-#            logging.info(" Default group <%s> not contained, have only: %s" % (self.getDefaultgroup(), ", ".join(possiblebasegroups)))
+#            logger.info(" Default group <%s> not contained, have only: %s" % (self.getDefaultgroup(), ", ".join(possiblebasegroups)))
 #            self.defaultgrouptuple = possiblebasegroups[0]
-#            logging.info(" Using value <%s> as base group" % (self.getDefaultgroup()))
+#            logger.info(" Using value <%s> as base group" % (self.getDefaultgroup()))
 
         data = self.validateData(data)
 
         data = self.calculateNeededData(data)
-        logging.debug("Result of calculateNeededData:\n{}\n".format(data))
+        logger.debug("Result of calculateNeededData:\n{}\n".format(data))
         #
         # create a target data frame that has the desired index
         #
         reduceddata = self.reduceByIndex(data)
 
         reduceddata = self.reduceToColumns(data, reduceddata)
-        logging.debug("Result of reduceToColumns:\n{}\n".format(reduceddata))
+        logger.debug("Result of reduceToColumns:\n{}\n".format(reduceddata))
 
         reduceddata = self.addComparisonColumns(reduceddata)
 
 
         # compile a long table with the requested row and column indices
         ret = self.convertToHorizontalFormat(reduceddata)
-        logging.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
+        logger.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
 
         self.rettab = ret
 
         # TODO Where do we need these following three lines?
         self.instance_wise = ret
         self.agg = self.aggregateToPivotTable(reduceddata)
-        logging.debug("Result of aggregateToPivotTable:\n{}\n".format(self.agg))
+        logger.debug("Result of aggregateToPivotTable:\n{}\n".format(self.agg))
 
         self.filtered_agg = {}
         self.filtered_instancewise = {}
@@ -1622,9 +1624,9 @@ class IPETEvaluation(IpetNode):
             filtergroupdata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
             if (len(filtergroupdata) == 0):
                 nonemptyactivefiltergroups.remove(fg)
-                logging.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
+                logger.warning("Filtergroup {} is empty and has been deactived.".format(fg.getName()))
                 continue
-            logging.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), filtergroupdata))
+            logger.debug("Reduced data for filtergroup {} is:\n{}".format(fg.getName(), filtergroupdata))
             self.filtered_instancewise[fg.name] = self.convertToHorizontalFormat(filtergroupdata)
             self.filtered_agg[fg.name] = self.aggregateToPivotTable(filtergroupdata)
 
@@ -1685,7 +1687,7 @@ class IPETEvaluation(IpetNode):
         # test if there is any aggregation to be calculated
         activecolumns = self.getActiveColumns()
         colsandaggregations = [(col, agg) for col in activecolumns for agg in col.aggregations]
-        logging.debug("Cols and aggregations:\n".format([(c.getName(), a.getName()) for (c, a) in colsandaggregations]))
+        logger.debug("Cols and aggregations:\n".format([(c.getName(), a.getName()) for (c, a) in colsandaggregations]))
 
         # if no aggregation was specified, return only the general part
         if len(colsandaggregations) == 0:
@@ -1716,7 +1718,7 @@ class IPETEvaluation(IpetNode):
             return ret
         else:
             # determine the row in the aggregated table corresponding to the default group
-            logging.debug("Index of colaggpart:\n{}".format(colaggpart.index))
+            logger.debug("Index of colaggpart:\n{}".format(colaggpart.index))
 
             dg = self.getDefaultgroup(df)
             if dg in colaggpart.index:
@@ -1743,7 +1745,7 @@ class IPETEvaluation(IpetNode):
             # glue the parts together
             parts = [generalpart, colaggpart, comppart]
 
-            logging.debug("Statspart : \n{}".format(statspart))
+            logger.debug("Statspart : \n{}".format(statspart))
             if statspart is not None:
                 parts.append(statspart)
 
@@ -1768,7 +1770,7 @@ class IPETEvaluation(IpetNode):
             try:
                 defaultvalues = groupeddata[dg][col.getName()].reset_index(drop = True)
             except KeyError:
-                logging.info("Sorry, cannot retrieve default values for column %s, key %s for applying statistical test)" % (col.getName(), self.getDefaultgroup(df)))
+                logger.info("Sorry, cannot retrieve default values for column %s, key %s for applying statistical test)" % (col.getName(), self.getDefaultgroup(df)))
                 continue
 
             # iterate through the stats tests associated with each column
@@ -1824,7 +1826,7 @@ class IPETEvaluation(IpetNode):
             # filter already has a stored result
             #
             if f.equals(previous_f) and stored_result is not None:
-                logging.debug("Reusing previously stored result for filter {}".format(f.getName()))
+                logger.debug("Reusing previously stored result for filter {}".format(f.getName()))
                 fcol = stored_result
             else:
                 fcol = f.applyFilter(df, self.getRowIndex())

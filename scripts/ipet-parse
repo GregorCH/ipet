@@ -94,7 +94,6 @@ argparser.add_argument("--docmode", action = "store_true", default = False, help
 
 if __name__ == '__main__':
 
-
     try:
         arguments = argparser.parse_args()
     except:
@@ -103,7 +102,7 @@ if __name__ == '__main__':
         exit()
     # if globals().get("help") is not None:
     logger = logging.getLogger()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)7s - %(name)s - %(message)s')
     ch = logging.StreamHandler(sys.stdout)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
@@ -121,7 +120,7 @@ if __name__ == '__main__':
         logger.setLevel(logging.ERROR)
 
     if arguments.logfiles is None:
-        logging.info("No testruns specified, exiting")
+        logger.info("No testruns specified, exiting")
         sys.exit(0)
 
     # initialize an experiment
@@ -130,17 +129,17 @@ if __name__ == '__main__':
     for reader in loader.loadAdditionalReaders(arguments.readers):
 
         experiment.readermanager.registerReader(reader)
-        logging.info("Registered reader with name %s" % reader.getName())
+        logger.info("Registered reader with name %s" % reader.getName())
 
     for solver in loader.loadAdditionalSolvers():
         experiment.readermanager.addSolver(solver)
-        logging.info("Registered solver with name %s" % solver.getName())
+        logger.info("Registered solver with name %s" % solver.getName())
 
     for solufile in loader.loadAdditionalSolufiles(arguments.solufiles):
         experiment.addSoluFile(solufile)
-        logging.info("Imported solufile with name %s" % solufile)
+        logger.info("Imported solufile with name %s" % solufile)
 
-    logging.info("Start parsing process")
+    logger.info("Start parsing process")
 
     if type(arguments.logfiles) != io.TextIOWrapper:
         for logfile in arguments.logfiles:
@@ -154,9 +153,9 @@ if __name__ == '__main__':
                 filename = tr.filenames[0]
                 newfilename = "%s%s" % (os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
                 tr.saveToFile(newfilename)
-                logging.info("converted %s --> %s" % (filename, newfilename))
+                logger.info("converted %s --> %s" % (filename, newfilename))
             except:
-                logging.info("skipped testrun %s" % tr.getIdentification())
+                logger.info("skipped testrun %s" % tr.getIdentification())
     else:
         experiment.addStdinput()
         experiment.collectData()

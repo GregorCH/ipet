@@ -16,6 +16,8 @@ import logging
 from ipet import misc
 from ipet.concepts.IPETNode import IpetNode
 
+logger = logging.getLogger(__name__)
+
 class CustomReader(StatisticReader):
     """
     Reader to be initialised interactively through IPET or from an interactive python shell
@@ -140,7 +142,7 @@ class CustomReader(StatisticReader):
                         self.addData(self.datakey, data)
 
             except:
-                logging.debug("Reader %s could not retrieve data at index %d from matching line '%s'", self.getName(), self.index, line)
+                logger.debug("Reader %s could not retrieve data at index %d from matching line '%s'", self.getName(), self.index, line)
                 pass
 
 
@@ -154,7 +156,7 @@ class CustomReader(StatisticReader):
             self.datatypemethod = getattr(builtins, sometype)
             self.datatype = sometype
         except:
-            logging.debug("Error: Could not recognize data type %s, using float" % sometype)
+            logger.debug("Error: Could not recognize data type %s, using float" % sometype)
             self.datatypemethod = float
             self.datatype = 'float'
     def set_datatype(self, datatype):

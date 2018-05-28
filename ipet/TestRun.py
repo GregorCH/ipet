@@ -221,6 +221,9 @@ class TestRun:
             for key in self.metadatadict.keys():
                 self.addData(key, self.metadatadict[key])
 
+            if "ProblemName" in self.metadatadict:
+                del self.metadatadict["ProblemName"]
+
 
 
             for key in self.currentproblemdata.keys():

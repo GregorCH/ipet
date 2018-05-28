@@ -679,6 +679,20 @@ class GurobiSolver(Solver):
             self.gurobiextralist = []
         return None
 
+    def extractPrimalbound(self, line : str):
+        """overrides method in super class Solver
+
+        Gurobi may report the best objective of the barrier algorithm, which needs to
+        overridden by the MIP result
+        """
+
+        # delete any previous matching line
+        if self.primalbound_expr.match(line):
+            self.deleteData(Key.PrimalBound)
+
+        # invoke primal bound extraction of super class
+        super(GurobiSolver, self).extractPrimalbound(line)
+
     def extractOptionalInformation(self, line : str):
         if "Explored " in line and "simplex iterations" in line:
             nnodes = line.split()[1]

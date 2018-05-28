@@ -212,6 +212,7 @@ class TestRun:
         if self.currentproblemdata != {}:
             # Add data collected by solver into currentproblemdata, such as primal and dual bound,
             if context == CONTEXT_LOGFILE:
+                solver.cleanupData()
                 self.addData(*solver.getData())
 
                 problemstatus = self.validation.validateSeries(self.currentproblemdata)

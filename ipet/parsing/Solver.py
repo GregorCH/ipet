@@ -38,6 +38,12 @@ class Solver():
 
     objsensemap = {}
 
+    codes_nobound = set(
+        [Key.SolverStatusCodes.Crashed,
+         Key.SolverStatusCodes.Readerror,
+         Key.SolverStatusCodes.Infeasible]
+    )
+
     def __init__(self,
                  solverId = None,
                  recognition_pattern = None,
@@ -196,11 +202,14 @@ class Solver():
         """
         self.data[key] = datum
 
-    def deleteData(self, key : str):
+    def deleteData(self, key : str) -> bool:
         """Delete data from local data dictionary
         """
         if key in self.data:
             del self.data[key]
+            return True
+
+        return False
 
 
     def addHistoryData(self, key, timestr : str, boundstr : str):
@@ -337,6 +346,17 @@ class Solver():
             a line of solver output that the information shall be read from
         """
         return self.recognition_expr.match(line) != None
+
+    def cleanupData(self):
+        """Clean up data
+
+        The cleanup step deletes potentially wrong data from the solver
+        """
+
+        # delete primal and dual bounds if the solver status is infeasible, read error, or crashed
+        if self.getData(Key.SolverStatus) in self.codes_nobound:
+            self.deleteData(Key.PrimalBound)
+            self.deleteData(Key.DualBound)
 
     def getData(self, datakey = None):
         """Return data stored under datakey
@@ -844,6 +864,27 @@ class XpressSolver(Solver):
     def extractStatus(self, line:str):
         if self.getData(Key.SolverStatus) in [Key.SolverStatusCodes.Crashed, Key.SolverStatusCodes.Optimal]:
             Solver.extractStatus(self, line)
+
+    def cleanupData(self):
+        """Clean up Xpress solver data
+
+        in addition to the clean up step of the solver class, the dual bound reported by XPress
+        can be wrong in that it exceeds the primal bound. In that case, the primal bound is
+        taken as a reference and the dual bound is adapted.
+        """
+
+        super(XpressSolver, self).cleanupData()
+
+        pb = self.getData(Key.PrimalBound)
+        db = self.getData(Key.DualBound)
+
+        if  pb is not None and db is not None:
+            if self.getData(Key.ObjectiveSense) == Key.ObjectiveSenseCode.MAXIMIZE:
+                db = max(db, pb)
+            elif self.getData(Key.ObjectiveSense) == Key.ObjectiveSenseCode.MINIMIZE:
+                db = min(db, pb)
+
+            self.addData(Key.DualBound, db)
 
 # class CouenneSolver(Solver):
 #

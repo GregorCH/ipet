@@ -453,3 +453,33 @@ class ListReader(StatisticReader):
         data = self.getLineData(line)
         if data is not None:
             self.addData(data[0], data[1])
+
+class SolCheckerReader(StatisticReader):
+    """reads the solution checker output, if available, that can be used for validation
+
+    The output looks like this
+Read MPS: 1
+MIP has 49606 vars and 26069 constraints
+Read SOL: 1
+Objective value computed by solver: 82895.99999986154
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 3.902288396999999e-06 Constraints 2.81133904261283e-05 Objective 1.47339791e-12
+    """
+    name = "SolCheckerReader"
+
+    def extractStatistic(self, line : str):
+        if line.startswith("Read SOL: 1"):
+            self.addData(Key.SolCheckerRead, True)
+        elif line.startswith("Read SOL: 0"):
+            self.addData(Key.SolCheckerRead, False)
+
+        if line.startswith("Check SOL: Integrality 1 Constraints 1 Objective 1"):
+            self.addData(Key.SolCheckerFeas, True)
+        elif line.startswith("Check SOL:"):
+            self.addData(Key.SolCheckerFeas, False)
+

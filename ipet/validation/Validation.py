@@ -217,6 +217,18 @@ class Validation:
             series or dictionary representing single instance information
         """
 
+        #
+        # respect solution checker output, if it exists
+        #
+        if x.get(Key.SolCheckerRead) is not None:
+            if x.get(Key.SolCheckerRead):
+                if x.get(Key.SolCheckerFeas):
+                    return False
+                else:
+                    return True
+
+
+
         # compute the maximum violation of constraints, LP rows, bounds, and integrality
         maxviol = max((x.get(key, 0.0) for key in [Key.ViolationBds, Key.ViolationCons, Key.ViolationInt, Key.ViolationLP]))
 

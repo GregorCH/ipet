@@ -78,6 +78,12 @@ ViolationInt = "Viol_Int"
 ViolationLP = "Viol_LP"
 ViolationCons = "Viol_Cons"
 
+#
+# sol checker output (optional)
+#
+SolCheckerFeas = "SolCheckerFeas"
+SolCheckerRead = "SolCheckerRead"
+
 
 class SolverStatusCodes:
     """ The reason why a solver stopped its calculation.

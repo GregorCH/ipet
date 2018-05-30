@@ -1,5 +1,8 @@
-### Author ###
+### Authors ###
+
 Gregor Hendel, Zuse Institute Berlin, hendel@zib.de
+
+Franziska Schlösser, Zuse Institute Berlin, schloesser@zib.de
 
 ### Acknowledgments ###
 

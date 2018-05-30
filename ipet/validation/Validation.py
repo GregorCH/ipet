@@ -488,6 +488,10 @@ class Validation:
         if self.isReferenceConsistent(x) != ProblemStatusCodes.Ok:
             return
 
+        # do not trust versions/settings/solvers that returned an infeasible solution
+        if self.isSolInfeasible(x):
+            return
+
         bestpb = self.bestpb.get(problemname, np.inf if obs == ObjectiveSenseCode.MINIMIZE else -np.inf)
         bestpb = min(bestpb, pb) if obs == ObjectiveSenseCode.MINIMIZE else max(bestpb, pb)
 

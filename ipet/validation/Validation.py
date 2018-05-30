@@ -483,7 +483,7 @@ class Validation:
 
         #
         # for inconsistency checks, we only consider problems that are consistent
-        # with the solu file.
+        # with the reference information.
         #
         if self.isReferenceConsistent(x) != ProblemStatusCodes.Ok:
             return

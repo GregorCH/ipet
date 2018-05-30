@@ -32,6 +32,9 @@ best_good = "best_good"
 best_pbad = "best_pbad"
 best_dbad = "best_dbad"
 
+# instances for which no reference exists for which both solvers consistently report infeasibility
+both_infeasible = "both_infeasible"
+
 # instances that crashed
 opt_abort = "opt_abort"
 opt_readerror = "opt_readerror"
@@ -126,7 +129,9 @@ class ValidationTest(unittest.TestCase):
                 (opt_bad, 89, 89, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent),
                 (part_inconsistent, 12, 12, osc.MINIMIZE, ssc.Optimal, psc.FailDualBound),
                 (part_inconsistent, 10, 10, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent),
-                (part_inconsistent, 9, 9, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent)
+                (part_inconsistent, 9, 9, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent),
+                (both_infeasible, numpy.nan, numpy.nan, osc.MAXIMIZE, ssc.Infeasible, psc.Ok),
+                (both_infeasible, numpy.nan, numpy.nan, osc.MAXIMIZE, ssc.Infeasible, psc.Ok),
                 ],
             columns = [Key.ProblemName, Key.PrimalBound, Key.DualBound, Key.ObjectiveSense, Key.SolverStatus, "Status"])
 
@@ -137,6 +142,7 @@ class ValidationTest(unittest.TestCase):
         v.collectInconsistencies(d)
 
         self.assertNotIn(opt_good, v.inconsistentset, "{} wrongly appears as inconsistent".format(opt_good))
+        self.assertNotIn(both_infeasible, v.inconsistentset, "{} wrongly appears as inconsistent".format(both_infeasible))
         self.assertIn(opt_bad, v.inconsistentset, "{} should be inconsistent".format(opt_bad))
         self.assertIn(part_inconsistent, v.inconsistentset, "{} should be inconsistent".format(part_inconsistent))
 

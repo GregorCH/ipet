@@ -711,8 +711,8 @@ class IPETEvaluation(IpetNode):
         self.gaptol = None
 
         self.defaultgroup = defaultgroup
-        self.set_indexsplit(indexsplit)
         self.set_index(index)
+        self.set_indexsplit(indexsplit)
 
         self.set_validate(validate)
 
@@ -797,7 +797,6 @@ class IPETEvaluation(IpetNode):
         if index == "auto":
             self.autoIndex = True
             return
-        self.set_indexsplit(self.indexsplit)
 
     def getRowIndex(self) -> list:
         """Return (list of) keys to create row index 
@@ -875,15 +874,8 @@ class IPETEvaluation(IpetNode):
     def set_indexsplit(self, indexsplit):
         self.indexsplit = int(indexsplit)
         # make sure that we have at least one col as rowindex
-        indexsplitmod = self.indexsplit
-        try:
-            if self.index is not None:
-                indexsplitmod = self.indexsplit % len(self.index)
-        except:
-            pass
-        if indexsplitmod == 0:
-            logger.warning("Indexsplit 0 is not allowed, setting it to 1.")
-            self.indexsplit = 1;
+        if self.index is not None and not self.autoIndex:
+            self.indexsplit = min(len(self.index), self.indexsplit)
 
     def addColumn(self, col):
         self.columns.append(col)

@@ -95,7 +95,6 @@ clarguments = [('--experimentfile', None, '-x', "An experiment file name (must h
                ('--evalfile', None, '-e', "An evaluation file name (must have .xml file extension) in xml-format to read"),
                ('--externaldata', None, '-E', "Should external data such as additional instance information be used?"),
                ('--defaultgroup', None, '-d', "overwrites the default group specified in the evaluation"),
-               ('--fileextension', None, '-f', "file extension for writing evaluated data, e.g., csv, tex, stdout, txt"),
                ('--compformatstring', None, '-C', "a format string like %%.5f for compare columns (those ending with ...'Q')"),
                # ('--groupkey', None,'-g', "overwrites the group key as, e.g., 'Settings' specified in the evaluation by something else"),
                ('--prefix', None, '-p', "a prefix string for every file written, only useful combined with --filextension"),
@@ -122,6 +121,7 @@ argparser.add_argument('--indexsplit', default = None, help = "position to split
 argparser.add_argument('--quiet', action = "store_true", default = False, help = "Supress all output (may be useful for profiling)")
 argparser.add_argument('--displaygroup', default = None, help = "Name of the group for which the long display should be printed. Only available for long output mode")
 argparser.add_argument('-v', '--validate', default = None, help = "Name of a solu file for validation information")
+argparser.add_argument('-f', '--fileextensions', default = None, action = "append", help = "file extensions for writing evaluated data, e.g., csv, tex, stdout, txt")
 
 
 if __name__ == '__main__':
@@ -282,26 +282,29 @@ if __name__ == '__main__':
         # for col in tr.data.columns:
             # print col
 
-    if arguments.fileextension is not None:
+    if arguments.fileextensions is not None:
+
         path = "."
-        extension = arguments.fileextension
         prefixstr = arguments.prefix if arguments.prefix else ""
-        for fg in theeval.getActiveFilterGroups():
-            instancewisename = "%s/%s%s" % (path, prefixstr, fg.name)
 
-            theeval.streamDataFrame(theeval.getInstanceGroupData(fg), instancewisename, extension)
-            logger.info("Instance-wise data written to %s.%s" % (instancewisename, extension))
-            aggname = instancewisename + "_agg"
-            theeval.streamDataFrame(theeval.getAggregatedGroupData(fg), aggname, extension)
-            logger.info("aggregated data written to %s.%s" % (aggname, extension))
 
-        filename = "%s/%s" % (path, "_".join((prefixstr, "inst_combined")) if prefixstr != "" else "inst_combined")
-        theeval.streamDataFrame(rettab, filename, extension)
-        logger.info("combined instance data written to %s.%s" % (filename, extension))
-        # print the combined aggregated data if there are multiple filter groups present
-        filename = "%s/%s" % (path, "_".join((prefixstr, "agg_combined")) if prefixstr != "" else "agg_combined")
-        theeval.streamDataFrame(retagg, filename, extension)
-        logger.info("combined aggregated data written to %s.%s" % (filename, extension))
+        for extension in arguments.fileextensions:
+            for fg in theeval.getActiveFilterGroups():
+                instancewisename = "%s/%s%s" % (path, prefixstr, fg.name)
+
+                theeval.streamDataFrame(theeval.getInstanceGroupData(fg), instancewisename, extension)
+                logger.info("Instance-wise data written to %s.%s" % (instancewisename, extension))
+                aggname = instancewisename + "_agg"
+                theeval.streamDataFrame(theeval.getAggregatedGroupData(fg), aggname, extension)
+                logger.info("aggregated data written to %s.%s" % (aggname, extension))
+
+            filename = "%s/%s" % (path, "_".join((prefixstr, "inst_combined")) if prefixstr != "" else "inst_combined")
+            theeval.streamDataFrame(rettab, filename, extension)
+            logger.info("combined instance data written to %s.%s" % (filename, extension))
+            # print the combined aggregated data if there are multiple filter groups present
+            filename = "%s/%s" % (path, "_".join((prefixstr, "agg_combined")) if prefixstr != "" else "agg_combined")
+            theeval.streamDataFrame(retagg, filename, extension)
+            logger.info("combined aggregated data written to %s.%s" % (filename, extension))
 
     # print pd.concat([rettab, theeval.levelonedf], axis=1)
 

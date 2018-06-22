@@ -62,6 +62,7 @@ class Validation:
                 self.objsensedict = {}
             else:
                 self.referencedict, self.objsensedict = self.connectToDataBase(solufilename)
+                logger.debug("Data base connection finished, {} items".format(len(self.referencedict.items())))
         else:
             self.referencedict, self.objsensedict = {}, {}
 
@@ -114,9 +115,9 @@ class Validation:
                     infotuple[self.__primalidx__] = infotuple[self.__dualidx__] = primbound
 
                 elif status == DataBaseMarkers.BEST:
-                    if primbound:
+                    if primbound is not None:
                         infotuple[self.__primalidx__] = primbound
-                    if dualbound:
+                    if dualbound is not None:
                         infotuple[self.__dualidx__] = dualbound
 
                 elif status == DataBaseMarkers.INF:
@@ -206,9 +207,41 @@ class Validation:
         """
         return problemname in self.inconsistentset
 
+    def isSolFeasible(self, x : pd.Series):
+        """check if the solution is feasible within tolerances
+
+        """
+        #
+        # respect solution checker output, if it exists
+        #
+        if x.get(Key.SolCheckerRead) is not None:
+            #
+            # if this column is not None, the solution checker output exists for at least some of the problems
+            # such that it is reasonable to assume that it should exist for all parsed problems
+            #
+            # recall that we explicitly assume that there has been a solution reported when this function is called
+            # if the solution checker failed to read in the solution, or the solution checker crashed and did
+            # not report the result of the check command, the solution was most likely infeasible.
+            #
+            if not pd.isnull(x.get(Key.SolCheckerRead)) and x.get(Key.SolCheckerRead):
+                if not pd.isnull(x.get(Key.SolCheckerFeas)) and x.get(Key.SolCheckerFeas):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+        # compute the maximum violation of constraints, LP rows, bounds, and integrality
+        maxviol = max((x.get(key, 0.0) for key in
+                       [Key.ViolationBds, Key.ViolationCons, Key.ViolationInt, Key.ViolationLP]))
+
+        return maxviol <= self.feastol
+
+
+
 
     def isSolInfeasible(self, x : pd.Series):
-        """check if the solution is feasible within tolerances
+        """check if the solution is infeasible within tolerances
         
         Parameters
         ----------
@@ -316,7 +349,8 @@ class Validation:
             #
             # check feasibility
             #
-            if self.isSolInfeasible(x):
+            pb = x.get(Key.PrimalBound)
+            if self.isSolInfeasible(x) or not (pd.isnull(pb) or isInf(pb) or self.isSolFeasible(x)):
                 return ProblemStatusCodes.FailSolInfeasible
 
             #
@@ -437,6 +471,8 @@ class Validation:
 
         reference = self.referencedict.get(problemname, (None, None))
 
+        logger.debug("Checking against reference {} for problem {}".format(reference, problemname))
+
         referencepb = self.getPbValue(reference[self.__primalidx__], obs)
         referencedb = self.getDbValue(reference[self.__dualidx__], obs)
 
@@ -489,7 +525,7 @@ class Validation:
             return
 
         # do not trust versions/settings/solvers that returned an infeasible solution
-        if self.isSolInfeasible(x):
+        if self.isSolInfeasible(x) or (not pd.isnull(pb) and not self.isSolFeasible(x)):
             return
 
         bestpb = self.bestpb.get(problemname, np.inf if obs == ObjectiveSenseCode.MINIMIZE else -np.inf)

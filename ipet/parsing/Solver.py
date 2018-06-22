@@ -621,13 +621,14 @@ class GurobiSolver(Solver):
     nodes_expr = re.compile("Explored (\d+) nodes")
 
     solverstatusmap = {"(Optimal solution found|Solved with barrier)" : Key.SolverStatusCodes.Optimal,
-                       "Model is infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "Model is infeasible$" : Key.SolverStatusCodes.Infeasible,
+                       "Model is infeasible or unbounded" : Key.SolverStatusCodes.InfOrUnbounded,
                         "Time limit reached" : Key.SolverStatusCodes.TimeLimit,
                         "^(ERROR 10001|Out of memory)" : Key.SolverStatusCodes.MemoryLimit,
 #                       "" : Key.SolverStatusCodes.NodeLimit,
 #                       "" : Key.SolverStatusCodes.Interrupted
                         "^ERROR 10003" : Key.SolverStatusCodes.Readerror,
-                        "^Model is unbounded" : Key.SolverStatusCodes.Unbounded
+                        "^Model is unbounded" : Key.SolverStatusCodes.Unbounded,
                        }
 
     # variables needed for bound history
@@ -713,9 +714,10 @@ class CplexSolver(Solver):
     elapsedtime_expr = re.compile("^Elapsed time = .+ sec. \(.* ticks, tree = .* MB, solutions = \d+\)")
 
     solverstatusmap = {"MIP - Integer optimal" : Key.SolverStatusCodes.Optimal,
-                       "MIP - Integer infeasible." : Key.SolverStatusCodes.Infeasible,
+                       "MIP - Integer infeasible\." : Key.SolverStatusCodes.Infeasible,
                        "MIP - Time limit exceeded" : Key.SolverStatusCodes.TimeLimit,
                        "MIP - Integer unbounded" : Key.SolverStatusCodes.Unbounded,
+                       "MIP - Integer infeasible or unbounded." : Key.SolverStatusCodes.InfOrUnbounded,
                        "CPLEX Error  1001: Out of memory\." : Key.SolverStatusCodes.MemoryLimit,
                        "No file read\." : Key.SolverStatusCodes.Readerror,
 
@@ -817,6 +819,8 @@ class CbcSolver(Solver):
     solverstatusmap = {"Result - Optimal solution found" : Key.SolverStatusCodes.Optimal,
                        "Result - Stopped on time limit" : Key.SolverStatusCodes.TimeLimit,
                        "Result - Problem proven infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "Problem is unbounded" : Key.SolverStatusCodes.Unbounded,
+                       "Pre-processing says infeasible or unbounded" : Key.SolverStatusCodes.InfOrUnbounded,
                        "\*\* Current model not valid" : Key.SolverStatusCodes.Readerror
                        #                       "" : Key.SolverStatusCodes.MemoryLimit,
                        #                       "" : Key.SolverStatusCodes.NodeLimit,
@@ -847,6 +851,7 @@ class XpressSolver(Solver):
     # TODO does this work? Benchmarks seem to be broken
     solverstatusmap = {r"Best integer solution found" : Key.SolverStatusCodes.Optimal,
                        "Problem is integer infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "Problem is unbounded" : Key.SolverStatusCodes.Unbounded,
                        "STOPPING - MAXTIME limit reached" : Key.SolverStatusCodes.TimeLimit,
                        "\?(45|20)" : Key.SolverStatusCodes.MemoryLimit,
                        #                       "" : Key.SolverStatusCodes.NodeLimit,
@@ -964,7 +969,7 @@ class MosekSolver(Solver):
     nodes_expr = re.compile("^Number of branches                 : (.*)$")
 
     solverstatusmap = {"^  Solution status : .*OPTIMAL" : Key.SolverStatusCodes.Optimal,
-                       "^  Problem status  : PRIMAL_INFEASIBLE" : Key.SolverStatusCodes.Infeasible,
+                       "^  Problem status  : PRIMAL_INFEASIBLE$" : Key.SolverStatusCodes.Infeasible,
                        "^(  Problem status  : UNKNOWN|  Solution status : PRIMAL_FEASIBLE)" : Key.SolverStatusCodes.TimeLimit,
                        "^  Problem status  : PRIMAL_INFEASIBLE_OR_UNBOUNDED" : Key.SolverStatusCodes.InfOrUnbounded,
                        "^mosek.Error: \(1101\)" : Key.SolverStatusCodes.Readerror,
@@ -1109,7 +1114,7 @@ class SasSolver(Solver):
     nodes_expr = re.compile("^ *Nodes *(\S+)$")
 
     solverstatusmap = {"^ *Solution Status *(Conditionally)* (Optimal|Failed)" : Key.SolverStatusCodes.Optimal,
-                       "^ *Solution Status *Infeasible" : Key.SolverStatusCodes.Infeasible,
+                       "^ *Solution Status *Infeasible$" : Key.SolverStatusCodes.Infeasible,
                        "^ *Solution Status *Time Limit Reached" : Key.SolverStatusCodes.TimeLimit,
                        "^ *Solution Status *Infeasible or Unbounded" : Key.SolverStatusCodes.InfOrUnbounded,
                        "^ERROR: The MPS file is incomplete\." : Key.SolverStatusCodes.Readerror,

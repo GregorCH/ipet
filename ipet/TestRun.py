@@ -216,6 +216,7 @@ class TestRun:
                 self.addData(*solver.getData())
 
                 problemstatus = self.validation.validateSeries(self.currentproblemdata)
+                logger.debug("Validation returns status {}".format(problemstatus))
                 self.addData(Key.ProblemStatus, problemstatus)
 
             for key in self.metadatadict.keys():

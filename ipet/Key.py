@@ -106,9 +106,9 @@ class SolverStatusCodes:
     MemoryLimit = 3
     NodeLimit = 4
     GapLimit = 5
-    Interrupted = 100
     Unbounded = 110
     InfOrUnbounded = 120
+    Interrupted = 1000
 
 class ProblemStatusCodes:
     """ Keeping track of how good the solution of a solver actually was.
@@ -142,14 +142,14 @@ class ProblemStatusCodes:
                         TimeLimit : 200,
                         MemoryLimit : 150,
                         Unknown : 100,
-                        FailInconsistent :-200,
-                        FailDualBound :-250,
-                        FailObjectiveValue :-500,
-                        FailSolInfeasible :-1000,
-                        FailSolOnInfeasibleInstance :-2000,
-                        Fail :-3000,
-                        FailReaderror :-4000,
-                        FailAbort :-10000}
+                        FailInconsistent : -200,
+                        FailDualBound : -250,
+                        FailObjectiveValue : -500,
+                        FailSolInfeasible : -1000,
+                        FailSolOnInfeasibleInstance : -2000,
+                        Fail : -3000,
+                        FailReaderror : -4000,
+                        FailAbort : -10000}
 
     @staticmethod
     def getBestStatus(*args):

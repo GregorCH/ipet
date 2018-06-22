@@ -103,13 +103,16 @@ class CustomReader(StatisticReader):
     def extractStatistic(self, line):
         if self.regexp.search(line):
 
+            logging.debug("Custom Reader {} found match in line \n{}".format(self.name, line.strip()))
+            logging.debug("Numerical expression matches: {}".format(", ".join(misc.numericExpression.findall(line))))
+
             previousdata = self.testrun.getCurrentProblemData(self.datakey)
             if self.methodint == CustomReader.METHOD_COUNT:
                 if previousdata is None:
                     self.addData(self.datakey, 1)
                 else:
                     self.addData(self.datakey, previousdata + 1)
-                    return
+                return
 
             try:
                 data = misc.getNumberAtIndex(line, self.index)

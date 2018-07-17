@@ -27,9 +27,14 @@ description = \
 '''
     produces a table evaluation of test runs according to an evaluation XML-file
 
-    An evaluation file is an xml file that specifies a number of columns of the original log file data and a number of interesting groups of instances for which aggregated results of the data should be produced.
+    An evaluation file is an xml file that specifies a number of columns of the original
+    log file data and a number of interesting groups of instances for which aggregated
+    results of the data should be produced.
 
-    The script produces two tables: the first, instancewise table has all specified columns for every passed log file and one row per instance. The second, aggregated table shows aggregated statistics for all specified filter groups for this evaluation.
+    The script produces two tables: the first, instancewise table has all specified columns
+    for every passed log file and one row per instance. 
+    The second, aggregated table shows aggregated statistics for all specified filter 
+    groups for this evaluation.
 '''
 
 epilog = \
@@ -38,11 +43,13 @@ epilog = \
     Examples of Usage
     =================
 
-    The simplest way to invoke the script is to specify the name of a parsed log file and the name of a valid evaluation file, e.g.,
+    The simplest way to invoke the script is to specify the name of a parsed log file and
+    the name of a valid evaluation file, e.g.,
 
        ipet-evaluate -t sometestrun.trn -e evaluation.xml
 
-    A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily available data like the number of solving nodes and the solving time in seconds.
+    A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily 
+    available data like the number of solving nodes and the solving time in seconds.
 
 
     Key Search

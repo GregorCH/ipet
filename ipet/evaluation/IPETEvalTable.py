@@ -1393,6 +1393,12 @@ class IPETEvaluation(IpetNode):
         with open("%s.tex" % filebasename, "w") as texfile:
             texfile.write(df.to_latex(formatters = formatters))
 
+    def flatten_index(self, col) -> str:
+        if type(col) is tuple:
+            return '_'.join(map(str, col[::-1]))
+        else:
+            return col
+
     def streamDataFrame_csv(self, df : DataFrame, filebasename, formatters = {}):
         with open("%s.csv" % filebasename, "w") as csvfile:
             #
@@ -1403,6 +1409,9 @@ class IPETEvaluation(IpetNode):
             # the final formatting.
             #
             logger.warn("Warning. Custom formatting ignored for csv output")
+
+            df.columns = [self.flatten_index(col) for col in df.columns]
+            print(df.columns)
             df.to_csv(csvfile)
 
     def streamDataFrame_txt(self, df : DataFrame, filebasename, formatters = {}):

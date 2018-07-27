@@ -1363,7 +1363,7 @@ class IPETEvaluation(IpetNode):
         # display countercolumns as integer
         counting_columns = [dfcol for dfcol in df.columns if dfcol[l].startswith("_") and dfcol[l].endswith("_")]
         for cctup in counting_columns:
-            formatters.update({cctup:FormatFunc("%d").beautify})
+            formatters.update({cctup:FormatFunc("%.0f").beautify})
 
         for comptuple in comptuples:
             formatters.update({comptuple:FormatFunc(self.comparecolformat).beautify})

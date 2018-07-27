@@ -844,7 +844,7 @@ class XpressSolver(Solver):
     primalbound_expr = re.compile("Objective value =\s*(\S*)")
     dualbound_expr = re.compile("Best Bound =\s*(\S*)")
     solvingtime_expr = re.compile(" \*\*\* Search.*\*\*\*\s*Time:\s*(\S*)")
-    version_expr = re.compile("FICO Xpress.* \S* v(\S*) ")
+    version_expr = re.compile("FICO Xpress-Optimizer \S* v([0-9.]*) ")
     nodes_expr = re.compile("^Nodes explored = (.*)$")
 
 

@@ -1,0 +1,49 @@
+@01 instances/benchmark/enlight14.mps ===========
+-----------------------------
+Wed Apr 25 14:31:39 MST 2018
+-----------------------------
+@03 1524691899
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.enlight14.mps.sol
+Set parameter TimeLimit to value 7200
+Set parameter MIPGap to value 0.0
+Set parameter Threads to value 1
+
+Gurobi Optimizer version 8.0.0 build v8.0.0rc0 (linux64)
+Copyright (c) 2018, Gurobi Optimization, LLC
+
+Read MPS format model from file instances/benchmark/enlight14.mps
+Reading time = 0.00 seconds
+enlight14: 196 rows, 392 columns, 1120 nonzeros
+Optimize a model with 196 rows, 392 columns and 1120 nonzeros
+Variable types: 0 continuous, 392 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 0 rows and 1 columns
+Presolve time: 0.00s
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds
+Thread count was 1 (of 8 available processors)
+
+Solution count 0
+
+Model is infeasible
+Best objective -, best bound -, gap -
+
+Unable to retrieve attribute 'X'
+
+
+@04 1524691899
+@05 7200
+
+Read MPS: 1
+MIP has 392 vars and 196 constraints
+Read SOL: 0
+
+-----------------------------
+Wed Apr 25 14:31:39 MST 2018
+-----------------------------
+
+=ready=

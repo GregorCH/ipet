@@ -1,0 +1,108 @@
+@01 instances/benchmark/tanglegram2.mps ===========
+-----------------------------
+Fri May 25 21:03:39 MST 2018
+-----------------------------
+@03 1527307419
+FICO Xpress Solver 64bit v8.5.1 May 21 2018
+(c) Copyright Fair Isaac Corporation 1983-2017. All rights reserved
+ Optimizer v33.01.03    [/home/beck/xpressmp/lib/libxprs.so.33.01.03]
+ Knitro 10.2.1          [/home/beck/xpressmp/lib/libxknitro.so]
+MAXTIME=-7200
+CPUTIME=0
+THREADS=1
+MIPRELCUTOFF=0
+MIPRELSTOP=0
+
+Reading Problem tanglegram2
+Problem Statistics
+        8981 (      0 spare) rows
+        4714 (      0 spare) structural columns
+       31430 (      0 spare) non-zero elements
+Global Statistics
+        4714 entities        0 sets        0 set members
+FICO Xpress v8.5.1, solve started 21:03:39, May 25, 2018
+Minimizing MILP tanglegram2
+Original problem has:
+      8981 rows         4714 cols        31430 elements      4714 globals
+Presolved problem has:
+       680 rows          564 cols         2040 elements       564 globals
+Symmetric problem: generators: 29, support set: 89 (partial detection)
+ Number of orbits: 21, largest orbit: 24
+ Row orbits: 17, row support: 68
+Will try to keep branch and bound tree memory usage below 14.7GB
+Fixed 116 (of 116) columns in 36 (of 36) subproblems
+
+ *** Heuristic solution found:  1844.000000      Time: 0 ***
+
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D    130     0        .000000     0
+   160           .000000      P      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  160 simplex iterations in 0s
+
+Final objective                         : 0.000000000000000e-01
+  Max primal violation      (abs / rel) :       0.0 /       0.0
+  Max dual violation        (abs / rel) :       0.0 /       0.0
+  Max complementarity viol. (abs / rel) :       0.0 /       0.0
+All values within tolerances
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+q         1383.000000      .000000      2                  1383        0      0
+c         1303.000000      .000000      3                  1303        0      0
+   1  K   1303.000000    14.333333      3     51      0   98.90%     148      0
+   2  K   1303.000000    33.000000      3     69     23   97.47%     168      0
+   3  K   1303.000000    47.833333      3     29     52   96.33%     173      0
+   4  K   1303.000000    48.500000      3     10     25   96.28%     184      0
+   5  K   1303.000000    55.000000      3     34      6   95.78%     179      0
+   6  K   1303.000000    56.000000      3     11     25   95.70%     180      0
+   7  K   1303.000000    59.500000      3      4      8   95.43%     181      0
+   8  K   1303.000000    59.500000      3      0      3   95.43%     181      0
+   9  G   1303.000000    65.500000      3     52      0   94.97%     181      0
+  10  G   1303.000000    67.166667      3     50    110   94.85%     183      0
+Heuristic search started
+Heuristic search stopped
+
+Cuts in the matrix         : 58
+Cut elements in the matrix : 628
+
+Starting tree search.
+Deterministic mode with up to 1 running thread and up to 1 task.
+
+    Node     BestSoln    BestBound   Sols Active  Depth     Gap     GInf   Time
+       1  1303.000000   213.700000      3      2      1   83.60%     190      0
+a      2   443.000000   250.286765      4      2      3   43.50%       0      0
+       4   443.000000   250.286765      4      2      3   43.50%     196      0
+       5   443.000000   360.666667      4      1      2   18.59%     194      0
+ *** Search completed ***     Time:     0 Nodes:          5
+Number of integer feasible solutions found is 4
+Best integer solution found is   443.000000
+Best bound is   443.000000
+Uncrunching matrix
+Objective value = 443
+Best Bound = 443
+Nodes explored = 5
+file3
+
+@04 1527307420
+@05 7200
+
+Read MPS: 1
+MIP has 4714 vars and 8980 constraints
+Read SOL: 1
+Objective value computed by solver: 443
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 1e-15 Constraints 1e-15 Objective 2e-15
+
+-----------------------------
+Fri May 25 21:03:40 MST 2018
+-----------------------------
+
+=ready=

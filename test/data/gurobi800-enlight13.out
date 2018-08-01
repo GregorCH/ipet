@@ -1,0 +1,58 @@
+@01 instances/benchmark/enlight13.mps ===========
+-----------------------------
+Wed Apr 25 14:31:39 MST 2018
+-----------------------------
+@03 1524691899
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.enlight13.mps.sol
+Set parameter TimeLimit to value 7200
+Set parameter MIPGap to value 0.0
+Set parameter Threads to value 1
+
+Gurobi Optimizer version 8.0.0 build v8.0.0rc0 (linux64)
+Copyright (c) 2018, Gurobi Optimization, LLC
+
+Read MPS format model from file instances/benchmark/enlight13.mps
+Reading time = 0.00 seconds
+enlight13: 169 rows, 338 columns, 962 nonzeros
+Optimize a model with 169 rows, 338 columns and 962 nonzeros
+Variable types: 0 continuous, 338 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 169 rows and 338 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 71
+
+Optimal solution found (tolerance 0.00e+00)
+Best objective 7.100000000000e+01, best bound 7.100000000000e+01, gap 0.0000%
+
+Wrote result file '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.enlight13.mps.sol'
+
+
+@04 1524691899
+@05 7200
+
+Read MPS: 1
+MIP has 338 vars and 169 constraints
+Read SOL: 1
+Objective value computed by solver: 71
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 0 Objective 0
+
+-----------------------------
+Wed Apr 25 14:31:39 MST 2018
+-----------------------------
+
+=ready=

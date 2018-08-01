@@ -1,0 +1,79 @@
+@01 instances/miplib2010/enlight14.mps.gz ===========
+-----------------------------
+Mon Nov 13 10:29:11 MST 2017
+-----------------------------
+@03 1510594151
+
+Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer 12.8.0.0
+  with Simplex, Mixed Integer & Barrier Optimizers
+5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21
+Copyright IBM Corp. 1988, 2017.  All Rights Reserved.
+
+Type 'help' for a list of available commands.
+Type 'help' followed by a command name for more
+information on commands.
+
+CPLEX> CPLEX> Logfile 'cplex.log' closed.
+CPLEX> New value for default parallel thread count: 1
+CPLEX> New value for mixed integer optimality gap tolerance: 0
+CPLEX> New value for type of clock used to measure time: 2
+CPLEX> New value for time limit in seconds: 7200
+CPLEX> New value for parallel optimization mode: 1
+CPLEX> Selected objective sense:  MINIMIZE
+Selected objective  name:  moves
+Selected RHS        name:  rhs
+Selected bound      name:  bnd
+Problem 'instances/miplib2010/enlight14.mps.gz' read.
+Read time = 0.00 sec. (0.14 ticks)
+CPLEX> Problem is a minimization problem.
+New sense ['max' or 'min']: No changes made.
+CPLEX> CPXPARAM_TimeLimit                               7200
+CPXPARAM_Threads                                 1
+CPXPARAM_Parallel                                1
+CPXPARAM_MIP_Tolerances_MIPGap                   0
+Tried aggregator 1 time.
+Reduced MIP has 196 rows, 392 columns, and 1120 nonzeros.
+Reduced MIP has 199 binaries, 193 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.57 ticks)
+Probing time = 0.00 sec. (0.18 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 196 rows, 392 columns, and 1120 nonzeros.
+Reduced MIP has 199 binaries, 193 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.83 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+      0     1  -1.00000e+37     0                      0.0000        0
+
+Root node processing (before b&c):
+  Real time             =    0.00 sec. (3.44 ticks)
+Sequential b&c:
+  Real time             =    0.00 sec. (0.00 ticks)
+                          ------------
+Total (root+branch&cut) =    0.00 sec. (3.44 ticks)
+
+
+MIP - Integer infeasible.
+Current MIP best bound is infinite.
+Solution time =    0.00 sec.  Iterations = 0  Nodes = 0 (1)
+Deterministic time = 3.44 ticks  (726.40 ticks/sec)
+
+CPLEX> CPLEX Error  1217: No solution exists.
+No file written.
+CPLEX> Logfile '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.cplex.enlight14.mps.sol' open.
+CPLEX> MIP - Integer infeasible.
+CPLEX> Logfile '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.cplex.enlight14.mps.sol' closed.
+CPLEX>
+@04 1510594151
+@05 7200
+
+Read MPS: 1
+MIP has 392 vars and 196 constraints
+Read SOL: 0
+
+-----------------------------
+Mon Nov 13 10:29:11 MST 2017
+-----------------------------
+
+=ready=

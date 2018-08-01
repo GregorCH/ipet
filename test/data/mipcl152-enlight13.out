@@ -1,0 +1,194 @@
+@01 instances/benchmark/enlight13.mps ===========
+-----------------------------
+Wed Jun 13 23:57:39 MST 2018
+-----------------------------
+@03 1528959459
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.enlight13.mps.sol
+/home/beck/miplib2010-1.1.0/bin/mipcl -solfile /home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.enlight13.mps.sol -threads 1 -time 7200 instances/benchmark/enlight13.mps
+Reading data...
+NAME           enlight13
+Start preprocessing: Rows - 169, Cols - 338 (Int - 338, Bin - 169), NZs - 962
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.002      1          338           0             0            0            12
+==================================================================================
+After preprocessing: Rows - 169, Cols - 338 (Int - 338, Bin - 173), NZs - 962
+Scaling...
+Min exp = 0,  Max exp = 1
+
+Preprocessing Time: 0.002
+Optimizing...
+     0.002          7          5      D/S                  1.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     0.002                  1.0000          3        9
+     0.003                  2.5000         17       61
+     0.003                  4.0000          9       27
+     0.005                  5.0000         39      207
+     0.007                  5.0000         36       91
+     0.008                  5.0000         46      168
+     0.011                  5.4583         49      269
+     0.014                  6.0625         61      283
+     0.016                  6.2879         51      101
+     0.018                  6.5085         67      172
+      Time                     Obj  Frac vars     Cuts
+     0.021                  6.7191         61      259
+     0.025                  7.0720         84      294
+     0.029                  7.3481         86      276
+     0.033                  7.6191         80      285
+     0.036                  7.8522         83      120
+     0.040                  8.1107        120       90
+     0.043                  8.8371        118      125
+     0.047                  9.0692        122      106
+     0.051                  9.6275        100      327
+     0.056                 10.0850        133       95
+      Time                     Obj  Frac vars     Cuts
+     0.061                 10.3209        136       99
+     0.066                 10.4910        141      290
+     0.072                 10.6011        146       82
+     0.077                 10.7563        142      117
+     0.084                 10.8963        178       81
+     0.092                 11.1040        152      172
+     0.100                 11.4725        147      190
+     0.109                 11.8254        167      275
+     0.117                 12.0125        165      155
+     0.124                 12.1940        191      191
+      Time                     Obj  Frac vars     Cuts
+     0.132                 12.4588        164      253
+     0.142                 12.8812        181      183
+     0.149                 13.0032        171      150
+     0.158                 13.1883        211      138
+     0.168                 13.3449        209      106
+     0.176                 13.4778        202      152
+     0.186                 13.6257        230       85
+     0.194                 13.7066        210      198
+     0.204                 13.8062        223      133
+     0.213                 13.9828        228      134
+      Time                     Obj  Frac vars     Cuts
+     0.221                 14.1427        226      173
+     0.228                 14.2498        221      117
+     0.236                 14.3504        225      112
+     0.244                 14.4710        209      172
+     0.255                 14.6357        222      151
+     0.264                 14.7437        218      111
+     0.274                 14.8577        240      167
+     0.284                 15.0473        206      200
+     0.294                 15.1215        231      136
+     0.303                 15.2190        218      168
+Start preprocessing: Rows - 278, Cols - 338 (Int - 338, Bin - 173), NZs - 3715
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.327      1          337           0             1            0            11
+==================================================================================
+After preprocessing: Rows - 279, Cols - 337 (Int - 337, Bin - 172), NZs - 3331
+Scaling...
+Min exp = 0,  Max exp = 2
+
+
+      Time        Its   Deg. Its   Method                     Obj
+     0.329        100         90      D/S                  8.3333
+     0.331        200        144      D/S                 14.5063
+     0.335        300        162      D/S                 15.2658
+     0.335        307        162      D/S                 15.2702
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     0.343                 15.2702        215      110
+     0.354                 15.3504        217      188
+     0.368                 15.4635        229      145
+     0.383                 15.5902        204       79
+     0.397                 15.6658        240      101
+     0.411                 15.7236        236      121
+Start preprocessing: Rows - 322, Cols - 337 (Int - 337, Bin - 172), NZs - 4490
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.441      1          337           0             0            0            11
+==================================================================================
+After preprocessing: Rows - 322, Cols - 337 (Int - 337, Bin - 172), NZs - 4356
+Scaling...
+Min exp = 0,  Max exp = 2
+
+
+      Time        Its   Deg. Its   Method                     Obj
+     0.443        100         88      D/S                  7.0000
+     0.446        200        157      D/S                 12.7305
+     0.450        300        175      D/S                 14.9981
+     0.455        400        183      D/S                 15.7027
+     0.459        459        187      D/S                 15.7689
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     0.469                 15.7689        244      129
+     0.486                 15.8242        215       99
+     0.504                 15.9143        245      112
+     0.522                 16.0237        240      118
+     0.542                 16.0856        242       86
+     0.561                 16.2016        240      103
+     0.583                 16.2879        250       77
+     0.601                 16.3796        241      111
+     0.623                 16.4653        246       98
+     0.648                 16.5594        245      101
+      Time                     Obj  Frac vars     Cuts
+     0.675                 16.6191        251       88
+     0.706                 17.1103        244      195
+     0.729                 17.3244        235      132
+     0.753                 17.7757        261      141
+     0.777                 18.0253        267       87
+     0.798                 18.1612        250      113
+     0.819                 18.3088        259       78
+     0.841                 18.4577        265       71
+     0.862                 18.5730        263       65
+     0.886                 18.9937        230      179
+      Time                     Obj  Frac vars     Cuts
+     0.909                 19.4235        263      193
+     0.932                 19.6836        280      102
+     0.959                 19.9536        260      171
+     0.982                 20.1209        269       84
+     1.001                 20.1870        281       53
+     1.023                 20.3840        276       97
+
+Cut statistics
+========== Cuts = Generated === Used
+       knapsack           5        2
+ mixed knapsack           1        1
+            mir        1266      303
+    sparse MOD2        1729      220
+     dense MOD2         398       37
+  sparse Gomory          84        2
+         parity        2049      208
+      var bound        2015      110
+    disjunction        4136      109
+========= total       11683      992
+
+After processing root node: Rows - 403, Cols - 337 (Int - 337, Bin - 172), NZs - 7259
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+     1.055         1         1      0                 inf             20.4249         inf
+    27.062       100        46      0                 inf             49.1430         inf
+    49.390       200        71      0                 inf             59.5887         inf
+    70.477       280         0      1             71.0000             69.8602        1.63
+===========================================
+MIPCL version 1.5.2
+Solution time: 70.477
+Branch-and-Cut nodes: 280
+Objective value: 71.0000 - optimality proven
+rm: cannot remove '*_mipcl.log': No such file or directory
+
+@04 1528959530
+@05 7200
+
+Read MPS: 1
+MIP has 338 vars and 169 constraints
+Read SOL: 1
+Objective value computed by solver: 71
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 0 Objective 0
+
+-----------------------------
+Wed Jun 13 23:58:50 MST 2018
+-----------------------------
+
+=ready=

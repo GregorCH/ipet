@@ -1,0 +1,209 @@
+@01 instances/miplib2010/tanglegram2.mps.gz ===========
+-----------------------------
+Mon Nov 13 16:59:57 MST 2017
+-----------------------------
+@03 1510617597
+
+Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer 12.8.0.0
+  with Simplex, Mixed Integer & Barrier Optimizers
+5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21
+Copyright IBM Corp. 1988, 2017.  All Rights Reserved.
+
+Type 'help' for a list of available commands.
+Type 'help' followed by a command name for more
+information on commands.
+
+CPLEX> CPLEX> Logfile 'cplex.log' closed.
+CPLEX> New value for default parallel thread count: 1
+CPLEX> New value for mixed integer optimality gap tolerance: 0
+CPLEX> New value for type of clock used to measure time: 2
+CPLEX> New value for time limit in seconds: 7200
+CPLEX> New value for parallel optimization mode: 1
+CPLEX> Selected objective sense:  MINIMIZE
+Selected objective  name:  obj
+Selected RHS        name:  rhs
+Selected bound      name:  bnd
+Problem 'instances/miplib2010/tanglegram2.mps.gz' read.
+Read time = 0.01 sec. (3.19 ticks)
+CPLEX> Problem is a minimization problem.
+New sense ['max' or 'min']: No changes made.
+CPLEX> CPXPARAM_TimeLimit                               7200
+CPXPARAM_Threads                                 1
+CPXPARAM_Parallel                                1
+CPXPARAM_MIP_Tolerances_MIPGap                   0
+Found incumbent of value 4490.000000 after 0.00 sec. (0.33 ticks)
+Tried aggregator 3 times.
+MIP Presolve eliminated 8326 rows and 171 columns.
+MIP Presolve added 1 rows and 1 columns.
+MIP Presolve modified 9 coefficients.
+Aggregator did 24 substitutions.
+Reduced MIP has 631 rows, 370 columns, and 1891 nonzeros.
+Reduced MIP has 369 binaries, 1 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.01 sec. (14.40 ticks)
+Probing changed sense of 2 constraints.
+Probing time = 0.00 sec. (0.12 ticks)
+Tried aggregator 1 time.
+MIP Presolve eliminated 227 rows and 116 columns.
+Reduced MIP has 404 rows, 254 columns, and 1212 nonzeros.
+Reduced MIP has 254 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.70 ticks)
+Probing time = 0.00 sec. (0.07 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 404 rows, 254 columns, and 1212 nonzeros.
+Reduced MIP has 254 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.73 ticks)
+Probing time = 0.00 sec. (0.07 ticks)
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: none, using 1 thread.
+Root relaxation solution time = 0.00 sec. (0.75 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+*     0+    0                         3856.0000        1.0000            99.97%
+      0     0        1.0000    52     3856.0000        1.0000       55   99.97%
+*     0+    0                         1969.0000        1.0000            99.95%
+      0     0       70.5833    67     1969.0000     Cuts: 153      160   96.42%
+      0     0       98.5000    70     1969.0000      Cuts: 65      227   95.00%
+      0     0      110.0000    85     1969.0000  ZeroHalf: 76      271   94.41%
+      0     0      117.0000    83     1969.0000  ZeroHalf: 57      320   94.06%
+      0     0      119.1250   107     1969.0000  ZeroHalf: 42      364   93.95%
+      0     0      127.8333    86     1969.0000      Cuts: 88      404   93.51%
+      0     0      134.2500    96     1969.0000  ZeroHalf: 56      448   93.18%
+      0     0      138.7976   127     1969.0000      Cuts: 44      489   92.95%
+      0     0      153.0000   130     1969.0000      Cuts: 64      544   92.23%
+      0     0      155.9118   134     1969.0000  ZeroHalf: 35      592   92.08%
+      0     0      160.5000   136     1969.0000      Cuts: 79      633   91.85%
+      0     0      165.1592   139     1969.0000     Cuts: 109      724   91.61%
+      0     0      167.6944   138     1969.0000      Cuts: 69      764   91.48%
+      0     0      171.5833   118     1969.0000      Cuts: 49      794   91.29%
+      0     0      172.6244   145     1969.0000  ZeroHalf: 55      856   91.23%
+      0     0      174.3821   145     1969.0000  ZeroHalf: 38      898   91.14%
+      0     0      178.2500   120     1969.0000  ZeroHalf: 50      927   90.95%
+      0     0      181.0000   127     1969.0000      Cuts: 55      982   90.81%
+      0     0      184.1591   142     1969.0000      Cuts: 60     1036   90.65%
+      0     0      185.5000   149     1969.0000      Cuts: 59     1073   90.58%
+      0     0      191.5000   113     1969.0000      Cuts: 79     1126   90.27%
+      0     0      193.0000   128     1969.0000      Cuts: 54     1172   90.20%
+      0     0      194.5000   145     1969.0000      Cuts: 70     1205   90.12%
+      0     0      198.9167   152     1969.0000      Cuts: 75     1287   89.90%
+      0     0      201.6795   154     1969.0000      Cuts: 45     1349   89.76%
+      0     0      204.1490   179     1969.0000      Cuts: 89     1420   89.63%
+*     0+    0                          470.0000      204.1490            56.56%
+      0     0      207.5000   135      470.0000  ZeroHalf: 37     1458   55.85%
+      0     0      208.4610   186      470.0000      Cuts: 94     1492   55.65%
+      0     0      214.5979   187      470.0000      Cuts: 44     1558   54.34%
+      0     0      218.8077   164      470.0000  ZeroHalf: 52     1627   53.45%
+      0     0      220.5335   175      470.0000      Cuts: 40     1670   53.08%
+      0     0      224.9792   172      470.0000      Cuts: 52     1745   52.13%
+      0     0      228.3750   118      470.0000      Cuts: 58     1786   51.41%
+      0     0      230.6212   191      470.0000      Cuts: 74     1867   50.93%
+      0     0      236.2500   137      470.0000      Cuts: 94     1969   49.73%
+      0     0      239.9132   190      470.0000  ZeroHalf: 89     2081   48.95%
+      0     0      241.3425   197      470.0000      Cuts: 69     2137   48.65%
+      0     0      243.2139   195      470.0000  ZeroHalf: 52     2207   48.25%
+      0     0      245.4956   191      470.0000      Cuts: 82     2281   47.77%
+      0     0      247.1134   196      470.0000      Cuts: 66     2345   47.42%
+      0     0      248.2610   195      470.0000      Cuts: 54     2408   47.18%
+      0     0      249.2911   188      470.0000      Cuts: 49     2460   46.96%
+      0     0      250.0542   196      470.0000      Cuts: 51     2503   46.80%
+      0     0      250.8924   196      470.0000  ZeroHalf: 48     2551   46.62%
+      0     0      251.4500   188      470.0000      Cuts: 68     2605   46.50%
+      0     0      252.0021   180      470.0000      Cuts: 54     2649   46.38%
+      0     0      253.9736   191      470.0000      Cuts: 62     2739   45.96%
+      0     0      255.5793   189      470.0000      Cuts: 63     2797   45.62%
+      0     0      256.9361   192      470.0000      Cuts: 50     2846   45.33%
+      0     0      257.9988   197      470.0000      Cuts: 53     2911   45.11%
+      0     0      259.2644   199      470.0000      Cuts: 55     2982   44.84%
+      0     0      259.8588   205      470.0000      Cuts: 47     3031   44.71%
+      0     0      260.8179   203      470.0000      Cuts: 59     3087   44.51%
+      0     0      263.5330   189      470.0000  ZeroHalf: 38     3172   43.93%
+      0     0      269.1913   196      470.0000      Cuts: 92     3241   42.73%
+      0     0      273.0333   164      470.0000      Cuts: 67     3314   41.91%
+      0     0      275.2846   200      470.0000     Cuts: 125     3386   41.43%
+      0     0      277.5876   198      470.0000      Cuts: 74     3446   40.94%
+      0     0      279.2721   205      470.0000      Cuts: 48     3502   40.58%
+      0     0      281.6669   195      470.0000      Cuts: 70     3574   40.07%
+      0     0      283.6646   204      470.0000  ZeroHalf: 77     3651   39.65%
+      0     0      285.1411   186      470.0000  ZeroHalf: 30     3698   39.33%
+      0     0      288.4262   196      470.0000  ZeroHalf: 57     3768   38.63%
+      0     0      289.0383   201      470.0000      Cuts: 64     3831   38.50%
+      0     0      290.5031   184      470.0000      Cuts: 75     3889   38.19%
+      0     0      291.3698   190      470.0000  ZeroHalf: 73     3939   38.01%
+      0     0      291.9843   192      470.0000      Cuts: 51     3991   37.88%
+*     0+    0                          459.0000      291.9843            36.39%
+      0     0      292.7841   196      459.0000      Cuts: 29     4044   36.21%
+      0     0      294.0971   201      459.0000      Cuts: 43     4135   35.93%
+      0     0      295.0183   203      459.0000      Cuts: 62     4181   35.73%
+      0     0      296.3371   194      459.0000      Cuts: 37     4244   35.44%
+      0     0      296.7080   200      459.0000      Cuts: 49     4290   35.36%
+      0     0      298.0833   212      459.0000      Cuts: 53     4353   35.06%
+      0     0      300.0734   208      459.0000      Cuts: 47     4423   34.62%
+      0     0      300.7435   206      459.0000  ZeroHalf: 48     4481   34.48%
+      0     0      301.5239   201      459.0000      Cuts: 34     4539   34.31%
+      0     0      303.1953   202      459.0000      Cuts: 64     4642   33.94%
+      0     0      304.6735   204      459.0000      Cuts: 60     4716   33.62%
+      0     0      305.0388   204      459.0000      Cuts: 48     4780   33.54%
+      0     0      305.6456   201      459.0000      Cuts: 59     4849   33.41%
+      0     0      306.0204   200      459.0000      Cuts: 31     4890   33.33%
+      0     0      306.3982   206      459.0000      Cuts: 39     4931   33.25%
+      0     0      307.1663   200      459.0000      Cuts: 52     5028   33.08%
+      0     0      308.1909   194      459.0000      Cuts: 63     5087   32.86%
+      0     0      311.5572   196      459.0000  ZeroHalf: 46     5177   32.12%
+*     0+    0                          453.0000      311.5572            31.22%
+      0     0      312.1212   199      453.0000      Cuts: 52     5235   31.10%
+      0     0      313.5465   203      453.0000      Cuts: 56     5316   30.78%
+      0     0      315.3641   195      453.0000      Cuts: 56     5417   30.38%
+      0     0      315.8291   190      453.0000      Cuts: 50     5487   30.28%
+      0     0      316.4288   196      453.0000      Cuts: 51     5563   30.15%
+      0     0      316.8818   196      453.0000      Cuts: 41     5613   30.05%
+      0     0      317.0107   204      453.0000  ZeroHalf: 23     5649   30.02%
+      0     0      317.1909   201      453.0000      Cuts: 21     5678   29.98%
+*     0+    0                          447.0000      317.1909            29.04%
+      0     2      317.1909   201      447.0000      317.1958     5678   29.04%
+Elapsed time = 0.97 sec. (947.26 ticks, tree = 0.01 MB, solutions = 7)
+*     1     1      integral     0      443.0000      317.1958     5900   28.40%
+
+Zero-half cuts applied:  123
+Lift and project cuts applied:  24
+Gomory fractional cuts applied:  3
+
+Root node processing (before b&c):
+  Real time             =    0.97 sec. (947.34 ticks)
+Sequential b&c:
+  Real time             =    0.01 sec. (18.69 ticks)
+                          ------------
+Total (root+branch&cut) =    0.98 sec. (966.04 ticks)
+
+Solution pool: 9 solutions saved.
+
+MIP - Integer optimal solution:  Objective =  4.4300000000e+02
+Solution time =    0.98 sec.  Iterations = 6240  Nodes = 3
+Deterministic time = 966.05 ticks  (988.41 ticks/sec)
+
+CPLEX> Incumbent solution written to file '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.cplex.tanglegram2.mps.sol.sol'.
+CPLEX> Logfile '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.cplex.tanglegram2.mps.sol' open.
+CPLEX> MIP - Integer optimal solution:  Objective =  4.4300000000e+02
+CPLEX> Logfile '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.cplex.tanglegram2.mps.sol' closed.
+CPLEX>
+@04 1510617598
+@05 7200
+
+Read MPS: 1
+MIP has 4714 vars and 8980 constraints
+Read SOL: 1
+Objective value computed by solver: 443
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 0 Objective 0
+
+-----------------------------
+Mon Nov 13 16:59:58 MST 2017
+-----------------------------
+
+=ready=

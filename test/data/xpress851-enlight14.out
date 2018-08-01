@@ -1,0 +1,146 @@
+-----------------------------
+Fri May 25 19:24:09 MST 2018
+-----------------------------
+@03 1527301449
+FICO Xpress Solver 64bit v8.5.1 May 21 2018
+(c) Copyright Fair Isaac Corporation 1983-2017. All rights reserved
+ Optimizer v33.01.03    [/home/beck/xpressmp/lib/libxprs.so.33.01.03]
+ Knitro 10.2.1          [/home/beck/xpressmp/lib/libxknitro.so]
+MAXTIME=-7200
+CPUTIME=0
+THREADS=1
+MIPRELCUTOFF=0
+MIPRELSTOP=0
+
+Reading Problem n3seq24
+Problem Statistics
+        6045 (      0 spare) rows
+      119856 (      0 spare) structural columns
+     3338516 (      0 spare) non-zero elements
+Global Statistics
+      119856 entities        0 sets        0 set members
+FICO Xpress v8.5.1, solve started 19:24:11, May 25, 2018
+Minimizing MILP n3seq24
+Original problem has:
+      6045 rows       119856 cols      3338516 elements    119856 globals
+Presolved problem has:
+      5950 rows       119856 cols      2404844 elements    119856 globals
+Symmetric problem: generators: 31, support set: 13680
+ Number of orbits: 6795, largest orbit: 4
+ Row orbits: 725, row support: 1500
+Will try to keep branch and bound tree memory usage below 14.7GB
+ *** Heuristic solution found:  162200.0000      Time: 3 ***
+ *** Heuristic solution found:  120600.0000      Time: 3 ***
+
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D     86     0        .000000     3
+  2655       52000.00044      D    126     0        .000000     5
+  3070       52000.00136      D     59     0        .000000     5
+  3287       52000.00000      P      0     0        .000000     6
+Optimal solution found
+Dual solved problem
+  3287 simplex iterations in 6s
+
+Final objective                         : 5.200000000000000e+04
+  Max primal violation      (abs / rel) : 1.996e-14 / 1.330e-14
+  Max dual violation        (abs / rel) : 1.844e-11 / 1.844e-11
+  Max complementarity viol. (abs / rel) :       0.0 /       0.0
+All values within tolerances
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+a         61600.00000  52000.00000      3                 15.58%       0      7
+a         61400.00000  52000.00000      4                 15.31%       0      7
+
+Performing root presolve...
+
+Reduced problem has:    5926 rows   81087 columns   1450688 elements
+Presolve dropped   :      24 rows   38769 columns        48 elements
+Symmetric problem: generators: 31, support set: 13656
+ Number of orbits: 6785, largest orbit: 4, chains: 4
+ Row orbits: 715, row support: 1476
+Will try to keep branch and bound tree memory usage below 14.7GB
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+q         58200.00000  52000.00000      5                 10.65%       0     13
+   1  K   58200.00000  52000.00000      5     62      0   10.65%      30     15
+   2  K   58200.00000  52000.00000      5     11     44   10.65%      34     17
+   3  K   58200.00000  52000.00000      5     89     20   10.65%     228     20
+   4  K   58200.00000  52000.00000      5     16     75   10.65%      72     22
+   5  K   58200.00000  52000.00000      5     99     34   10.65%     130     25
+   6  K   58200.00000  52000.00000      5     28     75   10.65%      72     28
+   7  K   58200.00000  52000.00000      5     90     44   10.65%     155     30
+   8  K   58200.00000  52000.00000      5     22     81   10.65%      39     32
+   9  K   58200.00000  52000.00000      5     54     35   10.65%      91     34
+  10  K   58200.00000  52000.00000      5     31     47   10.65%      70     37
+  11  K   58200.00000  52000.00000      5     85     33   10.65%     154     42
+  12  K   58200.00000  52000.00000      5      9     76   10.65%      46     44
+  13  K   58200.00000  52000.00000      5     48     28   10.65%      74     45
+  14  K   58200.00000  52000.00000      5     41     37   10.65%      28     48
+  15  K   58200.00000  52000.00000      5     70     41   10.65%     165     51
+  16  K   58200.00000  52000.00000      5     15     55   10.65%      30     54
+  17  K   58200.00000  52000.00000      5     66     34   10.65%      93     57
+  18  K   58200.00000  52000.00000      5     17     54   10.65%      38     60
+  19  K   58200.00000  52000.00000      5     46     30   10.65%     126     62
+  20  K   58200.00000  52000.00000      5     51     39   10.65%      38     64
+  21  G   58200.00000  52000.00000      5     13     60   10.65%      56     66
+a         55600.00000  52000.00000      6                  6.47%       0     68
+  22  G   55600.00000  52000.00000      6     38     13    6.47%      32     68
+
+Cuts in the matrix         : 46
+Cut elements in the matrix : 580183
+
+Performing root presolve...
+
+Reduced problem has:    5734 rows   56671 columns   1363026 elements
+Presolve dropped   :     238 rows   24416 columns      2934 elements
+Symmetric problem: generators: 29, support set: 4768
+ Number of orbits: 2351, largest orbit: 4, chains: 4
+ Row orbits: 556, row support: 1138
+Will try to keep branch and bound tree memory usage below 13.8GB
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+   1  K   55600.00000  52000.00000      6     56     46    6.47%      52     74
+   2  K   55600.00000  52000.00000      6      3     39    6.47%      72     75
+   3  G   55600.00000  52000.00000      6     14     18    6.47%     114     76
+   4  G   55600.00000  52000.00000      6     16     11    6.47%      39     77
+   5  G   55600.00000  52200.00000      6      9     17    6.12%     191     78
+   6  G   55600.00000  52200.00000      6      2      7    6.12%      20     80
+   7  G   55600.00000  52200.00000      6     14      4    6.12%      85     81
+   8  G   55600.00000  52200.00000      6      1     17    6.12%      15     82
+a         52200.00000  52200.00000      7                 -0.00%       0     84
+ *** Search completed ***     Time:    84 Nodes:          1
+Number of integer feasible solutions found is 7
+Best integer solution found is  52200.00000
+Best bound is  52200.00000
+Uncrunching matrix
+Objective value = 52200
+Best Bound = 52200.00000000001455191523
+Nodes explored = 1
+file3
+
+@04 1527301537
+@05 7200
+
+Read MPS: 1
+MIP has 119856 vars and 6044 constraints
+Read SOL: 1
+Objective value computed by solver: 52200
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 0 Objective 0
+
+-----------------------------
+Fri May 25 19:25:45 MST 2018
+-----------------------------
+
+=ready=

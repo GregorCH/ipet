@@ -1,0 +1,165 @@
+@01 instances/benchmark/mine-166-5.mps ===========
+-----------------------------
+Fri May 25 18:09:46 MST 2018
+-----------------------------
+@03 1527296986
+FICO Xpress Solver 64bit v8.5.1 May 21 2018
+(c) Copyright Fair Isaac Corporation 1983-2017. All rights reserved
+ Optimizer v33.01.03    [/home/beck/xpressmp/lib/libxprs.so.33.01.03]
+ Knitro 10.2.1          [/home/beck/xpressmp/lib/libxknitro.so]
+MAXTIME=-7200
+CPUTIME=0
+THREADS=1
+MIPRELCUTOFF=0
+MIPRELSTOP=0
+
+Reading Problem mine-166-5
+Problem Statistics
+        8430 (      0 spare) rows
+         830 (      0 spare) structural columns
+       20242 (      0 spare) non-zero elements
+Global Statistics
+         830 entities        0 sets        0 set members
+FICO Xpress v8.5.1, solve started 18:09:46, May 25, 2018
+Minimizing MILP mine-166-5
+Original problem has:
+      8430 rows          830 cols        20242 elements       830 globals
+Presolved problem has:
+      5386 rows          629 cols        11816 elements       621 globals
+LP relaxation tightened
+Will try to keep branch and bound tree memory usage below 14.7GB
+ *** Heuristic solution found:      .000000      Time: 0 ***
+ *** Heuristic solution found: -6902201.600      Time: 0 ***
+Crash basis containing 4 structural columns created
+
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0      -742454246.7      D   1561     0        .000000     0
+   892      -603302895.8      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  892 simplex iterations in 0s
+
+Final objective                         : -6.033028958204155e+08
+  Max primal violation      (abs / rel) :       0.0 /       0.0
+  Max dual violation        (abs / rel) :       0.0 /       0.0
+  Max complementarity viol. (abs / rel) :       0.0 /       0.0
+All values within tolerances
+
+Starting root cutting & heuristics
+
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+a        -49690551.91 -603302895.8      3                 91.76%       0      0
+k        -524713422.7 -603302895.8      4                 13.03%       0      0
+   1  K  -524713422.7 -591300798.3      4    119      0   11.26%     346      0
+k        -551365929.4 -589651486.1      5                  6.49%       0      0
+   2  K  -551365929.4 -589651486.1      5    119     94    6.49%     343      0
+   3  K  -551365929.4 -588007756.6      5     79    113    6.23%     351      0
+   4  K  -551365929.4 -587707396.7      5     44     73    6.18%     343      0
+   5  K  -551365929.4 -587540447.3      5     20     40    6.16%     340      0
+   6  K  -551365929.4 -587345276.7      5     41     16    6.13%     319      0
+   7  K  -551365929.4 -587122380.4      5     97     36    6.09%     326      0
+   8  K  -551365929.4 -587089533.0      5     13    100    6.08%     304      0
+   9  K  -551365929.4 -587031275.8      5     80     11    6.08%     317      1
+  10  K  -551365929.4 -586823746.3      5      6     76    6.04%     293      1
+k        -558319459.6 -586701043.6      6                  4.84%       0      1
+  11  K  -558319459.6 -586701043.6      6     77      9    4.84%     310      1
+  12  K  -558319459.6 -586653964.9      6     10     73    4.83%     295      1
+  13  K  -558319459.6 -586600914.6      6      6      8    4.82%     283      1
+  14  K  -558319459.6 -586514144.1      6     50      8    4.81%     278      1
+  15  K  -558319459.6 -586336066.1      6     26     49    4.78%     277      1
+  16  K  -558319459.6 -585973409.6      6     80     24    4.72%     289      1
+  17  K  -558319459.6 -585917982.4      6     39     83    4.71%     325      1
+  18  K  -558319459.6 -585794044.5      6     19     36    4.69%     272      1
+  19  K  -558319459.6 -585678482.0      6     23     20    4.67%     338      1
+  20  K  -558319459.6 -585524934.7      6     21     42    4.65%     254      1
+  21  G  -558319459.6 -583356574.0      6     71      0    4.29%     325      1
+k        -558330595.2 -582924673.7      7                  4.22%       0      1
+  22  G  -558330595.2 -582924673.7      7     72    137    4.22%     324      1
+Heuristic search started
+R        -559638668.6 -582924673.7      8                  3.99%       0      2
+R        -559934006.8 -582924673.7      9                  3.94%       0      2
+R        -561826358.9 -582924673.7     10                  3.62%       0      2
+R        -562233752.9 -582924673.7     11                  3.55%       0      2
+R        -562595194.4 -582924673.7     12                  3.49%       0      2
+R        -562844487.7 -582924673.7     13                  3.44%       0      2
+R        -563415909.7 -582924673.7     14                  3.35%       0      2
+R        -563946053.7 -582924673.7     15                  3.26%       0      2
+R        -564535883.1 -582924673.7     16                  3.15%       0      2
+R        -564860603.1 -582924673.7     17                  3.10%       0      2
+R        -564933537.7 -582924673.7     18                  3.09%       0      2
+R        -564990588.3 -582924673.7     19                  3.08%       0      2
+R        -565102233.2 -582924673.7     20                  3.06%       0      2
+R        -565253544.4 -582924673.7     21                  3.03%       0      2
+Heuristic search stopped
+M        -565515768.7 -582924673.7     22                  2.99%       0      2
+
+Cuts in the matrix         : 64
+Cut elements in the matrix : 1540
+
+Starting tree search.
+Deterministic mode with up to 1 running thread and up to 1 task.
+
+    Node     BestSoln    BestBound   Sols Active  Depth     Gap     GInf   Time
+       1 -565515768.7 -582860809.2     22      2      1    2.98%     255      4
+       2 -565515768.7 -582810760.0     22      2      3    2.97%      41      4
+       3 -565515768.7 -582810760.0     22      3      4    2.97%      47      4
+       4 -565515768.7 -582810760.0     22      4      4    2.97%      44      4
+       5 -565515768.7 -582810760.0     22      3      2    2.97%     255      4
+       6 -565515768.7 -569678284.5     22      2      3    0.73%      40      4
+       7 -565515768.7 -569678284.5     22      1      5    0.73%      40      4
+       8 -565515768.7 -568655750.5     22      2      6    0.55%      40      4
+       9 -565515768.7 -568632258.6     22      3      7    0.55%      37      4
+      10 -565515768.7 -568576651.2     22      4      8    0.54%      42      4
+k     31 -565517087.7 -568521709.0     23      8     20    0.53%       0      4
+      32 -565517087.7 -568521709.0     23      8     20    0.53%       3      4
+      43 -565517087.7 -567907876.5     23     16     13    0.42%      39      4
+      54 -565517087.7 -567826479.1     23     19     12    0.41%      35      4
+      64 -565517087.7 -567822641.6     23     20     19    0.41%      10      4
+      75 -565517087.7 -567753710.0     23     27     18    0.39%      10      4
+      88 -565517087.7 -567728499.5     23     31     11    0.39%      29      4
+      99 -565517087.7 -567486812.9     23     33     16    0.35%      11      4
+     124 -565517087.7 -567232401.3     23     33     29    0.30%       6      4
+B&B tree size: 0.7MB total
+
+    Node     BestSoln    BestBound   Sols Active  Depth     Gap     GInf   Time
+k    167 -565654721.6 -567003070.2     24     51     18    0.24%       0      4
+k    170 -565656040.6 -567003070.2     25     51     21    0.24%       0      4
+     224 -565656040.6 -566820357.3     25     63     12    0.21%      18      5
+k    252 -565725062.7 -566717344.2     26     71     26    0.18%       0      5
+k    329 -565816179.0 -566577881.6     27     73     32    0.13%       0      5
+k    330 -565817161.9 -566577881.6     28     73     32    0.13%       0      5
+     331 -565817161.9 -566577881.6     28     73     32    0.13%       1      5
+*    380 -566044358.8 -566419099.6     29     64     29    0.07%       0      5
+     432 -566044358.8 -566407123.8     29     41     28    0.06%       1      5
+k    457 -566394388.9 -566403118.4     30     46     21    0.00%       0      5
+k    502 -566395707.9 -566402056.4     31      2     24    0.00%       0      5
+ *** Search completed ***     Time:     5 Nodes:        505
+Number of integer feasible solutions found is 31
+Best integer solution found is -566395707.9
+Best bound is -566395707.9
+Uncrunching matrix
+Objective value = -566395707.871
+Best Bound = -566395707.8708435297012329
+Nodes explored = 505
+file3
+
+@04 1527296992
+@05 7200
+
+Read MPS: 1
+MIP has 830 vars and 8429 constraints
+Read SOL: 1
+Objective value computed by solver: -5.66396e+08
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 7.82036e-12 Constraints 7.82036e-12 Objective 6.98535e-08
+
+-----------------------------
+Fri May 25 18:09:52 MST 2018
+-----------------------------
+
+=ready=

@@ -1,0 +1,87 @@
+@01 instances/benchmark/mine-166-5.mps ===========
+-----------------------------
+Thu Jun 14 08:12:14 MST 2018
+-----------------------------
+@03 1528989134
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.mine-166-5.mps.sol
+/home/beck/miplib2010-1.1.0/bin/mipcl -solfile /home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.mine-166-5.mps.sol -threads 1 -time 7200 instances/benchmark/mine-166-5.mps
+Reading data...
+NAME           mine-166-5
+Start preprocessing: Rows - 8429, Cols - 830 (Int - 830, Bin - 830), NZs - 19412
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.226      1          830         117          2802            0         72281
+    0.295      2          713           0           202            0         66060
+==================================================================================
+After preprocessing: Rows - 6788, Cols - 713 (Int - 713, Bin - 713), NZs - 15878
+Scaling...
+Min exp = -5,  Max exp = 5
+
+Preprocessing Time: 0.305
+Optimizing...
+
+      Time        Its   Deg. Its   Method                     Obj
+     0.315        100          0      D/S         -994202742.1662
+     0.321        200          0      D/S         -970133523.5642
+     0.327        300          0      D/S         -936863262.1478
+     0.333        400          0      D/S         -894506570.9091
+     0.339        500          0      D/S         -856116483.9825
+     0.346        600          0      D/S         -801327667.3090
+     0.354        700          0      D/S         -763819531.0062
+     0.361        800          0      D/S         -741245661.4709
+     0.370        900          0      D/S         -725256583.6659
+     0.380        999          0      D/S         -715889283.4212
+Generating cuts...
+
+Cut statistics
+========== Cuts = Generated === Used
+========= total           0        0
+
+After processing root node: Rows - 6788, Cols - 713 (Int - 713, Bin - 713), NZs - 15878
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+     0.578         1         1      1     -350187149.2151     -715889283.4212      104.43
+     1.160        12         5      2     -497454467.6274     -611053432.3095       22.84
+     1.552        26        10      3     -535161767.5788     -582136748.6387        8.78
+     2.044        97        40      4     -548339148.8879     -570652202.7889        4.07
+     2.180       116        44      5     -550943029.5926     -570192520.9636        3.49
+     2.605       200        64      5     -550943029.5926     -569222013.2640        3.32
+     2.729       228        75      6     -551030648.1644     -569018405.0996        3.26
+     3.489       400       126      6     -551030648.1644     -567783494.4538        3.04
+     3.896       502       159      7     -551638002.8253     -567392439.0512        2.86
+     3.997       521       109      8     -557909571.2106     -567346757.6699        1.69
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+     4.086       543        91      9     -562936580.5301     -567302235.6435        0.78
+     4.640       700       121      9     -562936580.5301     -567012476.8519        0.72
+     5.436      1000       212      9     -562936580.5301     -566692517.0934        0.67
+     6.540      1500       411      9     -562936580.5301     -566491314.9063        0.63
+     7.338      1920        21     10     -566394388.8950     -566403712.5503        0.00
+     7.352      1927        16     11     -566395707.8708     -566402991.3349        0.00
+===========================================
+MIPCL version 1.5.2
+Solution time: 7.370
+Branch-and-Cut nodes: 1930
+Objective value: -566395707.8708 - optimality proven
+rm: cannot remove '*_mipcl.log': No such file or directory
+
+@04 1528989141
+@05 7200
+
+Read MPS: 1
+MIP has 830 vars and 8429 constraints
+Read SOL: 1
+Objective value computed by solver: -5.66396e+08
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 0 Objective 0.0291699
+
+-----------------------------
+Thu Jun 14 08:12:22 MST 2018
+-----------------------------
+
+=ready=

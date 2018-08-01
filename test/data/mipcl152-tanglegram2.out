@@ -1,0 +1,111 @@
+@01 instances/benchmark/tanglegram2.mps ===========
+-----------------------------
+Fri Jun 15 04:28:38 MST 2018
+-----------------------------
+@03 1529062118
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.tanglegram2.mps.sol
+/home/beck/miplib2010-1.1.0/bin/mipcl -solfile /home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.tanglegram2.mps.sol -threads 1 -time 7200 instances/benchmark/tanglegram2.mps
+Reading data...
+NAME           tanglegram2
+Start preprocessing: Rows - 8980, Cols - 4714 (Int - 4714, Bin - 4714), NZs - 26940
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.457      1         4714           0             0            0             0
+==================================================================================
+After preprocessing: Rows - 8980, Cols - 4714 (Int - 4714, Bin - 4714), NZs - 26940
+Scaling...
+Min exp = 0,  Max exp = 0
+
+Preprocessing Time: 0.470
+Optimizing...
+
+      Time        Its   Deg. Its   Method                     Obj
+     0.520        100         99      D/S                 -0.0000
+     0.525        170        169      D/S                 -0.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     1.049                 -0.0000        148      250
+     1.743                  1.5000        151      251
+     2.443                  3.5000        155      257
+     3.249                  5.0000        156      254
+     3.888                  6.0000        160      256
+     4.547                  7.0000        164      257
+     5.208                  7.5000        163      263
+     5.893                  8.5000        165      272
+     6.540                  9.0938        172      274
+     7.294                  9.4400        174      271
+      Time                     Obj  Frac vars     Cuts
+     7.924                 10.7059        170      262
+     8.553                 11.5000        172      261
+     9.229                 12.0000        171      264
+     9.926                 12.5417        171      259
+    10.977                 14.0000        170      263
+    12.005                 15.0000        177      269
+    12.720                 15.7500        180      269
+    13.390                 16.6667        182      272
+    14.114                 17.7500        186      267
+    14.898                 18.2647        188      274
+      Time                     Obj  Frac vars     Cuts
+    15.648                 19.5000        187      265
+    16.439                 20.6000        196      265
+    17.297                 21.7083        208      283
+    18.151                 23.6250        206      274
+    19.068                 24.4583        213      280
+    19.991                 25.6042        217      289
+    20.944                 26.7500        196      261
+    21.922                 28.0000        199      267
+    22.959                 28.7500        211      278
+    24.002                 29.9375        203      262
+      Time                     Obj  Frac vars     Cuts
+    25.072                 30.3750        211      274
+    26.144                 30.6250        216      276
+    27.209                 31.0625        217      268
+    28.279                 31.5000        219      270
+    29.338                 31.7813        223      281
+    30.266                 32.0769        216      282
+    31.149                 32.3750        214      276
+    32.041                 32.6226        220      258
+    32.979                 33.5958        231      261
+    33.962                 33.9375        231      302
+      Time                     Obj  Frac vars     Cuts
+    34.899                 34.5581        234      250
+
+Cut statistics
+========== Cuts = Generated === Used
+    sparse MOD2       10250      271
+  sparse Gomory         727      110
+         parity          10        2
+========= total       10987      383
+
+After processing root node: Rows - 9100, Cols - 4714 (Int - 4714, Bin - 4714), NZs - 28913
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+    34.948         1         1      0                 inf             34.5964         inf
+    35.395         1         0      1            443.0000             34.5964     1180.48
+===========================================
+MIPCL version 1.5.2
+Solution time: 35.829
+Branch-and-Cut nodes: 1
+Objective value: 443.0000 - optimality proven
+rm: cannot remove '*_mipcl.log': No such file or directory
+
+@04 1529062154
+@05 7200
+
+Read MPS: 1
+MIP has 4714 vars and 8980 constraints
+Read SOL: 1
+Objective value computed by solver: 443
+
+Integrality tolerance: 1/10000
+Linear tolerance: 1/10000
+Objective tolerance: 1/10000
+
+Check SOL: Integrality 1 Constraints 1 Objective 1
+Maximum violations: Integrality 0 Constraints 0 Objective 0
+
+-----------------------------
+Fri Jun 15 04:29:14 MST 2018
+-----------------------------
+
+=ready=

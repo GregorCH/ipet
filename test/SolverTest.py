@@ -567,6 +567,30 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:+4.43000000000000e+02,
                     Key.DualBound:+4.43000000000000e+02} ],
+                "scip501-in-memlim" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "5.0.1",
+                    Key.SolvingTime: 63.27,
+                    Key.Nodes: 0,
+                    Key.GitHash: "b1c222a",
+                    "mode": "optimized",
+                    "LPSolver": "SoPlex 3.1.1",
+                    "SpxGitHash": "ab921a5",
+                    Key.SolverStatus: Key.SolverStatusCodes.MemoryLimit }, {
+                    Key.PrimalBound: 1e+20,
+                    Key.DualBound: None} ],
+                "scip600-in-memlim" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "6.0.0",
+                    Key.SolvingTime: 70.67,
+                    Key.Nodes: 1,
+                    Key.GitHash: "ce154f0",
+                    "mode": "optimized",
+                    "LPSolver": "SoPlex 4.0.0",
+                    "SpxGitHash": "e0d3842",
+                    Key.SolverStatus: Key.SolverStatusCodes.MemoryLimit }, {
+                    Key.PrimalBound: 1e+20,
+                    Key.DualBound: 13.0} ],
                 }
 
     solvers = []

@@ -185,7 +185,12 @@ class Solver():
         m = expr.match(line)
         if m is not None:
             try:
-                d = datatype(m.groups()[0])
+                for i in m.groups():
+                    if i is not None:
+                        d = datatype(i)
+                        break
+                assert(d is not None)
+
                 self.addData(key, d)
             except:
                 pass
@@ -418,7 +423,7 @@ class SCIPSolver(Solver):
     solvingtime_expr = re.compile("^Solving Time \(sec\) : (\S+)")
     version_expr = re.compile("SCIP version (\S+)")
     limitreached_expr = re.compile("((?:^SCIP Status        :)|(?:\[(?:.*) (reached|interrupt)\]))")
-    nodes_expr = re.compile("  nodes \(total\)    : *(\d+) \(")
+    nodes_expr = re.compile("(?:Solving Nodes      : *\d+ \(total of (\d+) nodes in \d+ runs\)$|Solving Nodes      : *(\d+)$|  nodes \(total\)    : *(\d+) \()")
     extrasol_expr = re.compile("^feasible solution found .* after (.*) seconds, objective value (\S*)")
     soplexgithash_expr = re.compile("^  SoPlex .+\[GitHash: (\S+)\]")
     violbound_expr = re.compile("^  bounds           : \S+ (\S+)$")

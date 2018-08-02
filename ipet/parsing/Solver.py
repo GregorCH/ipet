@@ -1118,7 +1118,7 @@ class SasSolver(Solver):
     dualbound_expr = re.compile("^ *Best Bound *(\S+)$")
     nodes_expr = re.compile("^ *Nodes *(\S+)$")
 
-    solverstatusmap = {"^ *Solution Status *(Conditionally)* (Optimal|Failed)" : Key.SolverStatusCodes.Optimal,
+    solverstatusmap = {"^ *Solution Status *(Conditionally)* Optimal" : Key.SolverStatusCodes.Optimal,
                        "^ *Solution Status *Infeasible$" : Key.SolverStatusCodes.Infeasible,
                        "^ *Solution Status *Time Limit Reached" : Key.SolverStatusCodes.TimeLimit,
                        "^ *Solution Status *Infeasible or Unbounded" : Key.SolverStatusCodes.InfOrUnbounded,

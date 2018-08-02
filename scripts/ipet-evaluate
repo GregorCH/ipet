@@ -129,7 +129,7 @@ argparser.add_argument('--quiet', action = "store_true", default = False, help =
 argparser.add_argument('--displaygroup', default = None, help = "Name of the group for which the long display should be printed. Only available for long output mode")
 argparser.add_argument('-v', '--validate', default = None, help = "Name of a solu file for validation information")
 argparser.add_argument('-f', '--fileextensions', default = None, action = "append", help = "file extensions for writing evaluated data, e.g., csv, tex, stdout, txt")
-
+argparser.add_argument('--tolerance', default = None, help = "relative objective tolerance for validation")
 
 if __name__ == '__main__':
     try:
@@ -197,6 +197,9 @@ if __name__ == '__main__':
                 break
     elif arguments.validate:
         theeval.set_validate(arguments.validate)
+
+    if arguments.tolerance:
+        theeval.set_gaptol(float(arguments.tolerance))
 
     if arguments.experimentfile is not None:
         experiment = Experiment.loadFromFile(arguments.experimentfile)

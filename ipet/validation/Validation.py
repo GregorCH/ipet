@@ -350,7 +350,7 @@ class Validation:
             # check feasibility
             #
             pb = x.get(Key.PrimalBound)
-            if self.isSolInfeasible(x) or not (pd.isnull(pb) or isInf(pb) or self.isSolFeasible(x)):
+            if self.isSolInfeasible(x) or not (pd.isnull(pb) or isInf(pb) or self.isLE(x.get(Key.ObjectiveLimit, -1e20), pb) or self.isSolFeasible(x)):
                 return ProblemStatusCodes.FailSolInfeasible
 
             #
@@ -493,6 +493,8 @@ class Validation:
             db = self.getDbValue(db, obs)
             if not self.isPbReferenceConsistent(pb, referencedb, obs):
                 return ProblemStatusCodes.FailObjectiveValue
+            if sstatus == SolverStatusCodes.Infeasible and abs(referencepb) < infty():
+                return ProblemStatusCodes.FailDualBound
             if not self.isDbReferenceConsistent(db, referencepb, obs):
                 return ProblemStatusCodes.FailDualBound
 
@@ -574,12 +576,9 @@ class Validation:
     def isGE(self, a : float, b : float) -> bool:
         """tolerance comparison of a >= b
         """
-        return a >= b - self.tol * max(abs(a), abs(b), 1.0)
+        return (a >= b - self.tol * max(abs(a), abs(b), 1.0)) and (a >= b - 0.1)
 
     def isLE(self, a : float, b : float) -> bool:
         """tolerance comparison of a <= b
         """
         return self.isGE(b, a)
-
-
-

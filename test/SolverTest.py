@@ -138,6 +138,14 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound: -7.8430233763e+08,
                     Key.DualBound: -7.8430233763e+08} ],
+                "cplex1280-rmine6" : [ {
+                    Key.Solver: "CPLEX",
+                    Key.Version: "12.8.0.0",
+                    Key.SolvingTime: 1437.13,
+                    Key.Nodes: 540816,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:-4.5718614000e+02,
+                    Key.DualBound:-4.5718614070e+02 } ],
                 "cplex1280-satellites1-25" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.8.0.0",

@@ -1,0 +1,1624 @@
+@01 instances/benchmark/bnatt350.mps ===========
+-----------------------------
+Wed Jun 13 16:57:31 MST 2018
+-----------------------------
+@03 1528934251
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.bnatt350.mps.sol
+/home/beck/miplib2010-1.1.0/bin/mipcl -solfile /home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.bnatt350.mps.sol -threads 1 -time 7200 instances/benchmark/bnatt350.mps
+Reading data...
+NAME           bnatt350
+Start preprocessing: Rows - 4923, Cols - 3150 (Int - 3150, Bin - 3150), NZs - 19061
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    0.121      1         1763          14          3291            0         37475
+    0.180      2         1749           0             8            0         38672
+==================================================================================
+After preprocessing: Rows - 3890, Cols - 1749 (Int - 1749, Bin - 1749), NZs - 15890
+Scaling...
+Min exp = 0,  Max exp = 1
+
+Preprocessing Time: 0.185
+Optimizing...
+
+      Time        Its   Deg. Its   Method                     Obj
+     0.197        100         99      D/S                 -0.0000
+     0.201        200        199      D/S                  0.0000
+     0.206        300        223      D/S                  0.0001
+     0.211        400        270      D/S                  0.0001
+     0.217        500        312      D/S                  0.0001
+     0.225        600        358      D/S                  0.0001
+     0.234        700        402      D/S                  0.0002
+     0.244        800        450      D/S                  0.0002
+     0.255        900        505      D/S                  0.0002
+     0.261        951        520      D/S                 -0.0000
+     0.265          1          0      P/S                 -0.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     0.287                 -0.0000        495      515
+     0.472                 -0.0000        547      705
+     0.694                 -0.0000        575      644
+Start preprocessing: Rows - 4080, Cols - 1749 (Int - 1749, Bin - 1749), NZs - 16628
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    1.447      1         1710           1          8153            0         34999
+    1.501      2         1709           1            17            0         37472
+    1.551      3         1708           0             0            0         37469
+==================================================================================
+After preprocessing: Rows - 4666, Cols - 1708 (Int - 1708, Bin - 1708), NZs - 17312
+Scaling...
+Min exp = 0,  Max exp = 1
+
+
+      Time        Its   Deg. Its   Method                     Obj
+     1.571        100         99      D/S                 -0.0000
+     1.577        200        199      D/S                 -0.0000
+     1.583        300        232      D/S                  0.0001
+     1.589        400        274      D/S                  0.0001
+     1.596        500        315      D/S                  0.0001
+     1.604        600        353      D/S                  0.0002
+     1.614        700        397      D/S                  0.0002
+     1.625        800        450      D/S                  0.0002
+     1.637        900        500      D/S                  0.0002
+     1.649       1000        550      D/S                  0.0002
+
+      Time        Its   Deg. Its   Method                     Obj
+     1.662       1100        599      D/S                  0.0002
+     1.675       1200        654      D/S                  0.0002
+     1.676       1205        658      D/S                 -0.0000
+     1.680          1          0      P/S                 -0.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     1.724                 -0.0000        558      270
+     1.885                 -0.0000        562      273
+     2.108                 -0.0000        557      247
+Start preprocessing: Rows - 4754, Cols - 1708 (Int - 1708, Bin - 1708), NZs - 17913
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    2.504      1         1707           2            24            0         38210
+    2.558      2         1705           0            11            0         38362
+==================================================================================
+After preprocessing: Rows - 4689, Cols - 1705 (Int - 1705, Bin - 1705), NZs - 17556
+Scaling...
+Min exp = 0,  Max exp = 1
+
+
+      Time        Its   Deg. Its   Method                     Obj
+     2.578        100         99      D/S                 -0.0000
+     2.583        200        199      D/S                  0.0000
+     2.589        300        228      D/S                  0.0001
+     2.596        400        262      D/S                  0.0001
+     2.602        500        300      D/S                  0.0002
+     2.611        600        355      D/S                  0.0002
+     2.620        700        403      D/S                  0.0002
+     2.631        800        457      D/S                  0.0002
+     2.643        900        510      D/S                  0.0002
+     2.655       1000        561      D/S                  0.0002
+
+      Time        Its   Deg. Its   Method                     Obj
+     2.667       1100        617      D/S                  0.0002
+     2.681       1200        667      D/S                  0.0002
+     2.695       1300        725      D/S                  0.0002
+     2.705       1367        756      D/S                 -0.0000
+     2.709          1          0      P/S                 -0.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     2.741                 -0.0000        589      302
+     2.933                 -0.0000        552      314
+     3.253                 -0.0000        502      369
+Start preprocessing: Rows - 4765, Cols - 1705 (Int - 1705, Bin - 1705), NZs - 18143
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    3.763      1         1703           0            14            0         38389
+==================================================================================
+After preprocessing: Rows - 4731, Cols - 1703 (Int - 1703, Bin - 1703), NZs - 17977
+Scaling...
+Min exp = 0,  Max exp = 1
+
+
+      Time        Its   Deg. Its   Method                     Obj
+     3.783        100         99      D/S                 -0.0000
+     3.789        200        199      D/S                 -0.0000
+     3.795        300        228      D/S                  0.0001
+     3.801        400        256      D/S                  0.0001
+     3.809        500        300      D/S                  0.0002
+     3.818        600        351      D/S                  0.0002
+     3.828        700        398      D/S                  0.0002
+     3.839        800        444      D/S                  0.0002
+     3.851        900        494      D/S                  0.0002
+     3.863       1000        547      D/S                  0.0002
+
+      Time        Its   Deg. Its   Method                     Obj
+     3.877       1100        601      D/S                  0.0002
+     3.890       1200        662      D/S                  0.0002
+     3.905       1300        723      D/S                  0.0002
+     3.919       1400        771      D/S                  0.0002
+     3.932       1491        827      D/S                 -0.0000
+     3.937          1          0      P/S                 -0.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     3.984                 -0.0000        599      193
+     4.126                 -0.0000        560      205
+     4.262                 -0.0000        583       88
+Start preprocessing: Rows - 4816, Cols - 1703 (Int - 1703, Bin - 1703), NZs - 19339
+==================================== Probing =====================================
+     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
+    4.756      1         1703           0             5            0         38483
+==================================================================================
+After preprocessing: Rows - 4781, Cols - 1703 (Int - 1703, Bin - 1703), NZs - 19063
+Scaling...
+Min exp = 0,  Max exp = 1
+
+
+      Time        Its   Deg. Its   Method                     Obj
+     4.777        100         99      D/S                 -0.0000
+     4.783        200        199      D/S                  0.0000
+     4.790        300        226      D/S                  0.0001
+     4.796        400        260      D/S                  0.0001
+     4.803        500        304      D/S                  0.0002
+     4.811        600        347      D/S                  0.0002
+     4.821        700        396      D/S                  0.0002
+     4.832        800        449      D/S                  0.0002
+     4.842        900        499      D/S                  0.0002
+     4.854       1000        546      D/S                  0.0002
+
+      Time        Its   Deg. Its   Method                     Obj
+     4.867       1100        593      D/S                  0.0003
+     4.881       1200        654      D/S                  0.0003
+     4.895       1300        711      D/S                  0.0003
+     4.910       1400        774      D/S                  0.0003
+     4.924       1500        827      D/S                  0.0003
+     4.938       1600        880      D/S                  0.0003
+     4.943       1627        893      D/S                 -0.0000
+     4.948          1          0      P/S                 -0.0000
+Generating cuts...
+      Time                     Obj  Frac vars     Cuts
+     5.005                 -0.0000        661      250
+     5.255                 -0.0000        627      166
+     5.462                 -0.0000        617      184
+
+Cut statistics
+========== Cuts = Generated === Used
+          click        1206      330
+       knapsack           6        2
+ mixed knapsack           3        0
+            mir         153       17
+    sparse MOD2        2143      331
+     dense MOD2         522       31
+  sparse Gomory         495       18
+         parity          24        0
+    disjunction         173       12
+========= total        4725      741
+
+After processing root node: Rows - 4865, Cols - 1703 (Int - 1703, Bin - 1703), NZs - 20449
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+     5.736         1         1      0                 inf             -0.0000         inf
+    40.699       100        15      0                 inf             -0.0000         inf
+    86.711       200        13      0                 inf             -0.0000         inf
+   130.195       300        17      0                 inf             -0.0000         inf
+   179.974       400        15      0                 inf             -0.0000         inf
+   228.263       500        16      0                 inf             -0.0000         inf
+   250.486       600        17      0                 inf             -0.0000         inf
+   257.310       700        15      0                 inf             -0.0000         inf
+   265.183       800        12      0                 inf             -0.0000         inf
+   273.777       900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   281.424      1000        12      0                 inf             -0.0000         inf
+   291.199      1100        15      0                 inf             -0.0000         inf
+   298.156      1200        12      0                 inf             -0.0000         inf
+   305.298      1300        13      0                 inf             -0.0000         inf
+   311.893      1400        16      0                 inf             -0.0000         inf
+   318.503      1500        15      0                 inf             -0.0000         inf
+   325.674      1600        16      0                 inf             -0.0000         inf
+   331.146      1700        16      0                 inf             -0.0000         inf
+   337.670      1800        17      0                 inf             -0.0000         inf
+   343.748      1900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   351.117      2000        16      0                 inf             -0.0000         inf
+   358.302      2100        14      0                 inf             -0.0000         inf
+   365.533      2200        15      0                 inf             -0.0000         inf
+   371.525      2300        14      0                 inf             -0.0000         inf
+   378.395      2400        17      0                 inf             -0.0000         inf
+   384.412      2500        16      0                 inf             -0.0000         inf
+   392.707      2600        17      0                 inf             -0.0000         inf
+   400.561      2700        15      0                 inf             -0.0000         inf
+   409.232      2800        13      0                 inf             -0.0000         inf
+   416.311      2900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   424.185      3000        16      0                 inf             -0.0000         inf
+   430.269      3100        15      0                 inf             -0.0000         inf
+   435.840      3200        16      0                 inf             -0.0000         inf
+   443.430      3300        15      0                 inf             -0.0000         inf
+   451.447      3400        14      0                 inf             -0.0000         inf
+   457.985      3500        14      0                 inf             -0.0000         inf
+   466.337      3600        13      0                 inf             -0.0000         inf
+   474.952      3700        12      0                 inf             -0.0000         inf
+   480.645      3800        12      0                 inf             -0.0000         inf
+   488.518      3900        11      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   496.079      4000        14      0                 inf             -0.0000         inf
+   502.249      4100        14      0                 inf             -0.0000         inf
+   508.875      4200        13      0                 inf             -0.0000         inf
+   520.395      4300        15      0                 inf             -0.0000         inf
+   529.451      4400        17      0                 inf             -0.0000         inf
+   536.453      4500        15      0                 inf             -0.0000         inf
+   542.202      4600        17      0                 inf             -0.0000         inf
+   548.679      4700        16      0                 inf             -0.0000         inf
+   554.663      4800        14      0                 inf             -0.0000         inf
+   561.122      4900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   567.722      5000        16      0                 inf             -0.0000         inf
+   574.561      5100        15      0                 inf             -0.0000         inf
+   581.571      5200        15      0                 inf             -0.0000         inf
+   588.170      5300        13      0                 inf             -0.0000         inf
+   600.421      5400        18      0                 inf             -0.0000         inf
+   607.206      5500        14      0                 inf             -0.0000         inf
+   614.182      5600        14      0                 inf             -0.0000         inf
+   621.238      5700        18      0                 inf             -0.0000         inf
+   626.603      5800        16      0                 inf             -0.0000         inf
+   634.482      5900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   641.361      6000        15      0                 inf             -0.0000         inf
+   648.276      6100        13      0                 inf             -0.0000         inf
+   653.673      6200        20      0                 inf             -0.0000         inf
+   659.133      6300        16      0                 inf             -0.0000         inf
+   662.434      6400        17      0                 inf             -0.0000         inf
+   668.871      6500        18      0                 inf             -0.0000         inf
+   673.671      6600        18      0                 inf             -0.0000         inf
+   679.774      6700        17      0                 inf             -0.0000         inf
+   687.661      6800        14      0                 inf             -0.0000         inf
+   696.168      6900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   701.312      7000        21      0                 inf             -0.0000         inf
+   705.580      7100        18      0                 inf             -0.0000         inf
+   713.155      7200        15      0                 inf             -0.0000         inf
+   720.502      7300        14      0                 inf             -0.0000         inf
+   728.714      7400        17      0                 inf             -0.0000         inf
+   736.073      7500        15      0                 inf             -0.0000         inf
+   742.153      7600        18      0                 inf             -0.0000         inf
+   748.825      7700        16      0                 inf             -0.0000         inf
+   755.589      7800        16      0                 inf             -0.0000         inf
+   762.085      7900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   770.704      8000        13      0                 inf             -0.0000         inf
+   779.776      8100        13      0                 inf             -0.0000         inf
+   787.375      8200        11      0                 inf             -0.0000         inf
+   794.017      8300        15      0                 inf             -0.0000         inf
+   800.771      8400        18      0                 inf             -0.0000         inf
+   808.659      8500        14      0                 inf             -0.0000         inf
+   819.188      8600        12      0                 inf             -0.0000         inf
+   828.016      8700        11      0                 inf             -0.0000         inf
+   838.957      8800        12      0                 inf             -0.0000         inf
+   844.564      8900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   850.834      9000        13      0                 inf             -0.0000         inf
+   858.213      9100        13      0                 inf             -0.0000         inf
+   865.659      9200        14      0                 inf             -0.0000         inf
+   872.104      9300        12      0                 inf             -0.0000         inf
+   880.161      9400        13      0                 inf             -0.0000         inf
+   889.141      9500        11      0                 inf             -0.0000         inf
+   903.765      9600        17      0                 inf             -0.0000         inf
+   912.952      9700        15      0                 inf             -0.0000         inf
+   921.522      9800        15      0                 inf             -0.0000         inf
+   929.060      9900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+   939.031     10000        14      0                 inf             -0.0000         inf
+   945.879     10100        14      0                 inf             -0.0000         inf
+   952.792     10200        16      0                 inf             -0.0000         inf
+   958.704     10300        13      0                 inf             -0.0000         inf
+   964.223     10400        15      0                 inf             -0.0000         inf
+   971.637     10500        14      0                 inf             -0.0000         inf
+   977.709     10600        13      0                 inf             -0.0000         inf
+   983.158     10700        14      0                 inf             -0.0000         inf
+   988.464     10800        14      0                 inf             -0.0000         inf
+   994.591     10900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1002.734     11000        17      0                 inf             -0.0000         inf
+  1010.327     11100        16      0                 inf             -0.0000         inf
+  1018.602     11200        15      0                 inf             -0.0000         inf
+  1026.907     11300        16      0                 inf             -0.0000         inf
+  1035.647     11400        14      0                 inf             -0.0000         inf
+  1044.101     11500        14      0                 inf             -0.0000         inf
+  1052.115     11600        16      0                 inf             -0.0000         inf
+  1061.494     11700        17      0                 inf             -0.0000         inf
+  1070.506     11800        15      0                 inf             -0.0000         inf
+  1075.650     11900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1081.797     12000        16      0                 inf             -0.0000         inf
+  1087.943     12100        18      0                 inf             -0.0000         inf
+  1094.078     12200        13      0                 inf             -0.0000         inf
+  1100.247     12300        13      0                 inf             -0.0000         inf
+  1108.100     12400        15      0                 inf             -0.0000         inf
+  1117.080     12500        14      0                 inf             -0.0000         inf
+  1125.613     12600        16      0                 inf             -0.0000         inf
+  1133.632     12700        15      0                 inf             -0.0000         inf
+  1140.722     12800        13      0                 inf             -0.0000         inf
+  1145.261     12900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1150.615     13000        16      0                 inf             -0.0000         inf
+  1157.965     13100        15      0                 inf             -0.0000         inf
+  1163.505     13200        15      0                 inf             -0.0000         inf
+  1168.533     13300        14      0                 inf             -0.0000         inf
+  1174.929     13400        15      0                 inf             -0.0000         inf
+  1181.820     13500        13      0                 inf             -0.0000         inf
+  1189.654     13600        13      0                 inf             -0.0000         inf
+  1196.562     13700        13      0                 inf             -0.0000         inf
+  1205.933     13800        15      0                 inf             -0.0000         inf
+  1213.957     13900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1223.064     14000        16      0                 inf             -0.0000         inf
+  1232.380     14100        14      0                 inf             -0.0000         inf
+  1242.625     14200        14      0                 inf             -0.0000         inf
+  1250.361     14300        14      0                 inf             -0.0000         inf
+  1260.151     14400        12      0                 inf             -0.0000         inf
+  1268.712     14500        15      0                 inf             -0.0000         inf
+  1277.888     14600        15      0                 inf             -0.0000         inf
+  1288.669     14700        13      0                 inf             -0.0000         inf
+  1298.352     14800        13      0                 inf             -0.0000         inf
+  1306.675     14900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1314.122     15000        16      0                 inf             -0.0000         inf
+  1322.066     15100        11      0                 inf             -0.0000         inf
+  1328.504     15200        12      0                 inf             -0.0000         inf
+  1335.407     15300        15      0                 inf             -0.0000         inf
+  1341.745     15400        14      0                 inf             -0.0000         inf
+  1349.305     15500        14      0                 inf             -0.0000         inf
+  1356.960     15600        15      0                 inf             -0.0000         inf
+  1363.636     15700        15      0                 inf             -0.0000         inf
+  1367.513     15800        16      0                 inf             -0.0000         inf
+  1374.229     15900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1378.969     16000        12      0                 inf             -0.0000         inf
+  1386.472     16100        12      0                 inf             -0.0000         inf
+  1393.515     16200        12      0                 inf             -0.0000         inf
+  1401.451     16300        13      0                 inf             -0.0000         inf
+  1407.992     16400        13      0                 inf             -0.0000         inf
+  1415.722     16500        13      0                 inf             -0.0000         inf
+  1422.065     16600        13      0                 inf             -0.0000         inf
+  1427.559     16700        14      0                 inf             -0.0000         inf
+  1433.514     16800        13      0                 inf             -0.0000         inf
+  1441.384     16900        11      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1449.279     17000        12      0                 inf             -0.0000         inf
+  1456.218     17100        16      0                 inf             -0.0000         inf
+  1462.983     17200        14      0                 inf             -0.0000         inf
+  1468.769     17300        12      0                 inf             -0.0000         inf
+  1475.685     17400        12      0                 inf             -0.0000         inf
+  1481.089     17500        12      0                 inf             -0.0000         inf
+  1488.092     17600        10      0                 inf             -0.0000         inf
+  1494.963     17700        12      0                 inf             -0.0000         inf
+  1502.604     17800        11      0                 inf             -0.0000         inf
+  1509.336     17900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1517.097     18000        11      0                 inf             -0.0000         inf
+  1522.792     18100        20      0                 inf             -0.0000         inf
+  1528.123     18200        16      0                 inf             -0.0000         inf
+  1532.095     18300        22      0                 inf             -0.0000         inf
+  1535.930     18400        23      0                 inf             -0.0000         inf
+  1540.210     18500        20      0                 inf             -0.0000         inf
+  1543.454     18600        21      0                 inf             -0.0000         inf
+  1546.826     18700        19      0                 inf             -0.0000         inf
+  1550.312     18800        16      0                 inf             -0.0000         inf
+  1555.263     18900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1559.938     19000        22      0                 inf             -0.0000         inf
+  1564.207     19100        20      0                 inf             -0.0000         inf
+  1570.225     19200        15      0                 inf             -0.0000         inf
+  1575.904     19300        20      0                 inf             -0.0000         inf
+  1582.811     19400        18      0                 inf             -0.0000         inf
+  1589.221     19500        22      0                 inf             -0.0000         inf
+  1594.697     19600        19      0                 inf             -0.0000         inf
+  1602.133     19700        19      0                 inf             -0.0000         inf
+  1609.085     19800        19      0                 inf             -0.0000         inf
+  1614.642     19900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1621.045     20000        19      0                 inf             -0.0000         inf
+  1627.870     20100        21      0                 inf             -0.0000         inf
+  1633.277     20200        18      0                 inf             -0.0000         inf
+  1639.086     20300        19      0                 inf             -0.0000         inf
+  1646.755     20400        21      0                 inf             -0.0000         inf
+  1651.904     20500        16      0                 inf             -0.0000         inf
+  1658.368     20600        18      0                 inf             -0.0000         inf
+  1663.807     20700        17      0                 inf             -0.0000         inf
+  1668.346     20800        20      0                 inf             -0.0000         inf
+  1674.855     20900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1682.913     21000        17      0                 inf             -0.0000         inf
+  1690.051     21100        17      0                 inf             -0.0000         inf
+  1696.069     21200        16      0                 inf             -0.0000         inf
+  1705.113     21300        15      0                 inf             -0.0000         inf
+  1711.854     21400        20      0                 inf             -0.0000         inf
+  1718.577     21500        16      0                 inf             -0.0000         inf
+  1724.835     21600        15      0                 inf             -0.0000         inf
+  1731.401     21700        17      0                 inf             -0.0000         inf
+  1736.560     21800        17      0                 inf             -0.0000         inf
+  1740.895     21900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1745.255     22000        17      0                 inf             -0.0000         inf
+  1750.657     22100        19      0                 inf             -0.0000         inf
+  1757.670     22200        17      0                 inf             -0.0000         inf
+  1764.378     22300        20      0                 inf             -0.0000         inf
+  1769.698     22400        17      0                 inf             -0.0000         inf
+  1775.894     22500        14      0                 inf             -0.0000         inf
+  1780.922     22600        18      0                 inf             -0.0000         inf
+  1788.058     22700        17      0                 inf             -0.0000         inf
+  1794.868     22800        18      0                 inf             -0.0000         inf
+  1800.967     22900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1807.004     23000        16      0                 inf             -0.0000         inf
+  1812.374     23100        18      0                 inf             -0.0000         inf
+  1816.142     23200        17      0                 inf             -0.0000         inf
+  1820.857     23300        16      0                 inf             -0.0000         inf
+  1826.761     23400        18      0                 inf             -0.0000         inf
+  1833.684     23500        14      0                 inf             -0.0000         inf
+  1838.499     23600        19      0                 inf             -0.0000         inf
+  1842.743     23700        16      0                 inf             -0.0000         inf
+  1848.552     23800        15      0                 inf             -0.0000         inf
+  1852.875     23900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1860.669     24000        15      0                 inf             -0.0000         inf
+  1865.141     24100        18      0                 inf             -0.0000         inf
+  1871.389     24200        19      0                 inf             -0.0000         inf
+  1876.532     24300        15      0                 inf             -0.0000         inf
+  1880.438     24400        16      0                 inf             -0.0000         inf
+  1885.938     24500        18      0                 inf             -0.0000         inf
+  1894.110     24600        15      0                 inf             -0.0000         inf
+  1901.948     24700        13      0                 inf             -0.0000         inf
+  1908.057     24800        19      0                 inf             -0.0000         inf
+  1914.010     24900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1918.236     25000        19      0                 inf             -0.0000         inf
+  1923.824     25100        18      0                 inf             -0.0000         inf
+  1930.954     25200        16      0                 inf             -0.0000         inf
+  1937.988     25300        18      0                 inf             -0.0000         inf
+  1944.886     25400        16      0                 inf             -0.0000         inf
+  1951.038     25500        17      0                 inf             -0.0000         inf
+  1957.272     25600        15      0                 inf             -0.0000         inf
+  1964.518     25700        15      0                 inf             -0.0000         inf
+  1970.135     25800        15      0                 inf             -0.0000         inf
+  1976.323     25900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  1981.763     26000        18      0                 inf             -0.0000         inf
+  1988.214     26100        18      0                 inf             -0.0000         inf
+  1994.280     26200        16      0                 inf             -0.0000         inf
+  2002.324     26300        13      0                 inf             -0.0000         inf
+  2008.106     26400        18      0                 inf             -0.0000         inf
+  2016.381     26500        16      0                 inf             -0.0000         inf
+  2025.328     26600        14      0                 inf             -0.0000         inf
+  2032.281     26700        18      0                 inf             -0.0000         inf
+  2038.805     26800        17      0                 inf             -0.0000         inf
+  2045.699     26900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2053.870     27000        18      0                 inf             -0.0000         inf
+  2061.187     27100        17      0                 inf             -0.0000         inf
+  2067.806     27200        16      0                 inf             -0.0000         inf
+  2076.494     27300        15      0                 inf             -0.0000         inf
+  2083.437     27400        15      0                 inf             -0.0000         inf
+  2090.016     27500        16      0                 inf             -0.0000         inf
+  2096.495     27600        18      0                 inf             -0.0000         inf
+  2103.154     27700        16      0                 inf             -0.0000         inf
+  2110.940     27800        15      0                 inf             -0.0000         inf
+  2117.124     27900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2123.861     28000        14      0                 inf             -0.0000         inf
+  2133.180     28100        13      0                 inf             -0.0000         inf
+  2139.169     28200        16      0                 inf             -0.0000         inf
+  2145.853     28300        19      0                 inf             -0.0000         inf
+  2152.893     28400        16      0                 inf             -0.0000         inf
+  2161.973     28500        17      0                 inf             -0.0000         inf
+  2167.362     28600        20      0                 inf             -0.0000         inf
+  2171.253     28700        21      0                 inf             -0.0000         inf
+  2177.151     28800        19      0                 inf             -0.0000         inf
+  2182.334     28900        21      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2187.078     29000        17      0                 inf             -0.0000         inf
+  2191.401     29100        21      0                 inf             -0.0000         inf
+  2195.649     29200        20      0                 inf             -0.0000         inf
+  2200.338     29300        19      0                 inf             -0.0000         inf
+  2204.651     29400        18      0                 inf             -0.0000         inf
+  2209.591     29500        20      0                 inf             -0.0000         inf
+  2213.078     29600        18      0                 inf             -0.0000         inf
+  2217.372     29700        17      0                 inf             -0.0000         inf
+  2220.890     29800        21      0                 inf             -0.0000         inf
+  2224.131     29900        19      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2228.264     30000        16      0                 inf             -0.0000         inf
+  2233.456     30100        19      0                 inf             -0.0000         inf
+  2239.192     30200        18      0                 inf             -0.0000         inf
+  2244.240     30300        23      0                 inf             -0.0000         inf
+  2248.052     30400        19      0                 inf             -0.0000         inf
+  2252.928     30500        16      0                 inf             -0.0000         inf
+  2256.732     30600        18      0                 inf             -0.0000         inf
+  2260.554     30700        16      0                 inf             -0.0000         inf
+  2263.895     30800        18      0                 inf             -0.0000         inf
+  2267.476     30900        23      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2271.562     31000        19      0                 inf             -0.0000         inf
+  2276.435     31100        20      0                 inf             -0.0000         inf
+  2281.185     31200        22      0                 inf             -0.0000         inf
+  2284.882     31300        23      0                 inf             -0.0000         inf
+  2289.204     31400        21      0                 inf             -0.0000         inf
+  2295.601     31500        19      0                 inf             -0.0000         inf
+  2299.445     31600        21      0                 inf             -0.0000         inf
+  2302.680     31700        20      0                 inf             -0.0000         inf
+  2306.235     31800        16      0                 inf             -0.0000         inf
+  2311.226     31900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2316.140     32000        19      0                 inf             -0.0000         inf
+  2321.412     32100        15      0                 inf             -0.0000         inf
+  2326.563     32200        17      0                 inf             -0.0000         inf
+  2330.498     32300        21      0                 inf             -0.0000         inf
+  2334.307     32400        21      0                 inf             -0.0000         inf
+  2338.364     32500        17      0                 inf             -0.0000         inf
+  2343.635     32600        17      0                 inf             -0.0000         inf
+  2348.417     32700        19      0                 inf             -0.0000         inf
+  2351.446     32800        17      0                 inf             -0.0000         inf
+  2356.593     32900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2359.916     33000        18      0                 inf             -0.0000         inf
+  2363.422     33100        18      0                 inf             -0.0000         inf
+  2370.001     33200        14      0                 inf             -0.0000         inf
+  2375.062     33300        20      0                 inf             -0.0000         inf
+  2378.891     33400        19      0                 inf             -0.0000         inf
+  2382.807     33500        20      0                 inf             -0.0000         inf
+  2386.438     33600        15      0                 inf             -0.0000         inf
+  2391.093     33700        15      0                 inf             -0.0000         inf
+  2394.760     33800        15      0                 inf             -0.0000         inf
+  2399.744     33900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2407.023     34000        20      0                 inf             -0.0000         inf
+  2410.731     34100        17      0                 inf             -0.0000         inf
+  2416.544     34200        16      0                 inf             -0.0000         inf
+  2421.476     34300        15      0                 inf             -0.0000         inf
+  2427.331     34400        16      0                 inf             -0.0000         inf
+  2431.606     34500        17      0                 inf             -0.0000         inf
+  2438.068     34600        16      0                 inf             -0.0000         inf
+  2444.081     34700        18      0                 inf             -0.0000         inf
+  2449.585     34800        19      0                 inf             -0.0000         inf
+  2456.873     34900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2460.662     35000        14      0                 inf             -0.0000         inf
+  2465.314     35100        16      0                 inf             -0.0000         inf
+  2470.519     35200        17      0                 inf             -0.0000         inf
+  2476.105     35300        14      0                 inf             -0.0000         inf
+  2482.163     35400        17      0                 inf             -0.0000         inf
+  2487.079     35500        16      0                 inf             -0.0000         inf
+  2491.985     35600        16      0                 inf             -0.0000         inf
+  2497.299     35700        16      0                 inf             -0.0000         inf
+  2501.811     35800        14      0                 inf             -0.0000         inf
+  2506.354     35900        19      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2511.920     36000        17      0                 inf             -0.0000         inf
+  2515.664     36100        15      0                 inf             -0.0000         inf
+  2519.432     36200        15      0                 inf             -0.0000         inf
+  2522.277     36300        16      0                 inf             -0.0000         inf
+  2526.623     36400        15      0                 inf             -0.0000         inf
+  2531.082     36500        19      0                 inf             -0.0000         inf
+  2536.066     36600        16      0                 inf             -0.0000         inf
+  2540.895     36700        14      0                 inf             -0.0000         inf
+  2547.673     36800        16      0                 inf             -0.0000         inf
+  2554.379     36900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2558.674     37000        14      0                 inf             -0.0000         inf
+  2561.643     37100        18      0                 inf             -0.0000         inf
+  2565.369     37200        16      0                 inf             -0.0000         inf
+  2569.336     37300        18      0                 inf             -0.0000         inf
+  2575.444     37400        14      0                 inf             -0.0000         inf
+  2580.614     37500        14      0                 inf             -0.0000         inf
+  2584.002     37600        17      0                 inf             -0.0000         inf
+  2587.703     37700        15      0                 inf             -0.0000         inf
+  2591.850     37800        16      0                 inf             -0.0000         inf
+  2596.374     37900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2601.923     38000        19      0                 inf             -0.0000         inf
+  2609.184     38100        16      0                 inf             -0.0000         inf
+  2616.715     38200        15      0                 inf             -0.0000         inf
+  2621.809     38300        16      0                 inf             -0.0000         inf
+  2627.427     38400        16      0                 inf             -0.0000         inf
+  2633.655     38500        13      0                 inf             -0.0000         inf
+  2637.611     38600        21      0                 inf             -0.0000         inf
+  2642.478     38700        17      0                 inf             -0.0000         inf
+  2646.871     38800        16      0                 inf             -0.0000         inf
+  2652.419     38900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2655.086     39000        18      0                 inf             -0.0000         inf
+  2658.772     39100        20      0                 inf             -0.0000         inf
+  2663.084     39200        20      0                 inf             -0.0000         inf
+  2667.249     39300        18      0                 inf             -0.0000         inf
+  2671.258     39400        22      0                 inf             -0.0000         inf
+  2675.088     39500        20      0                 inf             -0.0000         inf
+  2679.936     39600        17      0                 inf             -0.0000         inf
+  2684.441     39700        19      0                 inf             -0.0000         inf
+  2690.139     39800        21      0                 inf             -0.0000         inf
+  2696.294     39900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2700.795     40000        18      0                 inf             -0.0000         inf
+  2705.464     40100        18      0                 inf             -0.0000         inf
+  2709.626     40200        20      0                 inf             -0.0000         inf
+  2715.023     40300        20      0                 inf             -0.0000         inf
+  2721.316     40400        16      0                 inf             -0.0000         inf
+  2727.624     40500        17      0                 inf             -0.0000         inf
+  2733.313     40600        15      0                 inf             -0.0000         inf
+  2738.761     40700        18      0                 inf             -0.0000         inf
+  2744.018     40800        18      0                 inf             -0.0000         inf
+  2749.425     40900        21      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2755.165     41000        16      0                 inf             -0.0000         inf
+  2760.218     41100        18      0                 inf             -0.0000         inf
+  2764.766     41200        18      0                 inf             -0.0000         inf
+  2770.664     41300        16      0                 inf             -0.0000         inf
+  2775.773     41400        16      0                 inf             -0.0000         inf
+  2781.543     41500        16      0                 inf             -0.0000         inf
+  2786.306     41600        15      0                 inf             -0.0000         inf
+  2790.964     41700        21      0                 inf             -0.0000         inf
+  2796.377     41800        16      0                 inf             -0.0000         inf
+  2802.149     41900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2808.416     42000        19      0                 inf             -0.0000         inf
+  2814.135     42100        19      0                 inf             -0.0000         inf
+  2819.705     42200        21      0                 inf             -0.0000         inf
+  2824.971     42300        16      0                 inf             -0.0000         inf
+  2829.635     42400        18      0                 inf             -0.0000         inf
+  2834.950     42500        16      0                 inf             -0.0000         inf
+  2839.486     42600        18      0                 inf             -0.0000         inf
+  2845.945     42700        16      0                 inf             -0.0000         inf
+  2849.769     42800        16      0                 inf             -0.0000         inf
+  2855.830     42900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2863.606     43000        14      0                 inf             -0.0000         inf
+  2867.749     43100        20      0                 inf             -0.0000         inf
+  2876.329     43200        16      0                 inf             -0.0000         inf
+  2879.471     43300        17      0                 inf             -0.0000         inf
+  2882.216     43400        16      0                 inf             -0.0000         inf
+  2886.055     43500        16      0                 inf             -0.0000         inf
+  2890.563     43600        18      0                 inf             -0.0000         inf
+  2897.401     43700        20      0                 inf             -0.0000         inf
+  2900.991     43800        19      0                 inf             -0.0000         inf
+  2905.023     43900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2911.666     44000        15      0                 inf             -0.0000         inf
+  2916.065     44100        17      0                 inf             -0.0000         inf
+  2920.992     44200        16      0                 inf             -0.0000         inf
+  2927.356     44300        16      0                 inf             -0.0000         inf
+  2934.635     44400        17      0                 inf             -0.0000         inf
+  2940.296     44500        18      0                 inf             -0.0000         inf
+  2945.018     44600        16      0                 inf             -0.0000         inf
+  2950.274     44700        16      0                 inf             -0.0000         inf
+  2956.362     44800        17      0                 inf             -0.0000         inf
+  2963.359     44900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  2970.489     45000        17      0                 inf             -0.0000         inf
+  2978.327     45100        18      0                 inf             -0.0000         inf
+  2982.905     45200        19      0                 inf             -0.0000         inf
+  2987.990     45300        18      0                 inf             -0.0000         inf
+  2992.056     45400        19      0                 inf             -0.0000         inf
+  2996.600     45500        19      0                 inf             -0.0000         inf
+  3001.132     45600        17      0                 inf             -0.0000         inf
+  3005.458     45700        18      0                 inf             -0.0000         inf
+  3010.869     45800        19      0                 inf             -0.0000         inf
+  3016.378     45900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3020.403     46000        18      0                 inf             -0.0000         inf
+  3025.449     46100        19      0                 inf             -0.0000         inf
+  3032.665     46200        14      0                 inf             -0.0000         inf
+  3036.579     46300        20      0                 inf             -0.0000         inf
+  3039.683     46400        19      0                 inf             -0.0000         inf
+  3044.578     46500        18      0                 inf             -0.0000         inf
+  3050.615     46600        20      0                 inf             -0.0000         inf
+  3057.047     46700        18      0                 inf             -0.0000         inf
+  3063.112     46800        18      0                 inf             -0.0000         inf
+  3069.618     46900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3075.780     47000        17      0                 inf             -0.0000         inf
+  3079.767     47100        18      0                 inf             -0.0000         inf
+  3086.091     47200        16      0                 inf             -0.0000         inf
+  3092.759     47300        15      0                 inf             -0.0000         inf
+  3098.229     47400        21      0                 inf             -0.0000         inf
+  3103.229     47500        17      0                 inf             -0.0000         inf
+  3108.419     47600        16      0                 inf             -0.0000         inf
+  3114.345     47700        18      0                 inf             -0.0000         inf
+  3119.890     47800        18      0                 inf             -0.0000         inf
+  3124.434     47900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3130.251     48000        20      0                 inf             -0.0000         inf
+  3136.450     48100        21      0                 inf             -0.0000         inf
+  3143.597     48200        15      0                 inf             -0.0000         inf
+  3149.891     48300        15      0                 inf             -0.0000         inf
+  3156.338     48400        19      0                 inf             -0.0000         inf
+  3161.155     48500        20      0                 inf             -0.0000         inf
+  3166.035     48600        19      0                 inf             -0.0000         inf
+  3171.923     48700        15      0                 inf             -0.0000         inf
+  3179.239     48800        19      0                 inf             -0.0000         inf
+  3184.771     48900        19      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3190.166     49000        15      0                 inf             -0.0000         inf
+  3195.587     49100        18      0                 inf             -0.0000         inf
+  3200.634     49200        16      0                 inf             -0.0000         inf
+  3206.128     49300        21      0                 inf             -0.0000         inf
+  3210.008     49400        19      0                 inf             -0.0000         inf
+  3214.578     49500        19      0                 inf             -0.0000         inf
+  3219.534     49600        16      0                 inf             -0.0000         inf
+  3223.821     49700        18      0                 inf             -0.0000         inf
+  3228.632     49800        19      0                 inf             -0.0000         inf
+  3233.824     49900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3238.852     50000        14      0                 inf             -0.0000         inf
+  3245.592     50100        15      0                 inf             -0.0000         inf
+  3252.810     50200        16      0                 inf             -0.0000         inf
+  3258.211     50300        12      0                 inf             -0.0000         inf
+  3263.215     50400        16      0                 inf             -0.0000         inf
+  3267.730     50500        17      0                 inf             -0.0000         inf
+  3274.250     50600        16      0                 inf             -0.0000         inf
+  3280.794     50700        17      0                 inf             -0.0000         inf
+  3288.247     50800        17      0                 inf             -0.0000         inf
+  3294.362     50900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3300.373     51000        17      0                 inf             -0.0000         inf
+  3305.215     51100        17      0                 inf             -0.0000         inf
+  3311.109     51200        16      0                 inf             -0.0000         inf
+  3316.622     51300        19      0                 inf             -0.0000         inf
+  3323.745     51400        17      0                 inf             -0.0000         inf
+  3327.814     51500        17      0                 inf             -0.0000         inf
+  3331.859     51600        16      0                 inf             -0.0000         inf
+  3338.132     51700        17      0                 inf             -0.0000         inf
+  3343.410     51800        17      0                 inf             -0.0000         inf
+  3347.312     51900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3351.758     52000        14      0                 inf             -0.0000         inf
+  3356.667     52100        15      0                 inf             -0.0000         inf
+  3362.950     52200        16      0                 inf             -0.0000         inf
+  3367.683     52300        17      0                 inf             -0.0000         inf
+  3373.194     52400        19      0                 inf             -0.0000         inf
+  3377.697     52500        15      0                 inf             -0.0000         inf
+  3383.623     52600        15      0                 inf             -0.0000         inf
+  3391.061     52700        15      0                 inf             -0.0000         inf
+  3398.821     52800        15      0                 inf             -0.0000         inf
+  3404.230     52900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3410.609     53000        16      0                 inf             -0.0000         inf
+  3416.732     53100        13      0                 inf             -0.0000         inf
+  3422.096     53200        18      0                 inf             -0.0000         inf
+  3427.846     53300        15      0                 inf             -0.0000         inf
+  3434.189     53400        13      0                 inf             -0.0000         inf
+  3440.200     53500        17      0                 inf             -0.0000         inf
+  3446.796     53600        16      0                 inf             -0.0000         inf
+  3451.264     53700        17      0                 inf             -0.0000         inf
+  3461.148     53800        16      0                 inf             -0.0000         inf
+  3469.578     53900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3476.753     54000        15      0                 inf             -0.0000         inf
+  3483.666     54100        15      0                 inf             -0.0000         inf
+  3489.109     54200        16      0                 inf             -0.0000         inf
+  3495.857     54300        15      0                 inf             -0.0000         inf
+  3502.608     54400        15      0                 inf             -0.0000         inf
+  3508.542     54500        14      0                 inf             -0.0000         inf
+  3513.786     54600        17      0                 inf             -0.0000         inf
+  3519.362     54700        16      0                 inf             -0.0000         inf
+  3525.447     54800        16      0                 inf             -0.0000         inf
+  3529.867     54900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3536.521     55000        14      0                 inf             -0.0000         inf
+  3543.956     55100        14      0                 inf             -0.0000         inf
+  3551.272     55200        16      0                 inf             -0.0000         inf
+  3559.162     55300        14      0                 inf             -0.0000         inf
+  3565.868     55400        14      0                 inf             -0.0000         inf
+  3570.962     55500        16      0                 inf             -0.0000         inf
+  3577.313     55600        15      0                 inf             -0.0000         inf
+  3586.273     55700        19      0                 inf             -0.0000         inf
+  3594.093     55800        15      0                 inf             -0.0000         inf
+  3601.065     55900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3606.512     56000        16      0                 inf             -0.0000         inf
+  3612.308     56100        15      0                 inf             -0.0000         inf
+  3620.583     56200        15      0                 inf             -0.0000         inf
+  3627.637     56300        13      0                 inf             -0.0000         inf
+  3635.980     56400        14      0                 inf             -0.0000         inf
+  3641.709     56500        14      0                 inf             -0.0000         inf
+  3647.599     56600        13      0                 inf             -0.0000         inf
+  3652.980     56700        20      0                 inf             -0.0000         inf
+  3658.856     56800        18      0                 inf             -0.0000         inf
+  3663.840     56900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3669.850     57000        17      0                 inf             -0.0000         inf
+  3675.290     57100        18      0                 inf             -0.0000         inf
+  3680.994     57200        16      0                 inf             -0.0000         inf
+  3687.088     57300        20      0                 inf             -0.0000         inf
+  3693.748     57400        19      0                 inf             -0.0000         inf
+  3697.999     57500        15      0                 inf             -0.0000         inf
+  3702.111     57600        18      0                 inf             -0.0000         inf
+  3707.035     57700        18      0                 inf             -0.0000         inf
+  3711.975     57800        19      0                 inf             -0.0000         inf
+  3718.766     57900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3723.920     58000        17      0                 inf             -0.0000         inf
+  3728.099     58100        21      0                 inf             -0.0000         inf
+  3733.812     58200        18      0                 inf             -0.0000         inf
+  3739.433     58300        19      0                 inf             -0.0000         inf
+  3743.842     58400        16      0                 inf             -0.0000         inf
+  3748.449     58500        15      0                 inf             -0.0000         inf
+  3753.367     58600        15      0                 inf             -0.0000         inf
+  3757.748     58700        17      0                 inf             -0.0000         inf
+  3763.396     58800        14      0                 inf             -0.0000         inf
+  3769.547     58900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3773.914     59000        17      0                 inf             -0.0000         inf
+  3778.142     59100        17      0                 inf             -0.0000         inf
+  3784.082     59200        16      0                 inf             -0.0000         inf
+  3788.721     59300        17      0                 inf             -0.0000         inf
+  3794.933     59400        20      0                 inf             -0.0000         inf
+  3801.944     59500        16      0                 inf             -0.0000         inf
+  3809.167     59600        16      0                 inf             -0.0000         inf
+  3814.919     59700        19      0                 inf             -0.0000         inf
+  3819.917     59800        17      0                 inf             -0.0000         inf
+  3825.614     59900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3830.669     60000        17      0                 inf             -0.0000         inf
+  3836.511     60100        15      0                 inf             -0.0000         inf
+  3841.715     60200        17      0                 inf             -0.0000         inf
+  3846.161     60300        14      0                 inf             -0.0000         inf
+  3850.742     60400        16      0                 inf             -0.0000         inf
+  3855.335     60500        18      0                 inf             -0.0000         inf
+  3860.036     60600        17      0                 inf             -0.0000         inf
+  3864.385     60700        16      0                 inf             -0.0000         inf
+  3869.923     60800        16      0                 inf             -0.0000         inf
+  3875.844     60900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3881.278     61000        13      0                 inf             -0.0000         inf
+  3886.647     61100        15      0                 inf             -0.0000         inf
+  3892.553     61200        19      0                 inf             -0.0000         inf
+  3898.723     61300        17      0                 inf             -0.0000         inf
+  3906.150     61400        16      0                 inf             -0.0000         inf
+  3912.378     61500        17      0                 inf             -0.0000         inf
+  3920.566     61600        16      0                 inf             -0.0000         inf
+  3931.214     61700        15      0                 inf             -0.0000         inf
+  3938.764     61800        16      0                 inf             -0.0000         inf
+  3948.945     61900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  3955.321     62000        18      0                 inf             -0.0000         inf
+  3961.108     62100        18      0                 inf             -0.0000         inf
+  3967.827     62200        16      0                 inf             -0.0000         inf
+  3973.475     62300        15      0                 inf             -0.0000         inf
+  3982.891     62400        14      0                 inf             -0.0000         inf
+  3989.964     62500        13      0                 inf             -0.0000         inf
+  3994.835     62600        13      0                 inf             -0.0000         inf
+  4000.160     62700        17      0                 inf             -0.0000         inf
+  4006.098     62800        16      0                 inf             -0.0000         inf
+  4011.747     62900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4019.405     63000        17      0                 inf             -0.0000         inf
+  4026.974     63100        11      0                 inf             -0.0000         inf
+  4032.284     63200        14      0                 inf             -0.0000         inf
+  4038.448     63300        14      0                 inf             -0.0000         inf
+  4043.877     63400        19      0                 inf             -0.0000         inf
+  4049.103     63500        18      0                 inf             -0.0000         inf
+  4053.061     63600        17      0                 inf             -0.0000         inf
+  4057.117     63700        19      0                 inf             -0.0000         inf
+  4062.147     63800        15      0                 inf             -0.0000         inf
+  4067.208     63900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4072.208     64000        17      0                 inf             -0.0000         inf
+  4076.373     64100        19      0                 inf             -0.0000         inf
+  4081.449     64200        18      0                 inf             -0.0000         inf
+  4086.030     64300        17      0                 inf             -0.0000         inf
+  4090.705     64400        14      0                 inf             -0.0000         inf
+  4095.715     64500        16      0                 inf             -0.0000         inf
+  4102.423     64600        17      0                 inf             -0.0000         inf
+  4107.749     64700        15      0                 inf             -0.0000         inf
+  4113.897     64800        18      0                 inf             -0.0000         inf
+  4119.109     64900        19      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4125.209     65000        14      0                 inf             -0.0000         inf
+  4131.900     65100        14      0                 inf             -0.0000         inf
+  4137.224     65200        16      0                 inf             -0.0000         inf
+  4141.299     65300        16      0                 inf             -0.0000         inf
+  4148.059     65400        14      0                 inf             -0.0000         inf
+  4152.404     65500        14      0                 inf             -0.0000         inf
+  4158.800     65600        16      0                 inf             -0.0000         inf
+  4163.732     65700        14      0                 inf             -0.0000         inf
+  4168.753     65800        18      0                 inf             -0.0000         inf
+  4173.553     65900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4179.538     66000        14      0                 inf             -0.0000         inf
+  4185.984     66100        15      0                 inf             -0.0000         inf
+  4192.142     66200        15      0                 inf             -0.0000         inf
+  4199.395     66300        16      0                 inf             -0.0000         inf
+  4206.165     66400        14      0                 inf             -0.0000         inf
+  4211.353     66500        15      0                 inf             -0.0000         inf
+  4217.197     66600        16      0                 inf             -0.0000         inf
+  4222.770     66700        16      0                 inf             -0.0000         inf
+  4228.095     66800        15      0                 inf             -0.0000         inf
+  4234.373     66900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4239.229     67000        15      0                 inf             -0.0000         inf
+  4244.033     67100        14      0                 inf             -0.0000         inf
+  4249.901     67200        12      0                 inf             -0.0000         inf
+  4257.128     67300        10      0                 inf             -0.0000         inf
+  4261.590     67400        15      0                 inf             -0.0000         inf
+  4268.144     67500        16      0                 inf             -0.0000         inf
+  4273.358     67600        13      0                 inf             -0.0000         inf
+  4278.713     67700        16      0                 inf             -0.0000         inf
+  4283.859     67800        19      0                 inf             -0.0000         inf
+  4288.178     67900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4292.713     68000        16      0                 inf             -0.0000         inf
+  4297.532     68100        17      0                 inf             -0.0000         inf
+  4303.579     68200        17      0                 inf             -0.0000         inf
+  4308.387     68300        15      0                 inf             -0.0000         inf
+  4314.504     68400        16      0                 inf             -0.0000         inf
+  4319.721     68500        15      0                 inf             -0.0000         inf
+  4324.107     68600        16      0                 inf             -0.0000         inf
+  4327.851     68700        16      0                 inf             -0.0000         inf
+  4332.196     68800        17      0                 inf             -0.0000         inf
+  4337.178     68900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4344.018     69000        17      0                 inf             -0.0000         inf
+  4351.364     69100        19      0                 inf             -0.0000         inf
+  4357.213     69200        16      0                 inf             -0.0000         inf
+  4363.304     69300        14      0                 inf             -0.0000         inf
+  4368.057     69400        16      0                 inf             -0.0000         inf
+  4373.533     69500        14      0                 inf             -0.0000         inf
+  4379.883     69600        17      0                 inf             -0.0000         inf
+  4386.270     69700        13      0                 inf             -0.0000         inf
+  4390.562     69800        15      0                 inf             -0.0000         inf
+  4395.425     69900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4401.543     70000        15      0                 inf             -0.0000         inf
+  4408.268     70100        15      0                 inf             -0.0000         inf
+  4415.280     70200        15      0                 inf             -0.0000         inf
+  4421.324     70300        15      0                 inf             -0.0000         inf
+  4428.943     70400        16      0                 inf             -0.0000         inf
+  4433.473     70500        15      0                 inf             -0.0000         inf
+  4440.392     70600        13      0                 inf             -0.0000         inf
+  4444.879     70700        16      0                 inf             -0.0000         inf
+  4450.099     70800        12      0                 inf             -0.0000         inf
+  4457.219     70900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4463.519     71000        15      0                 inf             -0.0000         inf
+  4468.675     71100        14      0                 inf             -0.0000         inf
+  4474.173     71200        16      0                 inf             -0.0000         inf
+  4478.069     71300        17      0                 inf             -0.0000         inf
+  4483.795     71400        13      0                 inf             -0.0000         inf
+  4489.573     71500        17      0                 inf             -0.0000         inf
+  4492.768     71600        19      0                 inf             -0.0000         inf
+  4497.473     71700        14      0                 inf             -0.0000         inf
+  4502.013     71800        13      0                 inf             -0.0000         inf
+  4508.152     71900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4513.154     72000        13      0                 inf             -0.0000         inf
+  4517.908     72100        15      0                 inf             -0.0000         inf
+  4522.602     72200        13      0                 inf             -0.0000         inf
+  4528.047     72300        14      0                 inf             -0.0000         inf
+  4532.361     72400        13      0                 inf             -0.0000         inf
+  4536.384     72500        12      0                 inf             -0.0000         inf
+  4541.640     72600        20      0                 inf             -0.0000         inf
+  4546.539     72700        19      0                 inf             -0.0000         inf
+  4551.034     72800        19      0                 inf             -0.0000         inf
+  4555.017     72900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4559.400     73000        18      0                 inf             -0.0000         inf
+  4563.997     73100        16      0                 inf             -0.0000         inf
+  4569.203     73200        19      0                 inf             -0.0000         inf
+  4574.790     73300        17      0                 inf             -0.0000         inf
+  4579.553     73400        18      0                 inf             -0.0000         inf
+  4584.027     73500        18      0                 inf             -0.0000         inf
+  4588.222     73600        19      0                 inf             -0.0000         inf
+  4593.110     73700        19      0                 inf             -0.0000         inf
+  4597.552     73800        16      0                 inf             -0.0000         inf
+  4603.309     73900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4610.001     74000        19      0                 inf             -0.0000         inf
+  4614.675     74100        17      0                 inf             -0.0000         inf
+  4620.266     74200        16      0                 inf             -0.0000         inf
+  4624.755     74300        17      0                 inf             -0.0000         inf
+  4631.658     74400        14      0                 inf             -0.0000         inf
+  4635.929     74500        20      0                 inf             -0.0000         inf
+  4639.922     74600        18      0                 inf             -0.0000         inf
+  4645.266     74700        18      0                 inf             -0.0000         inf
+  4650.494     74800        17      0                 inf             -0.0000         inf
+  4656.531     74900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4664.223     75000        19      0                 inf             -0.0000         inf
+  4672.912     75100        16      0                 inf             -0.0000         inf
+  4682.306     75200        13      0                 inf             -0.0000         inf
+  4687.107     75300        21      0                 inf             -0.0000         inf
+  4691.296     75400        20      0                 inf             -0.0000         inf
+  4696.384     75500        18      0                 inf             -0.0000         inf
+  4701.527     75600        20      0                 inf             -0.0000         inf
+  4706.350     75700        17      0                 inf             -0.0000         inf
+  4712.870     75800        19      0                 inf             -0.0000         inf
+  4718.631     75900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4724.097     76000        15      0                 inf             -0.0000         inf
+  4728.580     76100        15      0                 inf             -0.0000         inf
+  4734.289     76200        14      0                 inf             -0.0000         inf
+  4739.387     76300        15      0                 inf             -0.0000         inf
+  4745.739     76400        15      0                 inf             -0.0000         inf
+  4751.107     76500        18      0                 inf             -0.0000         inf
+  4754.957     76600        19      0                 inf             -0.0000         inf
+  4759.404     76700        17      0                 inf             -0.0000         inf
+  4764.708     76800        16      0                 inf             -0.0000         inf
+  4771.552     76900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4779.396     77000        15      0                 inf             -0.0000         inf
+  4786.464     77100        15      0                 inf             -0.0000         inf
+  4793.345     77200        15      0                 inf             -0.0000         inf
+  4800.938     77300        16      0                 inf             -0.0000         inf
+  4807.989     77400        15      0                 inf             -0.0000         inf
+  4815.473     77500        14      0                 inf             -0.0000         inf
+  4824.736     77600        19      0                 inf             -0.0000         inf
+  4832.427     77700        18      0                 inf             -0.0000         inf
+  4840.150     77800        16      0                 inf             -0.0000         inf
+  4845.608     77900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4850.245     78000        18      0                 inf             -0.0000         inf
+  4856.464     78100        18      0                 inf             -0.0000         inf
+  4861.615     78200        15      0                 inf             -0.0000         inf
+  4868.600     78300        16      0                 inf             -0.0000         inf
+  4877.225     78400        18      0                 inf             -0.0000         inf
+  4883.210     78500        18      0                 inf             -0.0000         inf
+  4888.808     78600        15      0                 inf             -0.0000         inf
+  4893.688     78700        16      0                 inf             -0.0000         inf
+  4900.620     78800        14      0                 inf             -0.0000         inf
+  4906.194     78900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4911.456     79000        15      0                 inf             -0.0000         inf
+  4918.219     79100        19      0                 inf             -0.0000         inf
+  4923.757     79200        16      0                 inf             -0.0000         inf
+  4933.068     79300        16      0                 inf             -0.0000         inf
+  4941.934     79400        16      0                 inf             -0.0000         inf
+  4951.808     79500        15      0                 inf             -0.0000         inf
+  4959.221     79600        17      0                 inf             -0.0000         inf
+  4965.073     79700        16      0                 inf             -0.0000         inf
+  4970.519     79800        16      0                 inf             -0.0000         inf
+  4974.581     79900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  4980.912     80000        16      0                 inf             -0.0000         inf
+  4987.573     80100        17      0                 inf             -0.0000         inf
+  4996.656     80200        15      0                 inf             -0.0000         inf
+  5002.919     80300        20      0                 inf             -0.0000         inf
+  5009.808     80400        15      0                 inf             -0.0000         inf
+  5017.722     80500        17      0                 inf             -0.0000         inf
+  5024.389     80600        12      0                 inf             -0.0000         inf
+  5030.615     80700        16      0                 inf             -0.0000         inf
+  5037.009     80800        13      0                 inf             -0.0000         inf
+  5047.216     80900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5054.749     81000        15      0                 inf             -0.0000         inf
+  5061.719     81100        16      0                 inf             -0.0000         inf
+  5067.976     81200        15      0                 inf             -0.0000         inf
+  5074.803     81300        18      0                 inf             -0.0000         inf
+  5083.863     81400        16      0                 inf             -0.0000         inf
+  5094.667     81500        14      0                 inf             -0.0000         inf
+  5099.849     81600        17      0                 inf             -0.0000         inf
+  5105.022     81700        17      0                 inf             -0.0000         inf
+  5111.289     81800        19      0                 inf             -0.0000         inf
+  5118.193     81900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5125.316     82000        15      0                 inf             -0.0000         inf
+  5132.055     82100        14      0                 inf             -0.0000         inf
+  5139.502     82200        14      0                 inf             -0.0000         inf
+  5147.578     82300        13      0                 inf             -0.0000         inf
+  5152.351     82400        16      0                 inf             -0.0000         inf
+  5156.406     82500        19      0                 inf             -0.0000         inf
+  5161.423     82600        15      0                 inf             -0.0000         inf
+  5165.929     82700        17      0                 inf             -0.0000         inf
+  5170.493     82800        16      0                 inf             -0.0000         inf
+  5174.510     82900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5178.900     83000        17      0                 inf             -0.0000         inf
+  5183.516     83100        16      0                 inf             -0.0000         inf
+  5188.644     83200        20      0                 inf             -0.0000         inf
+  5193.484     83300        18      0                 inf             -0.0000         inf
+  5197.579     83400        17      0                 inf             -0.0000         inf
+  5200.813     83500        16      0                 inf             -0.0000         inf
+  5205.564     83600        21      0                 inf             -0.0000         inf
+  5213.077     83700        17      0                 inf             -0.0000         inf
+  5220.381     83800        15      0                 inf             -0.0000         inf
+  5228.903     83900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5234.110     84000        18      0                 inf             -0.0000         inf
+  5243.544     84100        15      0                 inf             -0.0000         inf
+  5250.707     84200        15      0                 inf             -0.0000         inf
+  5258.263     84300        17      0                 inf             -0.0000         inf
+  5263.136     84400        15      0                 inf             -0.0000         inf
+  5270.093     84500        14      0                 inf             -0.0000         inf
+  5277.302     84600        14      0                 inf             -0.0000         inf
+  5284.439     84700        18      0                 inf             -0.0000         inf
+  5292.427     84800        19      0                 inf             -0.0000         inf
+  5299.971     84900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5307.660     85000        15      0                 inf             -0.0000         inf
+  5314.080     85100        14      0                 inf             -0.0000         inf
+  5320.040     85200        14      0                 inf             -0.0000         inf
+  5326.604     85300        17      0                 inf             -0.0000         inf
+  5332.315     85400        19      0                 inf             -0.0000         inf
+  5338.384     85500        20      0                 inf             -0.0000         inf
+  5351.003     85600        15      0                 inf             -0.0000         inf
+  5357.017     85700        21      0                 inf             -0.0000         inf
+  5362.053     85800        19      0                 inf             -0.0000         inf
+  5367.087     85900        19      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5372.525     86000        17      0                 inf             -0.0000         inf
+  5377.888     86100        17      0                 inf             -0.0000         inf
+  5382.766     86200        16      0                 inf             -0.0000         inf
+  5388.756     86300        16      0                 inf             -0.0000         inf
+  5395.512     86400        15      0                 inf             -0.0000         inf
+  5403.187     86500        14      0                 inf             -0.0000         inf
+  5408.764     86600        17      0                 inf             -0.0000         inf
+  5414.237     86700        15      0                 inf             -0.0000         inf
+  5419.513     86800        14      0                 inf             -0.0000         inf
+  5425.477     86900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5430.891     87000        13      0                 inf             -0.0000         inf
+  5439.313     87100        18      0                 inf             -0.0000         inf
+  5449.464     87200        13      0                 inf             -0.0000         inf
+  5456.808     87300        14      0                 inf             -0.0000         inf
+  5461.079     87400        13      0                 inf             -0.0000         inf
+  5465.213     87500        18      0                 inf             -0.0000         inf
+  5470.152     87600        14      0                 inf             -0.0000         inf
+  5475.484     87700        16      0                 inf             -0.0000         inf
+  5482.387     87800        14      0                 inf             -0.0000         inf
+  5487.914     87900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5494.479     88000        16      0                 inf             -0.0000         inf
+  5503.188     88100        16      0                 inf             -0.0000         inf
+  5510.475     88200        14      0                 inf             -0.0000         inf
+  5517.868     88300        15      0                 inf             -0.0000         inf
+  5526.548     88400        14      0                 inf             -0.0000         inf
+  5534.484     88500        14      0                 inf             -0.0000         inf
+  5542.528     88600        11      0                 inf             -0.0000         inf
+  5551.039     88700        12      0                 inf             -0.0000         inf
+  5556.968     88800        15      0                 inf             -0.0000         inf
+  5564.870     88900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5572.579     89000        13      0                 inf             -0.0000         inf
+  5579.143     89100        14      0                 inf             -0.0000         inf
+  5587.868     89200        11      0                 inf             -0.0000         inf
+  5594.296     89300        16      0                 inf             -0.0000         inf
+  5599.709     89400        14      0                 inf             -0.0000         inf
+  5606.259     89500        16      0                 inf             -0.0000         inf
+  5612.072     89600        14      0                 inf             -0.0000         inf
+  5621.079     89700        17      0                 inf             -0.0000         inf
+  5627.837     89800        17      0                 inf             -0.0000         inf
+  5633.795     89900        19      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5640.011     90000        18      0                 inf             -0.0000         inf
+  5645.105     90100        18      0                 inf             -0.0000         inf
+  5651.003     90200        19      0                 inf             -0.0000         inf
+  5658.531     90300        16      0                 inf             -0.0000         inf
+  5664.693     90400        18      0                 inf             -0.0000         inf
+  5672.070     90500        16      0                 inf             -0.0000         inf
+  5678.461     90600        16      0                 inf             -0.0000         inf
+  5683.532     90700        16      0                 inf             -0.0000         inf
+  5687.745     90800        19      0                 inf             -0.0000         inf
+  5693.140     90900        20      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5696.665     91000        20      0                 inf             -0.0000         inf
+  5701.968     91100        16      0                 inf             -0.0000         inf
+  5707.736     91200        15      0                 inf             -0.0000         inf
+  5712.554     91300        15      0                 inf             -0.0000         inf
+  5717.261     91400        14      0                 inf             -0.0000         inf
+  5721.811     91500        14      0                 inf             -0.0000         inf
+  5726.296     91600        13      0                 inf             -0.0000         inf
+  5731.039     91700        16      0                 inf             -0.0000         inf
+  5737.765     91800        18      0                 inf             -0.0000         inf
+  5744.673     91900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5753.698     92000        15      0                 inf             -0.0000         inf
+  5762.218     92100        15      0                 inf             -0.0000         inf
+  5768.924     92200        16      0                 inf             -0.0000         inf
+  5778.347     92300        14      0                 inf             -0.0000         inf
+  5790.931     92400        13      0                 inf             -0.0000         inf
+  5796.533     92500        12      0                 inf             -0.0000         inf
+  5805.121     92600        11      0                 inf             -0.0000         inf
+  5812.464     92700        16      0                 inf             -0.0000         inf
+  5820.242     92800        14      0                 inf             -0.0000         inf
+  5827.990     92900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5833.784     93000        19      0                 inf             -0.0000         inf
+  5839.153     93100        16      0                 inf             -0.0000         inf
+  5844.340     93200        17      0                 inf             -0.0000         inf
+  5849.971     93300        16      0                 inf             -0.0000         inf
+  5857.458     93400        16      0                 inf             -0.0000         inf
+  5863.752     93500        18      0                 inf             -0.0000         inf
+  5872.358     93600        16      0                 inf             -0.0000         inf
+  5881.385     93700        14      0                 inf             -0.0000         inf
+  5890.992     93800        17      0                 inf             -0.0000         inf
+  5899.945     93900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5906.861     94000        17      0                 inf             -0.0000         inf
+  5912.147     94100        16      0                 inf             -0.0000         inf
+  5916.906     94200        15      0                 inf             -0.0000         inf
+  5922.681     94300        15      0                 inf             -0.0000         inf
+  5929.039     94400        15      0                 inf             -0.0000         inf
+  5936.741     94500        12      0                 inf             -0.0000         inf
+  5942.276     94600        17      0                 inf             -0.0000         inf
+  5949.132     94700        16      0                 inf             -0.0000         inf
+  5955.730     94800        18      0                 inf             -0.0000         inf
+  5961.997     94900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  5968.326     95000        16      0                 inf             -0.0000         inf
+  5975.170     95100        16      0                 inf             -0.0000         inf
+  5981.893     95200        12      0                 inf             -0.0000         inf
+  5987.981     95300        14      0                 inf             -0.0000         inf
+  5994.582     95400        15      0                 inf             -0.0000         inf
+  6001.891     95500        15      0                 inf             -0.0000         inf
+  6009.951     95600        14      0                 inf             -0.0000         inf
+  6016.070     95700        18      0                 inf             -0.0000         inf
+  6021.050     95800        15      0                 inf             -0.0000         inf
+  6028.273     95900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6034.832     96000        14      0                 inf             -0.0000         inf
+  6040.513     96100        14      0                 inf             -0.0000         inf
+  6048.972     96200        13      0                 inf             -0.0000         inf
+  6057.876     96300        13      0                 inf             -0.0000         inf
+  6065.991     96400        14      0                 inf             -0.0000         inf
+  6075.417     96500        11      0                 inf             -0.0000         inf
+  6082.365     96600        17      0                 inf             -0.0000         inf
+  6088.702     96700        16      0                 inf             -0.0000         inf
+  6096.555     96800        15      0                 inf             -0.0000         inf
+  6103.564     96900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6109.330     97000        15      0                 inf             -0.0000         inf
+  6115.639     97100        17      0                 inf             -0.0000         inf
+  6122.698     97200        14      0                 inf             -0.0000         inf
+  6128.627     97300        16      0                 inf             -0.0000         inf
+  6135.047     97400        15      0                 inf             -0.0000         inf
+  6141.061     97500        14      0                 inf             -0.0000         inf
+  6147.916     97600        16      0                 inf             -0.0000         inf
+  6153.921     97700        16      0                 inf             -0.0000         inf
+  6159.135     97800        12      0                 inf             -0.0000         inf
+  6165.659     97900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6171.883     98000        16      0                 inf             -0.0000         inf
+  6178.886     98100        15      0                 inf             -0.0000         inf
+  6186.380     98200        16      0                 inf             -0.0000         inf
+  6192.531     98300        17      0                 inf             -0.0000         inf
+  6197.978     98400        16      0                 inf             -0.0000         inf
+  6204.557     98500        13      0                 inf             -0.0000         inf
+  6212.566     98600        15      0                 inf             -0.0000         inf
+  6220.518     98700        14      0                 inf             -0.0000         inf
+  6225.774     98800        18      0                 inf             -0.0000         inf
+  6229.507     98900        18      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6234.256     99000        18      0                 inf             -0.0000         inf
+  6238.174     99100        16      0                 inf             -0.0000         inf
+  6243.302     99200        16      0                 inf             -0.0000         inf
+  6248.178     99300        19      0                 inf             -0.0000         inf
+  6252.010     99400        19      0                 inf             -0.0000         inf
+  6255.574     99500        18      0                 inf             -0.0000         inf
+  6260.285     99600        18      0                 inf             -0.0000         inf
+  6265.016     99700        14      0                 inf             -0.0000         inf
+  6271.065     99800        16      0                 inf             -0.0000         inf
+  6277.495     99900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6283.749    100000        18      0                 inf             -0.0000         inf
+  6289.999    100100        15      0                 inf             -0.0000         inf
+  6295.144    100200        16      0                 inf             -0.0000         inf
+  6301.328    100300        17      0                 inf             -0.0000         inf
+  6308.123    100400        16      0                 inf             -0.0000         inf
+  6315.719    100500        14      0                 inf             -0.0000         inf
+  6320.270    100600        15      0                 inf             -0.0000         inf
+  6324.486    100700        17      0                 inf             -0.0000         inf
+  6327.863    100800        16      0                 inf             -0.0000         inf
+  6332.931    100900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6339.605    101000        13      0                 inf             -0.0000         inf
+  6342.844    101100        13      0                 inf             -0.0000         inf
+  6346.944    101200        14      0                 inf             -0.0000         inf
+  6351.516    101300        13      0                 inf             -0.0000         inf
+  6355.827    101400        16      0                 inf             -0.0000         inf
+  6362.263    101500        14      0                 inf             -0.0000         inf
+  6369.279    101600        14      0                 inf             -0.0000         inf
+  6375.174    101700        13      0                 inf             -0.0000         inf
+  6383.145    101800        15      0                 inf             -0.0000         inf
+  6390.943    101900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6397.165    102000        12      0                 inf             -0.0000         inf
+  6402.849    102100        18      0                 inf             -0.0000         inf
+  6405.869    102200        16      0                 inf             -0.0000         inf
+  6409.752    102300        15      0                 inf             -0.0000         inf
+  6413.524    102400        16      0                 inf             -0.0000         inf
+  6417.884    102500        14      0                 inf             -0.0000         inf
+  6423.470    102600        16      0                 inf             -0.0000         inf
+  6427.836    102700        15      0                 inf             -0.0000         inf
+  6432.247    102800        16      0                 inf             -0.0000         inf
+  6436.431    102900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6440.376    103000        14      0                 inf             -0.0000         inf
+  6444.195    103100        17      0                 inf             -0.0000         inf
+  6449.345    103200        17      0                 inf             -0.0000         inf
+  6455.067    103300        14      0                 inf             -0.0000         inf
+  6461.323    103400        14      0                 inf             -0.0000         inf
+  6466.141    103500        12      0                 inf             -0.0000         inf
+  6471.497    103600        14      0                 inf             -0.0000         inf
+  6476.795    103700        14      0                 inf             -0.0000         inf
+  6483.851    103800        14      0                 inf             -0.0000         inf
+  6488.842    103900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6493.992    104000        17      0                 inf             -0.0000         inf
+  6499.115    104100        15      0                 inf             -0.0000         inf
+  6506.815    104200        14      0                 inf             -0.0000         inf
+  6513.580    104300        13      0                 inf             -0.0000         inf
+  6518.658    104400        13      0                 inf             -0.0000         inf
+  6524.492    104500        14      0                 inf             -0.0000         inf
+  6529.285    104600        16      0                 inf             -0.0000         inf
+  6534.801    104700        15      0                 inf             -0.0000         inf
+  6538.721    104800        17      0                 inf             -0.0000         inf
+  6542.777    104900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6546.716    105000        16      0                 inf             -0.0000         inf
+  6550.597    105100        19      0                 inf             -0.0000         inf
+  6553.901    105200        14      0                 inf             -0.0000         inf
+  6557.463    105300        15      0                 inf             -0.0000         inf
+  6560.782    105400        15      0                 inf             -0.0000         inf
+  6564.339    105500        15      0                 inf             -0.0000         inf
+  6568.656    105600        16      0                 inf             -0.0000         inf
+  6574.794    105700        16      0                 inf             -0.0000         inf
+  6582.496    105800        15      0                 inf             -0.0000         inf
+  6589.458    105900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6597.075    106000        13      0                 inf             -0.0000         inf
+  6603.283    106100        16      0                 inf             -0.0000         inf
+  6610.441    106200        15      0                 inf             -0.0000         inf
+  6616.549    106300        16      0                 inf             -0.0000         inf
+  6622.319    106400        15      0                 inf             -0.0000         inf
+  6628.629    106500        16      0                 inf             -0.0000         inf
+  6635.591    106600        13      0                 inf             -0.0000         inf
+  6641.765    106700        16      0                 inf             -0.0000         inf
+  6649.193    106800        15      0                 inf             -0.0000         inf
+  6654.848    106900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6660.587    107000        12      0                 inf             -0.0000         inf
+  6669.037    107100        16      0                 inf             -0.0000         inf
+  6678.013    107200        14      0                 inf             -0.0000         inf
+  6685.338    107300        14      0                 inf             -0.0000         inf
+  6692.607    107400        15      0                 inf             -0.0000         inf
+  6698.110    107500        15      0                 inf             -0.0000         inf
+  6703.863    107600        13      0                 inf             -0.0000         inf
+  6710.879    107700        16      0                 inf             -0.0000         inf
+  6717.753    107800        15      0                 inf             -0.0000         inf
+  6725.685    107900        12      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6734.028    108000        13      0                 inf             -0.0000         inf
+  6740.373    108100        13      0                 inf             -0.0000         inf
+  6747.314    108200        12      0                 inf             -0.0000         inf
+  6753.975    108300        14      0                 inf             -0.0000         inf
+  6758.455    108400        14      0                 inf             -0.0000         inf
+  6763.489    108500        12      0                 inf             -0.0000         inf
+  6768.763    108600        16      0                 inf             -0.0000         inf
+  6775.047    108700        17      0                 inf             -0.0000         inf
+  6780.942    108800        16      0                 inf             -0.0000         inf
+  6787.381    108900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6795.189    109000        13      0                 inf             -0.0000         inf
+  6803.901    109100        11      0                 inf             -0.0000         inf
+  6808.735    109200        17      0                 inf             -0.0000         inf
+  6812.664    109300        19      0                 inf             -0.0000         inf
+  6816.743    109400        18      0                 inf             -0.0000         inf
+  6821.410    109500        17      0                 inf             -0.0000         inf
+  6826.947    109600        17      0                 inf             -0.0000         inf
+  6831.926    109700        14      0                 inf             -0.0000         inf
+  6836.437    109800        17      0                 inf             -0.0000         inf
+  6840.912    109900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6845.124    110000        16      0                 inf             -0.0000         inf
+  6849.642    110100        13      0                 inf             -0.0000         inf
+  6854.055    110200        16      0                 inf             -0.0000         inf
+  6858.656    110300        15      0                 inf             -0.0000         inf
+  6863.620    110400        14      0                 inf             -0.0000         inf
+  6867.406    110500        19      0                 inf             -0.0000         inf
+  6872.013    110600        15      0                 inf             -0.0000         inf
+  6876.877    110700        13      0                 inf             -0.0000         inf
+  6880.512    110800        13      0                 inf             -0.0000         inf
+  6884.787    110900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6889.410    111000        17      0                 inf             -0.0000         inf
+  6894.737    111100        14      0                 inf             -0.0000         inf
+  6900.205    111200        10      0                 inf             -0.0000         inf
+  6904.510    111300        14      0                 inf             -0.0000         inf
+  6909.626    111400        13      0                 inf             -0.0000         inf
+  6916.202    111500        10      0                 inf             -0.0000         inf
+  6923.095    111600        14      0                 inf             -0.0000         inf
+  6931.236    111700        11      0                 inf             -0.0000         inf
+  6936.892    111800        13      0                 inf             -0.0000         inf
+  6944.703    111900        13      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  6950.904    112000        14      0                 inf             -0.0000         inf
+  6958.132    112100        13      0                 inf             -0.0000         inf
+  6964.844    112200         9      0                 inf             -0.0000         inf
+  6968.859    112300        10      0                 inf             -0.0000         inf
+  6974.073    112400        17      0                 inf             -0.0000         inf
+  6978.705    112500        19      0                 inf             -0.0000         inf
+  6982.882    112600        20      0                 inf             -0.0000         inf
+  6988.859    112700        17      0                 inf             -0.0000         inf
+  6994.839    112800        17      0                 inf             -0.0000         inf
+  6999.078    112900        16      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  7004.177    113000        17      0                 inf             -0.0000         inf
+  7008.389    113100        23      0                 inf             -0.0000         inf
+  7014.151    113200        20      0                 inf             -0.0000         inf
+  7019.568    113300        17      0                 inf             -0.0000         inf
+  7024.743    113400        13      0                 inf             -0.0000         inf
+  7029.867    113500        15      0                 inf             -0.0000         inf
+  7034.334    113600        17      0                 inf             -0.0000         inf
+  7037.579    113700        18      0                 inf             -0.0000         inf
+  7042.006    113800        19      0                 inf             -0.0000         inf
+  7046.272    113900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  7049.592    114000        17      0                 inf             -0.0000         inf
+  7053.234    114100        18      0                 inf             -0.0000         inf
+  7057.288    114200        19      0                 inf             -0.0000         inf
+  7063.029    114300        15      0                 inf             -0.0000         inf
+  7068.007    114400        17      0                 inf             -0.0000         inf
+  7071.884    114500        13      0                 inf             -0.0000         inf
+  7074.921    114600        18      0                 inf             -0.0000         inf
+  7079.151    114700        17      0                 inf             -0.0000         inf
+  7083.812    114800        15      0                 inf             -0.0000         inf
+  7087.122    114900        17      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  7090.887    115000        17      0                 inf             -0.0000         inf
+  7094.816    115100        15      0                 inf             -0.0000         inf
+  7099.693    115200        17      0                 inf             -0.0000         inf
+  7105.894    115300        16      0                 inf             -0.0000         inf
+  7109.893    115400        18      0                 inf             -0.0000         inf
+  7113.409    115500        18      0                 inf             -0.0000         inf
+  7118.476    115600        16      0                 inf             -0.0000         inf
+  7122.313    115700        13      0                 inf             -0.0000         inf
+  7126.295    115800        17      0                 inf             -0.0000         inf
+  7131.573    115900        15      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  7136.752    116000        15      0                 inf             -0.0000         inf
+  7140.722    116100        17      0                 inf             -0.0000         inf
+  7143.874    116200        17      0                 inf             -0.0000         inf
+  7148.036    116300        15      0                 inf             -0.0000         inf
+  7150.853    116400        13      0                 inf             -0.0000         inf
+  7156.065    116500        17      0                 inf             -0.0000         inf
+  7164.175    116600        15      0                 inf             -0.0000         inf
+  7169.053    116700        17      0                 inf             -0.0000         inf
+  7174.500    116800        14      0                 inf             -0.0000         inf
+  7178.928    116900        14      0                 inf             -0.0000         inf
+
+      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
+  7183.006    117000        15      0                 inf             -0.0000         inf
+  7188.039    117100        15      0                 inf             -0.0000         inf
+  7192.209    117200        13      0                 inf             -0.0000         inf
+  7195.408    117300        12      0                 inf             -0.0000         inf
+  7199.330    117400        17      0                 inf             -0.0000         inf
+===========================================
+MIPCL version 1.5.2
+Solution time: 7199.330
+Branch-and-Cut nodes: 117400
+Time limit reached
+Solution not found
+     lower-bound: -0.0000
+rm: cannot remove '*_mipcl.log': No such file or directory
+
+@04 1528941451
+@05 7200
+
+Read MPS: 1
+MIP has 3150 vars and 4923 constraints
+Read SOL: 0
+
+-----------------------------
+Wed Jun 13 18:57:31 MST 2018
+-----------------------------
+
+=ready=

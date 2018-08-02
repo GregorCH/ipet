@@ -43,15 +43,15 @@ class Validation:
     def __init__(self, solufilename : str = None, tol : float = DEFAULT_RELTOL, feastol : float = DEFAULT_FEASTOL):
         '''
         Validation constructor
-        
+
         Parameters
         ----------
         solufilename : str
             string with absolute or relative path to a solu file with reference information
-            
+
         tol : float
             relative objective tolerance
-            
+
         feastol : float
             relative feasibility tolerance
         '''
@@ -133,13 +133,13 @@ class Validation:
 
     def readSoluFile(self, solufilename : str) -> dict:
         """parse entire solu file into a dictionary with problem names as keys
-        
+
         Parameters:
         -----------
-        
+
         solufilename : str
             name of .solu file containing optimal or best known bounds for instances
-            
+
         Return
         ------
         dict
@@ -193,13 +193,13 @@ class Validation:
 
     def isInconsistent(self, problemname : str) -> bool:
         """are there inconsistent results for this problem
-        
+
         Parameters
         ----------
-        
+
         problemname : str
             name of a problem
-            
+
         Returns
         -------
         bool
@@ -242,10 +242,10 @@ class Validation:
 
     def isSolInfeasible(self, x : pd.Series):
         """check if the solution is infeasible within tolerances
-        
+
         Parameters
         ----------
-        
+
         x : Series or dict
             series or dictionary representing single instance information
         """
@@ -283,7 +283,7 @@ class Validation:
         Returns
         -------
         float or None
-            either a finite floating point value, or None 
+            either a finite floating point value, or None
         """
         reference = self.referencedict.get(problemname, (None, None))
 
@@ -303,7 +303,7 @@ class Validation:
         Returns
         -------
         float or None
-            either a finite floating point value, or None 
+            either a finite floating point value, or None
         """
         reference = self.referencedict.get(problemname, (None, None))
 
@@ -313,7 +313,7 @@ class Validation:
             return reference[self.__dualidx__]
 
     def getObjSense(self, problemname : str, x : pd.Series):
-        """get the objective sense of a problem 
+        """get the objective sense of a problem
         """
         if problemname in self.objsensedict:
             return self.objsensedict[problemname]
@@ -326,12 +326,12 @@ class Validation:
     def validateSeries(self, x : pd.Series) -> str:
         """
         validate the results of a problem
-        
+
         Parameters:
         ----------
         x : Series
             Data series that represents problem information parsed by a solver
-        
+
         """
         # print("{x.ProblemName} {x.PrimalBound} {x.DualBound} {x.SolverStatus}".format(x=x))
         problemname = x.get(Key.ProblemName)
@@ -371,13 +371,13 @@ class Validation:
 
     def isInf(self, referencetuple : tuple) -> bool:
         """is this an infeasible reference?
-        
+
         Parameters:
         -----------
-        
+
         referencetuple : tuple
             tuple containing a primal and dual reference bound
-            
+
         Return:
         -------
         bool
@@ -387,13 +387,13 @@ class Validation:
 
     def isFeas(self, referencetuple):
         """is this a feasible reference?
-        
+
         Parameters:
         -----------
-        
+
         referencetuple : tuple
             tuple containing a primal and dual reference bound
-            
+
         Return:
         -------
         bool
@@ -408,10 +408,10 @@ class Validation:
 
     def collectInconsistencies(self, df : pd.DataFrame):
         """collect individual results for primal and dual bounds and collect inconsistencies.
-        
+
         Parameters
         ----------
-        
+
         df : DataFrame
             joined data of an experiment with several test runs
         """

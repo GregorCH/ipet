@@ -19,7 +19,7 @@ ALMOST = 1
 class SolverTest(unittest.TestCase):
 
     fileinfo = {
-                "cbc-app1-2" : [ {
+                "cbc298-app1-2" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
                     Key.SolvingTime: 7132.49,
@@ -27,7 +27,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound: None,
                     Key.DualBound:-96.111} ],
-                "cbc-ash608gpia-3col" : [ {
+                "cbc298-ash608gpia-3col" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
                     Key.SolvingTime: 224.71,
@@ -35,7 +35,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound: None ,
                     Key.DualBound: None} ],
-                "cbc-bab5" : [ {
+                "cbc298-bab5" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
                     Key.SolvingTime: 7194.79,
@@ -43,7 +43,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound:-104286.921,
                     Key.DualBound:-111273.306} ],
-                "cbc-dfn-gwin-UUM" : [ {
+                "cbc298-dfn-gwin-UUM" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
                     Key.SolvingTime: 725.37,
@@ -51,7 +51,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound: 38752,
                     Key.DualBound: 38752} ],
-                "cbc-enlight14" : [ {
+                "cbc298-enlight14" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
                     Key.SolvingTime: 7131.16,
@@ -59,7 +59,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound: None,
                     Key.DualBound: 36.768} ],
-                "cbc-satellites1-25" : [ {
+                "cbc298-satellites1-25" : [ {
                     Key.Solver: "CBC",
                     Key.Version: "2.9.8",
                     Key.SolvingTime: 4511.76,
@@ -67,14 +67,14 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-5,
                     Key.DualBound:-5} ],
-                "cplex-app1-2" : [ {
+                "cplex1271-app1-2" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.Nodes: 1415,
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-41,
                     Key.DualBound:-41} ],
-                "cplex-bab5" : [ {
+                "cplex1271-bab5" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.Nodes: 101234,
@@ -82,7 +82,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-106411.84,
                     Key.DualBound:-106411.84} ],
-                "cplex-dfn-gwin-UUM" : [ {
+                "cplex1271-dfn-gwin-UUM" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.Nodes: 16132,
@@ -90,7 +90,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound: 38752,
                     Key.DualBound: 38752} ],
-                "cplex-enlight14" : [ {
+                "cplex1271-enlight14" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.Nodes: 0,
@@ -98,7 +98,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound: None,
                     Key.DualBound: None} ],
-                "cplex-satellites1-25" : [ {
+                "cplex1271-satellites1-25" : [ {
                     Key.Solver: "CPLEX",
                     Key.Version: "12.7.1.0",
                     Key.Nodes: 2942,
@@ -106,7 +106,55 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-5,
                     Key.DualBound:-5} ],
-                "gurobi-app1-2" : [ {
+                "cplex1280-bab5" : [ {
+                    Key.Solver: "CPLEX",
+                    Key.Version: "12.8.0.0",
+                    Key.SolvingTime: 1551.53,
+                    Key.Nodes: 51737,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -1.0641184010e+05,
+                    Key.DualBound: -1.0641184010e+05} ],
+                "cplex1280-enlight13" : [ {
+                    Key.Solver: "CPLEX",
+                    Key.Version: "12.8.0.0",
+                    Key.SolvingTime: 0.00,
+                    Key.Nodes: 0,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 7.1000000000e+01,
+                    Key.DualBound: 7.1000000000e+01} ],
+                "cplex1280-enlight14" : [ {
+                    Key.Solver: "CPLEX",
+                    Key.Version: "12.8.0.0",
+                    Key.SolvingTime: 0.00,
+                    Key.Nodes: 0,
+                    Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
+                    Key.PrimalBound: None,
+                    Key.DualBound: None} ],
+                "cplex1280-mine-90-10" : [ {
+                    Key.Solver: "CPLEX",
+                    Key.Version: "12.8.0.0",
+                    Key.SolvingTime: 924.71,
+                    Key.Nodes: 388227,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -7.8430233763e+08,
+                    Key.DualBound: -7.8430233763e+08} ],
+                "cplex1280-satellites1-25" : [ {
+                    Key.Solver: "CPLEX",
+                    Key.Version: "12.8.0.0",
+                    Key.SolvingTime: 216.80,
+                    Key.Nodes: 3896,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -5.0000000000e+00,
+                    Key.DualBound: -5.0000000000e+00} ],
+                "cplex1280-tanglegram2" : [ {
+                    Key.Solver: "CPLEX",
+                    Key.Version: "12.8.0.0",
+                    Key.SolvingTime: 0.98,
+                    Key.Nodes: 3,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 4.4300000000e+02,
+                    Key.DualBound: 4.4300000000e+02} ],
+                "gurobi700-app1-2" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolvingTime: 46.67,
@@ -114,7 +162,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-41 ,
                     Key.DualBound:-41} ],
-                "gurobi-bab5" : [ {
+                "gurobi700-bab5" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolvingTime: 65.35,
@@ -122,7 +170,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-106411.84 ,
                     Key.DualBound:-106411.84} ],
-                "gurobi-dfn-gwin-UUM" : [ {
+                "gurobi700-dfn-gwin-UUM" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolvingTime: 388.98,
@@ -130,7 +178,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound: 38752 ,
                     Key.DualBound: 38752} ],
-                "gurobi-enlight14" : [ {
+                "gurobi700-enlight14" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolvingTime: 0.00,
@@ -138,7 +186,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound: None,
                     Key.DualBound: None} ],
-                "gurobi-satellites1-25" : [ {
+                "gurobi700-satellites1-25" : [ {
                     Key.Solver: "GUROBI",
                     Key.Version: "7.0.0",
                     Key.SolvingTime: 59.70,
@@ -146,7 +194,55 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-5 ,
                     Key.DualBound:-5} ],
-                "xpress-app1-2" : [ {
+                "gurobi800-bab5" : [ {
+                    Key.Solver: "GUROBI",
+                    Key.Version: "8.0.0",
+                    Key.SolvingTime: 25.52,
+                    Key.Nodes: 1,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -1.064118401000e+05,
+                    Key.DualBound: -1.064118401000e+05} ],
+                "gurobi800-enlight13" : [ {
+                    Key.Solver: "GUROBI",
+                    Key.Version: "8.0.0",
+                    Key.SolvingTime: 0.00,
+                    Key.Nodes: 0,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 7.100000000000e+01,
+                    Key.DualBound: 7.100000000000e+01} ],
+                "gurobi800-enlight14" : [ {
+                    Key.Solver: "GUROBI",
+                    Key.Version: "8.0.0",
+                    Key.SolvingTime: 0.00,
+                    Key.Nodes: 0,
+                    Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
+                    Key.PrimalBound: None,
+                    Key.DualBound: None} ],
+                "gurobi800-mine-90-10" : [ {
+                    Key.Solver: "GUROBI",
+                    Key.Version: "8.0.0",
+                    Key.SolvingTime: 769.45,
+                    Key.Nodes: 1181932,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -7.843023376332e+08,
+                    Key.DualBound: -7.843023376332e+08} ],
+                "gurobi800-satellites1-25" : [ {
+                    Key.Solver: "GUROBI",
+                    Key.Version: "8.0.0",
+                    Key.SolvingTime: 40.86,
+                    Key.Nodes: 380,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -5.000000000000e+00,
+                    Key.DualBound: -5.000000000000e+00} ],
+                "gurobi800-tanglegram2" : [ {
+                    Key.Solver: "GUROBI",
+                    Key.Version: "8.0.0",
+                    Key.SolvingTime: 0.57,
+                    Key.Nodes: 1,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 4.430000000000e+02,
+                    Key.DualBound: 4.430000000000e+02} ],
+                "xpress300103-app1-2" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolvingTime: 29,
@@ -155,7 +251,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-41,
                     Key.DualBound:-41} ],
-                "xpress-bab5" : [ {
+                "xpress300103-bab5" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolvingTime: 7200,
@@ -164,7 +260,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound:-106411.84,
                     Key.DualBound:-106701.8161} ],
-                "xpress-dfn-gwin-UUM" : [ {
+                "xpress300103-dfn-gwin-UUM" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolvingTime:181 ,
@@ -173,7 +269,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound: 38752,
                     Key.DualBound: 38748} ],
-                "xpress-enlight14" : [ {
+                "xpress300103-enlight14" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolvingTime: 0,
@@ -182,7 +278,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound: 1e+40,
                     Key.DualBound: 1e+40} ],
-                "xpress-satellites1-25" : [ {
+                "xpress300103-satellites1-25" : [ {
                     Key.Solver: "XPRESS",
                     Key.Version: "30.01.03",
                     Key.SolvingTime: 228,
@@ -191,37 +287,147 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-5 ,
                     Key.DualBound:-5} ],
-                "mipcl-app1-2" : [ {
+                "xpress330103-bab5" : [ {
+                    Key.Solver: "XPRESS",
+                    Key.Version: "33.01.03",
+                    Key.SolvingTime: 7200,
+                    Key.Nodes: 24575,
+                    Key.ObjectiveSense: Key.ObjectiveSenseCode.MINIMIZE,
+                    Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
+                    Key.PrimalBound: -106361.339104,
+                    Key.DualBound: -106600.8564439218171173707} ],
+                "xpress330103-enlight13" : [ {
+                    Key.Solver: "XPRESS",
+                    Key.Version: "33.01.03",
+                    Key.SolvingTime: 0,
+                    Key.Nodes: 0,
+                    Key.ObjectiveSense: Key.ObjectiveSenseCode.MINIMIZE,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 71,
+                    Key.DualBound: 71} ],
+                "xpress330103-enlight14" : [ {
+                    Key.Solver: "XPRESS",
+                    Key.Version: "33.01.03",
+                    Key.SolvingTime: 84,
+                    Key.Nodes: 1,
+                    Key.ObjectiveSense: Key.ObjectiveSenseCode.MINIMIZE,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 52200,
+                    Key.DualBound: 52200.00000000001455191523} ],
+                "xpress330103-mine-90-10" : [ {
+                    Key.Solver: "XPRESS",
+                    Key.Version: "33.01.03",
+                    Key.SolvingTime: 5,
+                    Key.Nodes: 505,
+                    Key.ObjectiveSense: Key.ObjectiveSenseCode.MINIMIZE,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -566395707.871,
+                    Key.DualBound: -566395707.8708435297012329} ],
+                "xpress330103-satellites1-25" : [ {
+                    Key.Solver: "XPRESS",
+                    Key.Version: "33.01.03",
+                    Key.SolvingTime: 99,
+                    Key.Nodes: 7917,
+                    Key.ObjectiveSense: Key.ObjectiveSenseCode.MINIMIZE,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -5.00000000001,
+                    Key.DualBound: -5.000000000005489830812166} ],
+                "xpress330103-tanglegram2" : [ {
+                    Key.Solver: "XPRESS",
+                    Key.Version: "33.01.03",
+                    Key.SolvingTime: 0,
+                    Key.Nodes: 5,
+                    Key.ObjectiveSense: Key.ObjectiveSenseCode.MINIMIZE,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 443,
+                    Key.DualBound: 443} ],
+                "mipcl131-app1-2" : [ {
                     Key.Solver: "MIPCL",
                     Key.Version: "1.3.1",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-41,
                     Key.DualBound:-41} ],
-                "mipcl-bab5" : [ {
+                "mipcl131-bab5" : [ {
                     Key.Solver: "MIPCL",
                     Key.Version: "1.3.1",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-106411.84,
                     Key.DualBound:-106411.84} ],
-                "mipcl-dfn-gwin-UUM" : [ {
+                "mipcl131-dfn-gwin-UUM" : [ {
                     Key.Solver: "MIPCL",
                     Key.Version: "1.3.1",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound: 38752,
                     Key.DualBound: 38752} ],
-                "mipcl-enlight14" : [ {
+                "mipcl131-enlight14" : [ {
                     Key.Solver: "MIPCL",
                     Key.Version: "1.3.1",
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound: None ,
                     Key.DualBound: None} ],
-                "mipcl-satellites1-25" : [ {
+                "mipcl131-satellites1-25" : [ {
                     Key.Solver: "MIPCL",
                     Key.Version: "1.3.1",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-5 ,
                     Key.DualBound:-5} ],
-                "scip-infeasible" : [ {
+                "mipcl152-bab5" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.5.2",
+                    Key.SolvingTime: 514.635,
+                    Key.Nodes: 264,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -106411.8401,
+                    Key.DualBound: -106411.8401} ],
+                "mipcl152-bnatt350" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.5.2",
+                    Key.SolvingTime: 7199.330,
+                    Key.Nodes: 117400,
+                    Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
+                    Key.PrimalBound: None,
+                    Key.DualBound: -0.0000} ],
+                "mipcl152-enlight13" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.5.2",
+                    Key.SolvingTime: 70.477,
+                    Key.Nodes: 280,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 71.0000,
+                    Key.DualBound: 71.0000} ],
+                "mipcl152-enlight14" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.5.2",
+                    Key.SolvingTime: 280.405,
+                    Key.Nodes: 1025,
+                    Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
+                    Key.PrimalBound: None,
+                    Key.DualBound: None} ],
+                "mipcl152-mine-90-10" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.5.2",
+                    Key.SolvingTime: 7.370,
+                    Key.Nodes: 1930,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -566395707.8708,
+                    Key.DualBound: -566395707.8708} ],
+                "mipcl152-satellites1-25" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.5.2",
+                    Key.SolvingTime: 2999.199,
+                    Key.Nodes: 14031,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: -5.0000,
+                    Key.DualBound: -5.0000} ],
+                "mipcl152-tanglegram2" : [ {
+                    Key.Solver: "MIPCL",
+                    Key.Version: "1.5.2",
+                    Key.SolvingTime: 35.829,
+                    Key.Nodes: 1,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound: 443.0000,
+                    Key.DualBound: 443.0000} ],
+                "scip400-infeasible" : [ {
                     Key.Solver: "SCIP",
                     Key.Version: "4.0.0",
                     Key.Nodes: 1,
@@ -233,7 +439,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound:+1.00000000000000e+20,
                     Key.DualBound:+1.00000000000000e+20} ],
-                "scip-memorylimit" : [ {
+                "scip400-memorylimit" : [ {
                     Key.Solver: "SCIP",
                     Key.Version: "4.0.0",
                     Key.Nodes: 1778883,
@@ -245,7 +451,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.MemoryLimit }, {
                     Key.PrimalBound:+1.49321500000000e+06,
                     Key.DualBound:+1.49059347656250e+06} ],
-                "scip-optimal" : [ {
+                "scip400-optimal" : [ {
                     Key.Solver: "SCIP",
                     Key.Version: "4.0.0",
                     Key.Nodes: 126,
@@ -257,7 +463,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:+3.36000000000000e+03,
                     Key.DualBound:+3.36000000000000e+03} ],
-                "scip-timelimit" : [ {
+                "scip400-timelimit" : [ {
                     Key.Solver: "SCIP",
                     Key.Version: "4.0.0",
                     Key.Nodes: 101678,
@@ -269,7 +475,7 @@ class SolverTest(unittest.TestCase):
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound:+1.16800000000000e+03,
                     Key.DualBound:+1.13970859166290e+03} ],
-                "scip-crashed" : [ {
+                "scip400-crashed" : [ {
                     Key.Solver: "SCIP",
                     Key.Version: "4.0.0",
                     Key.Nodes: None,
@@ -280,7 +486,79 @@ class SolverTest(unittest.TestCase):
                     "SpxGitHash": None,
                     Key.SolverStatus: Key.SolverStatusCodes.Crashed }, {
                     Key.PrimalBound: None,
-                    Key.DualBound: None} ]
+                    Key.DualBound: None} ],
+                "scip500-bab5" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "5.0.0",
+                    Key.SolvingTime: 7200.00,
+                    Key.Nodes: 120255,
+                    Key.GitHash: "3bbd232",
+                    "mode": "optimized",
+                    "LPSolver": "SoPlex 3.1.0",
+                    "SpxGitHash": "5147d37",
+                    Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
+                    Key.PrimalBound:-1.06411840100000e+05,
+                    Key.DualBound:-1.06736016607273e+05} ],
+                "scip500-enlight13" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "5.0.0",
+                    Key.SolvingTime: 0.01,
+                    Key.Nodes: 1,
+                    Key.GitHash: "3bbd232",
+                    "mode": "optimized",
+                    "LPSolver": "SoPlex 3.1.0",
+                    "SpxGitHash": "5147d37",
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:+7.10000000000000e+01,
+                    Key.DualBound:+7.10000000000000e+01} ],
+                "scip500-enlight14" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "5.0.0",
+                    Key.SolvingTime: 0.01,
+                    Key.Nodes: 1,
+                    Key.GitHash: "3bbd232",
+                    "mode": "optimized",
+                    "LPSolver": "CPLEX 12.8.0.0",
+                    "SpxGitHash": None,
+                    Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
+                    Key.PrimalBound:+1.00000000000000e+20,
+                    Key.DualBound:+1.00000000000000e+20} ],
+                "scip500-mine-90-10" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "5.0.0",
+                    Key.SolvingTime: 45.86,
+                    Key.Nodes: 1483,
+                    Key.GitHash: "3bbd232",
+                    "mode": "optimized",
+                    "LPSolver": "SoPlex 3.1.0",
+                    "SpxGitHash": "5147d37",
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:-5.66395707870830e+08,
+                    Key.DualBound:-5.66395707870830e+08} ],
+                "scip500-satellites1-25" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "5.0.0",
+                    Key.SolvingTime: 454.56,
+                    Key.Nodes: 424,
+                    Key.GitHash: "3bbd232",
+                    "mode": "optimized",
+                    "LPSolver": "CPLEX 12.8.0.0",
+                    "SpxGitHash": None,
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:-4.99999999999994e+00,
+                    Key.DualBound:-4.99999999999994e+00} ],
+                "scip500-tanglegram2" : [ {
+                    Key.Solver: "SCIP",
+                    Key.Version: "5.0.0",
+                    Key.SolvingTime: 5.82,
+                    Key.Nodes: 3,
+                    Key.GitHash: "3bbd232",
+                    "mode": "optimized",
+                    "LPSolver": "SoPlex 3.1.0",
+                    "SpxGitHash": "5147d37",
+                    Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
+                    Key.PrimalBound:+4.43000000000000e+02,
+                    Key.DualBound:+4.43000000000000e+02} ],
                 }
 
     solvers = []

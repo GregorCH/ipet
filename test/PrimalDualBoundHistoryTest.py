@@ -22,7 +22,7 @@ class PrimalDualBoundHistoryTest(unittest.TestCase):
         """
         correctPbHistory = [(0.1, 0.1176408), (0.1, 0.2329977), (0.2, 0.2333972), (0.2, 0.2425407), (0.2, 0.2458207), (42.6, 0.2529466), (42.7, 0.2533669), (42.9, 0.2566015), (43.0, 0.2580527)]
         ex = Experiment()
-        ex.addOutputFile(osp.join(DATADIR, "scip-primalintegral-emptyline.out"))
+        ex.addOutputFile(osp.join(DATADIR, "scip400-primalintegral-emptyline.out"))
         ex.collectData()
         tr = ex.getTestRuns()[0]
         assert isinstance(tr, TestRun)

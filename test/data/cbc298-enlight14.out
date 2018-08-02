@@ -3,9 +3,9 @@
 Sat Jun 11 21:06:01 MST 2016
 -----------------------------
 @03 1465704361
-Welcome to the CBC MILP Solver
-Version: 2.9.8
-Build Date: Jun 10 2016
+Welcome to the CBC MILP Solver 
+Version: 2.9.8 
+Build Date: Jun 10 2016 
 
 command line - /home/beck/math/opt/miplib/miplib2010-1.1.0/bin/cbc -import instances/miplib2010/enlight14.mps.gz -sec 7200 -threads 1 -ratio 0.0 -timeMode elapsed -solve -solution /home/beck/math/opt/miplib/miplib2010-1.1.0/results/solutions/benchmark.cbc.enlight14.mps.sol (default strategy 1)
 At line 1 NAME           enlight14

@@ -1,95 +1,82 @@
 @01 instances/benchmark/tanglegram2.mps ===========
 -----------------------------
-Fri Jun 15 04:28:38 MST 2018
+Wed Apr 25 17:18:17 MST 2018
 -----------------------------
-@03 1529062118
-/home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.tanglegram2.mps.sol
-/home/beck/miplib2010-1.1.0/bin/mipcl -solfile /home/beck/miplib2010-1.1.0/results/solutions/benchmark.mipcl.tanglegram2.mps.sol -threads 1 -time 7200 instances/benchmark/tanglegram2.mps
-Reading data...
-NAME           tanglegram2
-Start preprocessing: Rows - 8980, Cols - 4714 (Int - 4714, Bin - 4714), NZs - 26940
-==================================== Probing =====================================
-     Time  Round  Probed vars  Fixed vars  Mod. entries  New var bds  Implications
-    0.457      1         4714           0             0            0             0
-==================================================================================
-After preprocessing: Rows - 8980, Cols - 4714 (Int - 4714, Bin - 4714), NZs - 26940
-Scaling...
-Min exp = 0,  Max exp = 0
+@03 1524701897
+/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.tanglegram2.mps.sol
+Set parameter TimeLimit to value 7200
+Set parameter MIPGap to value 0.0
+Set parameter Threads to value 1
 
-Preprocessing Time: 0.470
-Optimizing...
+Gurobi Optimizer version 8.0.0 build v8.0.0rc0 (linux64)
+Copyright (c) 2018, Gurobi Optimization, LLC
 
-      Time        Its   Deg. Its   Method                     Obj
-     0.520        100         99      D/S                 -0.0000
-     0.525        170        169      D/S                 -0.0000
-Generating cuts...
-      Time                     Obj  Frac vars     Cuts
-     1.049                 -0.0000        148      250
-     1.743                  1.5000        151      251
-     2.443                  3.5000        155      257
-     3.249                  5.0000        156      254
-     3.888                  6.0000        160      256
-     4.547                  7.0000        164      257
-     5.208                  7.5000        163      263
-     5.893                  8.5000        165      272
-     6.540                  9.0938        172      274
-     7.294                  9.4400        174      271
-      Time                     Obj  Frac vars     Cuts
-     7.924                 10.7059        170      262
-     8.553                 11.5000        172      261
-     9.229                 12.0000        171      264
-     9.926                 12.5417        171      259
-    10.977                 14.0000        170      263
-    12.005                 15.0000        177      269
-    12.720                 15.7500        180      269
-    13.390                 16.6667        182      272
-    14.114                 17.7500        186      267
-    14.898                 18.2647        188      274
-      Time                     Obj  Frac vars     Cuts
-    15.648                 19.5000        187      265
-    16.439                 20.6000        196      265
-    17.297                 21.7083        208      283
-    18.151                 23.6250        206      274
-    19.068                 24.4583        213      280
-    19.991                 25.6042        217      289
-    20.944                 26.7500        196      261
-    21.922                 28.0000        199      267
-    22.959                 28.7500        211      278
-    24.002                 29.9375        203      262
-      Time                     Obj  Frac vars     Cuts
-    25.072                 30.3750        211      274
-    26.144                 30.6250        216      276
-    27.209                 31.0625        217      268
-    28.279                 31.5000        219      270
-    29.338                 31.7813        223      281
-    30.266                 32.0769        216      282
-    31.149                 32.3750        214      276
-    32.041                 32.6226        220      258
-    32.979                 33.5958        231      261
-    33.962                 33.9375        231      302
-      Time                     Obj  Frac vars     Cuts
-    34.899                 34.5581        234      250
+Read MPS format model from file instances/benchmark/tanglegram2.mps
+Reading time = 0.01 seconds
+tanglegram2: 8980 rows, 4714 columns, 26940 nonzeros
+Optimize a model with 8980 rows, 4714 columns and 26940 nonzeros
+Variable types: 0 continuous, 4714 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 2160.0000000
+Presolve removed 1004 rows and 656 columns
+Presolve time: 0.03s
+Presolved: 7976 rows, 4058 columns, 23928 nonzeros
+Found heuristic solution: objective 1981.0000000
+Variable types: 0 continuous, 4058 integer (4058 binary)
 
-Cut statistics
-========== Cuts = Generated === Used
-    sparse MOD2       10250      271
-  sparse Gomory         727      110
-         parity          10        2
-========= total       10987      383
+Root relaxation: objective 1.000000e+00, 73 iterations, 0.01 seconds
 
-After processing root node: Rows - 9100, Cols - 4714 (Int - 4714, Bin - 4714), NZs - 28913
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
 
-      Time     Nodes    Leaves   Sols       Best Solution         Lower Bound        Gap%
-    34.948         1         1      0                 inf             34.5964         inf
-    35.395         1         0      1            443.0000             34.5964     1180.48
-===========================================
-MIPCL version 1.5.2
-Solution time: 35.829
-Branch-and-Cut nodes: 1
-Objective value: 443.0000 - optimality proven
-rm: cannot remove '*_mipcl.log': No such file or directory
+     0     0    1.00000    0   70 1981.00000    1.00000   100%     -    0s
+H    0     0                     755.0000000    1.00000   100%     -    0s
+     0     0   36.50000    0   77  755.00000   36.50000  95.2%     -    0s
+H    0     0                     550.0000000   36.50000  93.4%     -    0s
+     0     0   39.00000    0   90  550.00000   39.00000  92.9%     -    0s
+     0     0   39.50000    0   77  550.00000   39.50000  92.8%     -    0s
+     0     0   53.83333    0  140  550.00000   53.83333  90.2%     -    0s
+     0     0   53.83333    0   70  550.00000   53.83333  90.2%     -    0s
+     0     0  214.00000    0   87  550.00000  214.00000  61.1%     -    0s
+     0     0  305.00000    0  106  550.00000  305.00000  44.5%     -    0s
+     0     0  309.50000    0  119  550.00000  309.50000  43.7%     -    0s
+     0     0  309.50000    0  113  550.00000  309.50000  43.7%     -    0s
+     0     0  342.25000    0  112  550.00000  342.25000  37.8%     -    0s
+H    0     0                     484.0000000  342.25000  29.3%     -    0s
+     0     0  347.50000    0  113  484.00000  347.50000  28.2%     -    0s
+     0     0  347.50000    0  102  484.00000  347.50000  28.2%     -    0s
+     0     0  380.16667    0  139  484.00000  380.16667  21.5%     -    0s
+     0     0  389.50000    0  156  484.00000  389.50000  19.5%     -    0s
+     0     0  389.50000    0  163  484.00000  389.50000  19.5%     -    0s
+     0     0  408.33333    0  115  484.00000  408.33333  15.6%     -    0s
+H    0     0                     474.0000000  408.33333  13.9%     -    0s
+     0     0  413.66667    0  105  474.00000  413.66667  12.7%     -    0s
+     0     0  415.66667    0  125  474.00000  415.66667  12.3%     -    0s
+     0     0  415.83333    0  127  474.00000  415.83333  12.3%     -    0s
+     0     0  433.00000    0   76  474.00000  433.00000  8.65%     -    0s
+H    0     0                     443.0000000  433.00000  2.26%     -    0s
+     0     0  436.50000    0   74  443.00000  436.50000  1.47%     -    0s
+     0     0     cutoff    0       443.00000  443.00000  0.00%     -    0s
 
-@04 1529062154
+Cutting planes:
+  Zero half: 5
+
+Explored 1 nodes (1670 simplex iterations) in 0.57 seconds
+Thread count was 1 (of 8 available processors)
+
+Solution count 7: 443 474 484 ... 2022
+
+Optimal solution found (tolerance 0.00e+00)
+Best objective 4.430000000000e+02, best bound 4.430000000000e+02, gap 0.0000%
+
+Wrote result file '/home/beck/miplib2010-1.1.0/results/solutions/benchmark.gurobi.tanglegram2.mps.sol'
+
+
+@04 1524701898
 @05 7200
 
 Read MPS: 1
@@ -105,7 +92,6 @@ Check SOL: Integrality 1 Constraints 1 Objective 1
 Maximum violations: Integrality 0 Constraints 0 Objective 0
 
 -----------------------------
-Fri Jun 15 04:29:14 MST 2018
+Wed Apr 25 17:18:18 MST 2018
 -----------------------------
 
-=ready=

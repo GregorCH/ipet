@@ -230,7 +230,7 @@ class Experiment:
 
     def getJoinedData(self):
         """ Concatenate the testrun data (possibly joined with external data)
-        
+
         this may result in nonunique index, the data is simply concatenated
         """
         datalist = []
@@ -242,7 +242,7 @@ class Experiment:
                 trdata = trdata.merge(self.externaldata, left_index = True, right_index = True, how = "left", suffixes = ("", "_ext"))
             datalist.append(trdata)
 
-        return pd.concat(datalist).infer_objects()
+        return pd.concat(datalist, sort=True).infer_objects()
 
     def calculateIntegrals(self):
         """ Calculate and store primal and dual integral values

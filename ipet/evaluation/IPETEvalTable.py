@@ -630,6 +630,8 @@ class IPETEvaluationColumn(IpetNode):
         return [self.getAggColName(aggr) for aggr in self.aggregations]
 
     def hasCompareColumn(self, title):
+        if title == "":
+            return False
         if title == self.getCompareColName():
             # title is a compare column of the long table
             return True
@@ -640,6 +642,8 @@ class IPETEvaluationColumn(IpetNode):
         return False
 
     def hasDataColumn(self, title):
+        if title == "":
+            return False
         if title == self.getName():
             # title is a data column of the long table
             return True
@@ -1363,7 +1367,7 @@ class IPETEvaluation(IpetNode):
             return {}
         formatters = {}
         l = 0
-        if isinstance(all_colnames[0], tuple):
+        if not isinstance(all_colnames[0], str):
             l = len(all_colnames[0]) - 1
 
         comptuples = []

@@ -106,10 +106,10 @@ class IPETEvaluationColumn(IpetNode):
         regex : use for selecting a set of columns at once by including regular expression wildcards such as '*+?' etc.
 
         active : True or "True" if this column should be active, False otherwise
-        
+
         reduction : aggregation function that is applied to reduce multiple occurrences of index
-        
-        reductionindex : integer or string tuple (space separated)   
+
+        reductionindex : integer or string tuple (space separated)
         """
 
         super(IPETEvaluationColumn, self).__init__(active, **kw)
@@ -149,7 +149,7 @@ class IPETEvaluationColumn(IpetNode):
 
     def isRegex(self) -> bool:
         """Is this a regular expression column
-        
+
         Returns
         -------
         bool
@@ -269,34 +269,34 @@ class IPETEvaluationColumn(IpetNode):
         """Set the reduction index of this column
         None
         a custom reduction index to apply this columns reduction function.
-        An integer n can be used to cause the reduction after the n'th 
-        index column (starting at zero) of the corresponding evaluation. 
+        An integer n can be used to cause the reduction after the n'th
+        index column (starting at zero) of the corresponding evaluation.
         If a negative integer -n is passed, this column creates its reduction index
         from the evaluation index before the element indexed by '-n'.
         If the desired reduction index is not a subset of the corresponding evaluation
         index, a string tuple can be passed to uniquely define the columns by which
         the reduced column should be indexed.
-        
+
         Example: The parent evaluation uses a three-level index 'A', 'B', 'C'. The column
         should be reduced along the dimension 'B', meaning that the reduction yields
         a unique index consisting of all combinations of 'A' X 'C'. This reduction can
-        be achieved by using "A C" as reduction index for this column. 
-        
+        be achieved by using "A C" as reduction index for this column.
+
         Note that the reduction index must be a subset of the parent evaluation index.
-        
+
         Parameters
         ----------
         reductionindex
             integer or string (comma separated) reduction index for this column. None to use the entire index of the parent evaluation.
-            
+
         """
-        if reductionindex is None or type(reductionindex) is int or isinstance(reductionindex, StrTuple):
+        if reductionindex is None or type(reductionindex) is int or isinstance(reductionindex, StrList):
             self._reductionindex = reductionindex
         elif type(reductionindex) is str:
             try:
                 self._reductionindex = int(reductionindex)
             except ValueError:
-                self._reductionindex = StrTuple(reductionindex)
+                self._reductionindex = StrList(reductionindex)
         self.reductionindex = reductionindex
 
     def getCompareColName(self):
@@ -400,52 +400,52 @@ class IPETEvaluationColumn(IpetNode):
         """
         return IPETEvaluationColumn.getMethodByStr(self.reduction, [numpy, misc, Experiment, Key.ProblemStatusCodes])
 
-    def getReductionIndex(self, evalindexcols : list) -> tuple:
+    def getReductionIndex(self, evalindexcols : list) -> list:
         """Return this columns reduction index, which is a subset of the evaluation index columns
-        
+
         Parameters
         ----------
         evalindexcols
             list of evaluation index columns, may only contain a single element
-            
+
         Returns
         -------
-        tuple
-            a tuple representing the (sub)set of columns representing this columns individual
+        list
+            a list representing the (sub)set of columns representing this columns individual
             reduction index
         """
         if self._reductionindex is None:
-            return evalindexcols
+            return list(evalindexcols)
         if type(self._reductionindex) is int:
             reductionindex = min(self._reductionindex, len(evalindexcols))
             # negative indices are also allowed
             reductionindex = max(reductionindex, -len(evalindexcols))
-            return tuple(evalindexcols[:reductionindex])
+            return list(evalindexcols[:reductionindex])
 
         else:  # reduction index is a string tuple
-            for c in self._reductionindex.getTuple():
+            for c in self._reductionindex.getList():
                 if c not in evalindexcols:
                     raise IpetNodeAttributeError(self.reduction, "reduction index column {} is not contained in evaluation index columns {}".format(c, evalindexcols))
-            return self._reductionindex.getTuple()
+            return self._reductionindex.getList()
 
     def getColumnData(self, df_long : DataFrame, df_target : DataFrame, evalindexcols : list) -> tuple:
         """
         Retrieve the data associated with this column
-        
+
         Parameters
         ----------
         df_long
             DataFrame that contains original, raw data and already evaluated columns
-            
+
         df_target
             DataFrame that has already been grouped to only been reduced to the target index columns
-            
+
         Returns
         tuple
-            (df_long, df_target, result) 
+            (df_long, df_target, result)
                 - df_long and df_target to which columns may have been appended
                 - result is the column (or data frame) view in df_long
-        
+
         """
         # if no children are associated with this column, it is either
         # a column represented in the data frame by an 'origcolname',
@@ -656,13 +656,12 @@ class FormatFunc:
     def beautify(self, x):
         return (self.formatstr % x)
 
-
-class StrTuple:
+class StrList:
     """
     Represents an easier readible and parsable list of strings
     """
     def __init__(self, strList, splitChar = " "):
-        self.tuple = StrTuple.splitStringList(strList, splitChar)
+        self.list = StrList.splitStringList(strList, splitChar)
         self.splitChar = splitChar
 
     @staticmethod
@@ -673,21 +672,21 @@ class StrTuple:
             return None
         elif type(strList) is str:
             if splitChar == " ":
-                return tuple(strList.split())
+                return strList.split()
             else:
-                return tuple(strList.split(splitChar))
+                return strList.split(splitChar)
         else:
-            return tuple(strList)
+            return list(strList)
 
-    def getTuple(self):
-        if self.tuple is None:
-            return tuple()
-        return self.tuple
+    def getList(self):
+        if self.list is None:
+            return []
+        return self.list
 
     def __str__(self):
-        if self.tuple is None:
+        if self.list is None:
             return ""
-        return self.splitChar.join(self.tuple)
+        return self.splitChar.join(self.list)
 
 class IPETEvaluation(IpetNode):
     """
@@ -828,37 +827,37 @@ class IPETEvaluation(IpetNode):
         """
         self.autoIndex = False
         self.index = index
-        self._index = StrTuple(index)
+        self._index = StrList(index)
         logger.debug("Set index to '{}'".format(index))
         if index == "auto":
             self.autoIndex = True
             return
 
     def getRowIndex(self) -> list:
-        """Return (list of) keys to create row index 
+        """Return (list of) keys to create row index
         """
-        return list(self.getIndex())[:self.indexsplit]
+        return self.getIndex()[:self.indexsplit]
 
     def getColIndex(self) -> list:
         """Return (list of) keys to create column index
         """
-        return list(self.getIndex())[self.indexsplit:]
+        return self.getIndex()[self.indexsplit:]
 
-    def getIndex(self) -> tuple:
-        """Return all index columns as a tuple
+    def getIndex(self) -> list:
+        """Return all index columns as a list
         """
-        return self._index.getTuple()
+        return self._index.getList()
 
     def getDefaultgroup(self, data):
         """Return tuple representation of defaultgroup
-        
+
         Parameters:
         data
             data frame object with columns that match the specified column index
         """
 
         # split the default group on colons
-        dg = StrTuple.splitStringList(self.defaultgroup, ":")
+        dg = StrList.splitStringList(self.defaultgroup, ":")
         if dg is None:
             x = None
         else:
@@ -897,7 +896,7 @@ class IPETEvaluation(IpetNode):
 
     def set_defaultgroup(self, dg : str):
         """Set defaultgroup
-        
+
         Parameters
         ----------
         dg
@@ -953,7 +952,7 @@ class IPETEvaluation(IpetNode):
             if col.getCompareMethod() is not None:
 
                 df_bar = df.set_index(self.getRowIndex(), drop = True)
-                grouped = df_bar.groupby(self.getColIndex())[col.getName()]
+                grouped = df_bar.groupby(by = self.getColIndex())[col.getName()]
                 compcol = dict(list(grouped))[dg]
                 comparecolname = col.getCompareColName()
 
@@ -962,7 +961,7 @@ class IPETEvaluation(IpetNode):
                 method = lambda x:compmethod(*x)
 
                 df[comparecolname] = 0
-                df.set_index(list(self.getIndex()), inplace = True)
+                df.set_index(self.getIndex(), inplace = True)
                 for name, group in grouped:
                     tmpgroup = DataFrame(group)
                     tmpgroup["_tmpcol_"] = compcol
@@ -976,7 +975,7 @@ class IPETEvaluation(IpetNode):
                         tmpgroup[colindex[0]] = name
 
                     tmpgroup.reset_index(drop = False, inplace = True)
-                    tmpgroup.set_index(list(self.getIndex()), inplace = True)
+                    tmpgroup.set_index(self.getIndex(), inplace = True)
 
                     newvals = tmpgroup[comparecolname]
 
@@ -991,7 +990,7 @@ class IPETEvaluation(IpetNode):
 
     def reduceToColumns(self, df_long : DataFrame, df_target : DataFrame) -> tuple:
         """ Reduce the huge number of columns
-        
+
         The data frame is reduced to the columns of the evaluation.
         (concatenate usercolumns, neededcolumns and additionalfiltercolumns from df_long)
 
@@ -999,15 +998,15 @@ class IPETEvaluation(IpetNode):
         ----------
         df_long
             DataFrame returned by Experiment with preprocessed columns '_count_', '_solved_', etc..
-            
+
             Dataframe to evaluate, mostly joined data from an experiment,
             that contains the necessary columns required by this evaluation.
             For example: A dataframe containing the parsed data from one or
             multiple .trn files created by ipet-parse.
-            
+
         df_target
             DataFrame with preprocessed columns that contain the index column
-            
+
         Returns
         -------
         tuple
@@ -1016,7 +1015,7 @@ class IPETEvaluation(IpetNode):
 
         # We are only interested in the columns that are currently active
         usercolumns = [c.getName() for c in self.getActiveColumns()]
-        evalindexcols = list(self.getIndex())
+        evalindexcols = self.getIndex()
 
         #
         # loop over a topological sorting of the active columns to compute
@@ -1045,7 +1044,7 @@ class IPETEvaluation(IpetNode):
 
         Returns
         -------
-        list 
+        list
             A list of topologically sorted column objects.
         """
         adj = self.getDependencies(columns)
@@ -1063,12 +1062,12 @@ class IPETEvaluation(IpetNode):
 
     def getDependencies(self, columns : list) -> dict:
         """ Recursively collect the dependencies of a list of columns.
-        
+
         Parameters
         ----------
-        columns 
+        columns
             A list of columns
-            
+
         Returns
         -------
             A dictionary containing the names and dependencies of the columns.
@@ -1082,7 +1081,7 @@ class IPETEvaluation(IpetNode):
 
     def getValidate(self):
         """this evaluations validation attribute
-        
+
         Returns
         -------
         string
@@ -1092,10 +1091,10 @@ class IPETEvaluation(IpetNode):
 
     def set_validate(self, validate):
         """sets this evaluation's validation attribute
-        
+
         Parameters
         ----------
-        
+
         validate : str or None
             new value for the source of validation information for this evaluation
         """
@@ -1282,7 +1281,7 @@ class IPETEvaluation(IpetNode):
             additionalfiltercolumns += fg.getNeededColumns(df)
 
         additionalfiltercolumns = list(set(additionalfiltercolumns))
-        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(activecolumns + self.countercolumns + list(self.getIndex()))]
+        additionalfiltercolumns = [afc for afc in additionalfiltercolumns if afc not in set(activecolumns + self.countercolumns + self.getIndex())]
 
         for col in additionalfiltercolumns:
             newcols.append(grouped[col].apply(meanOrConcat))
@@ -1299,7 +1298,8 @@ class IPETEvaluation(IpetNode):
         #
         # search for duplicate column names to avoid cryptic error messages later
         #
-        if len(reduceddf.columns.get_duplicates()) > 0:
+
+        if True in reduceddf.columns.duplicated():
             raise ValueError("Duplicate columns {} in reduced data frame, aborting".format(reduceddf.columns.get_duplicates()))
 
         return reduceddf
@@ -1329,12 +1329,12 @@ class IPETEvaluation(IpetNode):
         #
         columns = []
         colset = set()
-        for c in self.usercolumns + list(self.getIndex()):
+        for c in self.usercolumns + self.getIndex():
             if c not in colset and c not in self.countercolumns:
                 columns.append(c)
                 colset.add(c)
 
-        df = df[columns].set_index(list(self.getIndex())).sort_index(level = 0)
+        df = df[columns].set_index(self.getIndex()).sort_index(level = 0)
         df = df.unstack(self.getColIndex())
         if len(self.getColIndex()) > 0 :
             df = df.swaplevel(0, len(self.getColIndex()), axis = 1)
@@ -1788,7 +1788,7 @@ class IPETEvaluation(IpetNode):
         if self.getColIndex() == []:
             return None
         # group the data by the groupkey
-        groupeddata = dict(list(df.groupby(self.getColIndex())))
+        groupeddata = dict(list(df.groupby(by = self.getColIndex())))
         stats = []
         names = []
         dg = self.getDefaultgroup(df)

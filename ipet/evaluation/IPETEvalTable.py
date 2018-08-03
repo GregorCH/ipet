@@ -26,6 +26,7 @@ from ipet.evaluation.IPETFilter import IPETValue
 from ipet.misc.misc import meanOrConcat
 from ipet.validation import Validation
 import sys
+from logging.config import _create_formatters
 
 logger = logging.getLogger(__name__)
 
@@ -1435,17 +1436,10 @@ class IPETEvaluation(IpetNode):
 
     def streamDataFrame_csv(self, df : DataFrame, filebasename, formatters = {}):
         with open("%s.csv" % filebasename, "w") as csvfile:
-            #
-            # obviously, the support for custom csv formatters was dropped
-            # at some pandas update. This is not terrible as
-            # usually, a csv file is an intermediate product, anyway,
-            # and the tool that gets the csv as input can handle
-            # the final formatting.
-            #
-            logger.warn("Warning. Custom formatting ignored for csv output")
+            for c in df.columns:
+                df[c] = df[c].apply(formatters[c])
 
             df.columns = [self.flatten_index(col) for col in df.columns]
-            print(df.columns)
             df.to_csv(csvfile)
 
     def streamDataFrame_txt(self, df : DataFrame, filebasename, formatters = {}):

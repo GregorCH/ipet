@@ -612,6 +612,41 @@ class IPETEvaluationColumn(IpetNode):
 
         return dependencies
 
+    def getStatsColName(self, statstest):
+        """Return the column name of the statstest"""
+        return '_'.join((self.getName(), statstest.__name__))
+
+    def getAllStatsColNames(self, statstest):
+        """Return a list of the column names of all statstests"""
+        return [self.getStatsColName(statstest) for statstest in self.getStatsTests()]
+
+    def getAggColName(self, aggr):
+        """Return the column name of the aggrecation"""
+        return '_'.join((self.getName(), aggr.getName()))
+
+    def getAllAggColNames(self):
+        """Return a list of the column names of all aggregations"""
+        return [self.getAggColName(aggr) for aggr in self.aggregations]
+
+    def hasCompareColumn(self, title):
+        if title == self.getCompareColName():
+            # title is a compare column of the long table
+            return True
+        if title[-1] in ["Q", "p"]:
+            if title[:-1] in self.getAllAggColNames():
+                # title is a compare column of aggregated table or statistical test column
+                return True
+        return False
+
+    def hasDataColumn(self, title):
+        if title == self.getName():
+            # title is a data column of the long table
+            return True
+        if title in self.getAllAggColNames():
+            # title is a compare column of aggregated table or statistical test column
+            return True
+        return False
+
 class FormatFunc:
 
     def __init__(self, formatstr):
@@ -1322,46 +1357,45 @@ class IPETEvaluation(IpetNode):
 
         expects a Multiindex column data frame df
         """
-        if len(df.columns) == 0:
+        all_colnames = df.columns
+        if len(all_colnames) == 0:
             return {}
         formatters = {}
         l = 0
-        if isinstance(df.columns[0], tuple):
-            l = len(df.columns[0]) - 1
+        if isinstance(all_colnames[0], tuple):
+            l = len(all_colnames[0]) - 1
 
         comptuples = []
         # loop over columns
         for col in self.getActiveColumns():
 
-            name = col.getName()
-            suffix = col.getCompareSuffix()
-            # determine all possible comparison columns and append them to the list
+            colname = col.getName()
+
+            # determine all comparison columns and append them to the list
             if col.getCompareMethod() is not None:
                 if l == 0:
-                    comptuples += [dfcol for dfcol in df.columns if dfcol.startswith(name) and dfcol.endswith(suffix)]
+                    comptuples += [dfcol for dfcol in all_colnames if col.hasCompareColumn(dfcol)]
                 else:
-                    comptuples += [dfcol for dfcol in df.columns if dfcol[l].startswith(name) and dfcol[l].endswith(suffix)]
+                    comptuples += [dfcol for dfcol in all_colnames if col.hasCompareColumn(dfcol[l])]
 
             # if the column has no formatstr attribute, continue
-            if not col.getFormatString():
+            colformatstr = col.getFormatString()
+            if not colformatstr:
                 continue
 
-            # retrieve all columns as tuples that contain the column name, ie. for column 'Time' and
+            # for long table: retrieve all columns as tuples that contain the column name, ie. for column 'Time' and
             # settings 'default' and 'heuroff', the result should be [('default', 'Time'),('heuroff', 'Time')]
-            if suffix == "":
-                suffix = "ThisIsVeryUnlikelyTheSuffix"
-
             if l == 0:
-                tuples = [dfcol for dfcol in df.columns if dfcol.startswith(name) and not dfcol.endswith(suffix) and not dfcol.endswith(")p")]
+                tuples = [dfcol for dfcol in all_colnames if col.hasDataColumn(dfcol)]
             else:
-                tuples = [dfcol for dfcol in df.columns if dfcol[l].startswith(name) and not dfcol[l].endswith(suffix) and not dfcol[l].endswith(")p")]
+                tuples = [dfcol for dfcol in all_colnames if col.hasDataColumn(dfcol[l])]
 
             # add new formatting function to the map of formatting functions
             for thetuple in tuples:
-                formatters.update({thetuple:FormatFunc(col.getFormatString()).beautify})
+                formatters.update({thetuple:FormatFunc(colformatstr).beautify})
 
         # display countercolumns as integer
-        counting_columns = [dfcol for dfcol in df.columns if dfcol[l].startswith("_") and dfcol[l].endswith("_")]
+        counting_columns = [dfcol for dfcol in all_colnames if dfcol[l].startswith("_") and dfcol[l].endswith("_")]
         for cctup in counting_columns:
             formatters.update({cctup:FormatFunc("%.0f").beautify})
 
@@ -1709,7 +1743,7 @@ class IPETEvaluation(IpetNode):
                 aggfunc = agg.aggregate) for col, agg in colsandaggregations)
             colaggpart = pd.concat(tabs, axis = 1)
         # rename the column aggregations
-        newnames = ['_'.join((col.getName(), agg.getName())) for col, agg in colsandaggregations]
+        newnames = [col.getAggColName(agg) for col, agg in colsandaggregations]
 
         # set newnames
         colaggpart.columns = newnames
@@ -1781,7 +1815,7 @@ class IPETEvaluation(IpetNode):
                                           dropna = False,
                                           aggfunc = lambda x:statstest(x.reset_index(drop = True),
                                                                        defaultvalues)))
-                names.append('_'.join((col.getName(), statstest.__name__)))
+                names.append(col.getStatsColName(statstest))
 
         if len(stats) > 0:
             stats = pd.concat(stats, axis = 1)

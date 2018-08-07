@@ -1413,9 +1413,14 @@ class IPETEvaluation(IpetNode):
 
         return formatters
 
-    def streamDataFrame(self, df, filebasename, streamtype):
+    def sortDataFrame(self, df):
         if self.sortlevel is not None:
-            df.sort_index(level = self.sortlevel, axis = 1, inplace = True)
+            return df.sort_index(level = self.sortlevel, axis = 1, inplace = False)
+        else:
+            return df
+
+    def streamDataFrame(self, df, filebasename, streamtype):
+        df = self.sortDataFrame(df)
 
         if not self.checkStreamType(streamtype):
             raise ValueError("Stream error: Unknown stream type %s" % streamtype)

@@ -242,7 +242,8 @@ class Experiment:
                 trdata = trdata.merge(self.externaldata, left_index = True, right_index = True, how = "left", suffixes = ("", "_ext"))
             datalist.append(trdata)
 
-        return pd.concat(datalist, sort=True).infer_objects()
+        # return pd.concat(datalist, sort=True).infer_objects() # in later pandas versions this needs a sort argument
+        return pd.concat(datalist).infer_objects()
 
     def calculateIntegrals(self):
         """ Calculate and store primal and dual integral values

@@ -533,13 +533,18 @@ class IPETEvaluationColumn(IpetNode):
                     except:
                         logger.warning("When filling in the maximum, an error occurred for the column '{}':\n{}".format(self.getName(), self.attributesToStringDict()))
                         result = pd.concat([result, comp], axis = 1).min(axis = 1)
+
         reductionindex = self.getReductionIndex(evalindexcols)
 
         #
         # do not append frames with more than column. (They will be transformed at a higher level)
         #
         if len(result.shape) > 1:
-            return df_long, df_target, result
+            if result.shape[1] > 1:
+                return df_long, df_target, result
+            else:
+                # a dataframe with only one column: select that one to get a series to work with in further code
+                result = result[0]
 
         if len(reductionindex) > 0:
             # apply reduction and save the result by joining it into both data frames
@@ -1326,7 +1331,7 @@ class IPETEvaluation(IpetNode):
         DataFrame
             The converted DataFrame.
         """
-                #
+        #
         # restrict the columns to those that should appear in
         # the final table, but make sure that no columns
         # appear twice. Respect also the order of the columns

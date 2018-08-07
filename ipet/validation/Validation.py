@@ -320,7 +320,7 @@ class Validation:
         elif not pd.isnull(x.get(Key.ObjectiveSense, None)):
             return x.get(Key.ObjectiveSense)
         else:
-            logger.warning("No objective sense for {}, assuming minimization".format(problemname))
+            #logger.warning("No objective sense for {}, assuming minimization".format(problemname))
             return ObjectiveSenseCode.MINIMIZE
 
     def validateSeries(self, x : pd.Series) -> str:

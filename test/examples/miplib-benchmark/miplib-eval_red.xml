@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Evaluation comparecolformat="%.3f" defaultgroup="()" index="ProblemName" indexsplit="1" sortlevel="0">
+<Evaluation comparecolformat="%.3f" defaultgroup="()" index="ProblemName Solver" indexsplit="1">
 	<Column active="True" minval="1" name="LogDTime" reduction="mean" transformfunc="log">
 		<Column active="True" minval="1" name="DTime" reduction="mean" transformfunc="subtract">
 			<Column active="True" origcolname="Datetime_End" reduction="meanOrConcat"/>

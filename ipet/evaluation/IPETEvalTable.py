@@ -721,12 +721,13 @@ class IPETEvaluation(IpetNode):
 
 
     editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit", "validate"]
-    attributes2Options = {"evaluateoptauto":[True, False], "sortlevel":[0, 1]}
+    attributes2Options = {"evaluateoptauto":[True, False],
+                          "sortlevel":[-3, -2, -1, 0, 1, 2, 3, 4, 5, 6]}
 
     deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'",
                          "evaluateoptauto" : "Optimal auto settings are no longer available, use reductions instead"}
     def __init__(self, defaultgroup = None,
-                 sortlevel = 0, comparecolformat = DEFAULT_COMPARECOLFORMAT,
+                 sortlevel = None, comparecolformat = DEFAULT_COMPARECOLFORMAT,
                  index = DEFAULT_INDEX, indexsplit = DEFAULT_INDEXSPLIT,
                  validate = None, **kw):
         """
@@ -735,8 +736,7 @@ class IPETEvaluation(IpetNode):
         Parameters
         ----------
         defaultgroup : the values of the default group to be compared with, if left empty a defaultgroup is generated
-        evaluateoptauto : should optimal auto settings be calculated?
-        sortlevel : level on which to base column sorting, '0' for group level, '1' for column level
+        sortlevel : int or None, level on which to base column sorting, default: None (for no sorting)
         comparecolformat : format string for comparison columns
         index : (string or list or None) single or multiple column names that serve as (row) and column index levels, if 'auto' an index is generated.
         indexsplit : (int) position to split index into row and column levels, negative to count from the end.
@@ -749,7 +749,6 @@ class IPETEvaluation(IpetNode):
         self.filtergroups = []
         self.comparecolformat = comparecolformat[:]
         self.columns = []
-        self.sortlevel = int(sortlevel)
         self.evaluated = False
         self.feastol = None
         self.gaptol = None
@@ -757,6 +756,7 @@ class IPETEvaluation(IpetNode):
         self.defaultgroup = defaultgroup
         self.set_index(index)
         self.set_indexsplit(indexsplit)
+        self.set_sortlevel(sortlevel)
 
         self.set_validate(validate)
 
@@ -777,7 +777,11 @@ class IPETEvaluation(IpetNode):
         self.evaluated = evaluated
 
     def set_sortlevel(self, sortlevel):
-        self.sortlevel = int(sortlevel)
+        self.sortlevel = int(sortlevel) if sortlevel is not None else None
+
+        if self.sortlevel is not None and self.getColIndex() != []:
+            ncols = len(self.getColIndex()) + 1
+            self.sortlevel = self.sortlevel % ncols
 
     def setCompareColFormat(self, comparecolformat):
         self.comparecolformat = comparecolformat[:]
@@ -928,11 +932,6 @@ class IPETEvaluation(IpetNode):
     def removeColumn(self, col):
         self.columns.remove(col)
         self.setEvaluated(False)
-
-    def setEvaluateOptAuto(self, evaloptauto):
-        """ Should the evaluation calculate optimal auto settings?
-        """
-        self.set_evaluateoptauto(evaloptauto)
 
     def addComparisonColumns(self, df: DataFrame) -> DataFrame:
         """ Add the comparison columns.
@@ -1415,6 +1414,9 @@ class IPETEvaluation(IpetNode):
         return formatters
 
     def streamDataFrame(self, df, filebasename, streamtype):
+        if self.sortlevel is not None:
+            df.sort_index(level = self.sortlevel, axis = 1, inplace = True)
+
         if not self.checkStreamType(streamtype):
             raise ValueError("Stream error: Unknown stream type %s" % streamtype)
         streammethod = getattr(self, "streamDataFrame_%s" % streamtype)
@@ -1793,10 +1795,9 @@ class IPETEvaluation(IpetNode):
         """
         apply statistical tests defined by each column
         """
-        # TODO What if indexkeys[1] is empty?
         if self.getColIndex() == []:
             return None
-        # group the data by the groupkey
+        # group the data
         groupeddata = dict(list(df.groupby(by = self.getColIndex())))
         stats = []
         names = []

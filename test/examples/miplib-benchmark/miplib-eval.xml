@@ -1,15 +1,15 @@
 <?xml version="1.0" ?>
-<Evaluation comparecolformat="%.3f" defaultgroup="" evaluateoptauto="True" groupkey="Status" index="ProblemName" indexsplit="1" sortlevel="0">
-	<Column active="True" minval="1" name="LogDTime" reduction="mean" transformfunc="log" translevel="0">
-		<Column active="True" name="DTime" reduction="shmean" transformfunc="subtract" translevel="0">
-			<Column active="True" origcolname="Datetime_End" reduction="meanOrConcat" translevel="0"/>
-			<Column active="True" origcolname="Datetime_Start" reduction="meanOrConcat" translevel="0"/>
+<Evaluation comparecolformat="%.3f" defaultgroup="" index="ProblemName" indexsplit="1" sortlevel="0">
+	<Column active="True" minval="1" name="LogDTime" reduction="mean" transformfunc="log">
+		<Column active="True" name="DTime" reduction="shmean" transformfunc="subtract">
+			<Column active="True" origcolname="Datetime_End" reduction="meanOrConcat"/>
+			<Column active="True" origcolname="Datetime_Start" reduction="meanOrConcat"/>
 		</Column>
 	</Column>
-	<Column active="True" alternative="+" constant="o" reduction="strConcat" translevel="0">
+	<Column active="True" alternative="+" constant="o" reduction="strConcat">
 		<Filter active="True" anytestrun="all" expression1="SolvingTime" expression2="100" operator="le"/>
 	</Column>
-	<Column active="True" name="Median" origcolname="LogDTime" reduction="median" translevel="0"/>
+	<Column active="True" name="Median" origcolname="LogDTime" reduction="median"/>
 	<FilterGroup active="True" filtertype="intersection" name="all"/>
 	<FilterGroup active="True" filtertype="intersection" name="alloptimal">
 		<Filter active="True" anytestrun="all" expression1="_solved_" expression2="1" operator="eq"/>

@@ -721,8 +721,7 @@ class IPETEvaluation(IpetNode):
 
 
     editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit", "validate"]
-    attributes2Options = {"evaluateoptauto":[True, False],
-                          "sortlevel":[-3, -2, -1, 0, 1, 2, 3, 4, 5, 6]}
+    attributes2Options = {"evaluateoptauto":[True, False]}
 
     deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'",
                          "evaluateoptauto" : "Optimal auto settings are no longer available, use reductions instead"}

@@ -781,7 +781,8 @@ class IPETEvaluation(IpetNode):
 
         if self.sortlevel is not None and self.getColIndex() != []:
             ncols = len(self.getColIndex()) + 1
-            self.sortlevel = self.sortlevel % ncols
+            if self.sortlevel >= ncols:
+                logger.warning("Sortlevel too large: Value ({}) needs to be in [0, {}].".format(self.sortlevel, ncols-1))
 
     def setCompareColFormat(self, comparecolformat):
         self.comparecolformat = comparecolformat[:]

@@ -576,7 +576,7 @@ class Validation:
     def isGE(self, a : float, b : float) -> bool:
         """tolerance comparison of a >= b
         """
-        return (a >= b - self.tol * max(abs(a), abs(b), 1.0)) and (a >= b - 0.1)
+        return (a >= b - self.tol * max(abs(a), abs(b), 1.0)) #and (a >= b - 0.1)
 
     def isLE(self, a : float, b : float) -> bool:
         """tolerance comparison of a <= b

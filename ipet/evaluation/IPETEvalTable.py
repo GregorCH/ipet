@@ -1461,7 +1461,6 @@ class IPETEvaluation(IpetNode):
             logger.warn("Warning. Custom formatting ignored for csv output")
 
             df.columns = [self.flatten_index(col) for col in df.columns]
-            print(df.columns)
             df.to_csv(csvfile)
 
     def streamDataFrame_txt(self, df : DataFrame, filebasename, formatters = {}):

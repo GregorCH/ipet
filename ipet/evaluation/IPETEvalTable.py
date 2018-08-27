@@ -64,7 +64,9 @@ class IPETEvaluationColumn(IpetNode):
                                "strConcat" : (1, -1),
                                "meanOrConcat" : (1, -1)}
 
-    possiblereductions = [None] + [k for k, v in possibletransformations.items() if v == (1, -1)]
+    possiblereductions = [None] + \
+                        [k for k, v in possibletransformations.items() if v == (1, -1)] + \
+                        ["shmean shift. by %d" % shift for shift in (1,5, 10, 100, 1000)]
 
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 
@@ -397,7 +399,10 @@ class IPETEvaluationColumn(IpetNode):
         """
         tries to find the reduction function from the numpy, misc, or Experiment modules
         """
-        return IPETEvaluationColumn.getMethodByStr(self.reduction, [numpy, misc, Experiment, Key.ProblemStatusCodes])
+        if self.reduction is not None and self.reduction.startswith("shmean shift. by"):
+            return lambda x:misc.shmean(x, shiftby=float(self.reduction.split()[-1]))
+        else:
+            return IPETEvaluationColumn.getMethodByStr(self.reduction, [numpy, misc, Experiment, Key.ProblemStatusCodes])
 
     def getReductionIndex(self, evalindexcols : list) -> list:
         """Return this columns reduction index, which is a subset of the evaluation index columns

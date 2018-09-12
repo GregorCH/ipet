@@ -136,6 +136,33 @@ class StatisticReader(IpetNode):
 ######################################################################################
 # DERIVED Classes
 
+class NodeNameReader(StatisticReader):
+    context = [Key.CONTEXT_LOGFILE, Key.CONTEXT_ERRFILE]
+
+    nodenameexp = re.compile('^Linux (\S*) .* GNU/Linux')
+    name = 'NodeNameReader'
+    datakey = Key.NodeName
+    nodename = None
+
+    def extractStatistic(self, line):
+        """ Read nodename data from slurminfo (first line)
+
+        Parameters
+        ----------
+        line, output of `uname -a` will be saved
+        """
+        if self.nodenameexp.search(line):
+            nodename = line.split(" ")
+            if len(nodename) > 1 and nodename[1] is not None:
+                self.nodename = nodename[1]
+
+    def execEndOfProb(self):
+        """
+        overwrite this method to implement final behaviour at the end of each problem, such as setting flags
+        """
+        if self.nodename is not None:
+            self.addData(self.datakey, self.nodename)
+
 class MetaDataReader(StatisticReader):
     context = [Key.CONTEXT_METAFILE, Key.CONTEXT_LOGFILE, Key.CONTEXT_ERRFILE]
 

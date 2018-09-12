@@ -13,7 +13,7 @@ import os
 import logging
 import xml.etree.ElementTree as ElementTree
 from .StatisticReader import ErrorFileReader, GapReader, TimeLimitReader, ListReader, \
-    BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodesReader, RootNodeFixingsReader, \
+    BestSolInfeasibleReader, MaxDepthReader, MetaDataReader, NodeNameReader, NodesReader, RootNodeFixingsReader, \
     SettingsFileReader, TimeToFirstReader, TimeToBestReader, ObjsenseReader, DateTimeReader, SolCheckerReader
 from .StatisticReader_TableReader import TableReader, CustomTableReader
 from .StatisticReader_VariableReader import VariableReader
@@ -187,6 +187,7 @@ class ReaderManager(Manager, IpetNode):
              GapReader(),
              MaxDepthReader(),
              MetaDataReader(),
+             NodeNameReader(),
              NodesReader(),
              ObjsenseReader(),
              TableReader(),

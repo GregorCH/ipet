@@ -137,7 +137,10 @@ class StatisticReader(IpetNode):
 # DERIVED Classes
 
 class NodeNameReader(StatisticReader):
-    context = [Key.CONTEXT_LOGFILE, Key.CONTEXT_ERRFILE]
+    """
+    Read nodename data from a line in outfile like the output of 'uname -a' (currently only on Linux).
+    """
+    context = [Key.CONTEXT_LOGFILE]
 
     nodenameexp = re.compile('^Linux (\S*) .* GNU/Linux')
     name = 'NodeNameReader'
@@ -145,25 +148,30 @@ class NodeNameReader(StatisticReader):
     nodename = None
 
     def extractStatistic(self, line):
-        """ Read nodename data from slurminfo (first line)
+        """ Save the hostname from a line like the output of 'uname -a' (currently only on Linux) to add at the end of the problem.
 
         Parameters
         ----------
-        line, output of `uname -a` will be saved
+        line from the outfile
         """
-        if self.nodenameexp.search(line):
-            nodename = line.split(" ")
-            if len(nodename) > 1 and nodename[1] is not None:
-                self.nodename = nodename[1]
+        matched = self.nodenameexp.match(line)
+        if matched:
+            self.nodename = matched.groups()[0]
 
     def execEndOfProb(self):
         """
-        overwrite this method to implement final behaviour at the end of each problem, such as setting flags
+        At the end of each problem, add the current nodename to the data.
         """
         if self.nodename is not None:
             self.addData(self.datakey, self.nodename)
+        self.nodename = None
 
 class MetaDataReader(StatisticReader):
+    """
+    Read lines of the form
+    @Key Value
+    from meta, out and err file and stores 'Value' in a Field 'Key'.
+    """
     context = [Key.CONTEXT_METAFILE, Key.CONTEXT_LOGFILE, Key.CONTEXT_ERRFILE]
 
     metadataexp = re.compile("^@\S{3,}\s+\S+$")

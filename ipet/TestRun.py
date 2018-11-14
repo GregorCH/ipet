@@ -236,6 +236,7 @@ class TestRun:
         """ Save data of current problem
         """
         self.finalizeCurrentCollection(solver, context)
+        self.metadatadict = {}
 
     def setupForDataCollection(self):
         """ Save data in a python dictionary for easier data collection

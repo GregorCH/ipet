@@ -91,6 +91,7 @@ argparser.add_argument("-f", "--formatstr", default = DEFAULT_FORMATSTR,
 argparser.add_argument("-v", "--validatedual", action = "store_true", default = Experiment.DEFAULT_VALIDATEDUAL, help = "Enable dual validation, relative to 'gaptol' parameter")
 argparser.add_argument("-g", "--gaptol", type = float, default = Experiment.DEFAULT_GAPTOL, help = "relative tolerance for primal and dual objective validation")
 argparser.add_argument("--docmode", action = "store_true", default = False, help = "print this help as restructured text")
+argparser.add_argument("--csv", action = "store_true", default = False, help = "print the data as csv")
 
 if __name__ == '__main__':
 
@@ -156,6 +157,15 @@ if __name__ == '__main__':
                 logger.info("converted %s --> %s" % (filename, newfilename))
             except:
                 logger.info("skipped testrun %s" % tr.getIdentification())
+
+            if arguments.csv:
+                try:
+                    filename = tr.filenames[0]
+                    newfilename = "%s%s" % (os.path.splitext(filename)[0], ".ipetdata.csv")
+                    tr.saveToCSV(newfilename)
+                    logger.info("saved data for %s --> %s" % (filename, newfilename))
+                except:
+                    logger.info("couldn't save data for testrun %s" % tr.getIdentification())
     else:
         experiment.addStdinput()
         experiment.collectData()

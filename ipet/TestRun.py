@@ -358,6 +358,17 @@ class TestRun:
         except IOError:
             print("Could not open %s for saving test run" % filename)
 
+    def saveToCSV(self, filename):
+        """ Dump the pickled instance of itself into a .trn-file
+        """
+        try:
+            f = open(filename, 'w')
+            f.write(self.data.to_csv())
+            print(self.data["Queue"])
+            f.close()
+        except IOError:
+            print("Could not open %s for saving test run data" % filename)
+
     def emptyCurrentProblemData(self):
         """ Empty data of currently read problem
         """
@@ -399,7 +410,7 @@ class TestRun:
         return self.data
 
     def getCurrentLogfilename(self):
-        """ Return the name of the current logfile 
+        """ Return the name of the current logfile
         """
         return os.path.basename(self.filenames[0])
 

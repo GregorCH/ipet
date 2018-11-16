@@ -442,7 +442,8 @@ class SolverTest(unittest.TestCase):
                     Key.SolvingTime: 0.02,
                     Key.GitHash: "ea0b6dd",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 3.0.0",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "3.0.0",
                     "SpxGitHash": "b0cccbd",
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound:+1.00000000000000e+20,
@@ -454,7 +455,8 @@ class SolverTest(unittest.TestCase):
                     Key.SolvingTime: 6807.85,
                     Key.GitHash: "ea0b6dd",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 3.0.0",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "3.0.0",
                     "SpxGitHash": "b0cccbd",
                     Key.SolverStatus: Key.SolverStatusCodes.MemoryLimit }, {
                     Key.PrimalBound:+1.49321500000000e+06,
@@ -466,7 +468,8 @@ class SolverTest(unittest.TestCase):
                     Key.SolvingTime: 0.79,
                     Key.GitHash: "dd19a7b",
                     "mode": "optimized",
-                    "LPSolver": "CPLEX 12.6.0.0",
+                    "LPSolver": "CPLEX",
+                    "LPSolverVersion": "12.6.0.0",
                     "SpxGitHash": None,
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:+3.36000000000000e+03,
@@ -478,7 +481,8 @@ class SolverTest(unittest.TestCase):
                     Key.SolvingTime: 600.00,
                     Key.GitHash: "dd19a7b",
                     "mode": "optimized",
-                    "LPSolver": "CPLEX 12.6.0.0",
+                    "LPSolver": "CPLEX",
+                    "LPSolverVersion": "12.6.0.0",
                     "SpxGitHash": None,
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound:+1.16800000000000e+03,
@@ -490,7 +494,8 @@ class SolverTest(unittest.TestCase):
                     Key.SolvingTime: None,
                     Key.GitHash: "dd19a7b",
                     "mode": "optimized",
-                    "LPSolver": "CPLEX 12.6.0.0",
+                    "LPSolver": "CPLEX",
+                    "LPSolverVersion": "12.6.0.0",
                     "SpxGitHash": None,
                     Key.SolverStatus: Key.SolverStatusCodes.Crashed }, {
                     Key.PrimalBound: None,
@@ -502,7 +507,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 120255,
                     Key.GitHash: "3bbd232",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 3.1.0",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "3.1.0",
                     "SpxGitHash": "5147d37",
                     Key.SolverStatus: Key.SolverStatusCodes.TimeLimit }, {
                     Key.PrimalBound:-1.06411840100000e+05,
@@ -514,7 +520,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 1,
                     Key.GitHash: "3bbd232",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 3.1.0",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "3.1.0",
                     "SpxGitHash": "5147d37",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:+7.10000000000000e+01,
@@ -526,7 +533,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 1,
                     Key.GitHash: "3bbd232",
                     "mode": "optimized",
-                    "LPSolver": "CPLEX 12.8.0.0",
+                    "LPSolver": "CPLEX",
+                    "LPSolverVersion": "12.8.0.0",
                     "SpxGitHash": None,
                     Key.SolverStatus: Key.SolverStatusCodes.Infeasible }, {
                     Key.PrimalBound:+1.00000000000000e+20,
@@ -538,7 +546,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 1483,
                     Key.GitHash: "3bbd232",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 3.1.0",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "3.1.0",
                     "SpxGitHash": "5147d37",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-5.66395707870830e+08,
@@ -550,7 +559,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 424,
                     Key.GitHash: "3bbd232",
                     "mode": "optimized",
-                    "LPSolver": "CPLEX 12.8.0.0",
+                    "LPSolver": "CPLEX",
+                    "LPSolverVersion": "12.8.0.0",
                     "SpxGitHash": None,
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:-4.99999999999994e+00,
@@ -562,7 +572,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 3,
                     Key.GitHash: "3bbd232",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 3.1.0",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "3.1.0",
                     "SpxGitHash": "5147d37",
                     Key.SolverStatus: Key.SolverStatusCodes.Optimal }, {
                     Key.PrimalBound:+4.43000000000000e+02,
@@ -574,7 +585,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 0,
                     Key.GitHash: "b1c222a",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 3.1.1",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "3.1.1",
                     "SpxGitHash": "ab921a5",
                     Key.SolverStatus: Key.SolverStatusCodes.MemoryLimit }, {
                     Key.PrimalBound: 1e+20,
@@ -586,7 +598,8 @@ class SolverTest(unittest.TestCase):
                     Key.Nodes: 1,
                     Key.GitHash: "ce154f0",
                     "mode": "optimized",
-                    "LPSolver": "SoPlex 4.0.0",
+                    "LPSolver": "SoPlex",
+                    "LPSolverVersion": "4.0.0",
                     "SpxGitHash": "e0d3842",
                     Key.SolverStatus: Key.SolverStatusCodes.MemoryLimit }, {
                     Key.PrimalBound: 1e+20,

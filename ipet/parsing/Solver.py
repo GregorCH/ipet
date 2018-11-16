@@ -536,7 +536,16 @@ class SCIPSolver(Solver):
         for keyword in ["mode", "LP solver", "GitHash"]:
             data = re.search(r'SCIP.*\[%s: ([^]]*)\]' % keyword, line)
             if data:
-                self.addData(keyword if keyword != "LP solver" else "LPSolver", data.groups()[0])
+                if keyword == "LP solver":
+                    data = data.groups()[0]
+                    lp_data = data.split(" ")
+                    if len(lp_data) == 1:
+                        self.addData("LPSolver", data)
+                    else:
+                        self.addData("LPSolver", lp_data[0])
+                        self.addData("LPSolverVersion", " ".join(lp_data[1:]))
+                else:
+                    self.addData(keyword, data.groups()[0])
         soplexhashmatch = self.soplexgithash_expr.match(line)
         if soplexhashmatch:
             self.addData("SpxGitHash", soplexhashmatch.groups()[0])

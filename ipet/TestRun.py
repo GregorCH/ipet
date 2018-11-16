@@ -14,7 +14,7 @@ from ipet import misc
 from pandas import DataFrame, notnull
 import os, sys
 import logging
-from ipet.Key import CONTEXT_LOGFILE
+from ipet.Key import CONTEXT_LOGFILE, CONTEXT_METAFILE
 from ipet.validation import Validation
 # from lib2to3.fixes.fix_input import context
 # from matplotlib.tests import test_lines
@@ -45,6 +45,7 @@ class TestRun:
         self.currentproblemid = 0
         """ meta data represent problem-independent data """
         self.metadatadict = {}
+        self.historic_metadatadict = {}
         self.parametervalues = {}
         self.defaultparametervalues = {}
         self.keyset = set()
@@ -204,7 +205,7 @@ class TestRun:
     def getMetaData(self):
         """Return a data frame containing meta data
         """
-        return self.metadatadict
+        return self.historic_metadatadict
 
     def finalizeCurrentCollection(self, solver, context = CONTEXT_LOGFILE):
         """ Any data of the current problem is saved as a new row in datadict
@@ -225,8 +226,6 @@ class TestRun:
             if "ProblemName" in self.metadatadict:
                 del self.metadatadict["ProblemName"]
 
-
-
             for key in self.currentproblemdata.keys():
                 self.datadict.setdefault(key, {})[self.currentproblemid] = self.currentproblemdata[key]
             self.currentproblemdata = {}
@@ -236,7 +235,10 @@ class TestRun:
         """ Save data of current problem
         """
         self.finalizeCurrentCollection(solver, context)
-        self.metadatadict = {}
+
+        self.historic_metadatadict.update(self.metadatadict)
+        if context not in [CONTEXT_METAFILE]:
+            self.metadatadict = {}
 
     def setupForDataCollection(self):
         """ Save data in a python dictionary for easier data collection

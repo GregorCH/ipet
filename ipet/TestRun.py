@@ -367,7 +367,6 @@ class TestRun:
         try:
             f = open(filename, 'w')
             f.write(self.data.to_csv())
-            print(self.data["Queue"])
             f.close()
         except IOError:
             print("Could not open %s for saving test run data" % filename)

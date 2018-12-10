@@ -26,6 +26,7 @@ from ipet.evaluation.IPETFilter import IPETValue
 from ipet.misc.misc import meanOrConcat
 from ipet.validation import Validation
 import sys
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -724,7 +725,7 @@ class IPETEvaluation(IpetNode):
     ALLTOGETHER = "_alltogether_"
 
 
-    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit", "validate"]
+    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit", "validate", "suppressions"]
     attributes2Options = {"evaluateoptauto":[True, False]}
 
     deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'",
@@ -732,7 +733,7 @@ class IPETEvaluation(IpetNode):
     def __init__(self, defaultgroup = None,
                  sortlevel = None, comparecolformat = DEFAULT_COMPARECOLFORMAT,
                  index = DEFAULT_INDEX, indexsplit = DEFAULT_INDEXSPLIT,
-                 validate = None, **kw):
+                 validate = None, suppressions=None, **kw):
         """
         constructs an Ipet-Evaluation
 
@@ -744,6 +745,7 @@ class IPETEvaluation(IpetNode):
         index : (string or list or None) single or multiple column names that serve as (row) and column index levels, if 'auto' an index is generated.
         indexsplit : (int) position to split index into row and column levels, negative to count from the end.
         validate : (string) for the relative or absolute location of a solu file for validation.
+        suppressions : (string) column names that should be excluded from output (as comma separated list of simple strings or regular expressions).
         """
 
         # construct super class first, Evaluation is currently always active
@@ -762,6 +764,7 @@ class IPETEvaluation(IpetNode):
         self.set_sortlevel(sortlevel)
 
         self.set_validate(validate)
+        self.suppressions = suppressions
 
 
     def getName(self):
@@ -936,6 +939,11 @@ class IPETEvaluation(IpetNode):
     def removeColumn(self, col):
         self.columns.remove(col)
         self.setEvaluated(False)
+
+    def set_suppressions(self, suppressions: str):
+        """Sets suppressions attribute to the argument of this function
+        """
+        self.suppressions = suppressions
 
     def addComparisonColumns(self, df: DataFrame) -> DataFrame:
         """ Add the comparison columns.
@@ -1423,8 +1431,23 @@ class IPETEvaluation(IpetNode):
         else:
             return df
 
+    def suppressColumns(self, df : DataFrame) -> DataFrame:
+        """Returns a new data frame with all columns removed that match the suppressions attribute
+        """
+        if not self.suppressions: # None or empty string
+            return df
+
+        suppressions = self.suppressions.split()
+
+        for suppression in suppressions:
+            df.drop(list(df.filter(regex=suppression)), axis = 1, inplace = True)
+
+        return df
+
     def streamDataFrame(self, df, filebasename, streamtype):
         df = self.sortDataFrame(df)
+
+        df = self.suppressColumns(df)
 
         if not self.checkStreamType(streamtype):
             raise ValueError("Stream error: Unknown stream type %s" % streamtype)

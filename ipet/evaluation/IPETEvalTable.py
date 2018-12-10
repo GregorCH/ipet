@@ -26,7 +26,6 @@ from ipet.evaluation.IPETFilter import IPETValue
 from ipet.misc.misc import meanOrConcat
 from ipet.validation import Validation
 import sys
-import re
 
 logger = logging.getLogger(__name__)
 

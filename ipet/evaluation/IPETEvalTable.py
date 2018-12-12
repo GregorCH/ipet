@@ -29,6 +29,7 @@ import sys
 
 logger = logging.getLogger(__name__)
 
+
 class IPETEvaluationColumn(IpetNode):
 
     DEFAULT_REDUCTION = "meanOrConcat"
@@ -66,7 +67,7 @@ class IPETEvaluationColumn(IpetNode):
 
     possiblereductions = [None] + \
                         [k for k, v in possibletransformations.items() if v == (1, -1)] + \
-                        ["shmean shift. by %d" % shift for shift in (1,5, 10, 100, 1000)]
+                        ["shmean shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 
     possiblecomparisons = [None, "quot", "difference"] + ["quot shift. by %d" % shift for shift in (1, 5, 10, 100, 1000)]
 
@@ -400,7 +401,7 @@ class IPETEvaluationColumn(IpetNode):
         tries to find the reduction function from the numpy, misc, or Experiment modules
         """
         if self.reduction is not None and self.reduction.startswith("shmean shift. by"):
-            return lambda x:misc.shmean(x, shiftby=float(self.reduction.split()[-1]))
+            return lambda x:misc.shmean(x, shiftby = float(self.reduction.split()[-1]))
         else:
             return IPETEvaluationColumn.getMethodByStr(self.reduction, [numpy, misc, Experiment, Key.ProblemStatusCodes])
 
@@ -661,6 +662,7 @@ class IPETEvaluationColumn(IpetNode):
             return True
         return False
 
+
 class FormatFunc:
 
     def __init__(self, formatstr):
@@ -669,10 +671,12 @@ class FormatFunc:
     def beautify(self, x):
         return (self.formatstr % x)
 
+
 class StrList:
     """
     Represents an easier readible and parsable list of strings
     """
+
     def __init__(self, strList, splitChar = " "):
         self.list = StrList.splitStringList(strList, splitChar)
         self.splitChar = splitChar
@@ -700,6 +704,7 @@ class StrList:
         if self.list is None:
             return ""
         return self.splitChar.join(self.list)
+
 
 class IPETEvaluation(IpetNode):
     """
@@ -729,6 +734,7 @@ class IPETEvaluation(IpetNode):
 
     deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'",
                          "evaluateoptauto" : "Optimal auto settings are no longer available, use reductions instead"}
+
     def __init__(self, defaultgroup = None,
                  sortlevel = None, comparecolformat = DEFAULT_COMPARECOLFORMAT,
                  index = DEFAULT_INDEX, indexsplit = DEFAULT_INDEXSPLIT,
@@ -763,7 +769,6 @@ class IPETEvaluation(IpetNode):
 
         self.set_validate(validate)
 
-
     def getName(self):
         return self.nodetag
 
@@ -785,7 +790,7 @@ class IPETEvaluation(IpetNode):
         if self.sortlevel is not None and self.getColIndex() != []:
             ncols = len(self.getColIndex()) + 1
             if self.sortlevel >= ncols:
-                logger.warning("Sortlevel too large: Value ({}) needs to be in [0, {}].".format(self.sortlevel, ncols-1))
+                logger.warning("Sortlevel too large: Value ({}) needs to be in [0, {}].".format(self.sortlevel, ncols - 1))
 
     def setCompareColFormat(self, comparecolformat):
         self.comparecolformat = comparecolformat[:]
@@ -1063,6 +1068,7 @@ class IPETEvaluation(IpetNode):
 
         toposorted = list(toposort(adj))
         logger.debug("TOPOSORT:\nDependency List: {},\nTopological Ordering: {}".format(adj, toposorted))
+
         def getIndex(name, toposorted):
             for idx, topo in enumerate(toposorted):
                 if name in topo: return idx
@@ -1134,7 +1140,6 @@ class IPETEvaluation(IpetNode):
         """
         self.feastol = feastol
 
-
     def validateData(self, df : DataFrame) -> DataFrame:
         """validate data based on external solution information
         """
@@ -1168,7 +1173,6 @@ class IPETEvaluation(IpetNode):
             except:
                 pass
 
-
         result = v.validate(df)
 
         logger.info("Validation resulted in the following status codes: [{}]".format(
@@ -1177,7 +1181,6 @@ class IPETEvaluation(IpetNode):
         df[Key.ProblemStatus] = result
 
         return df
-
 
     def calculateNeededData(self, df : DataFrame) -> DataFrame:
         """ Add the status columns.
@@ -1298,7 +1301,6 @@ class IPETEvaluation(IpetNode):
         for col in additionalfiltercolumns:
             newcols.append(grouped[col].apply(meanOrConcat))
 
-
         reduceddf = pd.concat(newcols, axis = 1)
         ind = self.getIndex()
         index_uniq = [i for i in ind if i not in reduceddf.columns]
@@ -1341,8 +1343,8 @@ class IPETEvaluation(IpetNode):
         #
         columns = []
         colset = set()
-        for c in self.usercolumns + self.getIndex():
-            if c not in colset and c not in self.countercolumns:
+        for c in self.usercolumns + self.getIndex() + ["groupTags"]:
+            if c not in colset and c not in self.countercolumns and c in df.columns:
                 columns.append(c)
                 colset.add(c)
 
@@ -1560,7 +1562,6 @@ class IPETEvaluation(IpetNode):
                 result = result & (data[l] == group[idx])
             return numpy.any(result)
 
-
     def tryGenerateIndexAndDefaultgroup(self, data):
         '''
         Generate a reasonable index and defaultgroup based on the given data
@@ -1650,17 +1651,10 @@ class IPETEvaluation(IpetNode):
 
         reduceddata = self.addComparisonColumns(reduceddata)
 
-
-        # compile a long table with the requested row and column indices
-        ret = self.convertToHorizontalFormat(reduceddata)
-        logger.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
-
-        self.rettab = ret
-
-        # TODO Where do we need these following three lines?
-        self.instance_wise = ret
-        self.agg = self.aggregateToPivotTable(reduceddata)
-        logger.debug("Result of aggregateToPivotTable:\n{}\n".format(self.agg))
+#         # TODO Where do we need these following three lines?
+#         self.instance_wise = ret
+#         self.agg = self.aggregateToPivotTable(reduceddata)
+#         logger.debug("Result of aggregateToPivotTable:\n{}\n".format(self.agg))
 
         self.filtered_agg = {}
         self.filtered_instancewise = {}
@@ -1674,6 +1668,7 @@ class IPETEvaluation(IpetNode):
         IPETFilterGroup.setGlobalDataFrameAndIndex(reduceddata, self.getRowIndex())
         self.computeFilterResults(reduceddata)
 
+        self.filter_masks = {}
         for fg in activefiltergroups:
             # iterate through filter groups, thereby aggregating results for every group
             filtergroupdata = self.applyFilterGroup(reduceddata, fg, self.getRowIndex())
@@ -1699,6 +1694,15 @@ class IPETEvaluation(IpetNode):
         else:
             self.retagg = pd.DataFrame()
 
+        # compile a long table with the requested row and column indices
+        group_tags = self.computeGroupTags()
+        ret = reduceddata.copy()
+        ret["groupTags"] = group_tags
+        ret = self.convertToHorizontalFormat(ret)
+        logger.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
+
+        self.rettab = ret
+
         # cast all numeric columns back
         self.rettab = self.rettab.apply(pd.to_numeric, errors = 'ignore')
         self.retagg = self.retagg.apply(pd.to_numeric, errors = 'ignore')
@@ -1710,7 +1714,19 @@ class IPETEvaluation(IpetNode):
         return self.rettab, self.retagg
 
     def applyFilterGroup(self, df, fg, index):
-        return fg.filterDataFrame(df, index)
+        mask = fg.filterDataFrame(df, index)
+
+        self.filter_masks[fg.getName()] = mask
+
+        return df[mask]
+
+    def computeGroupTags(self) -> list:
+        """
+        returns a list of strings that contains the group tags for every record/row of the original data frame
+        """
+        string_reps = [numpy.where(self.filter_masks.get(fg.getName()), fg.getName(), "") for fg in self.getActiveFilterGroups()]
+
+        return DataFrame(string_reps).apply(";".join)
 
     def aggregateToPivotTable(self, df : DataFrame) -> DataFrame:
         """ Aggregates long data to short table
@@ -1888,9 +1904,6 @@ class IPETEvaluation(IpetNode):
             # store the result (either by applying the filter, or by copying)
             #
             f.storeResult(df, fcol)
-
-
-
 
 
 if __name__ == '__main__':

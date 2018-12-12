@@ -18,6 +18,7 @@ from ipet.evaluation import TestSets
 
 logger = logging.getLogger(__name__)
 
+
 class IPETValue(IpetNode):
     nodetag = "Value"
 
@@ -65,6 +66,7 @@ class IPETValue(IpetNode):
         me = ElementTree.Element(IPETValue.getNodeTag(), self.attributesToStringDict())
         return me
 
+
 class IPETComparison:
     """
     comparison operators for filters. All standard binary comparisons + float comparisons (with tolerance)
@@ -88,7 +90,6 @@ class IPETComparison:
         else:
             raise KeyError("Unknown key value %s" % (operator))
 
-
     def compare(self, x, y):
         method = getattr(self, "method_" + IPETComparison.comparisondict[self.operator])
         try:
@@ -99,16 +100,22 @@ class IPETComparison:
 
     def method_le(self, x, y):
         return x <= y
+
     def method_lt(self, x, y):
         return x < y
+
     def method_ge(self, x, y):
         return x >= y
+
     def method_gt(self, x, y):
         return x > y
+
     def method_eq(self, x, y):
         return x == y
+
     def method_neq(self, x, y):
         return x != y
+
 
 class IPETFilter(IpetNode):
     """
@@ -119,13 +126,12 @@ class IPETFilter(IpetNode):
     attribute2Options = {
                          "anytestrun":["one", "all"],
                          "operator":list(IPETComparison.comparisondict.keys())
-                         + valueoperators
-                         + listoperators}
+                         +valueoperators
+                         +listoperators}
     nodetag = "Filter"
     DEFAULT_ANYTESTRUN = 'all'
     _storedcol_ = None
     _storeddf_ = None
-
 
     def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = DEFAULT_ANYTESTRUN, active = True, datakey = None):
         """
@@ -162,7 +168,6 @@ class IPETFilter(IpetNode):
         if self.anytestrun not in self.attribute2Options["anytestrun"]:
             raise IpetNodeAttributeError("anytestrun", "Wrong attribute {} passed as 'anytestrun' property. Should be in {}".format(self.anytestrun, self.attribute2Options["anytestrun"]))
         return True
-
 
     @staticmethod
     def fromDict(attrdict):
@@ -262,7 +267,6 @@ class IPETFilter(IpetNode):
         else:
             return ~contained
 
-
     def isAllDiff(self, x):
         valueset = set()
         for x_i in x:
@@ -283,8 +287,6 @@ class IPETFilter(IpetNode):
 
     def isOneDiff(self, x):
         return not self.isAllEqual(x)
-
-
 
     def applyListOperator(self, df, groupindex):
         """
@@ -431,7 +433,6 @@ class IPETFilter(IpetNode):
 
         return fcol
 
-
     def getNeededColumns(self, df):
         return [exp for exp in [self.expression1, self.expression2, self.datakey] if exp in df.columns]
 
@@ -497,6 +498,7 @@ class IPETFilter(IpetNode):
 
         return True
 
+
 class IPETFilterGroup(IpetNode):
     """
     represents a list of filters, has a name attribute for quick tabular representation
@@ -514,7 +516,6 @@ class IPETFilterGroup(IpetNode):
 
     # intersection row index which can be shared across all filter groups of type "intersection"
     _glbinterrows_ = None
-
 
     def __init__(self, name = None, filtertype = "intersection", active = True):
         """
@@ -578,7 +579,6 @@ class IPETFilterGroup(IpetNode):
         """Set global data frame and index for filtering, that will be reused by each filter group
         """
 
-
         IPETFilterGroup._glbdf_ = df
         IPETFilterGroup._glbindex_ = index
 
@@ -602,14 +602,12 @@ class IPETFilterGroup(IpetNode):
         instancecount = groups.apply(len).max()
         interrows = groups.apply(lambda x:len(x) == instancecount)
 
-
         return interrows.reindex(dfindex)
 
     def filterDataFrame(self, df, index):
         """
         filters a data frame object as the intersection of all values that match the criteria defined by the filters
         """
-
 
         activefilters = self.getActiveFilters()
 
@@ -622,7 +620,6 @@ class IPETFilterGroup(IpetNode):
             if df is IPETFilterGroup._glbdf_:
                 intersection_index = IPETFilterGroup._glbinterrows_
             else:
-
                 intersection_index = IPETFilterGroup.computeIntersectionRows(df, index)
 
         elif self.filtertype == "union":
@@ -651,8 +648,7 @@ class IPETFilterGroup(IpetNode):
 
         lvalues = intersection_index.values
 
-        return df[lvalues]
-
+        return lvalues
 
     def filterProblem(self, probname, testruns = []):
         for filter_ in self.getActiveFilters():

@@ -689,7 +689,7 @@ class IPETFilterGroup(IpetNode):
                 instancename = child.attrib.get("name")
                 if instancename:
                     filter_.addChild(IPETValue(instancename))
-                filter_.checkAttributes()
+            filter_.checkAttributes()
             return filter_
 
     @staticmethod

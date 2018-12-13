@@ -1437,7 +1437,7 @@ class IPETEvaluation(IpetNode):
             return df
 
         suppressions = self.suppressions.split()
-        df_reduced = df
+        df_reduced = df.copy()
 
         for suppression in suppressions:
             df_reduced.drop(list(df_reduced.filter(regex=suppression)), axis = 1, inplace = True)

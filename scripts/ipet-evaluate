@@ -94,7 +94,9 @@ output_doc = """
         should be printed. Only useful in combination with '--long'.
     - -q, --quiet : Suppress all output
     - -D, --debug : enable debugging output
-    --supressions : List of regular expressions matching all columns that should have their output suppressed
+    --supressions : List of regular expressions matching all columns that should have their output suppressed.
+        For example, to suppress the column Time_shmean(1.0)p and all columns ending with Q in the aggregation table:
+            ipet-evaluate -t sometestrun.trn -e evaluation.xml --suppressions "Time_shmean\(1\.0\)p .*Q$"
 """
 
 # possible arguments in the form name,default,short,description #

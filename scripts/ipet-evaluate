@@ -51,6 +51,11 @@ epilog = \
     A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily 
     available data like the number of solving nodes and the solving time in seconds.
 
+    Certain columns can be suppressed by using the --suppressions tag with a list of regular expressions:
+        ipet-evaluate -t sometestrun.trn -e evaluation.xml --suppressions "<someRegex1> <someRegex2> ... <someRegexN>"
+    For example, to suppress the column Time_shmean(1.0)p and all columns ending with Q in the aggregation table:
+        ipet-evaluate -t sometestrun.trn -e evaluation.xml --suppressions "Time_shmean\(1\.0\)p .*Q$"
+    Note that special characters in column names need to be escaped for the matching to work.
 
     Key Search
     ----------

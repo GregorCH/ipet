@@ -1437,11 +1437,12 @@ class IPETEvaluation(IpetNode):
             return df
 
         suppressions = self.suppressions.split()
+        df_reduced = df
 
         for suppression in suppressions:
-            df.drop(list(df.filter(regex=suppression)), axis = 1, inplace = True)
+            df_reduced.drop(list(df_reduced.filter(regex=suppression)), axis = 1, inplace = True)
 
-        return df
+        return df_reduced
 
     def streamDataFrame(self, df, filebasename, streamtype):
         df = self.sortDataFrame(df)

@@ -51,7 +51,6 @@ epilog = \
     A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily 
     available data like the number of solving nodes and the solving time in seconds.
 
-
     Key Search
     ----------
 
@@ -95,6 +94,7 @@ output_doc = """
         should be printed. Only useful in combination with '--long'.
     - -q, --quiet : Suppress all output
     - -D, --debug : enable debugging output
+    --supressions : List of regular expressions matching all columns that should have their output suppressed
 """
 
 # possible arguments in the form name,default,short,description #
@@ -127,6 +127,7 @@ argparser.add_argument('-i', '--index', action = "append", default = None, help 
 argparser.add_argument('--indexsplit', default = None, help = "position to split index into row and column levels, negative to count from the end.")
 argparser.add_argument('--quiet', action = "store_true", default = False, help = "Supress all output (may be useful for profiling)")
 argparser.add_argument('--displaygroup', default = None, help = "Name of the group for which the long display should be printed. Only available for long output mode")
+argparser.add_argument('--suppressions', default = None, help = "List of regular expressions matching all columns that should have their output suppressed")
 argparser.add_argument('-v', '--validate', default = None, help = "Name of a solu file for validation information")
 argparser.add_argument('-f', '--fileextensions', default = None, action = "append", help = "file extensions for writing evaluated data, e.g., csv, tex, stdout, txt")
 argparser.add_argument('--tolerance', default = None, help = "relative objective tolerance for validation")
@@ -224,6 +225,9 @@ if __name__ == '__main__':
 
     if arguments.index is not None:
         theeval.set_index(arguments.index)
+
+    if arguments.suppressions is not None:
+        theeval.set_suppressions(arguments.suppressions)
 
     if arguments.defaultgroup is not None:
         # theeval.setDefaultGroup(arguments.defaultgroup)

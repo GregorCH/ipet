@@ -32,7 +32,7 @@ eval_index = ["ProblemName Status"]
 
 eval_indexsplit = [1, 2]
 
-columns= [{"name":"Time", "origcolname":"SolvingTime", "alternative":"100", "reduction":"mean"},
+columns = [{"name":"Time", "origcolname":"SolvingTime", "alternative":"100", "reduction":"mean"},
       {"origcolname":"ProblemName", "reduction":"strConcat"},
       {"name":"Indic", "constant":1, "alternative":1, "reduction":"max"}, ]
 
@@ -40,7 +40,7 @@ col_filters = [ None,
                 None,
                {"expression1":"SolvingTime", "expression2":"10", "operator":"ge"}]
 
-aggs= [{"aggregation":"mean"},
+aggs = [{"aggregation":"mean"},
        {"aggregation":"strConcat"},
        {"aggregation":"strConcat"}]
 
@@ -52,13 +52,14 @@ filters = [None,
 
 test_out = os.path.join(DATADIR, 'check.MMM.scip-hashing.linux.x86_64.gnu.dbg.cpx.mip-dbg.heuraggr.out')
 
+
 class EvaluationTest(unittest.TestCase):
 
-    test_fgs = [#None,
+    test_fgs = [  # None,
                 [0],
                 [1],
                 [0, 1]]
-    test_cols = [#None,
+    test_cols = [  # None,
                  [[0, True]],
                  [[0, False]],
                  [[0, True], [2, True]],
@@ -157,7 +158,6 @@ class EvaluationTest(unittest.TestCase):
             print(ev.attributesToStringDict())
             raise e
 
-
     def test_xml(self):
         """
         test construction of modified evaluations, and if they persist after constructing a twin directly from the XML representation
@@ -173,6 +173,7 @@ class EvaluationTest(unittest.TestCase):
             evaluation2 = IPETEvaluation.fromXML(ElementTree.tostring(evaluation.toXMLElem()))
             self.assertTrue(evaluation.equals(evaluation2),
                              "The two evaluations are not the same after modifying %s" % mod)
+
 
 if __name__ == "__main__":
     unittest.main()

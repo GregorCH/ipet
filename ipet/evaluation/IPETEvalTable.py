@@ -728,9 +728,8 @@ class IPETEvaluation(IpetNode):
     DEFAULT_INDEXSPLIT = -1
     ALLTOGETHER = "_alltogether_"
 
-
-    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "index", "indexsplit", "validate", "suppressions"]
-    attributes2Options = {"evaluateoptauto":[True, False]}
+    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "grouptags", "index", "indexsplit", "validate", "suppressions"]
+    attributes2Options = {"grouptags":[True, False]}
 
     deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'",
                          "evaluateoptauto" : "Optimal auto settings are no longer available, use reductions instead"}
@@ -738,7 +737,7 @@ class IPETEvaluation(IpetNode):
     def __init__(self, defaultgroup = None,
                  sortlevel = None, comparecolformat = DEFAULT_COMPARECOLFORMAT,
                  index = DEFAULT_INDEX, indexsplit = DEFAULT_INDEXSPLIT,
-                 validate = None, suppressions=None, **kw):
+                 validate = None, suppressions = None, grouptags = None, **kw):
         """
         constructs an Ipet-Evaluation
 
@@ -751,6 +750,7 @@ class IPETEvaluation(IpetNode):
         indexsplit : (int) position to split index into row and column levels, negative to count from the end.
         validate : (string) for the relative or absolute location of a solu file for validation.
         suppressions : (string) column names that should be excluded from output (as comma separated list of simple strings or regular expressions).
+        grouptags : (bool) True if group tags should be displayed in long table, otherwise False
         """
 
         # construct super class first, Evaluation is currently always active
@@ -767,12 +767,20 @@ class IPETEvaluation(IpetNode):
         self.set_index(index)
         self.set_indexsplit(indexsplit)
         self.set_sortlevel(sortlevel)
+        self.set_grouptags(grouptags)
 
         self.set_validate(validate)
         self.suppressions = suppressions
 
     def getName(self):
         return self.nodetag
+
+    def set_grouptags(self, grouptags):
+
+        if grouptags not in [None, "", False, "False"]:
+            self.grouptags = True
+        else:
+            self.grouptags = False
 
     def isEvaluated(self):
         """
@@ -1435,14 +1443,14 @@ class IPETEvaluation(IpetNode):
     def suppressColumns(self, df : DataFrame) -> DataFrame:
         """Returns a new data frame with all columns removed that match the suppressions attribute
         """
-        if not self.suppressions: # None or empty string
+        if not self.suppressions:  # None or empty string
             return df
 
         suppressions = self.suppressions.split()
         df_reduced = df.copy()
 
         for suppression in suppressions:
-            df_reduced.drop(list(df_reduced.filter(regex=suppression)), axis = 1, inplace = True)
+            df_reduced.drop(list(df_reduced.filter(regex = suppression)), axis = 1, inplace = True)
 
         return df_reduced
 
@@ -1718,9 +1726,11 @@ class IPETEvaluation(IpetNode):
             self.retagg = pd.DataFrame()
 
         # compile a long table with the requested row and column indices
-        group_tags = self.computeGroupTags()
         ret = reduceddata.copy()
-        ret["groupTags"] = group_tags
+        if self.grouptags:
+            group_tags = self.computeGroupTags()
+            ret["groupTags"] = group_tags
+
         ret = self.convertToHorizontalFormat(ret)
         logger.debug("Result of convertToHorizontalFormat:\n{}\n".format(ret))
 
@@ -1749,7 +1759,7 @@ class IPETEvaluation(IpetNode):
         """
         string_reps = [numpy.where(self.filter_masks.get(fg.getName()), fg.getName(), "") for fg in self.getActiveFilterGroups()]
 
-        return DataFrame(string_reps).apply(";".join)
+        return DataFrame(string_reps).apply("|".join)
 
     def aggregateToPivotTable(self, df : DataFrame) -> DataFrame:
         """ Aggregates long data to short table

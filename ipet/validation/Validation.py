@@ -516,8 +516,6 @@ class Validation:
         if not problemname:
             return
 
-        pb = self.getPbValue(pb, obs)
-        db = self.getDbValue(db, obs)
 
         #
         # for inconsistency checks, we only consider problems that are consistent
@@ -530,22 +528,24 @@ class Validation:
         if self.isSolInfeasible(x) or (not pd.isnull(pb) and not self.isSolFeasible(x)):
             return
 
+        pb = self.getPbValue(pb, obs)
+        db = self.getDbValue(db, obs)
         bestpb = self.bestpb.get(problemname, np.inf if obs == ObjectiveSenseCode.MINIMIZE else -np.inf)
         bestpb = min(bestpb, pb) if obs == ObjectiveSenseCode.MINIMIZE else max(bestpb, pb)
 
         bestdb = self.bestdb.get(problemname, -np.inf if obs == ObjectiveSenseCode.MINIMIZE else np.inf)
+        if x.get(Key.SolverStatus) == SolverStatusCodes.Infeasible:
+            db = infty() if obs == ObjectiveSenseCode.MINIMIZE else -infty()
+
         bestdb = max(bestdb, db) if obs == ObjectiveSenseCode.MINIMIZE else min(bestdb, db)
 
-        if obs == ObjectiveSenseCode.MINIMIZE:
-            if not self.isLE(bestdb, bestpb):
-                self.inconsistentset.add(problemname)
+        if (obs == ObjectiveSenseCode.MINIMIZE and not self.isLE(bestdb, bestpb)) or (obs == ObjectiveSenseCode.MAXIMIZE and not self.isGE(bestdb, bestpb)):
+            self.inconsistentset.add(problemname)
         else:
-            if not self.isGE(bestdb, bestpb):
-                self.inconsistentset.add(problemname)
+            self.bestdb[problemname] = bestdb
+            self.bestpb[problemname] = bestpb
 
 
-        self.bestdb[problemname] = bestdb
-        self.bestpb[problemname] = bestpb
 
 
     def validate(self, d : pd.DataFrame):

@@ -1171,7 +1171,7 @@ class IPETEvaluation(IpetNode):
                 logger.info("Validation information provided: '{}'".format(self.validate))
             except:
                 file_exists = False
-                logger.warning("Could not open solu file '{}' for validation".format(self.validate))
+                logger.warning("Could not open validation file '{}'".format(self.validate))
 
         if file_exists:
             v = Validation(self.validate)

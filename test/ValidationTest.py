@@ -35,6 +35,9 @@ best_dbad = "best_dbad"
 # instances for which no reference exists for which both solvers consistently report infeasibility
 both_infeasible = "both_infeasible"
 
+# instance that was reported infeasible by one method
+one_says_infeasible = "one_says_infeasible"
+
 # instances that crashed
 opt_abort = "opt_abort"
 opt_readerror = "opt_readerror"
@@ -47,7 +50,7 @@ class ValidationTest(unittest.TestCase):
 
 
     def testBoundReplacement(self):
-        """Test if Null values are replaced correctly 
+        """Test if Null values are replaced correctly
         """
         v = Validation()
         inftys = [(v.getDbValue, osc.MAXIMIZE),
@@ -132,6 +135,9 @@ class ValidationTest(unittest.TestCase):
                 (part_inconsistent, 9, 9, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent),
                 (both_infeasible, numpy.nan, numpy.nan, osc.MAXIMIZE, ssc.Infeasible, psc.Ok),
                 (both_infeasible, numpy.nan, numpy.nan, osc.MAXIMIZE, ssc.Infeasible, psc.Ok),
+                (one_says_infeasible, numpy.nan, numpy.nan, osc.MINIMIZE, ssc.Infeasible, psc.FailInconsistent),
+                (one_says_infeasible, 1, 1, osc.MINIMIZE, ssc.Optimal, psc.FailInconsistent),
+                (one_says_infeasible, 3, 0, osc.MINIMIZE, ssc.TimeLimit, psc.FailInconsistent)
                 ],
             columns = [Key.ProblemName, Key.PrimalBound, Key.DualBound, Key.ObjectiveSense, Key.SolverStatus, "Status"])
 
@@ -145,6 +151,7 @@ class ValidationTest(unittest.TestCase):
         self.assertNotIn(both_infeasible, v.inconsistentset, "{} wrongly appears as inconsistent".format(both_infeasible))
         self.assertIn(opt_bad, v.inconsistentset, "{} should be inconsistent".format(opt_bad))
         self.assertIn(part_inconsistent, v.inconsistentset, "{} should be inconsistent".format(part_inconsistent))
+        self.assertIn(one_says_infeasible, v.inconsistentset, "{} should be inconsistent".format(one_says_infeasible))
 
         self.compareValidationStatus(d, v)
 

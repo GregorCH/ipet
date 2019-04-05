@@ -4,7 +4,7 @@ Created on 09.06.2017
 @author: Gregor Hendel
 '''
 
-TESTSET_MIPLIB2017_BENCHMARK = "MIPLIB2017_BENCHMARK"
+TESTSET_MIPLIB2017 = "MIPLIB2017"
 TESTSET_MIPLIB2010 = "MIPLIB2010"
 TESTSET_MIPLIB2003 = "MIPLIB2003"
 TESTSET_MIPLIB3 = "MIPLIB3"
@@ -14,7 +14,7 @@ TESTSET_MINLP2 = "MINLP2"
 TESTSET_MINLP2_CONVEX = "MINLP2-convex"
 TESTSET_MINLP2_NONCONVEX = "MINLP2-nonconvex"
 
-_testsetdict = {TESTSET_MIPLIB2017_BENCHMARK : [\
+_testsetdict = {TESTSET_MIPLIB2017 : [\
     "30n20b8",
     "50v-10",
     "academictimetablesmall",
@@ -3853,9 +3853,8 @@ def getTestSetByName(testset : str = TESTSET_MIPLIB2010) -> list:
         return _testsetdict[testset]
     except IndexError:
         raise IndexError("Unknown test set specifier {}".format(testset))
-    
+
 def getTestSets():
     """return all valid test set identifiers
     """
     return list(_testsetdict.keys())
-

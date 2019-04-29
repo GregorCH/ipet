@@ -254,8 +254,8 @@ class Validation:
         # respect solution checker output, if it exists
         #
         if x.get(Key.SolCheckerRead) is not None:
-            if x.get(Key.SolCheckerRead):
-                if x.get(Key.SolCheckerFeas):
+            if not pd.isnull(x.get(Key.SolCheckerRead)) and x.get(Key.SolCheckerRead):
+                if not pd.isnull(x.get(Key.SolCheckerFeas)) and x.get(Key.SolCheckerFeas):
                     return False
                 else:
                     return True

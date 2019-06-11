@@ -130,7 +130,15 @@ the graphical user interface.
 
 
 
+# Building the documentation
 
+In you virtual environment type:
+
+    pip install sphinx
+    cd doc
+    make html
+
+your documentation will then be located in doc/build/html/index.html.
 
 
 # The concept of IPET

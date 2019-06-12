@@ -116,6 +116,12 @@ class IPETComparison:
     def method_neq(self, x, y):
         return x != y
 
+    def explain(self):
+        """Print a description of the evaluation in human understandable format."""
+        out = out + ", the operator is '{}'".format(self.operator)
+        return out + "."
+
+
 
 class IPETFilter(IpetNode):
     """

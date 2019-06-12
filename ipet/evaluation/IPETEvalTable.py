@@ -662,6 +662,44 @@ class IPETEvaluationColumn(IpetNode):
             return True
         return False
 
+    def explain(self):
+        """Print a description of the evaluation column in human understandable format."""
+        if self.active is False:
+            return None
+
+        out = "Column '{self.column}' takes the values from the field '{self.origcolname}'"
+        if self.formatstring is not None:
+            out = out + ", formats via formatstring '{}'".format(self.formatstring)
+
+        if self.aggregations != []:
+            out = out + ", produces an aggregation rows: '{}'".format(", ".join([a.explain() for a in self.aggregations]))
+
+        if self.filters != []:
+            out = out + ", the following filters are active: '{}'".format(", ".join([f.explain() for f in self.filters]))
+
+        if self.transformfunc is not None:
+            out = out + ", the transformationfunction '{}' is applied".format(self.transformfunc)
+            if self.children != []:
+                out = out + ", recursively to the children '{}'".format(", ".join([c.explain() for c in self.children]))
+        if self.regex is not None:
+            out = out + ", selects a set of columns at once by regex '{}'".format(self.regex)
+
+        if self.alternative is not None:
+            out = out + ", for nan-values an alternative value of '{}' is applied".format(self.alternative)
+        if self.maxval is not None:
+            out = out + ", a maximum value of '{}' is applied".format(self.maxval)
+        if self.minval is not None:
+            out = out + ", a minimum value of '{}' is applied".format(self.minval)
+        if self.constant is not None:
+            out = out + ", has a constant value of '{}'".format(self.constant)
+
+        if self.comp is not None:
+            out = out + ", produces a comparison column '{ccn}' to the default group '{c}'".format(ccn=self.getCompareColName(), c=self.comp)
+
+        if self.reductionindex is not None and self.reduction is not None:
+            out = out + ", the reductionindex is '{ri}' with a reduction function '{r}' that reduces multiples occurences on index".format(ri=self.reductionindex, r=self.reduction)
+
+        return out + "."
 
 class FormatFunc:
 
@@ -1937,6 +1975,30 @@ class IPETEvaluation(IpetNode):
             # store the result (either by applying the filter, or by copying)
             #
             f.storeResult(df, fcol)
+
+    def explain(self):
+        """Print a description of the evaluation in human understandable format."""
+            # TODO
+        out = out + "Evaluation has the following filtergroups: '{}'".format(", ".join([g.explain() for g in self.filtergroups]))
+        out = out + ", evaluation has the following columns: '{}'".format(", ".join([g.explain() for g in self.columns]))
+        out = out + ", the defaultgroup is '{}'".format(self.defaultgroup)
+        out = out + ", the sortlevel is '{}'".format(self.sortlevel)
+        if self.validate:
+            out = out + ", the solutions will be validated"
+        else:
+            out = out + ", the solutions will not be validated"
+        if self.grouptags:
+            out = out + ", the grouptags will be displayed"
+        else:
+            out = out + ", the grouptags will not be displayed"
+        if self.suppressions is not []:
+            out = out + "The following columns are suppressed: '{}'".format(self.suppressions)
+
+        out = out + ", the feasibility tolerance is '{}'".format(self.feastol)
+        out = out + ", the gap tolerance is '{}'".format(self.gaptol)
+        out = out + ", the index is '{}'".format(self.index)
+        out = out + ", the indexsplit is '{}'".format(self.indexsplit)
+        return out + "."
 
 
 if __name__ == '__main__':

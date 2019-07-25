@@ -728,8 +728,11 @@ class IPETEvaluation(IpetNode):
     DEFAULT_INDEXSPLIT = -1
     ALLTOGETHER = "_alltogether_"
 
-    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "grouptags", "index", "indexsplit", "validate", "suppressions"]
-    attributes2Options = {"grouptags":[True, False]}
+    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "grouptags", "index", "indexsplit", "validate", "suppressions", "fillin"]
+    attributes2Options = {
+        "grouptags" : [True, False],
+        "fillin" : [True, False]
+    }
 
     deprecatedattrdir = {"groupkey" : "groupkey is specified using 'index' and 'indexsplit'",
                          "evaluateoptauto" : "Optimal auto settings are no longer available, use reductions instead"}
@@ -737,7 +740,7 @@ class IPETEvaluation(IpetNode):
     def __init__(self, defaultgroup = None,
                  sortlevel = None, comparecolformat = DEFAULT_COMPARECOLFORMAT,
                  index = DEFAULT_INDEX, indexsplit = DEFAULT_INDEXSPLIT,
-                 validate = None, suppressions = None, grouptags = None, **kw):
+                 validate = None, suppressions = None, grouptags = None, fillin = None, **kw):
         """
         constructs an Ipet-Evaluation
 
@@ -751,6 +754,7 @@ class IPETEvaluation(IpetNode):
         validate : (string) for the relative or absolute location of a solu file for validation.
         suppressions : (string) column names that should be excluded from output (as comma separated list of simple strings or regular expressions).
         grouptags : (bool) True if group tags should be displayed in long table, otherwise False
+        fillin : (bool) True if missing data should be filled in, otherwise False
         """
 
         # construct super class first, Evaluation is currently always active
@@ -768,6 +772,7 @@ class IPETEvaluation(IpetNode):
         self.set_indexsplit(indexsplit)
         self.set_sortlevel(sortlevel)
         self.set_grouptags(grouptags)
+        self.set_fillin(fillin)
 
         self.set_validate(validate)
         self.suppressions = suppressions
@@ -781,6 +786,13 @@ class IPETEvaluation(IpetNode):
             self.grouptags = True
         else:
             self.grouptags = False
+
+    def set_fillin(self, fillin):
+
+        if fillin not in [None, "", False, "False"]:
+            self.fillin = True
+        else:
+            self.fillin = False
 
     def isEvaluated(self):
         """
@@ -1066,6 +1078,30 @@ class IPETEvaluation(IpetNode):
 
         return df_target
 
+    def fillMissingData(self, data):
+        """
+        Fill in missing elements to ensure that all possible index combinations are available.
+
+        Parameters
+        ----------
+        data
+            the dataframe
+
+        Returns
+        -------
+        newdata
+            dataframe filled with missing data
+        """
+        list_list = [list(set(data[i])) for i in self.getIndex()]
+        data["_miss_"] = False
+        newind = pd.MultiIndex.from_product(list_list, names=self.getIndex())
+        newdata = data.set_index(self.getIndex()).reindex(newind).reset_index()
+
+        newdata["_miss_"].fillna(value=True, inplace=True)
+        newdata[Key.ProblemStatus].fillna(Key.ProblemStatusCodes.Missing, inplace=True)
+
+        return newdata
+
     def toposortColumns(self, columns : list) -> list:
         """ Compute a topological ordering respecting the data dependencies of the specified column list.
 
@@ -1194,7 +1230,6 @@ class IPETEvaluation(IpetNode):
             "|".join([" {}: {} ".format(k, v) for k, v in result.value_counts().items()])))
 
         df[Key.ProblemStatus] = result
-
         return df
 
     def calculateNeededData(self, df : DataFrame) -> DataFrame:
@@ -1236,11 +1271,11 @@ class IPETEvaluation(IpetNode):
 
         df['_abort_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.FailAbort)
 
-        df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_'])
+        df['_solved_'] = (~df['_limit_']) & (~df['_fail_']) & (~df['_abort_']) & (~df['_miss_'])
 
         df['_count_'] = 1
         df['_unkn_'] = (df[Key.ProblemStatus] == Key.ProblemStatusCodes.Unknown)
-        self.countercolumns = ['_time_', '_limit_', '_primfail_', '_dualfail_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_']
+        self.countercolumns = ['_time_', '_limit_', '_primfail_', '_dualfail_', '_fail_', '_abort_', '_solved_', '_unkn_', '_count_', '_miss_']
         return df
 
     def toXMLElem(self):
@@ -1668,7 +1703,15 @@ class IPETEvaluation(IpetNode):
 #            self.defaultgrouptuple = possiblebasegroups[0]
 #            logger.info(" Using value <%s> as base group" % (self.getDefaultgroup()))
 
+
         data = self.validateData(data)
+
+        # Fill in must happen after index creation and data validation
+        if self.fillin:
+            data = self.fillMissingData(data)
+        else:
+            # create the column '_miss_' which is created within self.fillMissingData() otherwise
+            data['_miss_'] = False
 
         data = self.calculateNeededData(data)
         logger.debug("Result of calculateNeededData:\n{}\n".format(data))

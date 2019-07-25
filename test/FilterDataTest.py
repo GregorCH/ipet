@@ -9,9 +9,9 @@ import pandas as pd
 from ipet import Experiment, Key
 
 class HelperExperiment(Experiment):
-    """Special Experiment as minimal working example 
+    """Special Experiment as minimal working example
     """
-    
+
     def __init__(self):
         self.data = pd.DataFrame(
             [
@@ -27,8 +27,8 @@ class FilterDataTest(unittest.TestCase):
 
 
     def setUp(self):
-        """Set up the evaluation 
-        
+        """Set up the evaluation
+
             The evaluation has only one column
             for the 'Data' key, but applies
             filtering on the 'FilterData' key
@@ -40,9 +40,9 @@ class FilterDataTest(unittest.TestCase):
         fi = IPETFilter(expression1="FilterData", expression2=-1.0, operator="eq")
         fg.addFilter(fi)
         ev.addFilterGroup(fg)
-        
+
         self.ev = ev
-        
+
     def tearDown(self):
         pass
 
@@ -56,11 +56,11 @@ class FilterDataTest(unittest.TestCase):
 
         #
         # Test through the aggregated table that should contain
-        # the TestGroup and therefore have exactly one row 
+        # the TestGroup and therefore have exactly one row
         #
-        expected_shape = (1, 9)
+        expected_shape = (1, 10)
         self.assertEqual(aggtable.shape, expected_shape,
-                         "Expected shape {} in table, got {},n{}\n".format(expected_shape, aggtable.shape, aggtable) )         
+                         "Expected shape {} in table, got {},n{}\n".format(expected_shape, aggtable.shape, aggtable) )
 
 
 

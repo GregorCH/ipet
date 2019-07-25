@@ -134,6 +134,7 @@ class ProblemStatusCodes:
     MemoryLimit = "memlimit"
     NodeLimit = "nodelimit"
     Interrupted = "interrupt"
+    Missing = "missing"
 
     statusToPriority = {Ok : 1000,
                         SolvedNotVerified : 500,

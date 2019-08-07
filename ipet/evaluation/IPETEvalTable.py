@@ -1095,6 +1095,8 @@ class IPETEvaluation(IpetNode):
         list_list = [list(set(data[i])) for i in self.getIndex()]
         data["_miss_"] = False
         newind = pd.MultiIndex.from_product(list_list, names=self.getIndex())
+        if len(newind) < len(data):
+            raise AttributeError("Index not unique, cannot fill in data. Exiting.")
         newdata = data.set_index(self.getIndex()).reindex(newind).reset_index()
 
         newdata["_miss_"].fillna(value=True, inplace=True)

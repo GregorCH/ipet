@@ -1092,10 +1092,14 @@ class IPETEvaluation(IpetNode):
         newdata
             dataframe filled with missing data
         """
-        list_list = [list(set(data[i])) for i in self.getIndex()]
+        index = []
+        for i in ["RubberbandId", "ProblemName", "GitHash", "Settings", "Seed", "Permutation"] + self.getIndex():
+            if i in data.columns and i not in index:
+                index.append(i)
+        list_list = [list(set(data[i])) for i in index]
         data["_miss_"] = False
-        newind = pd.MultiIndex.from_product(list_list, names=self.getIndex())
-        newdata = data.set_index(self.getIndex()).reindex(newind).reset_index()
+        newind = pd.MultiIndex.from_product(list_list, names=index)
+        newdata = data.set_index(index).reindex(newind).reset_index()
 
         newdata["_miss_"].fillna(value=True, inplace=True)
         newdata[Key.ProblemStatus].fillna(Key.ProblemStatusCodes.Missing, inplace=True)

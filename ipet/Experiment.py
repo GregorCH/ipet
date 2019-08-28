@@ -48,6 +48,7 @@ class Experiment:
 
         self.gaptol = gaptol
         self.validatedual = validatedual
+        self.joineddata = None
 
     def set_gaptol(self, gaptol : float):
         """
@@ -198,6 +199,7 @@ class Experiment:
 
         # post processing steps: things like primal integrals depend on several, independent data
         self.updateDatakeys()
+        self.joineddata = None
 
     def getDatakeys(self):
         return self.datakeymanager.getAllRepresentations()
@@ -233,6 +235,9 @@ class Experiment:
 
         this may result in nonunique index, the data is simply concatenated
         """
+        if self.joineddata is not None:
+            return self.joineddata
+
         datalist = []
         for tr in self.getTestRuns():
             trdata = tr.data
@@ -243,7 +248,9 @@ class Experiment:
             datalist.append(trdata)
 
         # return pd.concat(datalist, sort=True).infer_objects() # in later pandas versions this needs a sort argument
-        return pd.concat(datalist).infer_objects()
+        self.joineddata = pd.concat(datalist).infer_objects()
+
+        return self.joineddata
 
     def calculateIntegrals(self):
         """ Calculate and store primal and dual integral values

@@ -199,6 +199,7 @@ class Experiment:
 
         # post processing steps: things like primal integrals depend on several, independent data
         self.updateDatakeys()
+        self.joineddata = None
 
     def getDatakeys(self):
         return self.datakeymanager.getAllRepresentations()

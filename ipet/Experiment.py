@@ -252,12 +252,12 @@ class Experiment:
 
         return self.joineddata
 
-    def calculateIntegrals(self):
+    def calculateIntegrals(self,scale=False, lim=(None,None)):
         """ Calculate and store primal and dual integral values
 
         ... for every problem under 'PrimalIntegral' and 'DualIntegral'
         """
-        dualargs = dict(historytouse = Key.DualBoundHistory, boundkey = Key.DualBound)
+        dualargs = dict(historytouse = Key.DualBoundHistory, xaftersolvekey = Key.DualBound)
 
         if self.validation is None:
             return
@@ -267,7 +267,7 @@ class Experiment:
             # go through problems and calculate both primal and dual integrals
             for problemid in testrun.getProblemIds():
                 problemname = testrun.getProblemDataById(problemid, Key.ProblemName)
-                processplotdata = getProcessPlotData(testrun, problemid, reference = self.validation.getReferencePb(problemname))
+                processplotdata = getProcessPlotData(testrun, problemid, reference = self.validation.getReferencePb(problemname),scale=scale, lim=lim)
 
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
@@ -277,7 +277,7 @@ class Experiment:
                     except AssertionError:
                         logger.error("Error for primal bound on problem %s, list: %s" % (problemid, processplotdata))
 
-                processplotdata = getProcessPlotData(testrun, problemid, reference = self.validation.getReferenceDb(problemname), **dualargs)
+                processplotdata = getProcessPlotData(testrun, problemid, reference = self.validation.getReferenceDb(problemname), scale=scale, lim=lim, **dualargs)
                 # check for well defined data (may not exist sometimes)
                 if processplotdata:
                     try:

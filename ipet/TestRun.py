@@ -160,11 +160,14 @@ class TestRun:
         # check for the right dictionary to store the data
         logger.debug("TestRun %s receives data Datakey %s, %s to problem %s" % (self.getName(), repr(datakeys), repr(data), problemid))
 
-        if type(datakeys) is list and type(data) is list:
-            for key, datum in zip(datakeys, data):
-                self.datadict.setdefault(key, {})[problemid] = datum
+        if not self.data.empty:
+            self.data.loc[problemid, datakeys] = data
         else:
-            self.datadict.setdefault(datakeys, {})[problemid] = data
+            if type(datakeys) is list and type(data) is list:
+                for key, datum in zip(datakeys, data):
+                    self.datadict.setdefault(key, {})[problemid] = datum
+            else:
+                self.datadict.setdefault(datakeys, {})[problemid] = data
 
     def addParameterValue(self, paramname, paramval):
         """Store the value for a parameter of a given name for this test run
@@ -434,4 +437,3 @@ class TestRun:
         """
         # TODO Is this still the way to do this? What if we are reading from stdin?
         return os.path.splitext(os.path.basename(self.filenames[0]))[0]
-

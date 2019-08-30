@@ -24,7 +24,6 @@ DEFAULT_BOUNDKEY = Key.PrimalBound
 def calcIntegralValue(thedatalist, pwlinear = False):
     """
     calculates the integral value of a piece-wise constant or piece-wise linear function represented as data list.
-
     Parameters
     ----------
     thedatalist: a list of tuples (x_i,f(x_i)) (sorted by x_i-1 <= x_i)
@@ -45,32 +44,40 @@ def calcIntegralValue(thedatalist, pwlinear = False):
         gaps = gaps[:-1]
     return np.sum((times[1:] - times[:-1]) * gaps)
 
-def getProcessPlotData(testrun, probid, normalize = True, access = "id", reference = None, **kw):
+def getProcessPlotData(testrun, probid, normalize = True, access = "id", reference = None,
+    historytouse = DEFAULT_HISTORYTOUSE, xaftersolvekey = DEFAULT_XAFTERSOLVEKEY, xlimitkey = DEFAULT_XLIMITKEY,
+    cutoffgap = DEFAULT_CUTOFFGAP, scale=False, lim=(None, None) ,
+    boundkey=None
+    ):
     """
     get process plot data for a selected history (X_i,Y_i)
-    
+
     returns a list of tuples, where the second value of the history (Y's) are mapped via a gap function
 
     Parameters
     ----------
     access : str
         either "id" or "name" to determine if testrun data should be accessed by name or by id
+    scale : bool
+        should all x-coordinates be scaled by the limit (and therefore lie in the range [0,1])? This makes
+        sense for tests where different time limits apply.
+    lim : tuple
+        tuple of lower and upper limit for x, or None if unspecified.
     """
     # read keys from kw dictionary
     if access == "id":
         getmethod = testrun.getProblemDataById
     else:
         getmethod = testrun.getProblemDataByName
-    historytouse = kw.get('historytouse', DEFAULT_HISTORYTOUSE)
+
     history = getmethod(probid, historytouse)
 
-    xaftersolvekey = kw.get('xaftersolvekey', DEFAULT_XAFTERSOLVEKEY)
     xaftersolve = getmethod(probid, xaftersolvekey)
 
-    xlimitkey = kw.get('xlimitkey', DEFAULT_XLIMITKEY)
     xlim = getmethod(probid, xlimitkey)
 
-    cutoffgap = kw.get('cutoffgap', DEFAULT_CUTOFFGAP)
+    if lim[0] is not None and lim[1] is not None and lim[1] < lim[0]:
+        raise Exception("Empty integration interval [{},{}]".format(*lim))
 
     if xlim is None and xaftersolve is None:
         return None
@@ -107,6 +114,14 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", referen
         normfunction = lambda z : z
 
     x = numpy.array(x)
+
+    if scale:
+        x = x / xlim
+
+    for thelim,func in zip(lim,(numpy.maximum,numpy.minimum)):
+        if thelim is not None:
+            x = func(x,thelim)
+
     y = numpy.array(list(map(normfunction, y)))
 
     return x, y
@@ -114,11 +129,11 @@ def getProcessPlotData(testrun, probid, normalize = True, access = "id", referen
 def getMeanIntegral(testrun, problemlist, access = "id", **kw):
     """
     returns a numpy array that represents the mean integral over the selected problem list.
-    
+
     Parameters
     ----------
     access : str
-        access modifier to determine if data should be accessed by 'id' or by "name"
+        access modifier to determine if data should be accessed by 'id' or by 'name'
 
     """
 

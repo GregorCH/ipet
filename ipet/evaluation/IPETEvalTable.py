@@ -728,7 +728,7 @@ class IPETEvaluation(IpetNode):
     DEFAULT_INDEXSPLIT = -1
     ALLTOGETHER = "_alltogether_"
 
-    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "grouptags", "index", "indexsplit", "validate", "suppressions", "fillin"]
+    editableAttributes = ["defaultgroup", "sortlevel", "comparecolformat", "grouptags", "index", "indexsplit", "validate", "suppressions", "fillin", "integral"]
     attributes2Options = {
         "grouptags" : [True, False],
         "fillin" : [True, False]
@@ -740,7 +740,7 @@ class IPETEvaluation(IpetNode):
     def __init__(self, defaultgroup = None,
                  sortlevel = None, comparecolformat = DEFAULT_COMPARECOLFORMAT,
                  index = DEFAULT_INDEX, indexsplit = DEFAULT_INDEXSPLIT,
-                 validate = None, suppressions = None, grouptags = None, fillin = None, **kw):
+                 validate = None, suppressions = None, grouptags = None, fillin = None, integral = None, **kw):
         """
         constructs an Ipet-Evaluation
 
@@ -755,6 +755,8 @@ class IPETEvaluation(IpetNode):
         suppressions : (string) column names that should be excluded from output (as comma separated list of simple strings or regular expressions).
         grouptags : (bool) True if group tags should be displayed in long table, otherwise False
         fillin : (bool) True if missing data should be filled in, otherwise False
+        integral : a string that specifies how to compute primal and dual integrals. Examples are 'unscaled 600 None' or 'scaled 0.5 1.0'.
+                    Specifying an integral leads to a recomputation of integrals by the experiment.
         """
 
         # construct super class first, Evaluation is currently always active
@@ -773,6 +775,7 @@ class IPETEvaluation(IpetNode):
         self.set_sortlevel(sortlevel)
         self.set_grouptags(grouptags)
         self.set_fillin(fillin)
+        self.integral = integral
 
         self.set_validate(validate)
         self.suppressions = suppressions
@@ -1675,6 +1678,28 @@ class IPETEvaluation(IpetNode):
         self.set_index(" ".join([i[0] for i in [first] + second]))
         logger.info("Automatically set index to ({}, {})".format(self.getRowIndex(), self.getColIndex()))
 
+    def recomputeIntegrals(self, exp):
+        """
+        recompute primal and dual integrals of experiment if 'integral' property has been set by user.
+        """
+        if self.integral:
+            try:
+                scale, a, b = self.integral.split()
+                scale = True if scale == "scaled" else False
+                if a == "None":
+                    a = None
+                else:
+                    a = float(a)
+                if b == "None":
+                    b = None
+                else:
+                    b = float(b)
+                logger.info("Recomputing primal and dual integrals with specification '{}': scale: {}, (a,b)=({},{})".format(self.integral, scale, a,b))
+                exp.calculateIntegrals(scale=scale, lim=(a,b))
+            except:
+                raise Exception("Unrecognized format for integral '{}'".format(self.integral))
+
+
     def evaluate(self, exp : Experiment):
         """
         evaluate the data of an Experiment instance exp
@@ -1692,6 +1717,8 @@ class IPETEvaluation(IpetNode):
             aggregated results for every filter group and every entry of the specified
         """
         self.checkMembers()
+
+        self.recomputeIntegrals(exp)
 
         # data is concatenated along the rows and eventually extended by external data
         data = exp.getJoinedData().copy()

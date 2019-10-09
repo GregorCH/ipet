@@ -549,7 +549,7 @@ class IPETEvaluationColumn(IpetNode):
                 return df_long, df_target, result
             else:
                 # a dataframe with only one column: select that one to get a series to work with in further code
-                result = result[0]
+                result = result[result.columns[0]]
 
         if len(reductionindex) > 0:
             # apply reduction and save the result by joining it into both data frames

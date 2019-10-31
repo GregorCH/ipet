@@ -358,10 +358,8 @@ class IPETEvaluationColumn(IpetNode):
             for child in elem:
                 if child.tag == 'Aggregation':
                     column.addAggregation(Aggregation.processXMLElem(child))
-                if child.tag == IPETFilter.getNodeTag():
-                    elemdict = dict(child.attrib)
-                    filter_ = IPETFilter.fromDict(elemdict)
-                    column.addFilter(filter_)
+                elif child.tag == IPETFilter.getNodeTag():
+                    column.addFilter(IPETFilter.processXMLElem(child))
                 elif child.tag == IPETEvaluationColumn.getNodeTag():
                     column.addChild(IPETEvaluationColumn.processXMLElem(child))
             return column

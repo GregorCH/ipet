@@ -25,10 +25,10 @@ class IPETValue(IpetNode):
     def __init__(self, name = None, active = True):
         """
         constructs an Ipet Instance
-        
+
         Parameters
         ----------
-        
+
         name : The name of this problem
         active : True or "True" if this element should be active, False otherwise
         """
@@ -136,15 +136,15 @@ class IPETFilter(IpetNode):
     def __init__(self, expression1 = None, expression2 = None, operator = "ge", anytestrun = DEFAULT_ANYTESTRUN, active = True, datakey = None):
         """
         filter constructor
-        
+
         Parameters
         ----------
-        
+
         expression1 : integer, float, string, or column name
         expression2 : integer, float, string, or column name
         datakey : available data key for drop and keep filters
         operator : operator such that evaluation expression1 op expression2 yields True or False
-        anytestrun : either 'one' or 'all' 
+        anytestrun : either 'one' or 'all'
         active : True or "True" if this filter should be active, False otherwise
         """
 
@@ -180,6 +180,32 @@ class IPETFilter(IpetNode):
         active = attrdict.get('active', True)
 
         return IPETFilter(expression1, expression2, operator, anytestrun, active, datakey)
+
+
+    @staticmethod
+    def processXMLElem(elem):
+        """
+        inspect and process an xml element
+        """
+
+        elemdict = dict(elem.attrib)
+
+        # filter_ must be written with a trailing underscore "_" not to conflict with the filter method of Python
+        filter_ = IPETFilter.fromDict(elemdict)
+
+        # add values one by one
+        for child in elem:
+
+            # catch wrong children
+            if not child.tag == IPETValue.getNodeTag():
+                raise AttributeError("Cannot add a child of type {} to a Filter".format(child.tag))
+
+            instancename = child.attrib.get("name")
+            if instancename:
+                filter_.addChild(IPETValue(instancename))
+        # check the filter attributes
+        filter_.checkAttributes()
+        return filter_
 
     def getName(self):
         prefix = self.anytestrun
@@ -291,10 +317,10 @@ class IPETFilter(IpetNode):
     def applyListOperator(self, df, groupindex):
         """
         Apply list operators 'diff' and 'equal' to the datakey.
-        
-        In combination with the 'anytestrun' attribute, there are 
+
+        In combination with the 'anytestrun' attribute, there are
         four possibilities in total:
-        
+
         | anytestrun | operator | result |
         |------------|----------|--------|
         | one        |diff      |True, if there are at least 2 different values in a group |
@@ -365,7 +391,7 @@ class IPETFilter(IpetNode):
         self._storedcol_ = filtercol
 
     def getStoredResult(self, df : pd.DataFrame):
-        """return the already stored result for this data frame 
+        """return the already stored result for this data frame
         """
         if self._storeddf_ is df:
             return self._storedcol_
@@ -374,18 +400,18 @@ class IPETFilter(IpetNode):
 
     def applyFilter(self, df, groupindex = None):
         """Apply the filter to a data frame rowwise
-        
+
         Parameters
         ----------
-        
+
         df : DataFrame
             data frame object containing columns 'expression1' and 'expression2' or 'datakey'
             depending on the selected operator
-            
+
         groupindex : list or None
-            either a list of columns that should be used for groupby operations 
+            either a list of columns that should be used for groupby operations
             (only needed for list operators 'equal' and 'diff')
-            
+
 
            Returns
            -------
@@ -683,14 +709,7 @@ class IPETFilterGroup(IpetNode):
                 filtergroup.addFilter(IPETFilterGroup.processXMLElem(child))
             return filtergroup
         elif elem.tag == IPETFilter.getNodeTag():
-            elemdict = dict(elem.attrib)
-            filter_ = IPETFilter.fromDict(elemdict)
-            for child in elem:
-                instancename = child.attrib.get("name")
-                if instancename:
-                    filter_.addChild(IPETValue(instancename))
-            filter_.checkAttributes()
-            return filter_
+            return IPETFilter.processXMLElem(elem)
 
     @staticmethod
     def fromXML(xmlstring):

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <Evaluation index="auto">
-	<Column origcolname="SolvingTime" minval="0.5" name="Time" comp="quot">
-		<Aggregation aggregation="shmean" name="shmean" shiftby="10.0"/>
+	<Column origcolname="SolvingTime" minval="0.5" name="Time" comp="quot shift. by 1">
+		<Aggregation aggregation="shmean" name="shmean" shiftby="1.0"/>
 	</Column>
 	<Column name="Nodes" origcolname="Nodes" comp="quot">
 		<Aggregation aggregation="shmean" name="shmean" shiftby="100.0" />

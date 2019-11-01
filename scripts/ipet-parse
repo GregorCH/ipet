@@ -117,7 +117,7 @@ if __name__ == '__main__':
     else:
         logger.setLevel(logging.INFO)
     # disable logging to console, in this case we just want the printstatement at the end
-    if type(arguments.logfiles) == io.TextIOWrapper:
+    if type(arguments.logfiles) == io.TextIOWrapper and not arguments.debug:
         logger.setLevel(logging.ERROR)
 
     if arguments.logfiles is None:
@@ -170,5 +170,3 @@ if __name__ == '__main__':
         experiment.addStdinput()
         experiment.collectData()
         experiment.printToConsole(arguments.formatstr)
-
-

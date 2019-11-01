@@ -203,7 +203,7 @@ class Solver():
         key
             string (or int or float) that acts as key for datum in data dictionary
         datum
-            the datum which shoul dbe saved
+            the datum which should be saved
         """
         self.data[key] = datum
 
@@ -628,7 +628,7 @@ class GurobiSolver(Solver):
 
     solverId = "GUROBI"
     recognition_expr = re.compile("Gurobi Optimizer version")
-    primalbound_expr = re.compile("^(?:Best|Optimal) objective ([^\s,]*)")
+    primalbound_expr = re.compile("^(?:Best|Optimal) objective .*(\S+)$")
     dualbound_expr = re.compile("^(?:Best objective \S+, best bound|Optimal objective) ([^\s,]+),*")
     solvingtime_expr = re.compile("^(?:Explored \d* nodes .* in|Solved in .* iterations and) (\S*) seconds")
     version_expr = re.compile("Gurobi Optimizer version (\S+)")

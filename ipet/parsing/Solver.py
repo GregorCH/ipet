@@ -634,7 +634,7 @@ class GurobiSolver(Solver):
     version_expr = re.compile("Gurobi Optimizer version (\S+)")
     nodes_expr = re.compile("Explored (\d+) nodes")
 
-    solverstatusmap = {"(Optimal solution found|Solved with barrier)" : Key.SolverStatusCodes.Optimal,
+    solverstatusmap = {"(Optimal solution found|Solved with barrier|Solved in \d+ iterations)" : Key.SolverStatusCodes.Optimal,
                        "Model is infeasible$" : Key.SolverStatusCodes.Infeasible,
                        "Model is infeasible or unbounded" : Key.SolverStatusCodes.InfOrUnbounded,
                         "Time limit reached" : Key.SolverStatusCodes.TimeLimit,

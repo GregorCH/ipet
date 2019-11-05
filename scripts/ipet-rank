@@ -1,0 +1,138 @@
+#!/usr/bin/env python
+'''
+The MIT License (MIT)
+
+Copyright (c) 2019 Zuse Institute Berlin, www.zib.de
+
+Permissions are granted as stated in the license file you have obtained
+with this software. If you find the library useful for your purpose,
+please refer to README.md for how to cite IPET.
+
+@author: Gregor Hendel
+'''
+
+from ipet import Experiment
+from ipet import Key
+import argparse
+import sys
+from ipet.evaluation import IPETEvaluation
+import pandas as pd
+
+import re
+import textwrap
+import os
+
+import logging
+
+description = \
+'''
+    this script detects common features shared by several instances in one or more test runs
+
+    All collected numeric columns are transformed into rank statistics over all records.
+
+    TODO Explanation rank statistics
+
+    For each selected record, all available data is sorted by increasing rank.
+'''
+
+epilog = \
+    '''
+    =================
+    Examples of Usage
+    =================
+
+    TODO Examples of usage
+
+
+
+    '''
+
+# possible arguments in the form name,default,short,description #
+argparser = argparse.ArgumentParser(prog = "IPET command line evaluation", \
+                                 description = description,
+                                 epilog = textwrap.dedent(epilog),
+                                 formatter_class = argparse.RawDescriptionHelpFormatter)
+
+argparser.add_argument('-t', '--testrunfiles', nargs = '*', default = [], help = "data input for the ranking")
+argparser.add_argument("-D", "--debug", action = "store_true", default = False, help = "Enable debug output to console during parsing")
+argparser.add_argument("--no_top", action = "store_true", default = False, help = "Don't display the top statistics (highest ranks)")
+argparser.add_argument("--no_bottom", action = "store_true", default = False, help = "Don't display the bottom statistics (lowest ranks)")
+argparser.add_argument('-s', '--subset', nargs='*', default = [], help = "specification of record subset")
+argparser.add_argument('-k', '--datakey',default = "ProblemName", help = "Data key where the names of the record subsets are found")
+argparser.add_argument('-n', '--number', default = 20, type=int, help="Number of top/bottom entries to show (use 0 for all entries)")
+argparser.add_argument('--include_only', nargs='*', default=[], help="List of regular expressions. If list is nonempty, only columns matching at least one expression are kept")
+argparser.add_argument('--exclude_all', nargs='*', default=[], help="List of regular expressions. All matching columns are suppressed from the computation (and output)")
+argparser.add_argument('-f', '--fileextensions', default = None, action = "append", help = "file extensions for writing evaluated data, e.g., csv, tex, stdout, txt")
+
+if __name__ == '__main__':
+    try:
+        arguments = argparser.parse_args()
+    except:
+        if not re.search(" -+h", ' '.join(sys.argv)) :
+            print("Wrong Usage, use --help for more information.")
+        exit()
+
+    # if globals().get("help") is not None:
+    logger = logging.getLogger()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)7s - %(name)s - %(message)s')
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    if arguments.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    # initialize an experiment
+    experiment = None
+    if arguments.testrunfiles == []:
+        print("Please provide at least one (or multiple, if needed) .trn testrun files")
+        sys.exit(0)
+
+    if not arguments.subset:
+        print("No subset selected")
+        sys.exit(0)
+
+    experiment = Experiment()
+
+    for trfile in arguments.testrunfiles:
+        experiment.addOutputFile(trfile)
+
+    # get joined data of this experiment
+    dataset = experiment.getJoinedData()
+
+    # subset dataset include only those columns that match at least one of the regular expressions
+    if arguments.include_only:
+        columnlist = list(set([c for r in arguments.include_only for c in dataset.filter(regex=r).columns] + [arguments.datakey]))
+        dataset = dataset[columnlist]
+
+    # from those columns, suppress all those that match one of the exclusion criteria
+    if arguments.exclude_all:
+        dropcols = list(set([c for r in arguments.exclude_all for c in dataset.columns if re.search(r, c)]))
+        #print(dropcols)
+        dataset = dataset.drop(columns=dropcols)
+
+    # get all numerical columns
+    numcolumns = dataset.select_dtypes(exclude='object').columns
+
+    # create a rank data frame
+    rankdataframe = dataset[numcolumns].rank(pct=True)
+
+    #subset the rank data frame by the requested subset.
+    requested_subset = dataset[arguments.datakey].isin(arguments.subset)
+
+    # compute average ranks among all selected records
+    overviewseries = rankdataframe[requested_subset].mean(skipna=False).dropna().sort_values(ascending = False)
+
+    ov_head = overviewseries.head(n=arguments.number)
+    ov_tail = overviewseries.tail(n=arguments.number)
+
+    for i, donotPrint in zip([ov_head, ov_tail], [arguments.no_top, arguments.no_bottom]):
+
+        if donotPrint:
+            continue
+
+        ranks = rankdataframe.set_index(dataset[arguments.datakey])[i.index].loc[arguments.subset].T.stack(dropna=False)
+        values = dataset.set_index(arguments.datakey)[i.index].loc[arguments.subset].T.stack(dropna = False)
+
+        print(pd.concat([pd.DataFrame({'rnk' : ranks, 'val' : values}).stack(dropna=False).unstack([2,1]), i], axis = 1))

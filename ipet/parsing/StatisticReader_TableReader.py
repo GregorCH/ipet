@@ -34,7 +34,7 @@ class TableReader(StatisticReader):
     """
     name = 'TableReader'
     tableids = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
-                   'Separators', 'Branching Rules', 'Diving Statistics', 'LP', 'Branching Analysis', 'Primal Heuristics', 'Concurrent Solvers']
+                'Separators', 'Branching Rules', 'Diving Statistics', 'Diving (single)', 'Diving (adaptive)', 'LP', 'Branching Analysis', 'Primal Heuristics', 'Concurrent Solvers', 'Integrals']
     columnids = ['Root Node', 'Total Time', 'B&B Tree']
     active = False
     spacesepcolumnnames = ['LP Iters']
@@ -102,7 +102,9 @@ class TableReader(StatisticReader):
             # determine minimum length (necessary if more headers were recognized than actual available data)
             minlen = min(len(datakeys), len(data))
 
-            self.addData(datakeys[:minlen], data[:minlen])
+            storekeys = [re.sub("[%&()]", ".", x) for x in datakeys[:minlen]]
+
+            self.addData(storekeys, data[:minlen])
 
     def execEndOfProb(self):
         self.active = False
@@ -113,11 +115,11 @@ class CustomTableReader(TableReader):
 
     def __init__(self, name = "CustomTableReader", tableid = None, columnid = None):
         """Constructs custom data table reader
-        
+
         Parameters
         ----------
         tableid : string representing table identifier
-        
+
         singlecolumname : string representing a column identifier
         """
 
@@ -144,5 +146,3 @@ class CustomTableReader(TableReader):
 
     def getEditableAttributes(self):
         return TableReader.getEditableAttributes(self) + ["tableid", "singlecolumname"]
-
-

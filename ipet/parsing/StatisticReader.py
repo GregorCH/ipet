@@ -189,7 +189,7 @@ class MetaDataReader(StatisticReader):
         """
         if self.metadataexp.match(line):
 #            TODO better to allow more spaces?
-            [attr, datum] = line.split('@')[1].split()
+            [attr, datum] = line[1:].split()
             datum = datum.split('\n')[0]
             self.testrun.metadatadict[attr] = datum
 

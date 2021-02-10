@@ -114,14 +114,15 @@ def setup_experiment(arguments, verbose=False):
 
     return experiment
 
-def process_one_outfile(task : tuple):
+def process_one_outfiles_group(task : tuple):
     # initialize an experiment
-    outfile, arguments = task
+    outfiles, arguments = task
     experiment = setup_experiment(arguments)
 
-    logger.info("Start parsing process of outfile '{}'".format(outfile))
+    logger.info("Start parsing process of outfile(s) {}".format(", ".join(outfiles)))
 
-    experiment.addOutputFile(outfile)
+    for o in outfiles:
+        experiment.addOutputFile(o)
 
     experiment.collectData()
 
@@ -144,7 +145,7 @@ def process_one_outfile(task : tuple):
             except:
                 logger.info("couldn't save data for testrun %s" % tr.getIdentification())
 
-    return outfile
+    return outfiles
 
 if __name__ == '__main__':
 
@@ -186,8 +187,15 @@ if __name__ == '__main__':
         pool = mp.Pool(nthreads)
         logger.info("Start parsing process using {} threads".format(nthreads))
 
-        tasks = [(outfile, arguments) for outfile in arguments.logfiles if outfile.endswith("out")]
-        for _ in tqdm.tqdm(pool.imap_unordered(process_one_outfile, tasks), total=len(tasks)):
+        # group the input files by their base names, to process related out and err files together
+        # META files are automatically picked up internally upon creation of a TestRun object
+        logfiles2basename = {}
+        for f in arguments.logfiles:
+            logfiles2basename.setdefault(os.path.splitext(f)[0], []).append(f)
+
+
+        tasks = [(outfiles, arguments) for outfiles in logfiles2basename.values()]
+        for _ in tqdm.tqdm(pool.imap_unordered(process_one_outfiles_group, tasks), total=len(tasks)):
             pass
 
         pool.close()

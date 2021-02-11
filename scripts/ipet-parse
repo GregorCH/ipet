@@ -92,6 +92,60 @@ argparser.add_argument("-v", "--validatedual", action = "store_true", default = 
 argparser.add_argument("-g", "--gaptol", type = float, default = Experiment.DEFAULT_GAPTOL, help = "relative tolerance for primal and dual objective validation")
 argparser.add_argument("--docmode", action = "store_true", default = False, help = "print this help as restructured text")
 argparser.add_argument("--csv", action = "store_true", default = False, help = "print the data as csv")
+argparser.add_argument("-j", "--jobs", default = -1, type=int, help = "number of threads to use (-1 for all available threads)")
+
+def setup_experiment(arguments, verbose=False):
+    experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
+    for reader in loader.loadAdditionalReaders(arguments.readers):
+
+        experiment.readermanager.registerReader(reader)
+        if verbose:
+            logger.info("Registered reader with name %s" % reader.getName())
+
+    for solver in loader.loadAdditionalSolvers():
+        experiment.readermanager.addSolver(solver)
+        if verbose:
+            logger.info("Registered solver with name %s" % solver.getName())
+
+    for solufile in loader.loadAdditionalSolufiles(arguments.solufiles):
+        experiment.addSoluFile(solufile)
+        if verbose:
+            logger.info("Imported solufile with name %s" % solufile)
+
+    return experiment
+
+def process_one_outfiles_group(task : tuple):
+    # initialize an experiment
+    outfiles, arguments = task
+    experiment = setup_experiment(arguments)
+
+    logger.info("Start parsing process of outfile(s) {}".format(", ".join(outfiles)))
+
+    for o in outfiles:
+        experiment.addOutputFile(o)
+
+    experiment.collectData()
+
+    # Write output
+    for tr in experiment.getTestRuns():
+        try:
+            filename = tr.filenames[0]
+            newfilename = "%s%s" % (os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
+            tr.saveToFile(newfilename)
+            logger.info("converted %s --> %s" % (filename, newfilename))
+        except:
+            logger.info("skipped testrun %s" % tr.getIdentification())
+
+        if arguments.csv:
+            try:
+                filename = tr.filenames[0]
+                newfilename = "%s%s" % (os.path.splitext(filename)[0], ".ipetdata.csv")
+                tr.saveToCSV(newfilename)
+                logger.info("saved data for %s --> %s" % (filename, newfilename))
+            except:
+                logger.info("couldn't save data for testrun %s" % tr.getIdentification())
+
+    return outfiles
 
 if __name__ == '__main__':
 
@@ -120,52 +174,33 @@ if __name__ == '__main__':
     if type(arguments.logfiles) == io.TextIOWrapper and not arguments.debug:
         logger.setLevel(logging.ERROR)
 
-    if arguments.logfiles is None:
-        logger.info("No testruns specified, exiting")
-        sys.exit(0)
 
     # initialize an experiment
-    experiment = Experiment(validatedual = arguments.validatedual, gaptol = arguments.gaptol)
+    experiment = setup_experiment(arguments, verbose=True)
 
-    for reader in loader.loadAdditionalReaders(arguments.readers):
-
-        experiment.readermanager.registerReader(reader)
-        logger.info("Registered reader with name %s" % reader.getName())
-
-    for solver in loader.loadAdditionalSolvers():
-        experiment.readermanager.addSolver(solver)
-        logger.info("Registered solver with name %s" % solver.getName())
-
-    for solufile in loader.loadAdditionalSolufiles(arguments.solufiles):
-        experiment.addSoluFile(solufile)
-        logger.info("Imported solufile with name %s" % solufile)
-
-    logger.info("Start parsing process")
 
     if type(arguments.logfiles) != io.TextIOWrapper:
-        for logfile in arguments.logfiles:
-            experiment.addOutputFile(logfile)
+        import multiprocessing as mp
+        import tqdm
 
-        experiment.collectData()
+        nthreads = mp.cpu_count() if arguments.jobs == -1 else arguments.jobs
+        pool = mp.Pool(nthreads)
+        logger.info("Start parsing process using {} threads".format(nthreads))
 
-        # Write output
-        for tr in experiment.getTestRuns():
-            try:
-                filename = tr.filenames[0]
-                newfilename = "%s%s" % (os.path.splitext(filename)[0], TestRun.FILE_EXTENSION)
-                tr.saveToFile(newfilename)
-                logger.info("converted %s --> %s" % (filename, newfilename))
-            except:
-                logger.info("skipped testrun %s" % tr.getIdentification())
+        # group the input files by their base names, to process related out and err files together
+        # META files are automatically picked up internally upon creation of a TestRun object
+        logfiles2basename = {}
+        for f in arguments.logfiles:
+            logfiles2basename.setdefault(os.path.splitext(f)[0], []).append(f)
 
-            if arguments.csv:
-                try:
-                    filename = tr.filenames[0]
-                    newfilename = "%s%s" % (os.path.splitext(filename)[0], ".ipetdata.csv")
-                    tr.saveToCSV(newfilename)
-                    logger.info("saved data for %s --> %s" % (filename, newfilename))
-                except:
-                    logger.info("couldn't save data for testrun %s" % tr.getIdentification())
+
+        tasks = [(outfiles, arguments) for outfiles in logfiles2basename.values()]
+        for _ in tqdm.tqdm(pool.imap_unordered(process_one_outfiles_group, tasks), total=len(tasks)):
+            pass
+
+        pool.close()
+        pool.join()
+
     else:
         experiment.addStdinput()
         experiment.collectData()

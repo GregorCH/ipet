@@ -6,6 +6,6 @@ Franziska Schlösser, Zuse Institute Berlin, schloesser@zib.de
 
 ### Acknowledgments ###
 
-Thanks to Robert Gottwald, Cristina Munoz, Stephen J. Maher, Thomas Nagel
+Thanks to Leona Gottwald, Cristina Munoz, Stephen J. Maher, Thomas Nagel
 for contributing to the project with code, helpful suggestions, and 
 troubleshooting.

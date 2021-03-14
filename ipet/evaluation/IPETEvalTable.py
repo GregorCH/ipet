@@ -1517,7 +1517,7 @@ class IPETEvaluation(IpetNode):
         write tex output
         """
         with open("%s.tex" % filebasename, "w") as texfile:
-            texfile.write(df.to_latex(formatters = formatters))
+            texfile.write(df.to_latex(formatters = formatters, escape=False))
 
     def flatten_index(self, col) -> str:
         if type(col) is tuple:

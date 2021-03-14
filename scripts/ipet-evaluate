@@ -32,8 +32,8 @@ description = \
     results of the data should be produced.
 
     The script produces two tables: the first, instancewise table has all specified columns
-    for every passed log file and one row per instance. 
-    The second, aggregated table shows aggregated statistics for all specified filter 
+    for every passed log file and one row per instance.
+    The second, aggregated table shows aggregated statistics for all specified filter
     groups for this evaluation.
 '''
 
@@ -48,32 +48,32 @@ epilog = \
 
        ipet-evaluate -t sometestrun.trn -e evaluation.xml
 
-    A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily 
+    A sample evaluation script to start with is '[IPET-ROOT]/scripts/evaluation.xml' which uses only readily
     available data like the number of solving nodes and the solving time in seconds.
 
     Key Search
     ----------
 
 
-    
+
 
     '''
 
 validation_doc = """
     Validation
     ----------
-    
+
     IPET can use external problem information to validate collected solver output. External problem information
     should be contained in a solu-file and can be passed by the -v, --validate command line option.
-    
+
     Example
-    
-    
+
+
         >>> ipet-evaluate -t mytestrun.trn -e myevaluation.xml -v subdir/solutions.solu
-    
+
     specifies the solution information 'subdir/solutions.solu' as solution information.
     It is possible to store this information as attribute for 'myevaluation.xml'.
-    
+
     If the working directory contains solu file reference information , and
     no validation is explicitly specified, ipet-evaluate recognizes and uses
     the solu file from the working directory.
@@ -83,11 +83,11 @@ output_doc = """
 
     Output control
     --------------
-    
+
     By default, ipet-evaluate displays aggregated results for every filter group specified
     in an evaluation file. The following command line options can be used
     to control the verbosity of the output:
-    
+
     - -l, --long : Show the 'long' table, with one row for every index element.
     --displaygroup : Specify the name of the filter group (as declared in the evaluation)
         for which the long table
@@ -135,6 +135,9 @@ argparser.add_argument('--grouptags', action = "store_true", default = False, he
 argparser.add_argument('-v', '--validate', default = None, help = "Name of a solu file for validation information")
 argparser.add_argument('-f', '--fileextensions', default = None, action = "append", help = "file extensions for writing evaluated data, e.g., csv, tex, stdout, txt")
 argparser.add_argument('--tolerance', default = None, help = "relative objective tolerance for validation")
+argparser.add_argument('--colselection', default = None, help = "List of column indices to display in aggregated tables")
+argparser.add_argument('--horizontal', action = "store_true", default = False, help = "Should the inner index of the aggregated table be pivoted into the columns?")
+
 
 if __name__ == '__main__':
     try:
@@ -205,7 +208,7 @@ if __name__ == '__main__':
 
     if arguments.tolerance:
         theeval.set_gaptol(float(arguments.tolerance))
-        
+
     if arguments.grouptags:
         theeval.set_grouptags(True)
 
@@ -288,6 +291,25 @@ if __name__ == '__main__':
     # returntable and returnaggregation
     rettab, retagg = theeval.evaluate(experiment)
 
+    if arguments.horizontal:
+        retagg = retagg.unstack().swaplevel(0,1,axis=1)
+
+    if arguments.colselection:
+        if arguments.colselection.lower() == "show":
+            print("")
+            print("The aggregated table has the following {} columns".format(len(retagg.columns)))
+            for i,col in enumerate(retagg.columns):
+                print("%-5d : %20s" %(i, col))
+            print("")
+            print("Please make your selection by selecting the corresponding indices, e.g., --colselection=\"0 5 1 14\"")
+            sys.exit(0)
+        colselection = list(map(int, arguments.colselection.split()))
+        print(colselection)
+        print(retagg.columns[colselection])
+        retagg = retagg.iloc[:,colselection]
+        print(retagg)
+
+
     if not arguments.quiet:
         if arguments.long:
             if arguments.displaygroup is not None:
@@ -328,4 +350,3 @@ if __name__ == '__main__':
             logger.info("combined aggregated data written to %s.%s" % (filename, extension))
 
     # print pd.concat([rettab, theeval.levelonedf], axis=1)
-

@@ -145,7 +145,7 @@ class CustomReader(StatisticReader):
                         self.addData(self.datakey, data)
 
             except:
-                logger.debug("Reader %s could not retrieve data at index %d from matching line '%s'", self.getName(), self.index, line)
+                logger.warn("Reader %s could not retrieve data at index %d from matching line '%s'", self.getName(), self.index, line)
                 pass
 
 

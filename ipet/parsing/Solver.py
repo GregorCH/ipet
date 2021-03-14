@@ -465,6 +465,7 @@ class SCIPSolver(Solver):
         self.lastdualbound = misc.FLOAT_INFINITY
         self.lasttime = -1
         self.dualboundindex = -1
+        self.primalboundindex = -1
 
     def extractPrimalboundHistory(self, line : str):
         """ Extract the sequence of primal bounds
@@ -490,8 +491,9 @@ class SCIPSolver(Solver):
             if len(allmatches) == 0:
                 return
 
+            splitline = line.split("|")
             pointInTime = allmatches[0]
-            PrimalBound = allmatches[-1]
+            PrimalBound = splitline[self.primalboundindex]
             # in the case of ugscip, we reacted on a disp char, so no problem at all.
             self.addHistoryData(Key.PrimalBoundHistory, pointInTime, PrimalBound)
 
@@ -499,8 +501,6 @@ class SCIPSolver(Solver):
     def extractDualboundHistory(self, line : str):
         """ Extract the sequence of dual bounds
         """
-        timeindex = 0
-
         if not self.isTableLine(line):
             return
 
@@ -508,8 +508,8 @@ class SCIPSolver(Solver):
             # TODO This works, why is eclipse complaining?
             lineelems = misc.tablenumericExpression.findall(line)
             # parse time and dual bound from the table
-            time = lineelems[timeindex]
-            dualbound = lineelems[self.dualboundindex]
+            time = lineelems[0]
+            dualbound = line.split("|")[self.dualboundindex]
 
             # store newly found (time, dual bound) tuple if it differs from the last dual bound
             self.addHistoryData(Key.DualBoundHistory, time, dualbound)
@@ -525,6 +525,7 @@ class SCIPSolver(Solver):
         if self.primalboundhistory_exp.match(line):
             columnheaders = list(map(str.strip, line.split('|')))
             self.dualboundindex = columnheaders.index('dualbound')
+            self.primalboundindex = columnheaders.index('primalbound')
             return True
         elif self.shorttablecheckexp.search(line):
             return True

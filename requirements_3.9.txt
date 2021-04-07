@@ -3,3 +3,4 @@ pandas==1.2.3
 pypandoc==1.5
 scipy==1.6.2
 toposort==1.6
+tqdm==4.60.0

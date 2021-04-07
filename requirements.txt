@@ -1,5 +1,6 @@
-numpy
-pandas
-pypandoc
-scipy
-toposort
+numpy==1.17.5
+pandas==0.25.3
+pypandoc==1.4
+scipy==1.3.3
+toposort==1.5
+tqdm==4.56.0

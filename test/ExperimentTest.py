@@ -16,7 +16,7 @@ import re
 import shutil
 import sys
 import numpy as np
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from ipet import Experiment
 from ipet.TestRun import TestRun
 from ipet.parsing import ListReader

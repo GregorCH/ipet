@@ -14,7 +14,6 @@ from .TestRun import TestRun
 from ipet.concepts.Manager import Manager
 from ipet.misc.integrals import calcIntegralValue, getProcessPlotData
 from ipet.parsing.ReaderManager import ReaderManager
-from pandas import Panel
 
 import pandas as pd
 import pickle
@@ -338,4 +337,4 @@ class Experiment:
         Set onlyactive to True to only get active testruns as defined by the testrun manager
         """
         trdatadict = {tr.getSettings():tr.data for tr in self.getTestRuns(onlyactive)}
-        return Panel(trdatadict)
+        return pd.Panel(trdatadict)

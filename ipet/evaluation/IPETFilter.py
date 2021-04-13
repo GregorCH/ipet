@@ -57,7 +57,7 @@ class IPETValue(IpetNode):
                     return mytype(self.name)
                 except ValueError:
                     continue
-        elif dtype != np.object:
+        elif dtype != object:
             return dtype.type(self.name)
 
         return self.name

@@ -156,7 +156,13 @@ User-defined configuration files are stored in the `~/.ipet` folder, that is con
 This includes
 
 - `~/.ipet/solvers`, where the user can define their own solver model. For an example check the `SCIPSolver` class in `ipet/parsing/Solver.py`
-- `~/.ipet/readers`, where the user can define their own rules for extracting data by giving a line, position and format of the number or string they want to parse from the logfile(s). For an example check `scripts/readers-example.xml`
+Additionally you need to place a `__init__.py` file in the `~/.ipet/solvers/` folder that loads the python modules (for example you have to classes `MySolver` and `OtherSolver` in files `~/.ipet/solvers/MySolver.py` and `~/.ipet/solvers/OtherSolver.py`):
+
+    __all__ = []
+    from .MySolver import MySolver
+    from .OtherSolver import OtherySolver
+
+- `~/.ipet/readers`, where the user can define their own rules for extracting data by giving a line, position and format of the number or string they want to parse from the logfile(s). For an example check `scripts/readers-example.xml`.
 - `~/.ipet/solufiles`, that contains solution files with information about the correct solution of instance files or their (inf)feasibility status. For an example check `test/data/short.solu`
 
 For more information, please also read the help pages that are displayed with `ipet-parse --help` and `ipet-evaluate --help`.

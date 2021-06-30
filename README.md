@@ -146,6 +146,7 @@ your documentation will then be located in doc/build/html/index.html.
 **this section is still under construction**
 
 IPET takes a logfile and some optional additional files like an error-, set- and metafile, extracts information and aggregates this data in a compact table.
+The Logfiles need to have an `.out` extension, errorfiles need to have `.err`, setfiles are `.set` and metafiles are `.meta`
 
 The process is divided in two stages:
 

@@ -1,6 +1,6 @@
 IPET (Interactive Performance Evaluation Tools) is a toolbox that
 allows to easily create customized benchmark tables from
-raw solver log files, written in Python 3. 
+raw solver log files, written in Python 3.
 
 It is aimed to develop evaluations through a
 grapical interface that can later be loaded and reused on other
@@ -54,9 +54,9 @@ We provide a script called "install-pyqt4-in-virtual-environment.sh" to install 
 
 ## Linux installation inside a virtual environment
 
-Using a virtual environment, you can safely install the required packages together without 
+Using a virtual environment, you can safely install the required packages together without
 messing with your globally installed system libraries. This is certainly the recommended way
-to install IPET. In the following, we assume you create the root directory of your virtual 
+to install IPET. In the following, we assume you create the root directory of your virtual
 environment directly in the IPET root directory and call it "venv". You may choose
 to use a differently named virtual environment somewhere else, of course.
 
@@ -65,12 +65,12 @@ to use a differently named virtual environment somewhere else, of course.
         cd ipet
         virtualenv --python python3 venv
         source venv/bin/activate
-   Note that you may deactivate the virtual environment at any time by calling 
-        
+   Note that you may deactivate the virtual environment at any time by calling
+
         deactivate
-    
-2. Install PyQt4 bindings inside your virtual environment by calling the provided script, 
-which assumes that you are running inside the virtual environment "venv" or the one specified by the optional path. 
+
+2. Install PyQt4 bindings inside your virtual environment by calling the provided script,
+which assumes that you are running inside the virtual environment "venv" or the one specified by the optional path.
 The script will ask you to carefully read and accept the license agreement for using PyQt4 bindings.
 
         ./install-pyqt4-in-virtual-environment.sh [optional path to virtual environment root]
@@ -93,13 +93,13 @@ If you would like to install *IPET* systemwide, all you need to do is
 
     cd ipet
     python3 setup.py install --user
-    
+
 or
 
     cd ipet
     sudo python3 setup.py install
-    
-This step makes imports available systemwide such as 
+
+This step makes imports available systemwide such as
 
     python3 -c "from ipet import *"
 
@@ -111,8 +111,8 @@ use the graphical user interface.
 
 ## Testing your installation
 
-Run the command 
-    
+Run the command
+
     python -m unittest test
  if the output says OK, all tests were passed.
 
@@ -123,7 +123,7 @@ Run the command
 
 # Getting Started on the command line
 
-IPET has a subdirectory called "scripts" with scripts to invoke log file parsing, test run evaluating, and starting 
+IPET has a subdirectory called "scripts" with scripts to invoke log file parsing, test run evaluating, and starting
 the graphical user interface.
 
 **under construction**
@@ -143,8 +143,21 @@ your documentation will then be located in doc/build/html/index.html.
 
 # The concept of IPET
 
-**under construction**
+**this section is still under construction**
 
+IPET takes a logfile and some optional additional files like an error-, set- and metafile, extracts information and aggregates this data in a compact table.
 
+The process is divided in two stages:
 
+- `ipet-parse`, which performs the parsing, where the standard data is extracted and stored in a .trn file.
+- `ipet-evaluate`, where the data is aggregated and displayed in two tables by user-defined rules. The *aggregated table* displays the information that was condensed from the *long table*.
+
+User-defined configuration files are stored in the `~/.ipet` folder, that is considered in the parsing process.
+This includes
+
+- `~/.ipet/solvers`, where the user can define their own solver model. For an example check the `SCIPSolver` class in `ipet/parsing/Solver.py`
+- `~/.ipet/readers`, where the user can define their own rules for extracting data by giving a line, position and format of the number or string they want to parse from the logfile(s). For an example check `scripts/readers-example.xml`
+- `~/.ipet/solufiles`, that contains solution files with information about the correct solution of instance files or their (inf)feasibility status. For an example check `test/data/short.solu`
+
+For more information, please also read the help pages that are displayed with `ipet-parse --help` and `ipet-evaluate --help`.
 

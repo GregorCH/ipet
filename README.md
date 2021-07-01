@@ -145,13 +145,17 @@ your documentation will then be located in doc/build/html/index.html.
 
 **this section is still under construction**
 
+## Concept
+ 
 IPET takes a logfile and some optional additional files like an error-, set- and metafile, extracts information and aggregates this data in a compact table.
 The Logfiles need to have an `.out` extension, errorfiles need to have `.err`, setfiles are `.set` and metafiles are `.meta`
 
 The process is divided in two stages:
 
-- `ipet-parse`, which performs the parsing, where the standard data is extracted and stored in a .trn file.
-- `ipet-evaluate`, where the data is aggregated and displayed in two tables by user-defined rules. The *aggregated table* displays the information that was condensed from the *long table*.
+1) `ipet-parse`, which performs the parsing, where the standard data is extracted and stored in a .trn file.
+2) `ipet-evaluate`, where the data is aggregated and displayed in two tables by user-defined rules. The *aggregated table* displays the information that was condensed from the *long table*.
+
+## Configuration
 
 User-defined configuration files are stored in the `~/.ipet` folder, that is considered in the parsing process.
 This includes
@@ -159,12 +163,12 @@ This includes
 - `~/.ipet/solvers`, where the user can define their own solver model. For an example check the `SCIPSolver` class in `ipet/parsing/Solver.py`
 Additionally you need to place a `__init__.py` file in the `~/.ipet/solvers/` folder that loads the python modules (for example you have to classes `MySolver` and `OtherSolver` in files `~/.ipet/solvers/MySolver.py` and `~/.ipet/solvers/OtherSolver.py`):
 
-    __all__ = []
-    from .MySolver import MySolver
-    from .OtherSolver import OtherySolver
+        __all__ = []
+        from .MySolver import MySolver
+        from .OtherSolver import OtherySolver
 
 - `~/.ipet/readers`, where the user can define their own rules for extracting data by giving a line, position and format of the number or string they want to parse from the logfile(s). For an example check `scripts/readers-example.xml`.
 - `~/.ipet/solufiles`, that contains solution files with information about the correct solution of instance files or their (inf)feasibility status. For an example check `test/data/short.solu`
 
-For more information, please also read the help pages that are displayed with `ipet-parse --help` and `ipet-evaluate --help`.
+For more information, please refer to the help pages that can be displayed with `ipet-parse --help` and `ipet-evaluate --help`.
 

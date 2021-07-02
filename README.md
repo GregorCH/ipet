@@ -133,23 +133,15 @@ the graphical user interface.
 Say that you used SCIP to solve a number of instances and would like to get the solving time, number of nodes used and the status of the solver for each instance. This short tutorial will show you how to do that with ipet. As an input, it is assumed that you have the output of scip in a separate file for each instance in the folder `SCIP_OUT_FILES`.
 
 ### Step 1
-Make sure that each file has the extension `.out`. If your files have the extension `.log`, you can easily change the extensions with:
-```
-for f in *.log; do 
-    mv -- "$f" "${f%.log}.out"
-done
-```
-
-### Step 2
-A helper script is available in the `scripts` folder that can handle such scip output files and convert them to the format needed by ipet. It takes as input the path to the folder containing your `.out` files:
+A helper script scripts/concat.sh is available that can preprocess single output files and create a concatenated logfile in the format that is needed by ipet. As input it takes the folder containing your logfiles:
 ```
 $ cd scripts
 $ ./concat.sh -f SCIP_OUT_FILES
-Concatenated logs from folder ../SCIP_OUT_FILES into '../SCIP_OUT_FILES/concatenated.out'.
+Concatenated logs from folder '../SCIP_OUT_FILES' into '../SCIP_OUT_FILES/concatenated.out'.
 ```
 
-### Step 3
-we can now parse the results with the `ipet-parse` command:
+### Step 2
+We can now parse the results by calling the ipet-parse command with the concatenated logfile:
 ```
 $ ipet-parse -l SCIP_OUT_FILES/concatenated.out
 2021-07-01 14:49:50,530 -    INFO - root - Start parsing process using 8 threads
@@ -158,8 +150,8 @@ $ ipet-parse -l SCIP_OUT_FILES/concatenated.out
 100%|████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  2.21it/s]
 ```
 
-### Step 4
-The example evaluation file in `scipts` folder will give us the results we seek:
+### Step 3
+Calling ipet-evaluate now with the resulting .trn file and the example evaluation file scipts/evaluation.xml will display our data in a table:
 ```
 $ ipet-evaluate -t SCIP_OUT_FILES/concatenated.trn -e scripts/evaluation.xml --long
 2021-07-01 14:52:32,903 -    INFO - root - No external data file

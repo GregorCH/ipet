@@ -49,4 +49,4 @@ do
     echo "=ready=" >> $LOGFILENAME.out
 done
 
-echo "Concatenated logs from folder '$FILES into '$LOGFILENAME.out'."
+echo "Concatenated logs from folder '$FILES' into '$LOGFILENAME.out'."

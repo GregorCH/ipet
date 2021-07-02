@@ -29,6 +29,7 @@ cite it using the following bibtex item:
 - [Usage and concept](#usage-and-concept)
   * [Overview](#overview)
   * [Basic usage on the command line](#basic-usage-on-the-command-line)
+  * [Tutorial for parsing results obtained with SCIP](#tutorial-for-parsing-resultsontained-with-scip)
   * [Configuration](#configuration)
   * [Starting the graphical user interface](#starting-the-graphical-user-interface)
 - [Building the documentation](#building-the-documentation)
@@ -182,6 +183,111 @@ Calling `ipet-evaluate` will display the aggregated table only:
 If you are interesting in the considered values that result in this table you can have a look at the long table with the `--long` or `-l` option:
 
         ipet-evaluate -e scripts/evaluation.xml -t testrun.trn --long
+
+## Tutorial for parsing results obtained with SCIP
+
+Say that you used SCIP to solve a number of instances and would like to get the solving time, number of nodes used and the status of the solver for each instance. This short tutorial will show you how to do that with ipet. As an input, it is assumed that you have the output of scip in a separate file for each instance in the folder `SCIP_OUT_FILES`.
+
+### Step 1
+A helper script scripts/concat.sh is available that can preprocess single output files and create a concatenated logfile in the format that is needed by ipet. As input it takes the folder containing your logfiles:
+```
+$ cd scripts
+$ ./concat.sh -f SCIP_OUT_FILES
+Concatenated logs from folder '../SCIP_OUT_FILES' into '../SCIP_OUT_FILES/concatenated.out'.
+```
+
+### Step 2
+We can now parse the results by calling the ipet-parse command with the concatenated logfile:
+```
+$ ipet-parse -l SCIP_OUT_FILES/concatenated.out
+2021-07-01 14:49:50,530 -    INFO - root - Start parsing process using 8 threads
+  0%|                                                                                    | 0/1 [00:00<?, ?it/s]2021-07-01 14:49:50,532 -    INFO - root - Start parsing process of outfile(s) SCIP_OUT_FILES/concatenated.out
+2021-07-01 14:49:50,983 -    INFO - root - converted /home/boro/repo/ipet/SCIP_OUT_FILES/concatenated.out --> /home/boro/repo/ipet/SCIP_OUT_FILES/concatenated.trn
+100%|████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  2.21it/s]
+```
+
+### Step 3
+Calling ipet-evaluate now with the resulting .trn file and the example evaluation file scipts/evaluation.xml will display our data in a table:
+```
+$ ipet-evaluate -t SCIP_OUT_FILES/concatenated.trn -e scripts/evaluation.xml --long
+2021-07-01 14:52:32,903 -    INFO - root - No external data file
+2021-07-01 14:52:32,949 -    INFO - ipet.evaluation.IPETEvalTable - Automatically set index to (['ProblemName'], [])
+2021-07-01 14:52:32,949 -    INFO - ipet.evaluation.IPETEvalTable - No validation information specified
+2021-07-01 14:52:32,949 -    INFO - ipet.validation.Validation - Validating with a (gap) tolerance of 0.0001 and a feasibility tolerance of 1e-06.
+2021-07-01 14:52:32,982 -    INFO - ipet.evaluation.IPETEvalTable - Validation resulted in the following status codes: [ fail_inconsistent: 59 | ok: 2 ]
+2021-07-01 14:52:33,149 -    INFO - ipet.evaluation.IPETFilter - Computing rows for intersection groups
+2021-07-01 14:52:33,213 - WARNING - ipet.evaluation.IPETEvalTable - Filtergroup diff-timeouts is empty and has been deactived.
+Instancewise Results:
+                 Time  Nodes             Status
+ProblemName                                    
+31966239     36004.22      1  fail_inconsistent
+31966240     36007.75      1  fail_inconsistent
+31966241     36012.76      1  fail_inconsistent
+31966242     36001.43      1  fail_inconsistent
+31966243     36008.84      1  fail_inconsistent
+31966244     36029.03      1  fail_inconsistent
+31966245     36002.47      1  fail_inconsistent
+31966246     36015.92      1  fail_inconsistent
+31966247     36005.92      1  fail_inconsistent
+31966248     36013.47      1  fail_inconsistent
+31966249     36004.72      1  fail_inconsistent
+31966250     36010.12      1  fail_inconsistent
+31966251     36016.95      1  fail_inconsistent
+31966252     36000.58      1  fail_inconsistent
+31966253     36021.44      1  fail_inconsistent
+31966254     36010.16      1  fail_inconsistent
+31966255     36015.02      1  fail_inconsistent
+31966256     36000.52      1  fail_inconsistent
+31966257     36025.40      1  fail_inconsistent
+31966258     36012.98      1  fail_inconsistent
+31966259     36002.78      1  fail_inconsistent
+31966260     36007.17      1  fail_inconsistent
+31966261     36000.00      1  fail_inconsistent
+31966262     36000.67      1  fail_inconsistent
+31966263     36002.23      1  fail_inconsistent
+31966264     36011.77      1  fail_inconsistent
+31966265     36001.57      1  fail_inconsistent
+31966266     36002.57      1  fail_inconsistent
+31966267     36000.01      1  fail_inconsistent
+31966268     36000.20      1  fail_inconsistent
+31966269     36000.01      1  fail_inconsistent
+31966270     36000.01      1  fail_inconsistent
+31966271     36000.01      1  fail_inconsistent
+31966272     36000.00      1  fail_inconsistent
+31966273     36000.01      1  fail_inconsistent
+31966274     36000.27      1  fail_inconsistent
+31966275     36000.01      1  fail_inconsistent
+31966276     36000.01      1  fail_inconsistent
+31966277     36000.01      1  fail_inconsistent
+31966278     36000.01      1  fail_inconsistent
+31966279     36000.04      1  fail_inconsistent
+31966280     36000.01      1  fail_inconsistent
+31966281     36000.01      1  fail_inconsistent
+31966282     36017.63      1  fail_inconsistent
+31966283     36000.01      1  fail_inconsistent
+31966284     36011.14      1  fail_inconsistent
+31966285     36000.01      1  fail_inconsistent
+31966286     36005.53      1  fail_inconsistent
+31966287     36000.01      1  fail_inconsistent
+31966288     36012.31      1  fail_inconsistent
+31966289     36008.58      1  fail_inconsistent
+31966290     36013.95      1  fail_inconsistent
+31966291     36009.99      1  fail_inconsistent
+31966292     36001.28      1  fail_inconsistent
+31966293     36000.01      1  fail_inconsistent
+31966294     36013.66      1  fail_inconsistent
+31966295     36000.02      1  fail_inconsistent
+31966296     36010.50      1  fail_inconsistent
+31966297     36000.02      1  fail_inconsistent
+31966298         2.53      1                 ok
+31966299         2.54      1                 ok
+Aggregated Results:
+              _time_ _limit_ _primfail_ _dualfail_ _fail_ _abort_ _solved_ _unkn_ _count_ _miss_  Time_shmean(1.0)  Nodes_shmean(100.0)
+Group                                                                                                                                  
+all                0       0          0          0     59       0        2      0      61      0      26604.848145                  1.0
+alloptimal         0       0          0          0      0       0        2      0       2      0          2.534996                  1.0
+easyinstances      0       0          0          0      0       0        2      0       2      0          2.534996                  1.0
+```
 
 ## Configuration
 

@@ -29,7 +29,7 @@ cite it using the following bibtex item:
 - [Usage and concept](#usage-and-concept)
   * [Overview](#overview)
   * [Basic usage on the command line](#basic-usage-on-the-command-line)
-  * [Tutorial for parsing results obtained with SCIP](#tutorial-for-parsing-resultsontained-with-scip)
+  * [Tutorial for parsing results obtained with SCIP](#tutorial-for-parsing-results-obtained-with-scip)
   * [Configuration](#configuration)
   * [Starting the graphical user interface](#starting-the-graphical-user-interface)
 - [Building the documentation](#building-the-documentation)

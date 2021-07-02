@@ -1,5 +1,6 @@
-IPET (Interactive Performance Evaluation Tools) is a toolbox that
-allows to easily create customized benchmark tables from
+# IPET (Interactive Performance Evaluation Tools) 
+
+IPET is a toolbox that allows to easily create customized benchmark tables from
 raw solver log files, written in Python 3.
 
 It is aimed to develop evaluations through a
@@ -17,6 +18,21 @@ cite it using the following bibtex item:
   HowPublished             = {\url{https://github.com/GregorCH/ipet}}
 }
 ```
+
+# Table of contents
+
+- [How to get IPET](#how-to-get-ipet)
+- [Installation and prerequisites](#installation-and-prerequisites)
+  * [Linux installation inside a virtual environment](#linux-installation-inside-a-virtual-environment)
+  * [Linux installation into your global environment](#linux-installation-into-your-global-environment)
+  * [Testing your installation](#testing-your-installation)
+- [Usage and concept](#usage-and-concept)
+  * [Overview](#overview)
+  * [Basic usage on the command line](#basic-usage-on-the-command-line)
+  * [Tutorial for parsing results obtained with SCIP](#tutorial-for-parsing-resultsontained-with-scip)
+  * [Configuration](#configuration)
+  * [Starting the graphical user interface](#starting-the-graphical-user-interface)
+- [Building the documentation](#building-the-documentation)
 
 # How to get IPET
 
@@ -54,9 +70,11 @@ We provide a script called "install-pyqt4-in-virtual-environment.sh" to install 
 
 ## Linux installation inside a virtual environment
 
+*This is the recommended kind of installation.*
+
 Using a virtual environment, you can safely install the required packages together without
 messing with your globally installed system libraries. This is certainly the recommended way
-to install IPET. In the following, we assume you create the root directory of your virtual
+to install *IPET*. In the following, we assume you create the root directory of your virtual
 environment directly in the IPET root directory and call it "venv". You may choose
 to use a differently named virtual environment somewhere else, of course.
 
@@ -65,11 +83,13 @@ to use a differently named virtual environment somewhere else, of course.
         cd ipet
         virtualenv --python python3 venv
         source venv/bin/activate
+        
    Note that you may deactivate the virtual environment at any time by calling
 
         deactivate
 
-2. Install PyQt4 bindings inside your virtual environment by calling the provided script,
+2. (*optional* step to install the graphical user interface, for command line only skip to next step) 
+Install PyQt4 bindings inside your virtual environment by calling the provided script,
 which assumes that you are running inside the virtual environment "venv" or the one specified by the optional path.
 The script will ask you to carefully read and accept the license agreement for using PyQt4 bindings.
 
@@ -82,12 +102,13 @@ The script will ask you to carefully read and accept the license agreement for u
 4. As a developer, it might be useful to call the following command instead:
 
         pip install -e .
+        
    This creates symlinks to the IPET source files in the site-packages of the virtual environment library,
    and allows for more rapid testing and development.
 
+## Linux installation into your global environment
 
-
-## Linux installation into your *global* environment
+[We highly recommend to install IPET into a virtual environment.](#linux-installation-inside-a-virtual-environment)
 
 If you would like to install *IPET* systemwide, all you need to do is
 
@@ -106,27 +127,62 @@ This step makes imports available systemwide such as
 The installation process will recognize if you have PyQt4 bindings available on your system, which are necessary to
 use the graphical user interface.
 
-
-
-
 ## Testing your installation
 
 Run the command
 
     python -m unittest test
- if the output says OK, all tests were passed.
+    
+if the output says OK, all tests were passed.
 
-
-
-
-
-
-# Getting Started on the command line
-
-IPET has a subdirectory called "scripts" with scripts to invoke log file parsing, test run evaluating, and starting
-the graphical user interface.
+# Usage and concept
 
 **under construction**
+
+## Overview 
+ 
+IPET takes a logfile and some optional additional files like an error-, set- and metafile, extracts information and aggregates this data in a compact table.
+The Logfiles need to have an `.out` extension, errorfiles need to have `.err`, setfiles are `.set` and metafiles are `.meta`
+
+The process is divided in two stages:
+
+1) `ipet-parse`, which performs the parsing, where the standard data is extracted and stored in a .trn file.
+2) `ipet-evaluate`, where the data is aggregated and displayed in two tables by user-defined rules. The *aggregated table* displays the information that was condensed from the *long table*.
+
+For more information, please refer to the [Basic usage](#basic-usage-on-the-command-line) section and the help pages, that can be displayed with `ipet-parse --help` and `ipet-evaluate --help`.
+It is possible to configure ipet for your own solver and testset, please check the [Configuration](#configuration) section.
+
+## Basic usage on the command line
+
+IPET is easily used on the command line. Assume you have a logfile `testrun.out` that contains the output of running the solver on a list of instances. 
+The output of each run is preceded by a line indicating the instance and preceded by a line indicating correct shutdown of the solver. 
+In other words your format is the following:
+
+        @01 /path/to/my/first_instance.clp
+        <Output of solver for aforementioned instance>
+        =ready=
+        @01 /path/to/my/second_instance.mpz
+        <Output of solver for aforementioned instance>
+        =ready=
+        ...
+        =ready=
+        @01 /path/to/my/last_instance.clp
+        <Output of solver for aforementioned instance>
+        =ready=
+        
+Now you call the parsing command with the logfile, which will create a `testrun.trn` file storing the parsed data.
+
+        ipet-parse -l testrun.out
+        
+In the second step you call the evaluation command with this `testrun.trn` file and an evaluation file that encodes the datakey and aggregation functions for your table. 
+There is an example in `scripts/evaluation.xml`.
+Calling `ipet-evaluate` will display the aggregated table only:
+
+        ipet-evaluate -e scripts/evaluation.xml -t testrun.trn
+
+If you are interesting in the considered values that result in this table you can have a look at the long table with the `--long` or `-l` option:
+
+        ipet-evaluate -e scripts/evaluation.xml -t testrun.trn --long
 
 ## Tutorial for parsing results obtained with SCIP
 
@@ -233,28 +289,7 @@ alloptimal         0       0          0          0      0       0        2      
 easyinstances      0       0          0          0      0       0        2      0       2      0          2.534996                  1.0
 ```
 
-# Building the documentation
-
-In you virtual environment type:
-
-    pip install sphinx
-    cd doc
-    make html
-
-your documentation will then be located in doc/build/html/index.html.
-
-
-# The concept of IPET
-
-**this section is still under construction**
-
-IPET takes a logfile and some optional additional files like an error-, set- and metafile, extracts information and aggregates this data in a compact table.
-The Logfiles need to have an `.out` extension, errorfiles need to have `.err`, setfiles are `.set` and metafiles are `.meta`
-
-The process is divided in two stages:
-
-- `ipet-parse`, which performs the parsing, where the standard data is extracted and stored in a .trn file.
-- `ipet-evaluate`, where the data is aggregated and displayed in two tables by user-defined rules. The *aggregated table* displays the information that was condensed from the *long table*.
+## Configuration
 
 User-defined configuration files are stored in the `~/.ipet` folder, that is considered in the parsing process.
 This includes
@@ -262,12 +297,24 @@ This includes
 - `~/.ipet/solvers`, where the user can define their own solver model. For an example check the `SCIPSolver` class in `ipet/parsing/Solver.py`
 Additionally you need to place a `__init__.py` file in the `~/.ipet/solvers/` folder that loads the python modules (for example you have to classes `MySolver` and `OtherSolver` in files `~/.ipet/solvers/MySolver.py` and `~/.ipet/solvers/OtherSolver.py`):
 
-    __all__ = []
-    from .MySolver import MySolver
-    from .OtherSolver import OtherySolver
+        __all__ = []
+        from .MySolver import MySolver
+        from .OtherSolver import OtherySolver
 
 - `~/.ipet/readers`, where the user can define their own rules for extracting data by giving a line, position and format of the number or string they want to parse from the logfile(s). For an example check `scripts/readers-example.xml`.
 - `~/.ipet/solufiles`, that contains solution files with information about the correct solution of instance files or their (inf)feasibility status. For an example check `test/data/short.solu`
+- 
+## Starting the graphical user interface
 
-For more information, please also read the help pages that are displayed with `ipet-parse --help` and `ipet-evaluate --help`.
+IPET has a subdirectory called "scripts" with scripts to invoke log file parsing, test run evaluating, and starting
+the graphical user interface.
 
+# Building the documentation
+
+In your virtual environment type:
+
+    pip install sphinx
+    cd doc
+    make html
+
+your documentation will then be located in doc/build/html/index.html.

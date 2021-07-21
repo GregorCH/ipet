@@ -439,6 +439,8 @@ class SCIPSolver(Solver):
     shorttablecheckexp = re.compile('s\|')
     firstsolexp = re.compile('^  First Solution   :')
 
+    primalHeuristicsStatsArePrinted = False
+
     # variables needed for dual bound history
     regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
 
@@ -565,6 +567,26 @@ class SCIPSolver(Solver):
         """
         self.extractPath(line)
         self.extractMoreData(line)
+        self.extractPrimalHeuristics(line)
+
+    def extractPrimalHeuristics(self, line: str):
+        if line.startswith('Primal Heuristics'):
+            self.primalHeuristicsStatsArePrinted = True
+        elif not line.startswith(' '):
+            self.primalHeuristicsStatsArePrinted = False
+        elif self.primalHeuristicsStatsArePrinted:
+            name = re.compile("(\s+)(\w+\s?\w+)(\s*)").match(line).groups()[1]
+            execTimeExpr = re.compile("\s+\w+\s?\w+\s*:\s+(\S+)")
+            setupTimeExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+(\S+)")
+            callsExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+(\S+)")
+            foundExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+\d+\s+(\S+)")
+            bestExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+\d+\s+\d+\s+(\S+)")
+            self.extractByExpression(line, execTimeExpr, name + "_EXECTIME")
+            self.extractByExpression(line, setupTimeExpr, name + "_SETUPTIME")
+            self.extractByExpression(line, callsExpr, name + "_CALLS")
+            self.extractByExpression(line, foundExpr, name + "_FOUND")
+            self.extractByExpression(line, bestExpr, name + "_BEST")
+
 
 class FiberSCIPSolver(SCIPSolver):
     """Reads data from FiberSCIP output, that ressembles SCIP output a lot, except for the table.

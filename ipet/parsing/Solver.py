@@ -439,7 +439,7 @@ class SCIPSolver(Solver):
     shorttablecheckexp = re.compile('s\|')
     firstsolexp = re.compile('^  First Solution   :')
 
-    primalHeuristicsStatsArePrinted = False
+    primal_heuristics_stats_are_printed = False
 
     # variables needed for dual bound history
     regular_exp = re.compile('\|')  # compile the regular expression to speed up reader
@@ -571,21 +571,21 @@ class SCIPSolver(Solver):
 
     def extractPrimalHeuristics(self, line: str):
         if line.startswith('Primal Heuristics'):
-            self.primalHeuristicsStatsArePrinted = True
+            self.primal_heuristics_stats_are_printed = True
         elif not line.startswith(' '):
-            self.primalHeuristicsStatsArePrinted = False
-        elif self.primalHeuristicsStatsArePrinted:
+            self.primal_heuristics_stats_are_printed = False
+        elif self.primal_heuristics_stats_are_printed:
             name = re.compile("(\s+)(\w+\s?\w+)(\s*)").match(line).groups()[1]
-            execTimeExpr = re.compile("\s+\w+\s?\w+\s*:\s+(\S+)")
-            setupTimeExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+(\S+)")
-            callsExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+(\S+)")
-            foundExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+\d+\s+(\S+)")
-            bestExpr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+\d+\s+\d+\s+(\S+)")
-            self.extractByExpression(line, execTimeExpr, name + "_EXECTIME")
-            self.extractByExpression(line, setupTimeExpr, name + "_SETUPTIME")
-            self.extractByExpression(line, callsExpr, name + "_CALLS")
-            self.extractByExpression(line, foundExpr, name + "_FOUND")
-            self.extractByExpression(line, bestExpr, name + "_BEST")
+            exec_time_expr = re.compile("\s+\w+\s?\w+\s*:\s+(\S+)")
+            setup_time_expr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+(\S+)")
+            calls_expr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+(\S+)")
+            found_expr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+\d+\s+(\S+)")
+            best_expr = re.compile("\s+\w+\s?\w+\s*:\s+\d+.\d+\s+\d+.\d+\s+\d+\s+\d+\s+(\S+)")
+            self.extractByExpression(line, exec_time_expr, name + "Exectime")
+            self.extractByExpression(line, setup_time_expr, name + "Setuptime")
+            self.extractByExpression(line, calls_expr, name + "Calls")
+            self.extractByExpression(line, found_expr, name + "Found")
+            self.extractByExpression(line, best_expr, name + "Best")
 
 
 class FiberSCIPSolver(SCIPSolver):

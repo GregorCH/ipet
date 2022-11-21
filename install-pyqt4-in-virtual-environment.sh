@@ -1,28 +1,29 @@
 #! /usr/bin/env bash
 #
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2016 Zuse Institute Berlin, www.zib.de
-# 
+#
 # Permissions are granted as stated in the license file you have obtained
 # with this software. If you find the library useful for your purpose,
 # please refer to README.md for how to cite IPET.
-# 
+#
 # @author: Gregor Hendel
 #
 # this script is an attempt to automate the installation
 # of PyQt4 into a virtual environment
-# 
+#
 # The graphical user interface of IPET is based on PyQt4,
 # Run without arguments from the IPET root directory
 #
-# If you have super user permissions on your machine, you may want to 
-# use 
+# If you have super user permissions on your machine, you may want to
+# use, but that package might not be in your package lists anymore. In that case
+# you should run this script
 #
-# sudo apt-get install python3-pyqt4 
+# sudo apt-get install python3-pyqt4
 #
 # to achieve something similar to this script.
-# 
+#
 # This script will only run under linux
 
 
@@ -88,14 +89,14 @@ make; make install
 cd -
 
 echo configure and install PyQt-$PYQT4_VERSION, might take a while
-cd $DOWNLOADDIR/PyQt-x11-gpl-${PYQT4_VERSION}
+cd $DOWNLOADDIR/PyQt4_gpl_x11-${PYQT4_VERSION}
 python configure.py
 make; make install
 cd -
 
 echo test the installation
-OUTPUT=`python -c "from PyQt4 import QtCore,QtGui"`
-if test "$OUTPUT" = ""
+OUTPUT=$(python -c "from PyQt4 import QtCore,QtGui" 2>&1)
+if test "${OUTPUT}" = ""
 then
     echo PyQt successfully installed
 else

@@ -12,6 +12,7 @@ please refer to README.md for how to cite IPET.
 from ipet import Key
 from ipet import misc
 from pandas import DataFrame, notnull
+import pandas as pd
 import os, sys
 import logging
 from ipet.Key import CONTEXT_LOGFILE, CONTEXT_METAFILE
@@ -379,13 +380,13 @@ class TestRun:
         """
         return self.currentproblemdata == {}
 
-    def printToConsole(self, formatstr = "{idx}: {d}"):
+    def printToConsole(self, formatstr = "{idx}: {d}", all_rows = False):
         """ Print data to console
         """
+        if (all_rows):
+            pd.set_option('display.max_rows', None)
         for idx, d in self.data.iterrows():
-#            pd.set_option('display.max_rows', len(d))
             print(formatstr.format(d = d, idx = idx))
-#            pd.reset_option('display.max_rows')
 
     def toJson(self):
         """ Return the data-object in json

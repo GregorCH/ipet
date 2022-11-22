@@ -1,110 +1,101 @@
-ipet\.parsing package
-=====================
+ipet.parsing package
+====================
 
 Submodules
 ----------
 
-ipet\.parsing\.ReaderManager module
------------------------------------
+ipet.parsing.ReaderManager module
+---------------------------------
 
 .. automodule:: ipet.parsing.ReaderManager
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.Solver module
-----------------------------
+ipet.parsing.Solver module
+--------------------------
 
 .. automodule:: ipet.parsing.Solver
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader module
--------------------------------------
+ipet.parsing.StatisticReader module
+-----------------------------------
 
 .. automodule:: ipet.parsing.StatisticReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader\_CustomHistoryReader module
-----------------------------------------------------------
+ipet.parsing.StatisticReader\_CustomHistoryReader module
+--------------------------------------------------------
 
 .. automodule:: ipet.parsing.StatisticReader_CustomHistoryReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader\_CustomReader module
----------------------------------------------------
+ipet.parsing.StatisticReader\_CustomReader module
+-------------------------------------------------
 
 .. automodule:: ipet.parsing.StatisticReader_CustomReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader\_DualBoundHistoryReader module
--------------------------------------------------------------
+ipet.parsing.StatisticReader\_DualBoundHistoryReader module
+-----------------------------------------------------------
 
 .. automodule:: ipet.parsing.StatisticReader_DualBoundHistoryReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader\_GeneralInformationReader module
----------------------------------------------------------------
-
-.. automodule:: ipet.parsing.StatisticReader_GeneralInformationReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-ipet\.parsing\.StatisticReader\_PluginStatisticsReader module
+ipet.parsing.StatisticReader\_GeneralInformationReader module
 -------------------------------------------------------------
 
-.. automodule:: ipet.parsing.StatisticReader_PluginStatisticsReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. automodule:: ipet.parsing.StatisticReader_GeneralInformationReader
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader\_PrimalBoundHistoryReader module
----------------------------------------------------------------
+ipet.parsing.StatisticReader\_PrimalBoundHistoryReader module
+-------------------------------------------------------------
 
 .. automodule:: ipet.parsing.StatisticReader_PrimalBoundHistoryReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader\_SoluFileReader module
------------------------------------------------------
+ipet.parsing.StatisticReader\_TableReader module
+------------------------------------------------
 
-.. automodule:: ipet.parsing.StatisticReader_SoluFileReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. automodule:: ipet.parsing.StatisticReader_TableReader
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.StatisticReader\_VariableReader module
------------------------------------------------------
+ipet.parsing.StatisticReader\_VariableReader module
+---------------------------------------------------
 
 .. automodule:: ipet.parsing.StatisticReader_VariableReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-ipet\.parsing\.TraceFileReader module
--------------------------------------
+ipet.parsing.TraceFileReader module
+-----------------------------------
 
 .. automodule:: ipet.parsing.TraceFileReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: ipet.parsing
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -18,6 +18,6 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	@mkdir -p source/commandline
-	@ipet-parse --docmode | tee source/commandline/ipet-parse.rst
-	@ipet-parse --docmode | tee source/commandline/ipet-evaluate.rst
+	@ipet-parse --docmode > source/commandline/ipet-parse.rst
+	@ipet-parse --docmode > source/commandline/ipet-evaluate.rst
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

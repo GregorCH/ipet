@@ -896,7 +896,8 @@ class IPETEvaluation(IpetNode):
     def getDefaultgroup(self, data):
         """Return tuple representation of defaultgroup
 
-        Parameters:
+        Parameters
+        ----------
         data
             data frame object with columns that match the specified column index
         """
@@ -1635,12 +1636,10 @@ class IPETEvaluation(IpetNode):
         '''
         Generate a reasonable index and defaultgroup based on the given data
 
-        Take a look at the columns: Key.ProblemName, Key.Solver, Key.Settings,
-            Key.Version and Key.LogFileName.
-        Set indexsplit to 1 and choose the column with the most values as rowindex.
-        From the remaining columns choose as columnindex as one or two columns with
-            as little values as possible but at least two.
-        At last generate a defaultgroup based on the new index.
+        Take a look at the columns: Key.ProblemName, Key.Solver, Key.Settings, Key.Version and
+        Key.LogFileName. Set indexsplit to 1 and choose the column with the most values as rowindex.
+        From the remaining columns choose as columnindex as one or two columns with as little values
+        as possible but at least two. At last generate a defaultgroup based on the new index.
 
         Parameters
         ----------

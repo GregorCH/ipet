@@ -323,7 +323,7 @@ the graphical user interface.
 
 In your virtual environment type:
 
-    pip install sphinx
+    pip install sphinx myst-parser
     cd doc
     make html
 

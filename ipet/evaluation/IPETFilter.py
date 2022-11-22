@@ -321,12 +321,10 @@ class IPETFilter(IpetNode):
         In combination with the 'anytestrun' attribute, there are
         four possibilities in total:
 
-        | anytestrun | operator | result |
-        |------------|----------|--------|
-        | one        |diff      |True, if there are at least 2 different values in a group |
-        | all        |diff      |True, if all values are different in this group |
-        | one        |equal     |True, if at least one value occurs twice in a group |
-        | all        |equal     |True, if there is only a single value for this group |
+        - anytestrun=one, operator=diff yields True, if there are at least 2 different values in a group
+        - anytestrun=all, operator=diff yields True, if all values are different in this group
+        - anytestrun=one, operator=equal yields True, if at least one value occurs twice in a group
+        - anytestrun=all, operator=equal yields True, if there is only a single value for this group
         """
 
         #
@@ -413,9 +411,10 @@ class IPETFilter(IpetNode):
             (only needed for list operators 'equal' and 'diff')
 
 
-           Returns
-           -------
-           booleanseries :
+        Returns
+        -------
+        fcol : DataFrame
+            filtered data frame object
         """
         if self.operator in self.listoperators:
             filtercol = self.applyListOperator(df, groupindex)

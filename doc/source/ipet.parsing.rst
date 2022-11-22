@@ -4,14 +4,6 @@ ipet\.parsing package
 Submodules
 ----------
 
-ipet\.parsing\.MIPCLSolver module
----------------------------------
-
-.. automodule:: ipet.parsing.MIPCLSolver
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 ipet\.parsing\.ReaderManager module
 -----------------------------------
 

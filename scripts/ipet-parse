@@ -165,6 +165,7 @@ if __name__ == '__main__':
 
     if arguments.docmode:
         print(pypandoc.convert_text(formatstrExamples, "rst", "md"))
+        print(pypandoc.convert_text(explainAutoloading, "rst", "md"))
         exit()
 
     if arguments.debug:

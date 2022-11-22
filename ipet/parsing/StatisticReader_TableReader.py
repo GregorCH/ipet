@@ -33,7 +33,7 @@ class TableReader(StatisticReader):
     and will store the corresponding values under Foo_a, and Foo_b
     """
     name = 'TableReader'
-    tableids = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis',
+    tableids = ['Presolvers', 'Constraints', 'Constraint Timings', 'Propagators', 'Propagator Timings', 'Conflict Analysis', 'Cutselectors',
                 'Separators', 'Branching Rules', 'Diving Statistics', 'Diving (single)', 'Diving (adaptive)', 'LP', 'Branching Analysis', 'Primal Heuristics', 'Concurrent Solvers', 'Integrals']
     columnids = ['Root Node', 'Total Time', 'B&B Tree']
     active = False

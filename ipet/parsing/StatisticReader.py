@@ -20,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 class StatisticReader(IpetNode):
     """
-    base class for all statistic readers - readers should always inherit from this base class for minimal implementation
-    effort
+    base class for all statistic readers - readers should always inherit from this base class for minimal implementation effort
 
     readers only need to overwrite the methods extractStatistic() and perhaps execEndOfProb()
     """

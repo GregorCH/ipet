@@ -1,4 +1,5 @@
-# IPET (Interactive Performance Evaluation Tools)
+IPET (Interactive Performance Evaluation Tools)
+===============================================
 
 IPET is a toolbox that allows to easily create customized benchmark tables from
 raw solver log files, written in Python 3.
@@ -186,7 +187,11 @@ If you are interesting in the considered values that result in this table you ca
 
 If you want to see what the parsed fields are, you can use
 
-        cat logfile.out | ipet-parse -a
+        cat logfile.out | ipet-parse -a | sort
+
+Then of course if you search for a specific string, you can use
+
+        cat locafile.out | ipet-parse -a | grep Time
 
 ## Tutorial for parsing results obtained with SCIP
 
@@ -202,6 +207,7 @@ Concatenated logs from folder '../SCIP_OUT_FILES' into '../SCIP_OUT_FILES/concat
 
 ### Step 2
 We can now parse the results by calling the ipet-parse command with the concatenated logfile:
+
 ```
 $ ipet-parse -l SCIP_OUT_FILES/concatenated.out
 2021-07-01 14:49:50,530 -    INFO - root - Start parsing process using 8 threads

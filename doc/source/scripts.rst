@@ -2,6 +2,5 @@ Scripts
 =======
 
 .. toctree::
-   commandline/ipet-parse.rst
-   commandline/ipet-evaluate.rst
-   commandline/ipet-gui.rst
+   commandline/ipet-parse.md
+   commandline/ipet-evaluate.md

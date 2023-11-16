@@ -15,7 +15,7 @@ Contents
 .. toctree::
    :maxdepth: 3
 
-   installation.md
+   README.md
    overview.md
    dataflow.md
    example_tables.md

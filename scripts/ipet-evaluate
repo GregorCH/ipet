@@ -19,6 +19,7 @@ from ipet.evaluation import IPETEvaluation
 
 import re
 import textwrap
+import pypandoc
 import os
 
 import logging
@@ -54,8 +55,13 @@ epilog = \
     Key Search
     ----------
 
+    By calling `ipet-evaluate` on a trn-file with the `-k <regular expression>` you can search for Keys matching the given regular expression
 
+    Example
 
+        >>> ipet-evaluate -t mytestrun.trn -k Time
+
+    will show you all keys parsed in mytestrun that contain the string "Time".
 
     '''
 
@@ -137,7 +143,7 @@ argparser.add_argument('-f', '--fileextensions', default = None, action = "appen
 argparser.add_argument('--tolerance', default = None, help = "relative objective tolerance for validation")
 argparser.add_argument('--colselection', default = None, help = "List of column indices to display in aggregated tables")
 argparser.add_argument('--horizontal', action = "store_true", default = False, help = "Should the inner index of the aggregated table be pivoted into the columns?")
-
+argparser.add_argument("--docmode", action = "store_true", default = False, help = "print this help as restructured text")
 
 if __name__ == '__main__':
     try:
@@ -153,6 +159,13 @@ if __name__ == '__main__':
     ch = logging.StreamHandler(sys.stdout)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+
+    if arguments.docmode:
+        print(pypandoc.convert_text(epilog, "rst", "md"))
+        print(pypandoc.convert_text(validation_doc, "rst", "md"))
+        print(pypandoc.convert_text(output_doc, "rst", "md"))
+        exit()
+
     if arguments.quiet:
         logger.setLevel(logging.ERROR)
     elif arguments.debug:

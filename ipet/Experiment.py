@@ -286,10 +286,9 @@ class Experiment:
                         logger.error("Error for dual bound on problem %s, list: %s " % (problemid, processplotdata))
 
 
-
-    def printToConsole(self, formatstr = "{idx} {d}"):
+    def printToConsole(self, formatstr = "{idx} {d}", all_rows = False):
         for tr in self.testruns:
-            tr.printToConsole(formatstr)
+            tr.printToConsole(formatstr, all_rows)
 
     def saveToFile(self, filename):
         """ Save the experiment instance to a file specified by 'filename'.

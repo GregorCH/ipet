@@ -1,4 +1,5 @@
-# IPET (Interactive Performance Evaluation Tools) 
+IPET (Interactive Performance Evaluation Tools)
+===============================================
 
 IPET is a toolbox that allows to easily create customized benchmark tables from
 raw solver log files, written in Python 3.
@@ -83,12 +84,12 @@ to use a differently named virtual environment somewhere else, of course.
         cd ipet
         virtualenv --python python3 venv
         source venv/bin/activate
-        
+
    Note that you may deactivate the virtual environment at any time by calling
 
         deactivate
 
-2. (*optional* step to install the graphical user interface, for command line only skip to next step) 
+2. (*optional* step to install the graphical user interface, for command line only skip to next step)
 Install PyQt4 bindings inside your virtual environment by calling the provided script,
 which assumes that you are running inside the virtual environment "venv" or the one specified by the optional path.
 The script will ask you to carefully read and accept the license agreement for using PyQt4 bindings.
@@ -102,7 +103,7 @@ The script will ask you to carefully read and accept the license agreement for u
 4. As a developer, it might be useful to call the following command instead:
 
         pip install -e .
-        
+
    This creates symlinks to the IPET source files in the site-packages of the virtual environment library,
    and allows for more rapid testing and development.
 
@@ -132,15 +133,15 @@ use the graphical user interface.
 Run the command
 
     python -m unittest test
-    
+
 if the output says OK, all tests were passed.
 
 # Usage and concept
 
 **under construction**
 
-## Overview 
- 
+## Overview
+
 IPET takes a logfile and some optional additional files like an error-, set- and metafile, extracts information and aggregates this data in a compact table.
 The Logfiles need to have an `.out` extension, errorfiles need to have `.err`, setfiles are `.set` and metafiles are `.meta`
 
@@ -154,8 +155,8 @@ It is possible to configure ipet for your own solver and testset, please check t
 
 ## Basic usage on the command line
 
-IPET is easily used on the command line. Assume you have a logfile `testrun.out` that contains the output of running the solver on a list of instances. 
-The output of each run is preceded by a line indicating the instance and preceded by a line indicating correct shutdown of the solver. 
+IPET is easily used on the command line. Assume you have a logfile `testrun.out` that contains the output of running the solver on a list of instances.
+The output of each run is preceded by a line indicating the instance and preceded by a line indicating correct shutdown of the solver.
 In other words your format is the following:
 
         @01 /path/to/my/first_instance.clp
@@ -169,12 +170,12 @@ In other words your format is the following:
         @01 /path/to/my/last_instance.clp
         <Output of solver for aforementioned instance>
         =ready=
-        
+
 Now you call the parsing command with the logfile, which will create a `testrun.trn` file storing the parsed data.
 
         ipet-parse -l testrun.out
-        
-In the second step you call the evaluation command with this `testrun.trn` file and an evaluation file that encodes the datakey and aggregation functions for your table. 
+
+In the second step you call the evaluation command with this `testrun.trn` file and an evaluation file that encodes the datakey and aggregation functions for your table.
 There is an example in `scripts/evaluation.xml`.
 Calling `ipet-evaluate` will display the aggregated table only:
 
@@ -183,6 +184,14 @@ Calling `ipet-evaluate` will display the aggregated table only:
 If you are interesting in the considered values that result in this table you can have a look at the long table with the `--long` or `-l` option:
 
         ipet-evaluate -e scripts/evaluation.xml -t testrun.trn --long
+
+If you want to see what the parsed fields are, you can use
+
+        cat logfile.out | ipet-parse -a | sort
+
+Then of course if you search for a specific string, you can use
+
+        cat locafile.out | ipet-parse -a | grep Time
 
 ## Tutorial for parsing results obtained with SCIP
 
@@ -198,6 +207,7 @@ Concatenated logs from folder '../SCIP_OUT_FILES' into '../SCIP_OUT_FILES/concat
 
 ### Step 2
 We can now parse the results by calling the ipet-parse command with the concatenated logfile:
+
 ```
 $ ipet-parse -l SCIP_OUT_FILES/concatenated.out
 2021-07-01 14:49:50,530 -    INFO - root - Start parsing process using 8 threads
@@ -219,7 +229,7 @@ $ ipet-evaluate -t SCIP_OUT_FILES/concatenated.trn -e scripts/evaluation.xml --l
 2021-07-01 14:52:33,213 - WARNING - ipet.evaluation.IPETEvalTable - Filtergroup diff-timeouts is empty and has been deactived.
 Instancewise Results:
                  Time  Nodes             Status
-ProblemName                                    
+ProblemName
 31966239     36004.22      1  fail_inconsistent
 31966240     36007.75      1  fail_inconsistent
 31966241     36012.76      1  fail_inconsistent
@@ -283,7 +293,7 @@ ProblemName
 31966299         2.54      1                 ok
 Aggregated Results:
               _time_ _limit_ _primfail_ _dualfail_ _fail_ _abort_ _solved_ _unkn_ _count_ _miss_  Time_shmean(1.0)  Nodes_shmean(100.0)
-Group                                                                                                                                  
+Group
 all                0       0          0          0     59       0        2      0      61      0      26604.848145                  1.0
 alloptimal         0       0          0          0      0       0        2      0       2      0          2.534996                  1.0
 easyinstances      0       0          0          0      0       0        2      0       2      0          2.534996                  1.0
@@ -303,7 +313,7 @@ Additionally you need to place a `__init__.py` file in the `~/.ipet/solvers/` fo
 
 - `~/.ipet/readers`, where the user can define their own rules for extracting data by giving a line, position and format of the number or string they want to parse from the logfile(s). For an example check `scripts/readers-example.xml`.
 - `~/.ipet/solufiles`, that contains solution files with information about the correct solution of instance files or their (inf)feasibility status. For an example check `test/data/short.solu`
-- 
+-
 ## Starting the graphical user interface
 
 IPET has a subdirectory called "scripts" with scripts to invoke log file parsing, test run evaluating, and starting
@@ -313,7 +323,7 @@ the graphical user interface.
 
 In your virtual environment type:
 
-    pip install sphinx
+    pip install sphinx myst-parser
     cd doc
     make html
 

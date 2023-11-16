@@ -383,8 +383,6 @@ class TestRun:
     def printToConsole(self, formatstr = "{idx}: {d}", all_rows = False):
         """ Print data to console
         """
-        if (all_rows):
-            pd.set_option('display.max_rows', None)
         for idx, d in self.data.iterrows():
             print(formatstr.format(d = d, idx = idx))
 
